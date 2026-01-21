@@ -11,11 +11,11 @@
     <Authors>Nedelcho Ganchovski</Authors>
     <RootNamespace>Calcpad.Wpf</RootNamespace>
     <Platforms>AnyCPU</Platforms>
-		<Version>7.5.8</Version>
-		<Authors>Nedelcho Ganchovski</Authors>
-		<Company>Proektsoft EOOD</Company>
-    <PackageId>Calcpad</PackageId>
-    <Product>Calcpad</Product>
+		<Version>1.0.0</Version>
+		<Authors>Calcpad Fork Contributors</Authors>
+		<Company>Calcpad Fork Project</Company>
+    <PackageId>CalcpadFork</PackageId>
+    <Product>Calcpad Fork</Product>
     <AssemblyName>Calcpad</AssemblyName>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
