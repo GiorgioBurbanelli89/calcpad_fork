@@ -4945,14 +4945,21 @@ namespace Calcpad.Wpf
             {
                 _isSyncingBetweenModes = true;
 
-                // 1. Get current code from RichTextBox
+                // 1. Get current code from active editor
                 string currentCode = InputText;
 
                 // 2. Load into MathEditor
                 MathEditorControl.FromCalcpad(currentCode);
 
-                // 3. Change visibility
-                RichTextBox.Visibility = Visibility.Collapsed;
+                // 3. Change visibility - hide the active editor
+                if (_isAvalonEditActive && TextEditor != null)
+                {
+                    TextEditor.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    RichTextBox.Visibility = Visibility.Collapsed;
+                }
                 MathEditorControl.Visibility = Visibility.Visible;
                 LineNumbers.Visibility = Visibility.Collapsed;
 
@@ -4985,14 +4992,28 @@ namespace Calcpad.Wpf
                 // 1. Get code from MathEditor
                 string mathCode = MathEditorControl.ToCalcpad();
 
-                // 2. Update RichTextBox (source of truth)
+                // 2. Update the active editor (AvalonEdit or RichTextBox)
                 _isTextChangedEnabled = false;
-                SetInputText(mathCode);
+                if (_isAvalonEditActive && TextEditor != null)
+                {
+                    TextEditor.Text = mathCode;
+                }
+                else
+                {
+                    SetInputText(mathCode);
+                }
                 _isTextChangedEnabled = true;
 
-                // 3. Change visibility
+                // 3. Change visibility - show the active editor
                 MathEditorControl.Visibility = Visibility.Collapsed;
-                RichTextBox.Visibility = Visibility.Visible;
+                if (_isAvalonEditActive && TextEditor != null)
+                {
+                    TextEditor.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    RichTextBox.Visibility = Visibility.Visible;
+                }
                 LineNumbers.Visibility = Visibility.Visible;
 
                 // 4. Update state
@@ -5001,8 +5022,15 @@ namespace Calcpad.Wpf
                 ToggleModeButton.Background = new SolidColorBrush(
                     Color.FromRgb(0x66, 0x7e, 0xea));
 
-                // 5. Give focus to RichTextBox
-                RichTextBox.Focus();
+                // 5. Give focus to active editor
+                if (_isAvalonEditActive && TextEditor != null)
+                {
+                    TextEditor.Focus();
+                }
+                else
+                {
+                    RichTextBox.Focus();
+                }
 
                 _isSyncingBetweenModes = false;
             }
@@ -5036,9 +5064,16 @@ namespace Calcpad.Wpf
                 // 1. Get code from MathEditor
                 string mathCode = MathEditorControl.ToCalcpad();
 
-                // 2. Update RichTextBox (source of truth)
+                // 2. Update the active editor (AvalonEdit or RichTextBox)
                 _isTextChangedEnabled = false;
-                SetInputText(mathCode);
+                if (_isAvalonEditActive && TextEditor != null)
+                {
+                    TextEditor.Text = mathCode;
+                }
+                else
+                {
+                    SetInputText(mathCode);
+                }
                 _isTextChangedEnabled = true;
 
                 // 3. Execute calculation if AutoRun is active
