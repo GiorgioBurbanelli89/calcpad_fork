@@ -29,9 +29,31 @@ namespace Calcpad.Wpf
         {
             if (TextEditor == null) return;
 
-            // Install folding manager
+            // Install folding manager - this automatically adds FoldingMargin to LeftMargins
             _foldingManager = FoldingManager.Install(TextEditor.TextArea);
             _foldingStrategy = new CalcpadFoldingStrategy();
+
+            // CRITICAL: Force add FoldingMargin to ensure it's always visible
+            // Remove any existing folding margin first
+            var existingMargins = TextEditor.TextArea.LeftMargins
+                .OfType<ICSharpCode.AvalonEdit.Folding.FoldingMargin>()
+                .ToList();
+            foreach (var margin in existingMargins)
+                TextEditor.TextArea.LeftMargins.Remove(margin);
+
+            // Add fresh FoldingMargin
+            var foldingMargin = new ICSharpCode.AvalonEdit.Folding.FoldingMargin
+            {
+                FoldingMarkerBackgroundBrush = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xF0, 0xF0, 0xF0)),
+                FoldingMarkerBrush = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x80, 0x80, 0x80))
+            };
+
+            if (_foldingManager != null)
+                foldingMargin.FoldingManager = _foldingManager;
+
+            TextEditor.TextArea.LeftMargins.Insert(0, foldingMargin);
 
             // Install syntax highlighting
             TextEditor.TextArea.TextView.LineTransformers.Add(new CalcpadHighlighter());
@@ -52,7 +74,12 @@ namespace Calcpad.Wpf
             };
 
             // Update foldings when text changes (debounced)
-            TextEditor.TextChanged += (s, e) => ScheduleFoldingUpdate();
+            TextEditor.TextChanged += (s, e) =>
+            {
+                ScheduleFoldingUpdate();
+                // Sync with MathEditor if in Visual mode
+                SyncAvalonEditToMathEditor();
+            };
 
             // Install autocomplete for @{calcpad:}
             TextEditor.TextArea.TextEntering += TextEditor_TextEntering;
@@ -71,6 +98,30 @@ namespace Calcpad.Wpf
             _foldingUpdatePending = true;
             _foldingUpdateTimer?.Stop();
             _foldingUpdateTimer?.Start();
+        }
+
+        /// <summary>
+        /// Sync AvalonEdit content to MathEditor when in Visual mode
+        /// </summary>
+        private void SyncAvalonEditToMathEditor()
+        {
+            if (_isSyncingBetweenModes) return;
+            if (!_isTextChangedEnabled) return;
+            if (_currentEditorMode != EditorMode.Visual) return;
+            if (MathEditorControl == null || MathEditorControl.Visibility != Visibility.Visible) return;
+
+            try
+            {
+                _isSyncingBetweenModes = true;
+                string currentCode = TextEditor?.Text ?? string.Empty;
+                MathEditorControl.FromCalcpad(currentCode);
+            }
+            finally
+            {
+                Dispatcher.InvokeAsync(
+                    () => { _isSyncingBetweenModes = false; },
+                    System.Windows.Threading.DispatcherPriority.Background);
+            }
         }
 
         private void TextEditor_TextEntering(object? sender, TextCompositionEventArgs e)
@@ -92,45 +143,76 @@ namespace Calcpad.Wpf
         {
             if (TextEditor == null) return;
 
-            // Check if we're inside @{html} or @{markdown} block
-            if (!IsInsideExternalBlock())
-                return;
+            // Get current context (html, css, ts, etc.)
+            string context = GetCurrentBlockContext();
 
-            // Get the word before cursor
-            string wordBeforeCursor = GetWordBeforeCursor();
-
-            // If user typed "Calcpad", show autocomplete
-            if (wordBeforeCursor.Equals("Calcpad", StringComparison.OrdinalIgnoreCase))
+            if (context == "calcpad")
             {
-                ShowCalcpadAutocomplete();
+                // Calcpad context - show @{calcpad:} autocomplete
+                string wordBeforeCursor = GetWordBeforeCursor();
+                if (wordBeforeCursor.Equals("Calcpad", StringComparison.OrdinalIgnoreCase))
+                {
+                    ShowCalcpadAutocomplete();
+                }
             }
+            else if (!string.IsNullOrEmpty(context))
+            {
+                // Inside external block (html, css, ts, etc.) - show snippets
+                string wordBeforeCursor = GetWordBeforeCursor();
+                if (wordBeforeCursor.Length >= 1) // Show after typing at least 1 char
+                {
+                    ShowSnippetAutocomplete(context, wordBeforeCursor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get current block context: "html", "css", "ts", "calcpad", or empty
+        /// </summary>
+        private string GetCurrentBlockContext()
+        {
+            if (TextEditor == null) return string.Empty;
+
+            var textUpToCursor = TextEditor.Document.GetText(0, TextEditor.CaretOffset);
+            var lines = textUpToCursor.Split('\n');
+
+            // Track open blocks with stack
+            var blockStack = new Stack<string>();
+
+            foreach (var line in lines)
+            {
+                var trimmed = line.Trim();
+
+                // Check for opening blocks
+                if (trimmed.StartsWith("@{"))
+                {
+                    if (trimmed.StartsWith("@{end"))
+                    {
+                        // Closing block
+                        if (blockStack.Count > 0)
+                            blockStack.Pop();
+                    }
+                    else
+                    {
+                        // Opening block - extract language
+                        int endIdx = trimmed.IndexOf('}');
+                        if (endIdx > 2)
+                        {
+                            string lang = trimmed.Substring(2, endIdx - 2).Trim().ToLowerInvariant();
+                            blockStack.Push(lang);
+                        }
+                    }
+                }
+            }
+
+            // Return innermost block context
+            return blockStack.Count > 0 ? blockStack.Peek() : "calcpad";
         }
 
         private bool IsInsideExternalBlock()
         {
-            if (TextEditor == null) return false;
-
-            var textUpToCursor = TextEditor.Document.GetText(0, TextEditor.CaretOffset);
-
-            // Count @{html}, @{markdown} vs @{end html}, @{end markdown}
-            int htmlCount = 0;
-            int markdownCount = 0;
-
-            var lines = textUpToCursor.Split('\n');
-            foreach (var line in lines)
-            {
-                var trimmed = line.Trim();
-                if (trimmed.StartsWith("@{html}"))
-                    htmlCount++;
-                else if (trimmed.StartsWith("@{end html}"))
-                    htmlCount--;
-                else if (trimmed.StartsWith("@{markdown}"))
-                    markdownCount++;
-                else if (trimmed.StartsWith("@{end markdown}"))
-                    markdownCount--;
-            }
-
-            return htmlCount > 0 || markdownCount > 0;
+            string context = GetCurrentBlockContext();
+            return !string.IsNullOrEmpty(context) && context != "calcpad";
         }
 
         private string GetWordBeforeCursor()
@@ -171,6 +253,51 @@ namespace Calcpad.Wpf
             _completionWindow.Closed += delegate {
                 _completionWindow = null;
             };
+        }
+
+        /// <summary>
+        /// Show snippet autocomplete for HTML/CSS/TS blocks
+        /// </summary>
+        private void ShowSnippetAutocomplete(string context, string filter)
+        {
+            if (TextEditor == null) return;
+
+            // Get snippets for this context
+            var snippets = HtmlSnippets.GetSnippetsForContext(context);
+            if (snippets == null || snippets.Count == 0)
+                return;
+
+            // Filter snippets that start with the typed word
+            var matchingSnippets = snippets.Values
+                .Where(s => s.Trigger.StartsWith(filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (matchingSnippets.Count == 0)
+                return;
+
+            // Close existing completion window if open
+            if (_completionWindow != null)
+            {
+                _completionWindow.Close();
+            }
+
+            // Create new completion window
+            _completionWindow = new CompletionWindow(TextEditor.TextArea);
+            var data = _completionWindow.CompletionList.CompletionData;
+
+            // Add matching snippets
+            foreach (var snippet in matchingSnippets)
+            {
+                data.Add(new SnippetCompletionData(snippet));
+            }
+
+            if (data.Count > 0)
+            {
+                _completionWindow.Show();
+                _completionWindow.Closed += delegate {
+                    _completionWindow = null;
+                };
+            }
         }
 
         /// <summary>
@@ -580,6 +707,44 @@ namespace Calcpad.Wpf
 
             // Move cursor before the closing }
             textArea.Caret.Offset = completionSegment.Offset + 10; // Position after ':'
+        }
+    }
+
+    /// <summary>
+    /// Completion data for HTML/CSS/TS snippets with preview
+    /// </summary>
+    public class SnippetCompletionData : ICompletionData
+    {
+        private readonly HtmlSnippet _snippet;
+
+        public SnippetCompletionData(HtmlSnippet snippet)
+        {
+            _snippet = snippet;
+            Text = snippet.Trigger;
+        }
+
+        public System.Windows.Media.ImageSource? Image => null;
+
+        public string Text { get; private set; }
+
+        public object Content => Text;
+
+        // Show full template as description (preview)
+        public object Description => _snippet.Description + "\n\n" + _snippet.Template;
+
+        public double Priority => 1.0;
+
+        public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
+        {
+            // Replace trigger word with full template
+            textArea.Document.Replace(completionSegment, _snippet.Template);
+
+            // Move cursor to specified position
+            int cursorPosition = completionSegment.Offset + _snippet.Template.Length + _snippet.CursorOffset;
+            if (cursorPosition >= 0 && cursorPosition <= textArea.Document.TextLength)
+            {
+                textArea.Caret.Offset = cursorPosition;
+            }
         }
     }
 }

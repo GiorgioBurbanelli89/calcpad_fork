@@ -281,6 +281,10 @@ namespace Calcpad.Wpf
             // Initialize AvalonEdit with code folding
             InitializeAvalonEdit();
 
+            // Subscribe to MathEditor events
+            MathEditorControl.SwitchToCodeModeRequested += MathEditor_SwitchToCodeModeRequested;
+            // Note: ContentChanged is already subscribed in XAML
+
             _currentParagraph = _document.Blocks.FirstBlock as Paragraph;
             _currentLineNumber = 1;
             HighLighter.Clear(_currentParagraph);
@@ -1821,6 +1825,10 @@ namespace Calcpad.Wpf
                 catch { }
 
                 htmlResult = HtmlApplyWorksheet(FixHref(_parser.HtmlResult));
+
+                // Process MULTILANG_OUTPUT markers (from mixed mode external code execution)
+                htmlResult = Calcpad.Common.GlobalParser.ProcessMultilangOutputMarkers(htmlResult);
+
                 SetOutputFrameHeader(IsWebForm);
             }
             _autoRun = false;
@@ -2102,12 +2110,25 @@ namespace Calcpad.Wpf
 
         private bool GetInputTextFromFile()
         {
+            System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile] _isAvalonEditActive={_isAvalonEditActive}, _currentEditorMode={_currentEditorMode}");
+
+            // FIXED: Check if MathEditor is VISIBLE (not just the mode flag)
+            // This ensures files load correctly even if mode flag is stale
+            if (MathEditorControl != null && MathEditorControl.Visibility == Visibility.Visible)
+            {
+                System.Diagnostics.Debug.WriteLine("[GetInputTextFromFile] MathEditor is VISIBLE, loading to MathEditor");
+                return GetInputTextFromFile_MathEditor();
+            }
+
             // OPTIMIZATION: If AvalonEdit is active, load file directly to AvalonEdit
             // This prevents loading the file twice (RichTextBox + AvalonEdit sync)
-            if (_isAvalonEditActive && TextEditor != null)
+            if (_isAvalonEditActive && TextEditor != null && TextEditor.Visibility == Visibility.Visible)
             {
+                System.Diagnostics.Debug.WriteLine("[GetInputTextFromFile] AvalonEdit is VISIBLE, loading to AvalonEdit");
                 return GetInputTextFromFile_AvalonEdit();
             }
+
+            System.Diagnostics.Debug.WriteLine("[GetInputTextFromFile] Loading to RichTextBox");
 
             // Read lines directly from file like GitHub version - this prevents space collapsing
             var lines = ReadLines(CurrentFileName);
@@ -2218,6 +2239,9 @@ namespace Calcpad.Wpf
         {
             // Read file content directly as string
             var fileContent = ReadTextFromFile(CurrentFileName);
+            System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEdit] File: {CurrentFileName}, Content length: {fileContent?.Length ?? 0}");
+            System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEdit] First 100 chars: {(fileContent?.Length > 0 ? fileContent.Substring(0, Math.Min(100, fileContent.Length)) : "EMPTY")}");
+
             var hasForm = false;
 
             // Quick scan for input fields without processing every line
@@ -2260,6 +2284,53 @@ namespace Calcpad.Wpf
             }, System.Windows.Threading.DispatcherPriority.Render); // Use Render priority for immediate display
 
             // Reset undo immediately
+            _undoMan.Reset();
+
+            return hasForm;
+        }
+
+        /// <summary>
+        /// Fast file loading for MathEditor - loads directly to MathEditor
+        /// </summary>
+        private bool GetInputTextFromFile_MathEditor()
+        {
+            // Read file content directly as string
+            var fileContent = ReadTextFromFile(CurrentFileName);
+            var hasForm = false;
+
+            // Quick scan for input fields
+            hasForm = fileContent.Contains('\v') || fileContent.Contains("? {");
+
+            // Load directly to MathEditor
+            _isSyncingBetweenModes = true;
+            _isTextChangedEnabled = false;
+
+            try
+            {
+                // Load content to MathEditor using FromCalcpad
+                MathEditorControl.FromCalcpad(fileContent);
+
+                // Also sync to the background editor (AvalonEdit or RichTextBox) for when switching modes
+                if (_isAvalonEditActive && TextEditor != null)
+                {
+                    TextEditor.Text = fileContent;
+                }
+                else
+                {
+                    // Sync to RichTextBox in background (will be ready when switching modes)
+                    Dispatcher.InvokeAsync(() =>
+                    {
+                        SetInputText(fileContent);
+                    }, System.Windows.Threading.DispatcherPriority.Background);
+                }
+            }
+            finally
+            {
+                _isSyncingBetweenModes = false;
+                _isTextChangedEnabled = true;
+            }
+
+            // Reset undo
             _undoMan.Reset();
 
             return hasForm;
@@ -5100,6 +5171,33 @@ namespace Calcpad.Wpf
             if (_currentEditorMode == EditorMode.Code)
             {
                 SwitchToMathEditorMode();
+            }
+        }
+
+        /// <summary>
+        /// Handler para cuando el usuario hace doble-click en un bloque externo en MathEditor
+        /// Cambia automáticamente al modo Code para editar el bloque
+        /// </summary>
+        private void MathEditor_SwitchToCodeModeRequested(object sender, int lineIndex)
+        {
+            if (_currentEditorMode != EditorMode.Code)
+            {
+                // Cambiar a modo Code
+                SwitchToCodeEditorMode();
+
+                // Posicionar cursor en la línea del bloque externo
+                Dispatcher.InvokeAsync(() =>
+                {
+                    if (_isAvalonEditActive && TextEditor != null)
+                    {
+                        // Posicionar en la línea especificada (lineIndex es 0-based)
+                        var line = TextEditor.Document.GetLineByNumber(Math.Min(lineIndex + 1, TextEditor.Document.LineCount));
+                        TextEditor.TextArea.Caret.Line = line.LineNumber;
+                        TextEditor.TextArea.Caret.Column = 1;
+                        TextEditor.ScrollTo(line.LineNumber, 1);
+                        TextEditor.Focus();
+                    }
+                }, DispatcherPriority.Background);
             }
         }
 
