@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <RootNamespace>Calcpad.Common</RootNamespace>
+    <OutputType>Library</OutputType>
+    <Version>7.5.8</Version>
+    <Authors>Nedelcho Ganchovski</Authors>
+    <Company>Proektsoft EOOD</Company>
+    <Description>Shared IO and file reading utilities for Calcpad CLI and WPF</Description>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Calcpad.Core\Calcpad.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig.Signed" Version="0.43.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- MultLangConfig.json as external file - edit without recompiling -->
+    <Content Include="MultLangCode\MultLangConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="MultLangCode\Templates\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

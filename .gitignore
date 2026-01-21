@@ -1,0 +1,27 @@
+# Build folders
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+**/.vs/
+
+# Compiled binaries
+*.dll
+*.exe
+*.pdb
+
+# Temporary files
+*.tmp
+*_wpftmp.csproj
+*.user
+*.suo
+
+# Logs
+*.log
+*.txt
+*.output
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/

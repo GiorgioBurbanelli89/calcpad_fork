@@ -1,0 +1,453 @@
+"Demo: Generar y Guardar Archivos Web
+'Este ejemplo genera archivos HTML, TypeScript y los guarda automáticamente
+'NOTA: CSS está dentro del HTML con <style> (no se usa @{css} separado)
+
+#hide
+
+'========================================
+'  PASO 1: GENERAR TYPESCRIPT
+'========================================
+
+@{ts}
+// Interfaces para tipado fuerte
+interface BeamCalculation {
+  length: number;
+  load: number;
+  maxMoment: number;
+  maxShear: number;
+  maxDeflection: number;
+}
+
+// Clase para cálculos de viga
+class SimpleBeam {
+  private length: number;
+  private load: number;
+  private E: number = 200000; // MPa (acero)
+  private I: number = 0.0001; // m^4
+
+  constructor(length: number, load: number) {
+    this.length = length;
+    this.load = load;
+  }
+
+  // Momento máximo (viga simplemente apoyada, carga uniforme)
+  calculateMaxMoment(): number {
+    return (this.load * this.length ** 2) / 8;
+  }
+
+  // Cortante máximo
+  calculateMaxShear(): number {
+    return (this.load * this.length) / 2;
+  }
+
+  // Deflexión máxima
+  calculateMaxDeflection(): number {
+    return (5 * this.load * this.length ** 4) / (384 * this.E * this.I);
+  }
+
+  // Obtener todos los resultados
+  getResults(): BeamCalculation {
+    return {
+      length: this.length,
+      load: this.load,
+      maxMoment: this.calculateMaxMoment(),
+      maxShear: this.calculateMaxShear(),
+      maxDeflection: this.calculateMaxDeflection()
+    };
+  }
+}
+
+// Función para actualizar resultados en el DOM
+function updateResults(): void {
+  const lengthInput = document.getElementById('length') as HTMLInputElement;
+  const loadInput = document.getElementById('load') as HTMLInputElement;
+
+  if (!lengthInput || !loadInput) return;
+
+  const length = parseFloat(lengthInput.value) || 0;
+  const load = parseFloat(loadInput.value) || 0;
+
+  if (length <= 0 || load <= 0) {
+    updateDisplay('---', '---', '---');
+    return;
+  }
+
+  const beam = new SimpleBeam(length, load);
+  const results = beam.getResults();
+
+  updateDisplay(
+    results.maxMoment.toFixed(2),
+    results.maxShear.toFixed(2),
+    (results.maxDeflection * 1000).toFixed(3) // Convertir a mm
+  );
+
+  console.log('Cálculo actualizado:', results);
+}
+
+// Función para actualizar la UI
+function updateDisplay(moment: string, shear: string, deflection: string): void {
+  const momentEl = document.getElementById('moment-value');
+  const shearEl = document.getElementById('shear-value');
+  const deflectionEl = document.getElementById('deflection-value');
+
+  if (momentEl) momentEl.textContent = moment + ' kN·m';
+  if (shearEl) shearEl.textContent = shear + ' kN';
+  if (deflectionEl) deflectionEl.textContent = deflection + ' mm';
+}
+
+// Exponer función al window
+(window as any).updateResults = updateResults;
+
+// Inicializar cuando el DOM esté listo
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('✅ Calculadora de vigas inicializada');
+  updateResults();
+});
+@{end ts}
+
+'========================================
+'  PASO 2: GENERAR HTML (con CSS integrado)
+'========================================
+
+@{html}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Vigas - Demo</title>
+  <style>
+:root {
+  --primary: #3498db;
+  --secondary: #2ecc71;
+  --danger: #e74c3c;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+}
+
+h1 {
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+}
+
+.calculator {
+  margin: 20px 0;
+}
+
+.input-group {
+  margin: 15px 0;
+}
+
+label {
+  display: block;
+  color: #555;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1.1em;
+  transition: border-color 0.3s;
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.result-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin: 25px 0;
+  text-align: center;
+}
+
+.result-label {
+  font-size: 0.9em;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.result-value {
+  font-size: 3em;
+  font-weight: bold;
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+  margin: 10px 0;
+}
+
+button:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.info {
+  background: #ecf0f1;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-size: 0.9em;
+  color: #555;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏗️ Calculadora de Vigas</h1>
+
+    <div class="calculator">
+      <div class="input-group">
+        <label for="length">📏 Longitud de la viga (m):</label>
+        <input type="number" id="length" value="6" min="0" step="0.1" oninput="updateResults()">
+      </div>
+
+      <div class="input-group">
+        <label for="load">⚖️ Carga distribuida (kN/m):</label>
+        <input type="number" id="load" value="10" min="0" step="0.5" oninput="updateResults()">
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">Momento Máximo</div>
+        <div class="result-value" id="moment-value">---</div>
+      </div>
+
+      <div class="result-box" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);">
+        <div class="result-label">Cortante Máximo</div>
+        <div class="result-value" id="shear-value">---</div>
+      </div>
+
+      <div class="result-box" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+        <div class="result-label">Deflexión Máxima</div>
+        <div class="result-value" id="deflection-value">---</div>
+      </div>
+
+      <button onclick="updateResults()">🔄 Recalcular</button>
+    </div>
+
+    <div class="info">
+      <strong>📝 Información:</strong><br>
+      Esta calculadora usa las fórmulas para una viga simplemente apoyada con carga uniforme.<br>
+      <br>
+      <strong>Archivos generados:</strong><br>
+      • script.js (lógica compilada desde TypeScript)<br>
+      • index.html (este archivo con CSS integrado)
+    </div>
+  </div>
+</body>
+</html>
+@{end html}
+
+'========================================
+'  PASO 3: GUARDAR ARCHIVOS
+'========================================
+
+@{python}
+import os
+import shutil
+import subprocess
+from datetime import datetime
+
+# Configurar rutas
+temp_dir = os.path.join(os.getenv('TEMP'), 'temp_multilang')
+timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+dest_dir = rf"C:\Users\j-b-j\Documents\Calcpad_Proyectos\Calculadora_Vigas_{timestamp}"
+
+print("=" * 50)
+print("  GUARDANDO ARCHIVOS WEB")
+print("=" * 50)
+print()
+
+# Crear directorio de destino
+os.makedirs(dest_dir, exist_ok=True)
+print(f"[OK] Directorio creado: {dest_dir}")
+print()
+
+# Archivos a copiar
+archivos = {
+    'script.ts': 'TypeScript (codigo fuente)',
+    'script.js': 'JavaScript (compilado)',
+    'index.html': 'HTML principal (con CSS integrado)'
+}
+
+print("Copiando archivos:")
+print()
+
+archivos_copiados = []
+for archivo, descripcion in archivos.items():
+    origen = os.path.join(temp_dir, archivo)
+    destino = os.path.join(dest_dir, archivo)
+
+    if os.path.exists(origen):
+        shutil.copy2(origen, destino)
+        size = os.path.getsize(destino)
+        archivos_copiados.append(archivo)
+        print(f"  [OK] {archivo:<15} ({size:>6} bytes) - {descripcion}")
+    else:
+        print(f"  [X]  {archivo:<15} (no encontrado)")
+
+print()
+print("=" * 50)
+print(f"[OK] {len(archivos_copiados)} archivos guardados exitosamente")
+print("=" * 50)
+print()
+
+# Crear archivo README
+readme_path = os.path.join(dest_dir, 'README.txt')
+with open(readme_path, 'w', encoding='utf-8') as f:
+    f.write(f"""CALCULADORA DE VIGAS - PROYECTO WEB
+========================================
+
+Generado: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Herramienta: Calcpad 7.5.7
+
+ARCHIVOS:
+---------
+- index.html  : Abrir este archivo en el navegador (contiene CSS integrado)
+- script.js   : Logica JavaScript (compilado)
+- script.ts   : Codigo fuente TypeScript (opcional)
+
+COMO USAR:
+----------
+1. Haz doble clic en index.html
+2. Se abrira en tu navegador predeterminado
+3. Ingresa valores y ve los resultados
+
+EDITAR:
+-------
+Puedes editar estos archivos con:
+- Visual Studio Code
+- Notepad++
+- Sublime Text
+- O cualquier editor de texto
+
+SERVIDOR LOCAL (opcional):
+--------------------------
+Para desarrollo avanzado, puedes usar:
+  python -m http.server
+
+Luego abre: http://localhost:8000
+
+========================================
+Proyecto generado con Calcpad
+https://github.com/Proektsoftbg/Calcpad
+========================================
+""")
+
+print(f"[OK] README creado: README.txt")
+print()
+
+# Informacion de ubicacion
+print("UBICACION DE LOS ARCHIVOS:")
+print(f"   {dest_dir}")
+print()
+
+print("PARA ABRIR LA APLICACION:")
+html_path = os.path.join(dest_dir, 'index.html')
+print(f"   Haz doble clic en: {html_path}")
+print()
+
+print("TIPS:")
+print("   - Copia esta carpeta donde quieras")
+print("   - Comparte el proyecto completo")
+print("   - Edita los archivos y recarga el navegador")
+print()
+
+# Abrir automaticamente (sin input porque causa timeout en Calcpad)
+import webbrowser
+webbrowser.open(html_path)
+print(f"[OK] Abriendo en navegador: {html_path}")
+
+# Abrir carpeta
+subprocess.run(['explorer', dest_dir], shell=True)
+print(f"[OK] Carpeta abierta en explorador")
+
+print()
+print("=" * 50)
+print("PROCESO COMPLETADO!")
+print("=" * 50)
+@{end python}
+
+#show
+
+'========================================
+'  DEMO COMPLETADA
+'========================================
+'
+'Este ejemplo demuestra el flujo completo:
+'
+'1. [OK] Generar TypeScript con @{ts}
+'   - Se ejecuta con ts-node
+'   - Se compila a JavaScript
+'
+'2. [OK] Generar HTML con @{html}
+'   - CSS integrado con <style>
+'   - Se abre en el navegador
+'
+'3. [OK] Guardar todo con @{python}
+'   - Se copian todos los archivos
+'   - Se crea un README
+'   - Se abre la aplicacion automaticamente
+'
+'Resultado:
+'  - Carpeta con proyecto completo
+'  - Todos los archivos listos
+'  - Aplicacion web funcionando
+'  - README con instrucciones
+'
+'Para usar este ejemplo:
+'  1. Presiona F5
+'  2. Espera a que se generen los archivos
+'  3. Se abrira automaticamente el navegador
+'  4. Disfruta tu aplicacion web!
+'
+'Los archivos se guardan en:
+'  C:\Users\j-b-j\Documents\Calcpad_Proyectos\
+'  Con timestamp para evitar sobrescribir
+'
+'========================================
