@@ -69,6 +69,8 @@ namespace Calcpad.Core
         internal abstract string FormatComplex(double re, double im, string format);
         internal abstract string FormatMatrix(Matrix matrix);
         internal abstract string FormatVector(Vector vector);
+        internal abstract string FormatVectorExpression(string[] elements);
+        internal abstract string FormatMatrixExpression(string[][] rows);
         internal abstract string FormatMatrixValue(RealValue value, double zeroThreshold);
         internal abstract string FormatBlock(string[] sa);
         internal abstract string CloseCurlyBrackets(string sa, int level);

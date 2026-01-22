@@ -385,12 +385,41 @@ namespace Calcpad.Core
             }
         }
 
+        internal override string FormatVectorExpression(string[] elements)
+        {
+            var sb = new StringBuilder();
+            sb.Append("<span class=\"matrix\"><span class=\"tr\"><span class=\"td\"></span>");
+            foreach (var element in elements)
+            {
+                sb.Append($"<span class=\"td\">{element}</span>");
+            }
+            sb.Append("<span class=\"td\"></span></span></span>");
+            return sb.ToString();
+        }
+
+        internal override string FormatMatrixExpression(string[][] rows)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("<span class=\"matrix\">");
+            foreach (var row in rows)
+            {
+                sb.Append("<span class=\"tr\"><span class=\"td\"></span>");
+                foreach (var cell in row)
+                {
+                    sb.Append($"<span class=\"td\">{cell}</span>");
+                }
+                sb.AppendLine("<span class=\"td\"></span></span>");
+            }
+            sb.AppendLine("</span>");
+            return sb.ToString();
+        }
+
         internal override string FormatMatrixValue(RealValue value, double zeroThreshold)
         {
             var d = value.D;
             var s = FormatReal(d, value.Units?.FormatString, zeroSmallElements && Math.Abs(d) < zeroThreshold);
-            return value.Units is null ? 
-                s : 
+            return value.Units is null ?
+                s :
                 string.Concat(s, ThinSpace, value.Units.Html);
         }
 

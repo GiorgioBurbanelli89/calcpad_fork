@@ -573,6 +573,37 @@ namespace Calcpad.Core
             return value.Units is null ? s : s + value.Units.Xml;
         }
 
+        internal override string FormatVectorExpression(string[] elements)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i < elements.Length; ++i)
+            {
+                if (i > 0)
+                    sb.Append(RunVectorSpacing);
+                sb.Append(elements[i]);
+            }
+            return AddBrackets(sb.ToString(), 0, '[', ']');
+        }
+
+        internal override string FormatMatrixExpression(string[][] rows)
+        {
+            var sb = new StringBuilder();
+            sb.Append(@"<m:d><m:dPr><m:begChr m:val=""[""/><m:endChr m:val=""]""/></m:dPr><m:e><m:m>");
+            var nc = rows.Length > 0 ? rows[0].Length : 0;
+            sb.Append($@"<m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val=""{nc}""/><m:mcJc m:val=""center""/></m:mcPr></m:mc></m:mcs></m:mPr>");
+            foreach (var row in rows)
+            {
+                sb.Append("<m:mr>");
+                foreach (var cell in row)
+                {
+                    sb.Append($"<m:e>{cell}</m:e>");
+                }
+                sb.Append("</m:mr>");
+            }
+            sb.Append("</m:m></m:e></m:d>");
+            return sb.ToString();
+        }
+
         private static readonly string RunIf = Run(" if ", NormalText);
         private static readonly string RunColon = Run(":");
         private static string FormatIfRow(string sa, string sb) =>

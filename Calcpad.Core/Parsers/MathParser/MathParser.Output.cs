@@ -73,6 +73,11 @@ namespace Calcpad.Core
                         var subst = string.Empty;
                         var splitted = false;
                         var len = rpn.Length;
+
+                        // Check if result is vector/matrix without variables - show only formatted result
+                        var isVectorOrMatrixLiteral = !_hasVariables &&
+                            (_parser._result is Vector || _parser._result is Matrix);
+
                         if (!(len == 3 &&
                             rpn[1].Type == TokenTypes.Solver &&
                             rpn[2].Content == "=" ||
@@ -112,7 +117,17 @@ namespace Calcpad.Core
                             Matrix matrix => RenderMatrix(matrix, writer),
                             _ => null
                         };
-                        if (hasOperators && res != subst || string.IsNullOrEmpty(subst))
+
+                        // For vector/matrix literals without variables, replace equation with just var = result
+                        if (isVectorOrMatrixLiteral && _assignmentPosition > 0)
+                        {
+                            // Keep only the variable name part (before the first =)
+                            var varPart = _stringBuilder.ToString()[.._assignmentPosition];
+                            _stringBuilder.Clear();
+                            _stringBuilder.Append(varPart);
+                            _stringBuilder.Append(res);
+                        }
+                        else if (hasOperators && res != subst || string.IsNullOrEmpty(subst))
                         {
                             if (_stringBuilder.Length > 0)
                                 _stringBuilder.Append(assignment);
@@ -676,16 +691,61 @@ namespace Calcpad.Core
 
                 void RenderMatrixToken(RenderToken t, RenderToken b)
                 {
-                    var s = RenderParameters(t, b, t.ParameterCount, true);
-                    t.Content = AddBrackets(s, t.Level, t.MinOffset, t.MaxOffset, '[', ']');
+                    // Collect all row elements
+                    var rowCount = t.ParameterCount + 1;
+                    var rows = new List<string[]>();
+
+                    // First row starts with b
+                    var firstRowElements = CollectRowElements(b);
+                    rows.Insert(0, firstRowElements);
+
+                    // Collect remaining rows from stack
+                    for (int j = 0; j < t.ParameterCount; ++j)
+                    {
+                        var rowToken = stackBuffer.Pop();
+                        var rowElements = CollectRowElements(rowToken);
+                        rows.Insert(0, rowElements);
+                        if (rowToken.Level > t.Level)
+                            t.Level = rowToken.Level;
+                        t.MinOffset = Math.Min(rowToken.MinOffset, t.MinOffset);
+                        t.MaxOffset = Math.Max(rowToken.MaxOffset, t.MaxOffset);
+                    }
+
+                    t.Content = writer.FormatMatrixExpression(rows.ToArray());
                     t.MinOffset = 0;
                     t.MaxOffset = 0;
+
+                    string[] CollectRowElements(RenderToken rowToken)
+                    {
+                        // The row content is already semicolon-separated from RenderRowToken
+                        // We need to split it back into elements
+                        var content = rowToken.Content;
+                        // Split by the formatted semicolon separator
+                        var parts = content.Split(new[] { div }, StringSplitOptions.None);
+                        return parts;
+                    }
                 }
 
                 void RenderVectorToken(RenderToken t, RenderToken b)
                 {
-                    var s = RenderParameters(t, b, t.ParameterCount);
-                    t.Content = AddBrackets(s, t.Level, t.MinOffset, t.MaxOffset, '[', ']');
+                    // Collect all elements
+                    var elements = new List<string>();
+                    elements.Insert(0, b.Content);
+                    t.Level = b.Level;
+                    t.MinOffset = b.MinOffset;
+                    t.MaxOffset = b.MaxOffset;
+
+                    for (int j = 0; j < t.ParameterCount; ++j)
+                    {
+                        var a = stackBuffer.Pop();
+                        elements.Insert(0, a.Content);
+                        if (a.Level > t.Level)
+                            t.Level = a.Level;
+                        t.MinOffset = Math.Min(a.MinOffset, t.MinOffset);
+                        t.MaxOffset = Math.Max(a.MaxOffset, t.MaxOffset);
+                    }
+
+                    t.Content = writer.FormatVectorExpression(elements.ToArray());
                     t.MinOffset = 0;
                     t.MaxOffset = 0;
                 }

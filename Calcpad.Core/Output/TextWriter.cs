@@ -194,6 +194,19 @@ namespace Calcpad.Core
             }
         }
 
+        internal override string FormatVectorExpression(string[] elements) =>
+            "[" + string.Join("; ", elements) + "]";
+
+        internal override string FormatMatrixExpression(string[][] rows)
+        {
+            var rowStrings = new string[rows.Length];
+            for (int i = 0; i < rows.Length; i++)
+            {
+                rowStrings[i] = string.Join("; ", rows[i]);
+            }
+            return "[" + string.Join(" | ", rowStrings) + "]";
+        }
+
         internal override string FormatMatrixValue(RealValue value, double zeroThreshold)
         {
             var d = value.D;
