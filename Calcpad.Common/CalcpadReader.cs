@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Calcpad.Common
 {
@@ -43,6 +44,11 @@ namespace Calcpad.Common
         public static string Read(string fileName, CalcpadEnvironment environment = CalcpadEnvironment.Cli)
         {
             var content = ReadFileContent(fileName, environment);
+
+            // Process import directives (@{mathcad:file}, @{smathstudio:file})
+            var basePath = Path.GetDirectoryName(Path.GetFullPath(fileName)) ?? Environment.CurrentDirectory;
+            content = ProcessImportDirectives(content, basePath);
+
             var inputLines = content.EnumerateLines();
             var outputLines = new List<string>();
             var hasForm = false;
@@ -317,5 +323,196 @@ namespace Calcpad.Common
                 _stringBuilder.AppendLine("<style>p {margin:0; line-height:1.15em;}</style>");
             return _stringBuilder.ToString();
         }
+
+        #region Import Directives (@{mathcad:file}, @{smathstudio:file})
+
+        // Pattern to match @{mathcad:filepath} - captures the file path
+        private static readonly Regex MathcadDirectivePattern = new(@"@\{mathcad:([^}]+)\}", RegexOptions.IgnoreCase);
+
+        // Pattern to match @{smathstudio:filepath} or @{smath:filepath} - captures the file path
+        private static readonly Regex SMathDirectivePattern = new(@"@\{(?:smathstudio|smath):([^}]+)\}", RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// Processes import directives in code:
+        /// - @{mathcad:file.mcdx} - Imports and converts Mathcad Prime file
+        /// - @{smathstudio:file.sm} or @{smath:file.sm} - Imports and converts SMath Studio file
+        /// </summary>
+        /// <param name="code">Code containing import directives</param>
+        /// <param name="basePath">Base directory for resolving relative paths</param>
+        /// <returns>Code with directives replaced by converted content</returns>
+        public static string ProcessImportDirectives(string code, string basePath = null)
+        {
+            if (string.IsNullOrEmpty(code))
+                return code;
+
+            // Quick check: if no import directives, return as-is
+            if (!code.Contains("@{mathcad:", StringComparison.OrdinalIgnoreCase) &&
+                !code.Contains("@{smathstudio:", StringComparison.OrdinalIgnoreCase) &&
+                !code.Contains("@{smath:", StringComparison.OrdinalIgnoreCase))
+            {
+                return code;
+            }
+
+            basePath ??= Environment.CurrentDirectory;
+
+            // Process Mathcad directives
+            code = MathcadDirectivePattern.Replace(code, match =>
+            {
+                var filePath = match.Groups[1].Value.Trim();
+                return ProcessMathcadImport(filePath, basePath);
+            });
+
+            // Process SMath directives
+            code = SMathDirectivePattern.Replace(code, match =>
+            {
+                var filePath = match.Groups[1].Value.Trim();
+                return ProcessSMathImport(filePath, basePath);
+            });
+
+            return code;
+        }
+
+        /// <summary>
+        /// Processes a Mathcad Prime import directive
+        /// </summary>
+        private static string ProcessMathcadImport(string filePath, string basePath)
+        {
+            try
+            {
+                // Resolve relative path
+                if (!Path.IsPathRooted(filePath))
+                {
+                    filePath = Path.Combine(basePath, filePath);
+                }
+
+                if (!File.Exists(filePath))
+                {
+                    return $"' ERROR: Archivo Mathcad no encontrado: {filePath}";
+                }
+
+                var converter = new McdxConverter();
+                var result = converter.Convert(filePath);
+
+                // Add header comment
+                var sb = new StringBuilder();
+                sb.AppendLine($"' === Importado de Mathcad: {Path.GetFileName(filePath)} ===");
+
+                // Skip the header that McdxConverter adds (first 6 lines starting with ')
+                var lines = result.Split('\n');
+                bool skipHeader = true;
+                foreach (var line in lines)
+                {
+                    var trimmed = line.TrimEnd('\r');
+                    if (skipHeader && trimmed.StartsWith("'"))
+                    {
+                        if (trimmed.StartsWith("' ===") && !trimmed.Contains("Importado"))
+                            continue; // Skip header lines
+                        if (string.IsNullOrWhiteSpace(trimmed.TrimStart('\'')))
+                            continue; // Skip empty comment lines in header
+                        if (trimmed.Contains("Versión") || trimmed.Contains("Archivo:") || trimmed.Contains("Fecha:"))
+                            continue; // Skip version/file/date lines
+                    }
+                    skipHeader = false;
+                    sb.AppendLine(trimmed);
+                }
+
+                sb.AppendLine($"' === Fin importación Mathcad ===");
+
+                // Add warnings if any
+                if (converter.Warnings.Count > 0)
+                {
+                    sb.AppendLine("' Advertencias:");
+                    foreach (var warning in converter.Warnings)
+                    {
+                        sb.AppendLine($"'   - {warning}");
+                    }
+                }
+
+                return sb.ToString().TrimEnd();
+            }
+            catch (Exception ex)
+            {
+                return $"' ERROR al importar Mathcad: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Processes an SMath Studio import directive
+        /// </summary>
+        private static string ProcessSMathImport(string filePath, string basePath)
+        {
+            try
+            {
+                // Resolve relative path
+                if (!Path.IsPathRooted(filePath))
+                {
+                    filePath = Path.Combine(basePath, filePath);
+                }
+
+                if (!File.Exists(filePath))
+                {
+                    return $"' ERROR: Archivo SMath no encontrado: {filePath}";
+                }
+
+                var converter = new SMathConverter();
+                var result = converter.Convert(filePath);
+
+                // Add header comment
+                var sb = new StringBuilder();
+                sb.AppendLine($"' === Importado de SMath Studio: {Path.GetFileName(filePath)} ===");
+
+                // Skip the header that SMathConverter adds (similar to Mathcad)
+                var lines = result.Split('\n');
+                bool skipHeader = true;
+                foreach (var line in lines)
+                {
+                    var trimmed = line.TrimEnd('\r');
+                    if (skipHeader && trimmed.StartsWith("'"))
+                    {
+                        if (trimmed.StartsWith("' ===") && !trimmed.Contains("Importado"))
+                            continue;
+                        if (string.IsNullOrWhiteSpace(trimmed.TrimStart('\'')))
+                            continue;
+                        if (trimmed.Contains("Versión") || trimmed.Contains("Archivo:") || trimmed.Contains("Fecha:"))
+                            continue;
+                    }
+                    skipHeader = false;
+                    sb.AppendLine(trimmed);
+                }
+
+                sb.AppendLine($"' === Fin importación SMath ===");
+
+                // Add warnings if any
+                if (converter.Warnings.Count > 0)
+                {
+                    sb.AppendLine("' Advertencias:");
+                    foreach (var warning in converter.Warnings)
+                    {
+                        sb.AppendLine($"'   - {warning}");
+                    }
+                }
+
+                return sb.ToString().TrimEnd();
+            }
+            catch (Exception ex)
+            {
+                return $"' ERROR al importar SMath: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Checks if code contains any import directives
+        /// </summary>
+        public static bool HasImportDirectives(string code)
+        {
+            if (string.IsNullOrEmpty(code))
+                return false;
+
+            return code.Contains("@{mathcad:", StringComparison.OrdinalIgnoreCase) ||
+                   code.Contains("@{smathstudio:", StringComparison.OrdinalIgnoreCase) ||
+                   code.Contains("@{smath:", StringComparison.OrdinalIgnoreCase);
+        }
+
+        #endregion
     }
 }
