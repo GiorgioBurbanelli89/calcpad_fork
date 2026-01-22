@@ -2866,6 +2866,230 @@ namespace Calcpad.Wpf
                 InsertImage(dlg.FileName);
         }
 
+        private void ImportMathcadButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog
+            {
+                DefaultExt = ".mcdx",
+                Filter = "Mathcad Prime Files (*.mcdx)|*.mcdx|All Files (*.*)|*.*",
+                Title = "Importar archivo Mathcad Prime",
+                CheckFileExists = true,
+                Multiselect = false
+            };
+            var result = (bool)dlg.ShowDialog();
+            if (result)
+            {
+                try
+                {
+                    var converter = new Calcpad.Common.McdxConverter();
+                    string convertedContent = converter.Convert(dlg.FileName);
+
+                    // Preguntar si crear nuevo archivo o insertar
+                    var msgResult = MessageBox.Show(
+                        "¿Desea crear un nuevo archivo con el contenido importado?\n\n" +
+                        "Sí = Crear nuevo archivo\n" +
+                        "No = Insertar en documento actual",
+                        "Importar Mathcad",
+                        MessageBoxButton.YesNoCancel,
+                        MessageBoxImage.Question);
+
+                    if (msgResult == MessageBoxResult.Yes)
+                    {
+                        // Crear nuevo archivo - limpiar contenido
+                        if (_isParsing)
+                            _parser.Cancel();
+
+                        _parser.ShowWarnings = true;
+
+                        // Limpiar contenido basado en editor activo
+                        if (_isAvalonEditActive && TextEditor != null)
+                        {
+                            TextEditor.Text = convertedContent;
+                            TextEditor.CaretOffset = 0;
+                        }
+                        else
+                        {
+                            _document.Blocks.Clear();
+                            // Insertar el contenido convertido
+                            foreach (var line in convertedContent.Split('\n'))
+                            {
+                                var p = new Paragraph();
+                                p.Inlines.Add(new Run(line.TrimEnd('\r')));
+                                _highlighter.Parse(p, IsComplex, GetLineNumber(p), true);
+                                _document.Blocks.Add(p);
+                            }
+                            RichTextBox.CaretPosition = _document.ContentStart;
+                        }
+
+                        _highlighter.Defined.Clear(IsComplex);
+
+                        // Sugerir nombre de archivo
+                        var suggestedName = Path.ChangeExtension(dlg.FileName, ".cpd");
+                        CurrentFileName = suggestedName;
+                        Title = Path.GetFileName(suggestedName) + " - Calcpad";
+                    }
+                    else if (msgResult == MessageBoxResult.No)
+                    {
+                        // Insertar en posición actual
+                        InsertTextAtCursor(convertedContent);
+                    }
+
+                    // Mostrar advertencias si las hay
+                    if (converter.Warnings.Count > 0)
+                    {
+                        var warnings = string.Join("\n", converter.Warnings.Take(10));
+                        if (converter.Warnings.Count > 10)
+                            warnings += $"\n... y {converter.Warnings.Count - 10} más";
+
+                        MessageBox.Show(
+                            $"Conversión completada con {converter.Warnings.Count} advertencia(s):\n\n{warnings}",
+                            "Advertencias de importación",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error al importar archivo Mathcad:\n\n{ex.Message}",
+                        "Error de importación",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Import from Mathcad Prime (.mcdx) - new button handler
+        /// </summary>
+        private void ImportMathcadPrime_Click(object sender, RoutedEventArgs e)
+        {
+            // Reuse existing ImportMathcadButton_Click logic
+            ImportMathcadButton_Click(sender, e);
+        }
+
+        /// <summary>
+        /// Export to Mathcad Prime (.mcdx) - placeholder for future implementation
+        /// </summary>
+        private void ExportMathcadPrime_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(
+                "Exportar a Mathcad Prime (.mcdx) estará disponible en una versión futura.\n\n" +
+                "Esta función convertirá el archivo .cpd actual al formato Mathcad Prime.",
+                "Función en desarrollo",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// Import from SMath Studio (.sm)
+        /// </summary>
+        private void ImportSMath_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog
+            {
+                DefaultExt = ".sm",
+                Filter = "SMath Studio Files (*.sm)|*.sm|All Files (*.*)|*.*",
+                Title = "Importar archivo SMath Studio",
+                CheckFileExists = true,
+                Multiselect = false
+            };
+            var result = (bool)dlg.ShowDialog();
+            if (result)
+            {
+                try
+                {
+                    var converter = new Calcpad.Common.SMathConverter();
+                    string convertedContent = converter.Convert(dlg.FileName);
+
+                    // Preguntar si crear nuevo archivo o insertar
+                    var msgResult = MessageBox.Show(
+                        "¿Desea crear un nuevo archivo con el contenido importado?\n\n" +
+                        "Sí = Crear nuevo archivo\n" +
+                        "No = Insertar en documento actual",
+                        "Importar SMath Studio",
+                        MessageBoxButton.YesNoCancel,
+                        MessageBoxImage.Question);
+
+                    if (msgResult == MessageBoxResult.Yes)
+                    {
+                        // Crear nuevo archivo - limpiar contenido
+                        if (_isParsing)
+                            _parser.Cancel();
+
+                        _parser.ShowWarnings = true;
+
+                        // Limpiar contenido basado en editor activo
+                        if (_isAvalonEditActive && TextEditor != null)
+                        {
+                            TextEditor.Text = convertedContent;
+                            TextEditor.CaretOffset = 0;
+                        }
+                        else
+                        {
+                            _document.Blocks.Clear();
+                            // Insertar el contenido convertido
+                            foreach (var line in convertedContent.Split('\n'))
+                            {
+                                var p = new Paragraph();
+                                p.Inlines.Add(new Run(line.TrimEnd('\r')));
+                                _highlighter.Parse(p, IsComplex, GetLineNumber(p), true);
+                                _document.Blocks.Add(p);
+                            }
+                            RichTextBox.CaretPosition = _document.ContentStart;
+                        }
+
+                        _highlighter.Defined.Clear(IsComplex);
+
+                        // Sugerir nombre de archivo
+                        var suggestedName = Path.ChangeExtension(dlg.FileName, ".cpd");
+                        CurrentFileName = suggestedName;
+                        Title = Path.GetFileName(suggestedName) + " - Calcpad";
+                    }
+                    else if (msgResult == MessageBoxResult.No)
+                    {
+                        // Insertar en posición actual
+                        InsertTextAtCursor(convertedContent);
+                    }
+
+                    // Mostrar advertencias si las hay
+                    if (converter.Warnings.Count > 0)
+                    {
+                        var warnings = string.Join("\n", converter.Warnings.Take(10));
+                        if (converter.Warnings.Count > 10)
+                            warnings += $"\n... y {converter.Warnings.Count - 10} más";
+
+                        MessageBox.Show(
+                            $"Conversión completada con {converter.Warnings.Count} advertencia(s):\n\n{warnings}",
+                            "Advertencias de importación",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error al importar archivo SMath Studio:\n\n{ex.Message}",
+                        "Error de importación",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Export to SMath Studio (.sm) - placeholder for future implementation
+        /// </summary>
+        private void ExportSMath_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(
+                "Exportar a SMath Studio (.sm) estará disponible en una versión futura.\n\n" +
+                "Esta función convertirá el archivo .cpd actual al formato SMath Studio.",
+                "Función en desarrollo",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
         private void InsertImage(string filePath)
         {
             var fileName = Path.GetFileName(filePath);

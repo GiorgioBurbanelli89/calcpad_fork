@@ -79,11 +79,20 @@ namespace Calcpad.Wpf
                 ScheduleFoldingUpdate();
                 // Sync with MathEditor if in Visual mode
                 SyncAvalonEditToMathEditor();
+
+                // AutoRun support - same logic as RichTextBox_TextChanged
+                if (_isTextChangedEnabled && IsAutoRun)
+                {
+                    _autoRun = true;
+                }
             };
 
             // Install autocomplete for @{calcpad:}
             TextEditor.TextArea.TextEntering += TextEditor_TextEntering;
             TextEditor.TextArea.TextEntered += TextEditor_TextEntered;
+
+            // AutoRun: trigger when caret position changes (equivalent to RichTextBox SelectionChanged)
+            TextEditor.TextArea.Caret.PositionChanged += TextEditor_CaretPositionChanged;
 
             // Initial update (delayed to not block startup)
             Dispatcher.InvokeAsync(() => UpdateFoldingsInternal(),
@@ -334,6 +343,25 @@ namespace Calcpad.Wpf
         {
             // Delegate to existing RichTextBox logic if needed
             // Folding is now handled by TextChanged event in InitializeAvalonEdit
+        }
+
+        /// <summary>
+        /// Handle caret position changes to trigger AutoRun (equivalent to RichTextBox SelectionChanged)
+        /// </summary>
+        private async void TextEditor_CaretPositionChanged(object? sender, EventArgs e)
+        {
+            if (!_autoRun || !IsAutoRun)
+                return;
+
+            // Check if we're at the end of the document
+            if (TextEditor == null) return;
+
+            int caretOffset = TextEditor.CaretOffset;
+            int docLength = TextEditor.Document.TextLength;
+            bool isNearEnd = (docLength - caretOffset) <= 2;
+
+            // Execute AutoRun
+            await AutoRun(isNearEnd);
         }
 
         private void TextEditor_PreviewKeyDown(object sender, KeyEventArgs e)

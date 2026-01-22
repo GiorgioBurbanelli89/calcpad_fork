@@ -115,8 +115,23 @@ namespace Calcpad.Common.MultLangCode
                     string output;
                     var extractedVars = new List<(string name, string value)>();
 
+                    // Special handling for mcdx - convert Mathcad Prime file to Calcpad
+                    if (language.Equals("mcdx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing MCDX block\n");
+                        }
+                        catch { }
+
+                        // The code content should be a file path to .mcdx file
+                        var mcdxPath = block.Code.Trim();
+                        output = ProcessMcdxFile(mcdxPath);
+                    }
                     // Special handling for markdown - render to HTML
-                    if (language.Equals("markdown", StringComparison.OrdinalIgnoreCase))
+                    else if (language.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
@@ -131,25 +146,12 @@ namespace Calcpad.Common.MultLangCode
                         var processedCode = ProcessInlineCalcpad(block.Code);
                         output = RenderMarkdown(processedCode);
                     }
-                    // Special handling for HTML - process inline Calcpad
-                    else if (language.Equals("html", StringComparison.OrdinalIgnoreCase))
-                    {
-                        try
-                        {
-                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
-                            System.IO.File.AppendAllText(debugPath,
-                                $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing HTML block, calling ProcessInlineCalcpad...\n");
-                        }
-                        catch { }
-
-                        // Process inline Calcpad code: @{calcpad:...}
-                        // For HTML, we return the processed content DIRECTLY, not wrapped
-                        output = ProcessInlineCalcpad(block.Code);
-                    }
-                    // C#, XAML, WPF always execute (handled specially in LanguageExecutor)
+                    // C#, XAML, WPF, CSS, HTML always execute (handled specially in LanguageExecutor)
                     else if (language.Equals("csharp", StringComparison.OrdinalIgnoreCase) ||
                              language.Equals("xaml", StringComparison.OrdinalIgnoreCase) ||
                              language.Equals("wpf", StringComparison.OrdinalIgnoreCase) ||
+                             language.Equals("css", StringComparison.OrdinalIgnoreCase) ||
+                             language.Equals("html", StringComparison.OrdinalIgnoreCase) ||
                              MultLangManager.IsLanguageAvailable(language))
                     {
                         var execResult = _executor.Execute(block, variables, progressCallback);
@@ -453,6 +455,55 @@ namespace Calcpad.Common.MultLangCode
         {
             var blocks = MultLangManager.ExtractCodeBlocks(code);
             return blocks.Keys;
+        }
+
+        /// <summary>
+        /// Processes a Mathcad Prime (.mcdx) file and converts it to Calcpad format
+        /// </summary>
+        private string ProcessMcdxFile(string mcdxPath)
+        {
+            try
+            {
+                // Resolve relative paths
+                if (!System.IO.Path.IsPathRooted(mcdxPath))
+                {
+                    // Try to find the file relative to current directory or temp
+                    var currentDir = Environment.CurrentDirectory;
+                    var fullPath = System.IO.Path.Combine(currentDir, mcdxPath);
+                    if (System.IO.File.Exists(fullPath))
+                        mcdxPath = fullPath;
+                }
+
+                if (!System.IO.File.Exists(mcdxPath))
+                {
+                    return $"' ERROR: Archivo Mathcad no encontrado: {mcdxPath}\n" +
+                           "' Verifique la ruta del archivo .mcdx";
+                }
+
+                var converter = new McdxConverter();
+                var result = converter.Convert(mcdxPath);
+
+                // Add any warnings as comments
+                if (converter.Warnings.Count > 0)
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine(result);
+                    sb.AppendLine();
+                    sb.AppendLine("' === Advertencias de conversion ===");
+                    foreach (var warning in converter.Warnings)
+                    {
+                        sb.AppendLine($"' {warning}");
+                    }
+                    result = sb.ToString();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return $"' ERROR al convertir archivo Mathcad: {ex.Message}\n" +
+                       $"' Archivo: {mcdxPath}";
+            }
         }
 
         /// <summary>

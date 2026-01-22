@@ -47,7 +47,7 @@ namespace Calcpad.Common.MultLangCode
 
             _tracker?.ReportStep($"Language configured: Command={langDef.Command}, Extension={langDef.Extension}");
 
-            // Special handling for XAML, WPF, Avalonia, and C#
+            // Special handling for XAML, WPF, Avalonia, C#, CSS, and HTML
             var language = block.Language.ToLower();
             if (language == "xaml" || language == "wpf")
             {
@@ -65,32 +65,21 @@ namespace Calcpad.Common.MultLangCode
                 return ExecuteCSharpProject(block);
             }
 
-            _tracker?.ReportStep($"Checking if '{block.Language}' is available in PATH");
-            if (!MultLangManager.IsLanguageAvailable(block.Language))
-            {
-                _tracker?.ReportStep($"ERROR: '{block.Language}' not found in PATH");
-                return new ExecutionResult
-                {
-                    Success = false,
-                    Error = $"Language '{block.Language}' not found in PATH. Please install {langDef.Command}"
-                };
-            }
-
-            _tracker?.ReportStep($"'{block.Language}' is available in PATH");
-
-            // Prepare code with variable injection if needed
+            // Prepare code with variable injection if needed (before CSS/HTML check)
             var code = block.Code;
             if (_config.Settings.ShareVariables && variables != null)
             {
                 code = InjectVariables(code, variables, langDef);
             }
 
-            // Special handling for CSS, HTML, and TypeScript to work together
+            // Special handling for CSS and HTML (no command execution needed)
             if (language == "css")
             {
+                _tracker?.ReportStep("Detected CSS block, saving to styles.css");
                 // CSS: Just save to file, don't execute
                 var cssPath = Path.Combine(_tempDir, "styles.css");
                 File.WriteAllText(cssPath, code);
+                _tracker?.ReportStep($"CSS saved to: {cssPath}");
                 return new ExecutionResult
                 {
                     Success = true,
@@ -132,6 +121,20 @@ namespace Calcpad.Common.MultLangCode
                     };
                 }
             }
+
+            // Now check if language is available in PATH (for languages that need execution)
+            _tracker?.ReportStep($"Checking if '{block.Language}' is available in PATH");
+            if (!MultLangManager.IsLanguageAvailable(block.Language))
+            {
+                _tracker?.ReportStep($"ERROR: '{block.Language}' not found in PATH");
+                return new ExecutionResult
+                {
+                    Success = false,
+                    Error = $"Language '{block.Language}' not found in PATH. Please install {langDef.Command}"
+                };
+            }
+
+            _tracker?.ReportStep($"'{block.Language}' is available in PATH");
 
             if (language == "typescript" || language == "ts")
             {

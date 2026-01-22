@@ -300,32 +300,111 @@ namespace Calcpad.Cli
 
             if (OperatingSystem.IsWindows())
                 fileName = fileName.ToLower();
-            
-            var i = fileName.IndexOf(".cpd");
-            if (i < 0)
+
+            // Check for .mcdx (Mathcad Prime) files first
+            var i = fileName.IndexOf(".mcdx");
+            bool isMcdx = i >= 0;
+            bool isSMath = false;
+
+            if (!isMcdx)
             {
-                i = fileName.IndexOf(".txt");
+                // Check for .sm (SMath Studio) files
+                i = fileName.IndexOf(".sm");
+                isSMath = i >= 0 && (i + 3 == fileName.Length || fileName[i + 3] == ' ');
+            }
+
+            if (!isMcdx && !isSMath)
+            {
+                i = fileName.IndexOf(".cpd");
                 if (i < 0)
                 {
-                    if (fileName.IndexOf(".cpc") < 0)
+                    i = fileName.IndexOf(".txt");
+                    if (i < 0)
                     {
-                        WriteErrorAndWait(Messages.InvalidInputFileExtensionMustBeCpdOrTxt + ": " + fileName);
-                        return true;
+                        if (fileName.IndexOf(".cpc") < 0)
+                        {
+                            WriteErrorAndWait(Messages.InvalidInputFileExtensionMustBeCpdOrTxt + ": " + fileName);
+                            return true;
+                        }
+                        else
+                            return false;
                     }
-                    else
-                        return false;
                 }
             }
-            i += 4;
+            i += isMcdx ? 5 : (isSMath ? 3 : 4);
             var outFile = fileName[i..].Trim();
             var isSilent = outFile.EndsWith(" -s");
             if (isSilent)
-                outFile = outFile[..^3]; 
+                outFile = outFile[..^3];
+
+            // Check for -cpd option (convert mcdx to cpd only, no processing)
+            var cpdOnly = outFile.EndsWith(" -cpd") || outFile.EndsWith(" cpd") ||
+                          outFile == "-cpd" || outFile == "cpd";
+            if (cpdOnly)
+            {
+                if (outFile.EndsWith(" -cpd"))
+                    outFile = outFile[..^5];
+                else if (outFile.EndsWith(" cpd"))
+                    outFile = outFile[..^4];
+                else
+                    outFile = "";
+            }
 
             fileName = fileName[..i].Trim();
             if (!File.Exists(fileName))
             {
                 WriteErrorAndWait(Messages.InputFileDoesNotExist);
+                return true;
+            }
+
+            // Handle -cpd option for mcdx/sm files (convert without processing)
+            if ((isMcdx || isSMath) && cpdOnly)
+            {
+                if (string.IsNullOrWhiteSpace(outFile))
+                    outFile = Path.ChangeExtension(fileName, ".cpd");
+
+                if (isMcdx)
+                {
+                    if (!isSilent)
+                        Console.WriteLine($"Converting Mathcad Prime to Calcpad: {Path.GetFileName(fileName)}");
+
+                    var mcdxConverter = new McdxConverter();
+                    var convertedCode = mcdxConverter.Convert(fileName);
+                    File.WriteAllText(outFile, convertedCode);
+
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"  Mathcad version: {mcdxConverter.MathcadVersion}");
+                        if (mcdxConverter.Warnings.Count > 0)
+                        {
+                            Console.WriteLine($"  Warnings ({mcdxConverter.Warnings.Count}):");
+                            foreach (var warning in mcdxConverter.Warnings)
+                                Console.WriteLine($"    - {warning}");
+                        }
+                        Console.WriteLine($"Output: {outFile}");
+                    }
+                }
+                else // isSMath
+                {
+                    if (!isSilent)
+                        Console.WriteLine($"Converting SMath Studio to Calcpad: {Path.GetFileName(fileName)}");
+
+                    var smathConverter = new SMathConverter();
+                    var convertedCode = smathConverter.Convert(fileName);
+                    File.WriteAllText(outFile, convertedCode);
+
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"  SMath version: {smathConverter.SMathVersion}");
+                        if (smathConverter.Warnings.Count > 0)
+                        {
+                            Console.WriteLine($"  Warnings ({smathConverter.Warnings.Count}):");
+                            foreach (var warning in smathConverter.Warnings)
+                                Console.WriteLine($"    - {warning}");
+                        }
+                        Console.WriteLine($"Output: {outFile}");
+                    }
+                }
                 return true;
             }
 
@@ -346,7 +425,54 @@ namespace Calcpad.Cli
                 if (!string.IsNullOrWhiteSpace(path))
                     Directory.SetCurrentDirectory(path);
 
-                var code = CalcpadReader.Read(fileName);
+                string code;
+
+                // Handle .mcdx files (Mathcad Prime)
+                if (isMcdx)
+                {
+                    if (!isSilent)
+                        Console.WriteLine($"Converting Mathcad Prime file: {Path.GetFileName(fileName)}");
+
+                    var mcdxConverter = new McdxConverter();
+                    code = mcdxConverter.Convert(fileName);
+
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"  Mathcad version: {mcdxConverter.MathcadVersion}");
+                        if (mcdxConverter.Warnings.Count > 0)
+                        {
+                            Console.WriteLine($"  Warnings ({mcdxConverter.Warnings.Count}):");
+                            foreach (var warning in mcdxConverter.Warnings)
+                                Console.WriteLine($"    - {warning}");
+                        }
+                        Console.WriteLine();
+                    }
+                }
+                // Handle .sm files (SMath Studio)
+                else if (isSMath)
+                {
+                    if (!isSilent)
+                        Console.WriteLine($"Converting SMath Studio file: {Path.GetFileName(fileName)}");
+
+                    var smathConverter = new SMathConverter();
+                    code = smathConverter.Convert(fileName);
+
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"  SMath version: {smathConverter.SMathVersion}");
+                        if (smathConverter.Warnings.Count > 0)
+                        {
+                            Console.WriteLine($"  Warnings ({smathConverter.Warnings.Count}):");
+                            foreach (var warning in smathConverter.Warnings)
+                                Console.WriteLine($"    - {warning}");
+                        }
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    code = CalcpadReader.Read(fileName);
+                }
 
                 // Process through CalcpadProcessor (reads MultLangConfig.json automatically)
                 var processor = new CalcpadProcessor(CalcpadReader.Include);

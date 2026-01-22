@@ -1870,16 +1870,24 @@
                 ToolTip="{x:Static wpf:MainWindowResources.InsertImage}">
             <Image Source="Resources/image.png" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Center"/>
         </Button>
-        <Button Grid.Row="0" Click="KeyPadButton_Click" x:Name="KeyPadButton" Tag="F" 
-                VerticalAlignment="Top" HorizontalAlignment="Left"
+        <Button Grid.Row="0" Click="ImportMathcadButton_Click" x:Name="ImportMathcadButton"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
                 Height="24" Width="24" Margin="271,24,0,0"
+                Focusable="false" IsTabStop="false"
+                Background="{x:Null}" BorderBrush="{x:Null}"
+                ToolTip="Importar archivo Mathcad Prime (.mcdx)">
+            <Image Source="Resources/form.png" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+        </Button>
+        <Button Grid.Row="0" Click="KeyPadButton_Click" x:Name="KeyPadButton" Tag="F"
+                VerticalAlignment="Top" HorizontalAlignment="Left"
+                Height="24" Width="24" Margin="298,24,0,0"
                 Focusable="false" IsTabStop="false" 
                 Background="AliceBlue" BorderBrush="SteelBlue"
                 ToolTip="{x:Static wpf:MainWindowResources.ShowHideKeypad}">
             <Image Source="Resources/calc.png" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
         </Button>
-        <Button Grid.Row="0" x:Name="HelpButton" HorizontalAlignment="Left" VerticalAlignment="Top" 
-                Height="24" Width="24" Margin="298,24,0,0"
+        <Button Grid.Row="0" x:Name="HelpButton" HorizontalAlignment="Left" VerticalAlignment="Top"
+                Height="24" Width="24" Margin="325,24,0,0"
                 Command="ApplicationCommands.Help" Focusable="false"  IsTabStop="false"
                 Background="{x:Null}" BorderBrush="{x:Null}"
                 ToolTip="{x:Static wpf:MainWindowResources.ShowHelp}">
@@ -1973,6 +1981,35 @@
                     Foreground="White" FontSize="9" FontWeight="Bold"
                     Content="mathCAD" Padding="2"
                     ToolTip="Toggle Code/mathCAD Mode (Ctrl+M)"/>
+            <!-- Import/Export buttons for Mathcad and SMath -->
+            <Button Click="ImportMathcadPrime_Click" x:Name="ImportMathcadPrimeBtn"
+                    Height="20" Width="20" VerticalAlignment="Center"
+                    HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
+                    Canvas.Left="250" Canvas.Top="2" Background="#FF6B35"
+                    Foreground="White" FontSize="10" FontWeight="Bold"
+                    Content="M↓" Padding="0"
+                    ToolTip="Importar desde Mathcad Prime (.mcdx)"/>
+            <Button Click="ExportMathcadPrime_Click" x:Name="ExportMathcadPrimeBtn"
+                    Height="20" Width="20" VerticalAlignment="Center"
+                    HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
+                    Canvas.Left="272" Canvas.Top="2" Background="#FF6B35"
+                    Foreground="White" FontSize="10" FontWeight="Bold"
+                    Content="M↑" Padding="0"
+                    ToolTip="Exportar a Mathcad Prime (.mcdx)"/>
+            <Button Click="ImportSMath_Click" x:Name="ImportSMathBtn"
+                    Height="20" Width="20" VerticalAlignment="Center"
+                    HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
+                    Canvas.Left="297" Canvas.Top="2" Background="#2E8B57"
+                    Foreground="White" FontSize="10" FontWeight="Bold"
+                    Content="S↓" Padding="0"
+                    ToolTip="Importar desde SMath Studio (.sm)"/>
+            <Button Click="ExportSMath_Click" x:Name="ExportSMathBtn"
+                    Height="20" Width="20" VerticalAlignment="Center"
+                    HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
+                    Canvas.Left="319" Canvas.Top="2" Background="#2E8B57"
+                    Foreground="White" FontSize="10" FontWeight="Bold"
+                    Content="S↑" Padding="0"
+                    ToolTip="Exportar a SMath Studio (.sm)"/>
         </Canvas>
         <Separator Grid.Row="0" HorizontalAlignment="Left" Height="2" Margin="85,35,0,0" 
                    VerticalAlignment="Top" Width="24" IsTabStop="False" 

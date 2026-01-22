@@ -285,6 +285,20 @@ EndFragment:0000000004";
 
         internal async Task NavigateToStringAsync(string html)
         {
+            // LOG: Save HTML output to file for debugging
+            try
+            {
+                var timestamp = DateTime.Now.ToString("HHmmss");
+                var outputPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"calcpad_html_output_{timestamp}.html");
+                System.IO.File.WriteAllText(outputPath, html);
+
+                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath,
+                    $"[{DateTime.Now:HH:mm:ss}] HTML OUTPUT saved to: {outputPath}\n" +
+                    $"[{DateTime.Now:HH:mm:ss}] HTML length: {html.Length} chars\n");
+            }
+            catch { }
+
             var zoom = _wv2.ZoomFactor;
             _wv2.CoreWebView2.Navigate(_blankPagePath);
             _wv2.ZoomFactor = zoom;

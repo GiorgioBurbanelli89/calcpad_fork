@@ -489,13 +489,45 @@ namespace Calcpad.Common.MultLangCode
         {
             var trimmed = line.Trim();
 
+            // LOG: Debug first call to see what languages are loaded
+            if (trimmed == "@{css}")
+            {
+                try
+                {
+                    var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                    File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] DetectDirective checking '@{{css}}'\n");
+                    File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Config.Languages count: {Config.Languages.Count}\n");
+                    foreach (var (n, l) in Config.Languages)
+                    {
+                        File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}]   Lang '{n}': directive='{l.Directive}', end='{l.EndDirective}'\n");
+                    }
+                }
+                catch { }
+            }
+
             foreach (var (name, lang) in Config.Languages)
             {
                 if (trimmed.Equals(lang.Directive, StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                        File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] DetectDirective MATCH: '{trimmed}' == '{lang.Directive}' (lang={name})\n");
+                    }
+                    catch { }
                     return (true, name, false);
+                }
 
                 if (trimmed.Equals(lang.EndDirective, StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                        File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] DetectDirective MATCH END: '{trimmed}' == '{lang.EndDirective}' (lang={name})\n");
+                    }
+                    catch { }
                     return (true, name, true);
+                }
             }
 
             return (false, string.Empty, false);
@@ -513,12 +545,40 @@ namespace Calcpad.Common.MultLangCode
             int blockStart = -1;
             var currentBlock = new StringBuilder();
 
+            try
+            {
+                var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                File.AppendAllText(debugPath, $"\n[{DateTime.Now:HH:mm:ss}] === ExtractCodeBlocks START ===\n");
+                File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Total lines: {lines.Length}\n");
+            }
+            catch { }
+
             for (int i = 0; i < lines.Length; i++)
             {
                 var (found, langName, isEnd) = DetectDirective(lines[i]);
 
+                // LOG: First 5 lines and lines around directives
+                if (i < 5 || i >= 37 && i <= 42)
+                {
+                    try
+                    {
+                        var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                        var linePreview = lines[i].Length > 50 ? lines[i].Substring(0, 50) : lines[i];
+                        File.AppendAllText(debugPath,
+                            $"[{DateTime.Now:HH:mm:ss}] Line {i}: DetectDirective('{linePreview}') returned: found={found}, lang='{langName}', isEnd={isEnd}\n");
+                    }
+                    catch { }
+                }
+
                 if (found)
                 {
+                    try
+                    {
+                        var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                        File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Line {i}: Directive found - lang='{langName}', isEnd={isEnd}, currentLang='{currentLanguage}'\n");
+                    }
+                    catch { }
+
                     if (isEnd && currentLanguage == langName)
                     {
                         // End of block
@@ -533,6 +593,13 @@ namespace Calcpad.Common.MultLangCode
                             EndLine = i
                         });
 
+                        try
+                        {
+                            var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                            File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Block closed: '{currentLanguage}', code length={currentBlock.Length}\n");
+                        }
+                        catch { }
+
                         currentLanguage = null;
                         currentBlock.Clear();
                     }
@@ -541,6 +608,13 @@ namespace Calcpad.Common.MultLangCode
                         // Start of block
                         currentLanguage = langName;
                         blockStart = i;
+
+                        try
+                        {
+                            var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                            File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Block started: '{currentLanguage}'\n");
+                        }
+                        catch { }
                     }
                 }
                 else if (currentLanguage != null)
@@ -548,6 +622,18 @@ namespace Calcpad.Common.MultLangCode
                     currentBlock.AppendLine(lines[i]);
                 }
             }
+
+            try
+            {
+                var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] === ExtractCodeBlocks END ===\n");
+                File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Total language types found: {blocks.Count}\n");
+                foreach (var lang in blocks.Keys)
+                {
+                    File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}]   - '{lang}': {blocks[lang].Count} block(s)\n");
+                }
+            }
+            catch { }
 
             return blocks;
         }

@@ -11,7 +11,7 @@
     <Authors>Nedelcho Ganchovski</Authors>
     <RootNamespace>Calcpad.Wpf</RootNamespace>
     <Platforms>AnyCPU</Platforms>
-		<Version>1.0.0</Version>
+		<Version>1.0.3</Version>
 		<Authors>Calcpad Fork Contributors</Authors>
 		<Company>Calcpad Fork Project</Company>
     <PackageId>CalcpadFork</PackageId>
