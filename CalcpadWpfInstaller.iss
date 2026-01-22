@@ -2,7 +2,7 @@
 ; Genera un instalador setup.exe con todo incluido
 
 #define MyAppName "Calcpad Fork"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "Calcpad Fork Project"
 #define MyAppURL "https://github.com/GiorgioBurbanelli89/calcpad_fork"
 #define MyAppExeName "Calcpad.exe"
@@ -67,6 +67,7 @@ Source: "Examples\*"; DestDir: "{app}\Examples"; Flags: ignoreversion recursesub
 
 ; Documentación general
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme skipifsourcedoesntexist
+Source: "CHANGELOG.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 
 ; Documentación de HTML + CSS + TypeScript
@@ -80,6 +81,12 @@ Source: "INDICE_ARCHIVOS_CREADOS.txt"; DestDir: "{app}\Docs"; Flags: ignoreversi
 Source: "TYPESCRIPT_LISTO.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "TYPESCRIPT_@TS_CONFIGURADO.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "RESUMEN_TYPESCRIPT_@TS.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
+
+; Documentación de fixes críticos v1.0.1
+Source: "AUDITORIA_COMPLETA_MATHEDITOR.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "FIXES_CRITICOS_MEMORY_LEAKS_APLICADOS.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "RESUMEN_FINAL_TODOS_LOS_FIXES.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "TODOS_LOS_FIXES_APLICADOS.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
 
 ; Documentación del sistema de archivos separados y guardado
 Source: "NUEVO_SISTEMA_ARCHIVOS_SEPARADOS.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
