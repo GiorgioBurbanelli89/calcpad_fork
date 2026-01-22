@@ -1,10 +1,10 @@
-; Inno Setup Script para Calcpad WPF
+; Inno Setup Script para Calcpad Fork WPF
 ; Genera un instalador setup.exe con todo incluido
 
-#define MyAppName "Calcpad"
-#define MyAppVersion "7.5.7"
-#define MyAppPublisher "Proektsoftbg"
-#define MyAppURL "https://github.com/Proektsoftbg/Calcpad"
+#define MyAppName "Calcpad Fork"
+#define MyAppVersion "1.0.0"
+#define MyAppPublisher "Calcpad Fork Project"
+#define MyAppURL "https://github.com/GiorgioBurbanelli89/calcpad_fork"
 #define MyAppExeName "Calcpad.exe"
 
 [Setup]
@@ -16,12 +16,12 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\Calcpad
-DefaultGroupName=Calcpad
+DefaultDirName={autopf}\CalcpadFork
+DefaultGroupName=Calcpad Fork
 AllowNoIcons=yes
-LicenseFile=LICENSE.txt
+LicenseFile=LICENSE
 OutputDir=.\Installer
-OutputBaseFilename=Calcpad-Setup-{#MyAppVersion}
+OutputBaseFilename=CalcpadFork-Setup-{#MyAppVersion}
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
