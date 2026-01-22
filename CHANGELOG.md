@@ -7,6 +7,67 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [1.0.4] - 2026-01-22
+
+### ✨ Nueva Funcionalidad
+
+#### Formateo de Vectores y Matrices
+- Vectores `[2;3;4]` ahora se muestran con estilo de matriz (bordes) en lugar de texto plano
+- Matrices `[2;3|4;5]` se muestran como matrices 2D con bordes
+- Funciona en todos los modos: `#noc`, `#equ`, `#show`
+- Soporta valores literales y variables: `[x;y;z]` también se formatea
+
+### 📄 Archivos Modificados
+- `Calcpad.Core/Output/OutputWriter.cs` - Métodos abstractos FormatVectorExpression/FormatMatrixExpression
+- `Calcpad.Core/Output/HtmWriter.cs` - Implementación HTML con clase .matrix
+- `Calcpad.Core/Output/TextWriter.cs` - Implementación texto plano
+- `Calcpad.Core/Output/XmlWriter.cs` - Implementación XML para Word
+- `Calcpad.Core/Parsers/MathParser/MathParser.Output.cs` - RenderVectorToken/RenderMatrixToken
+
+---
+
+## [1.0.3] - 2026-01-22
+
+### ✨ Nueva Funcionalidad
+
+#### Directivas de Importación Inline
+- **@{mathcad:archivo.mcdx}** - Importa y convierte archivos Mathcad Prime
+- **@{smathstudio:archivo.sm}** o **@{smath:archivo.sm}** - Importa y convierte archivos SMath Studio
+- Las directivas se procesan durante la lectura del archivo y se reemplazan por código Calcpad convertido
+- Soporte para rutas absolutas y relativas
+
+#### Conversores de Archivos
+- **McdxConverter**: Conversión completa de hojas de cálculo Mathcad Prime a formato Calcpad
+  - Matrices en orden column-major correcto
+  - Regiones de texto convertidas a comentarios
+  - Sistema de advertencias para características no soportadas
+
+- **SMathConverter**: Parsing completo de archivos XML de SMath Studio
+  - Conversión de expresiones matemáticas con mapeo de operadores
+  - Soporte para matrices y vectores
+  - Traducción de nombres de funciones (ej: `ceil` → `ceiling`, `transpose` → `transp`)
+
+#### Botones de Toolbar para Import/Export
+- **M↓** (Naranja): Importar desde Mathcad Prime
+- **M↑** (Naranja): Exportar a Mathcad Prime (placeholder)
+- **S↓** (Verde): Importar desde SMath Studio
+- **S↑** (Verde): Exportar a SMath Studio (placeholder)
+
+### 🖥️ CLI
+- Soporte para archivos `.mcdx` en Calcpad CLI
+- Soporte para archivos `.sm` en Calcpad CLI
+- Nueva opción `-cpd` para convertir sin procesar
+
+### 📄 Archivos Modificados
+- `Calcpad.Common/CalcpadReader.cs` - Procesamiento de directivas de importación
+- `Calcpad.Common/McdxConverter.cs` - Conversor Mathcad Prime
+- `Calcpad.Common/SMathConverter.cs` - Conversor SMath Studio
+- `Calcpad.Cli/Program.cs` - Soporte CLI para .mcdx y .sm
+- `Calcpad.Wpf/MainWindow.xaml` - Botones de toolbar
+- `Calcpad.Wpf/MainWindow.xaml.cs` - Handlers de import/export
+
+---
+
 ## [1.0.2] - 2026-01-22
 
 ### 🐛 Corregido
