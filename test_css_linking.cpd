@@ -1,0 +1,94 @@
+"Test de CSS Linking con HTML
+'=============================
+
+"CSS como archivo separado
+'==========================
+
+@{css}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.box {
+    background-color: #3498db;
+    color: white;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.result {
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+@{end css}
+
+"HTML que usa el CSS mediante <link>
+'====================================
+
+@{html}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CSS Linking</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Test de CSS Linking</h1>
+
+        <p>Este HTML debería tener una referencia automática a <code>styles.css</code></p>
+
+        <div class="box">
+            Este div debería tener fondo azul y texto blanco
+        </div>
+
+        <div class="result">
+            Si ves estos estilos aplicados, CSS Linking funciona correctamente
+        </div>
+
+        <h2>Cálculos de Calcpad</h2>
+        <p>Longitud = 10 m</p>
+        <p>Ancho = 5 m</p>
+        <p>Área = 10 × 5 = 50 m²</p>
+    </div>
+</body>
+</html>
+@{end html}
+
+"Resultado esperado:
+'==================
+
+'1. El bloque @{css} se guarda como styles.css
+'2. El bloque @{html} se guarda como index.html
+'3. El HTML tiene automáticamente: <link rel="stylesheet" href="styles.css">
+'4. Al abrir index.html en el navegador, se ve el CSS aplicado
+'5. Ambos archivos están en: temp_multilang/
+
+"NOTA: Después de calcular (F5), verifica la carpeta:
+'C:\Users\j-b-j\Documents\Calcpad-7.5.7\temp_multilang\
+'
+'Deberías encontrar:
+'- index.html (con el <link> inyectado)
+'- styles.css (con todos los estilos)
