@@ -995,7 +995,20 @@ namespace Calcpad.Wpf
 
         private void EndAutoComplete()
         {
+            // FIX: Validar que _autoCompleteStart no sea null antes de usarlo
+            if (_autoCompleteStart == null || _richTextBox?.Selection == null)
+            {
+                _listBox.Visibility = Visibility.Hidden;
+                return;
+            }
+
             var selectedItem = (ListBoxItem)_listBox.SelectedItem;
+            if (selectedItem == null)
+            {
+                _listBox.Visibility = Visibility.Hidden;
+                return;
+            }
+
             string s = (string)selectedItem.Content;
             var items = _listBox.Items;
             var index = items.IndexOf(selectedItem);
