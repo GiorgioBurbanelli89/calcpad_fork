@@ -7,6 +7,27 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [1.0.2] - 2026-01-22
+
+### 🐛 Corregido
+
+#### AutoComplete Manager - Crash crítico
+- **ArgumentNullException:** Corregido crash al seleccionar item del autocompletado
+  - Error: "Value cannot be null. (Parameter 'position1')"
+  - Ubicación: `AutoCompleteManager.cs:1012` en método `EndAutoComplete()`
+  - Causa: `_autoCompleteStart` era null al crear `TextRange`
+  - Fix: Agregadas 3 validaciones null al inicio del método
+  - Impacto: Alto - Previene crash durante uso normal del autocompletado
+
+### 📄 Archivos Modificados
+- `Calcpad.Wpf/AutoCompleteManager.cs` (+13 líneas de validación)
+
+### ✅ Testing
+- Compilación: ✅ Exitosa (0 errores)
+- Validaciones: ✅ 3 null checks agregados
+
+---
+
 ## [1.0.1] - 2026-01-22
 
 ### 🐛 Corregido

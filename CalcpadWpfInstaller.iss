@@ -2,7 +2,7 @@
 ; Genera un instalador setup.exe con todo incluido
 
 #define MyAppName "Calcpad Fork"
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.2"
 #define MyAppPublisher "Calcpad Fork Project"
 #define MyAppURL "https://github.com/GiorgioBurbanelli89/calcpad_fork"
 #define MyAppExeName "Calcpad.exe"
