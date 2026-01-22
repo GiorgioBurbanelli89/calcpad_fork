@@ -27,7 +27,7 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesInstallIn64BitMode=x64
 PrivilegesRequired=admin
-SetupIconFile={#SourcePath}\Calcpad.Wpf\resources\calcpad.ico
+;SetupIconFile={#SourcePath}\Calcpad.Wpf\resources\calcpad.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
 [Languages]
