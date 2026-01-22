@@ -84,7 +84,8 @@ namespace Calcpad.Wpf.MathEditor
         private ExpressionParser _visualParser;
 
         // Preview AvalonEdit para mostrar línea actual con syntax highlighting
-        private TextEditor _previewEditor;
+        // DEPRECATED: Ahora usamos PreviewEditor del XAML directamente
+        // private TextEditor _previewEditor;
 
         // Evento para notificar cambios de contenido
         public event EventHandler ContentChanged;
@@ -127,7 +128,8 @@ namespace Calcpad.Wpf.MathEditor
             Loaded += (s, e) =>
             {
                 // Inicializar preview AvalonEdit compacto
-                InitializePreviewEditor();
+                // DEPRECATED: PreviewEditor se inicializa automáticamente desde XAML
+                // InitializePreviewEditor();
 
                 Render();
                 _cursorTimer.Start();
@@ -136,6 +138,13 @@ namespace Calcpad.Wpf.MathEditor
                 // Inicializar autocompletado
                 _autoComplete = new MathAutoComplete(AutoCompletePopup, AutoCompleteListBox);
                 _autoComplete.SetInsertCallback(InsertAutoCompleteText);
+            };
+
+            // FIX: Detener timers cuando el control se descarga (evitar memory leak)
+            Unloaded += (s, e) =>
+            {
+                _cursorTimer?.Stop();
+                _previewEditorProtectionTimer?.Stop();
             };
 
             PreviewKeyDown += MathEditorControl_PreviewKeyDown;
@@ -151,7 +160,9 @@ namespace Calcpad.Wpf.MathEditor
 
         /// <summary>
         /// Inicializa AvalonEdit compacto para preview de la línea actual
+        /// DEPRECATED: Ahora usamos PreviewEditor del XAML directamente
         /// </summary>
+        /*
         private void InitializePreviewEditor()
         {
             if (PreviewEditorContainer == null) return;
@@ -192,6 +203,7 @@ namespace Calcpad.Wpf.MathEditor
 
             PreviewEditorContainer.Child = _previewEditor;
         }
+        */
 
         #region Modo Visual (HTML Preview)
 
@@ -1157,11 +1169,8 @@ namespace Calcpad.Wpf.MathEditor
             var lineText = beforeCursor.ToString() + "|" + afterCursor.ToString();
             PreviewTextBlock.Text = lineText;
 
-            // También actualizar AvalonEdit si está disponible (para syntax highlighting opcional)
-            if (_previewEditor != null)
-            {
-                _previewEditor.Text = lineText;
-            }
+            // NO actualizar PreviewEditor aquí porque el | es solo visual para TextBlock
+            // PreviewEditor se actualiza solo cuando el usuario hace click en PreviewTextBlock
         }
 
         /// <summary>
@@ -1193,10 +1202,8 @@ namespace Calcpad.Wpf.MathEditor
 
             PreviewTextBlock.Text = lineText;
 
-            if (_previewEditor != null)
-            {
-                _previewEditor.Text = lineText;
-            }
+            // NO actualizar PreviewEditor aquí porque el | es solo visual para TextBlock
+            // PreviewEditor se actualiza solo cuando el usuario hace click en PreviewTextBlock
         }
 
         /// <summary>
@@ -2099,7 +2106,7 @@ namespace Calcpad.Wpf.MathEditor
                             typeface,
                             _fontSize,
                             Brushes.Black,
-                            VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+                            GetDpiScale());
                         cursorX += formattedText.Width;
                     }
                     break;
@@ -2126,6 +2133,26 @@ namespace Calcpad.Wpf.MathEditor
         }
 
         #region Helper methods para cursor y texto
+
+        /// <summary>
+        /// Obtiene el DPI scale de forma segura sin causar excepciones
+        /// </summary>
+        /// <returns>PixelsPerDip, o 1.0 si no se puede obtener</returns>
+        private double GetDpiScale()
+        {
+            try
+            {
+                if (Application.Current?.MainWindow != null)
+                {
+                    return VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip;
+                }
+            }
+            catch
+            {
+                // Fallback silencioso
+            }
+            return 1.0;
+        }
 
         /// <summary>
         /// Obtiene la posición del cursor del elemento actual
@@ -2253,7 +2280,7 @@ namespace Calcpad.Wpf.MathEditor
                         typeface,
                         fontSize,
                         Brushes.Black,
-                        VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+                        GetDpiScale());
 
                     double charEndX = formattedText.Width;
                     double charMidX = (accumulatedWidth + charEndX) / 2;
@@ -3741,6 +3768,184 @@ namespace Calcpad.Wpf.MathEditor
             }
         }
 
+        #region Preview Editor Event Handlers
+
+        // Campo para evitar recursión en sincronización preview
+        private bool _isApplyingPreviewEdit = false;
+        private bool _previewEditorJustOpened = false;
+        private DispatcherTimer _previewEditorProtectionTimer;
+
+        /// <summary>
+        /// Handler para click en preview bar - abre el editor de la línea actual
+        /// </summary>
+        private void PreviewTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_currentElement is MathExternalBlock externalBlock)
+            {
+                var lines = externalBlock.GetCodeLines();
+                if (externalBlock.CursorLine >= 0 && externalBlock.CursorLine < lines.Length)
+                {
+                    string currentLine = lines[externalBlock.CursorLine];
+                    string prefix = $"@{{{externalBlock.Language.ToLower()}}} Ln {externalBlock.CursorLine + 1}: ";
+                    string fullText = prefix + currentLine;
+
+                    // Mostrar editor, ocultar TextBlock
+                    PreviewTextBlock.Visibility = Visibility.Collapsed;
+                    PreviewEditorContainer.Visibility = Visibility.Visible;
+                    PreviewEditor.Text = fullText;
+
+                    // Marcar que el editor acaba de abrirse
+                    _previewEditorJustOpened = true;
+
+                    // Establecer cursor después de que se renderice el control
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        int caretPos = prefix.Length + externalBlock.CursorPosition;
+                        if (caretPos >= 0 && caretPos <= PreviewEditor.Text.Length)
+                        {
+                            PreviewEditor.CaretOffset = caretPos;
+                        }
+                        PreviewEditor.Focus();
+
+                        // Desmarcar después de 500ms usando un timer
+                        // FIX: Usar campo para poder hacer cleanup en Unloaded
+                        _previewEditorProtectionTimer?.Stop();
+                        _previewEditorProtectionTimer = new DispatcherTimer
+                        {
+                            Interval = TimeSpan.FromMilliseconds(500)
+                        };
+                        _previewEditorProtectionTimer.Tick += (s, args) =>
+                        {
+                            _previewEditorJustOpened = false;
+                            _previewEditorProtectionTimer.Stop();
+                        };
+                        _previewEditorProtectionTimer.Start();
+                    }), System.Windows.Threading.DispatcherPriority.Loaded);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handler para cambios de texto en preview editor - sincroniza en tiempo real
+        /// </summary>
+        private void PreviewEditor_TextChanged(object sender, EventArgs e)
+        {
+            if (_isApplyingPreviewEdit) return;
+            if (PreviewEditor == null || !PreviewEditor.IsFocused) return;
+            ApplyPreviewEditFromAvalonEdit(finalApply: false);
+        }
+
+        /// <summary>
+        /// Handler para teclas en preview editor - detecta Enter para cerrar
+        /// </summary>
+        private void PreviewEditor_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                ApplyPreviewEditFromAvalonEdit(finalApply: true);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                // Cancelar edición y cerrar
+                PreviewEditorContainer.Visibility = Visibility.Collapsed;
+                PreviewTextBlock.Visibility = Visibility.Visible;
+                EditorCanvas.Focus();
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// Handler para perder foco en preview editor - cierra el editor
+        /// </summary>
+        private void PreviewEditor_LostFocus(object sender, RoutedEventArgs e)
+        {
+            // Ignorar LostFocus si el editor acaba de abrirse (prevenir cierre inmediato)
+            if (_previewEditorJustOpened)
+            {
+                // Devolver el foco al editor
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (PreviewEditorContainer.Visibility == Visibility.Visible)
+                    {
+                        PreviewEditor.Focus();
+                    }
+                }), System.Windows.Threading.DispatcherPriority.Background);
+                return;
+            }
+
+            ApplyPreviewEditFromAvalonEdit(finalApply: true);
+        }
+
+        /// <summary>
+        /// Aplica los cambios del preview editor al modelo y canvas
+        /// </summary>
+        /// <param name="finalApply">true para Render completo y cerrar, false para actualización ligera</param>
+        private void ApplyPreviewEditFromAvalonEdit(bool finalApply = true)
+        {
+            if (_isApplyingPreviewEdit) return;
+            if (_currentElement is not MathExternalBlock externalBlock) return;
+
+            _isApplyingPreviewEdit = true;
+
+            try
+            {
+                // Extraer texto sin prefijo "@{lang} Ln X: "
+                string fullText = PreviewEditor.Text;
+                string pattern = @"^@\{[^\}]+\}\s+Ln\s+\d+:\s*";
+                string newText = System.Text.RegularExpressions.Regex.Replace(fullText, pattern, "");
+
+                // Actualizar modelo
+                externalBlock.SetCurrentLine(newText);
+
+                // Actualizar posición del cursor
+                string prefix = fullText.Substring(0, fullText.Length - newText.Length);
+                int caretInText = Math.Max(0, PreviewEditor.CaretOffset - prefix.Length);
+                externalBlock.CursorPosition = Math.Max(0, Math.Min(caretInText, newText.Length));
+
+                if (finalApply)
+                {
+                    // Render completo
+                    Render();
+
+                    // Cerrar editor después de que Render termine
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        PreviewEditorContainer.Visibility = Visibility.Collapsed;
+                        PreviewTextBlock.Visibility = Visibility.Visible;
+                        EditorCanvas.Focus();
+                    }), System.Windows.Threading.DispatcherPriority.Loaded);
+                }
+                else
+                {
+                    // Actualización ligera sin parseo completo
+                    UpdateCurrentElementInCanvas();
+                }
+            }
+            finally
+            {
+                _isApplyingPreviewEdit = false;
+            }
+        }
+
+        /// <summary>
+        /// Actualiza el canvas actual sin hacer Render completo (ligero)
+        /// </summary>
+        private void UpdateCurrentElementInCanvas()
+        {
+            if (_currentElement != null)
+            {
+                EditorCanvas.InvalidateVisual();
+            }
+        }
+
+        // Handlers deprecated para TextBox antiguo (evitar errores de compilación)
+        private void PreviewEditTextBox_KeyDown(object sender, KeyEventArgs e) { }
+        private void PreviewEditTextBox_LostFocus(object sender, RoutedEventArgs e) { }
+        private void PreviewEditTextBox_TextChanged(object sender, TextChangedEventArgs e) { }
+
+        #endregion
+
         private void EditorCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             var pos = e.GetPosition(EditorCanvas);
@@ -4150,7 +4355,8 @@ namespace Calcpad.Wpf.MathEditor
                 _lineSelectionEndElemIdx = endElem;
 
                 _selectedElements.Clear();
-                for (int lineIdx = startLine; lineIdx <= endLine; lineIdx++)
+                // FIX: Validar que lineIdx no exceda el tamaño de _lines
+                for (int lineIdx = startLine; lineIdx <= endLine && lineIdx < _lines.Count; lineIdx++)
                 {
                     var line = _lines[lineIdx];
                     int fromElem, toElem;
@@ -4241,7 +4447,7 @@ namespace Calcpad.Wpf.MathEditor
                     typeface,
                     _fontSize,
                     Brushes.Black,
-                    VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+                    GetDpiScale());
 
                 if (formattedText.Width >= relativeX)
                 {
@@ -4256,7 +4462,7 @@ namespace Calcpad.Wpf.MathEditor
                             typeface,
                             _fontSize,
                             Brushes.Black,
-                            VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+                            GetDpiScale());
 
                         double midPoint = (prevFormatted.Width + formattedText.Width) / 2;
                         if (relativeX < midPoint)

@@ -569,8 +569,12 @@ namespace Calcpad.Core
 
             if (_calculate && _startLine == 0)
             {
-                _parser.ClearCache();
-                _parser = null;
+                // FIX: Null check antes de llamar ClearCache()
+                if (_parser != null)
+                {
+                    _parser.ClearCache();
+                    _parser = null;
+                }
             }
         }
 

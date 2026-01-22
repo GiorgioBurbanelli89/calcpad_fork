@@ -332,6 +332,37 @@ namespace Calcpad.Wpf.MathEditor
         }
 
         /// <summary>
+        /// Establece el contenido de la línea actual donde está el cursor
+        /// No modifica CursorPosition - eso lo hace el llamador si es necesario
+        /// </summary>
+        public void SetCurrentLine(string newContent)
+        {
+            var lines = new System.Collections.Generic.List<string>(GetCodeLines());
+            LogToFile($"[SetCurrentLine] CursorLine={CursorLine} lines.Count={lines.Count} newContent='{newContent}'");
+            if (CursorLine >= 0 && CursorLine < lines.Count)
+            {
+                var oldLine = lines[CursorLine];
+                lines[CursorLine] = newContent ?? "";
+                Code = string.Join("\n", lines);
+                LogToFile($"[SetCurrentLine] oldLine='{oldLine}' -> newLine='{newContent}'");
+            }
+            else
+            {
+                LogToFile($"[SetCurrentLine] SKIPPED - CursorLine out of range");
+            }
+        }
+
+        private static void LogToFile(string message)
+        {
+            try
+            {
+                var logPath = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), "calcpad_debug.log");
+                System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} {message}\n");
+            }
+            catch { }
+        }
+
+        /// <summary>
         /// Inserta un carácter en la posición del cursor
         /// </summary>
         public void InsertChar(char c)
@@ -539,18 +570,6 @@ namespace Calcpad.Wpf.MathEditor
                 pos = i;
             }
             CursorPosition = pos;
-
-            // DEBUG - mostrar offsets de primeras posiciones
-            var offsets = new System.Text.StringBuilder();
-            for (int j = 0; j <= Math.Min(6, lineText.Length); j++)
-            {
-                offsets.Append($"[{j}]={GetCursorOffset(lineText, j, codeFontSize):F1} ");
-            }
-            System.Windows.MessageBox.Show(
-                $"relativeX={relativeX:F1}, pos={pos}\n" +
-                $"offsets: {offsets}\n" +
-                $"lineText=\"{lineText.Substring(0, Math.Min(20, lineText.Length))}\"",
-                "Debug Cursor");
         }
 
         /// <summary>

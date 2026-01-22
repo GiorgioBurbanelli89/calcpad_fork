@@ -329,21 +329,57 @@ namespace Calcpad.Common.MultLangCode
             }
             else
             {
-                // Return Calcpad comments (legacy mode for backward compatibility)
+                // Return Calcpad code with HTML markers for external block outputs
+                // HTML markers will be preserved by ExpressionParser and processed later
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (insertedContent.TryGetValue(i, out var content))
                     {
-                        // Insert output as Calcpad text (each line prefixed with ')
-                        var outputLines = content.output.Split('\n');
-                        foreach (var outputLine in outputLines)
+                        // Check if output looks like HTML (contains tags)
+                        var outputTrimmed = content.output?.Trim() ?? "";
+                        var isHtmlOutput = outputTrimmed.StartsWith("<") ||
+                                          outputTrimmed.Contains("<div") ||
+                                          outputTrimmed.Contains("<p") ||
+                                          outputTrimmed.Contains("<span") ||
+                                          outputTrimmed.Contains("<!DOCTYPE");
+
+                        if (isHtmlOutput)
                         {
-                            var trimmedLine = outputLine.TrimEnd('\r');
-                            if (!string.IsNullOrWhiteSpace(trimmedLine))
+                            // For HTML output: use a special marker that ExpressionParser will preserve
+                            // Format: <!--MULTILANG_OUTPUT:base64-->
+                            var base64Output = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(content.output));
+                            result.AppendLine($"<!--MULTILANG_OUTPUT:{base64Output}-->");
+                        }
+                        else
+                        {
+                            // For plain text output: insert as Calcpad comments
+                            var outputLines = content.output?.Split('\n') ?? Array.Empty<string>();
+                            foreach (var outputLine in outputLines)
                             {
-                                // Don't show CALCPAD:var=value lines in output
-                                if (!trimmedLine.StartsWith("CALCPAD:"))
-                                    result.AppendLine($"'{trimmedLine}");
+                                var trimmedLine = outputLine.TrimEnd('\r');
+                                if (!string.IsNullOrWhiteSpace(trimmedLine))
+                                {
+                                    // Don't show CALCPAD:var=value lines in output
+                                    if (!trimmedLine.StartsWith("CALCPAD:"))
+                                    {
+                                        // Use double quotes if line contains single quotes to avoid comment termination
+                                        // Calcpad interprets ' and " as comment start, and uses the same char to end
+                                        var hasSingle = trimmedLine.Contains('\'');
+                                        var hasDouble = trimmedLine.Contains('"');
+
+                                        if (hasSingle && hasDouble)
+                                        {
+                                            // Both quotes present - escape single quotes and use single quote prefix
+                                            var escaped = trimmedLine.Replace("'", "\\'");
+                                            result.AppendLine($"'{escaped}");
+                                        }
+                                        else
+                                        {
+                                            var commentChar = hasSingle ? '"' : '\'';
+                                            result.AppendLine($"{commentChar}{trimmedLine}");
+                                        }
+                                    }
+                                }
                             }
                         }
 

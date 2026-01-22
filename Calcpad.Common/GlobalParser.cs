@@ -318,5 +318,106 @@ namespace Calcpad.Common
 
             return result.ToString();
         }
+
+        /// <summary>
+        /// Processes MULTILANG_OUTPUT markers in HTML content
+        /// Replaces <!--MULTILANG_OUTPUT:base64--> with the decoded HTML
+        /// </summary>
+        /// <param name="htmlContent">HTML content with MULTILANG_OUTPUT markers</param>
+        /// <returns>HTML with markers replaced by decoded content</returns>
+        public static string ProcessMultilangOutputMarkers(string htmlContent)
+        {
+            if (string.IsNullOrEmpty(htmlContent))
+                return htmlContent;
+
+            const string markerStart = "<!--MULTILANG_OUTPUT:";
+            const string markerEnd = "-->";
+
+            // Quick check: if no markers, return as-is
+            if (!htmlContent.Contains(markerStart))
+                return htmlContent;
+
+            try
+            {
+                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath,
+                    $"[{DateTime.Now:HH:mm:ss}] ProcessMultilangOutputMarkers: Processing markers...\n");
+            }
+            catch { }
+
+            var result = new StringBuilder();
+            int i = 0;
+            int markersProcessed = 0;
+
+            while (i < htmlContent.Length)
+            {
+                // Look for marker: <!--MULTILANG_OUTPUT:
+                if (i + markerStart.Length < htmlContent.Length &&
+                    htmlContent.Substring(i, markerStart.Length) == markerStart)
+                {
+                    markersProcessed++;
+                    int start = i + markerStart.Length;
+                    int endIndex = htmlContent.IndexOf(markerEnd, start, StringComparison.Ordinal);
+
+                    if (endIndex > start)
+                    {
+                        var base64Content = htmlContent.Substring(start, endIndex - start);
+
+                        try
+                        {
+                            // Decode base64 to get the original HTML
+                            var decodedBytes = Convert.FromBase64String(base64Content);
+                            var decodedHtml = System.Text.Encoding.UTF8.GetString(decodedBytes);
+
+                            // Insert the decoded HTML
+                            result.Append(decodedHtml);
+
+                            try
+                            {
+                                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                                System.IO.File.AppendAllText(debugPath,
+                                    $"[{DateTime.Now:HH:mm:ss}] ProcessMultilangOutputMarkers: Decoded marker #{markersProcessed}, HTML length: {decodedHtml.Length}\n");
+                            }
+                            catch { }
+                        }
+                        catch (Exception ex)
+                        {
+                            // If decoding fails, keep the marker as-is
+                            result.Append($"<!--MULTILANG_OUTPUT:{base64Content}-->");
+
+                            try
+                            {
+                                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                                System.IO.File.AppendAllText(debugPath,
+                                    $"[{DateTime.Now:HH:mm:ss}] ProcessMultilangOutputMarkers: Failed to decode marker #{markersProcessed}: {ex.Message}\n");
+                            }
+                            catch { }
+                        }
+
+                        i = endIndex + markerEnd.Length;
+                    }
+                    else
+                    {
+                        result.Append(htmlContent[i]);
+                        i++;
+                    }
+                }
+                else
+                {
+                    result.Append(htmlContent[i]);
+                    i++;
+                }
+            }
+
+            try
+            {
+                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath,
+                    $"[{DateTime.Now:HH:mm:ss}] ProcessMultilangOutputMarkers: Processed {markersProcessed} markers, result length: {result.Length}\n");
+            }
+            catch { }
+
+            return result.ToString();
+        }
     }
 }

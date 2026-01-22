@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
              Focusable="True"
              Background="White">
     <Grid>
@@ -30,15 +31,40 @@
                     <TextBlock Text="Calcpad: " FontSize="10" Foreground="#666" FontWeight="Bold"
                                VerticalAlignment="Center" Margin="0,0,0,0"/>
 
-                    <!-- TextBlock simple para mostrar la línea actual con cursor -->
+                    <!-- TextBlock simple para mostrar la línea actual con cursor (click para editar) -->
                     <TextBlock x:Name="PreviewTextBlock" FontFamily="Consolas" FontSize="10"
                                Foreground="#333" VerticalAlignment="Center" MinWidth="200"
-                               TextTrimming="CharacterEllipsis" MaxWidth="600"/>
+                               TextTrimming="CharacterEllipsis" MaxWidth="600"
+                               MouseLeftButtonDown="PreviewTextBlock_MouseLeftButtonDown"
+                               Cursor="IBeam" ToolTip="Click para editar"
+                               AutomationProperties.AutomationId="PreviewTextBlock"/>
 
-                    <!-- Container oculto para AvalonEdit (usado para syntax highlighting si se necesita) -->
-                    <Border x:Name="PreviewEditorContainer" BorderThickness="0" Background="Transparent"
-                            Height="16" MinWidth="0" VerticalAlignment="Center" Margin="0,0,0,0"
-                            Visibility="Collapsed"/>
+                    <!-- AvalonEdit para edición directa con syntax highlighting (oculto por defecto) -->
+                    <Border x:Name="PreviewEditorContainer" BorderThickness="1" BorderBrush="#1976D2"
+                            Background="White" Height="20" MinWidth="200" MaxWidth="600"
+                            VerticalAlignment="Center" Margin="0,0,0,0" Visibility="Collapsed">
+                        <avalonEdit:TextEditor x:Name="PreviewEditor"
+                                               FontFamily="Consolas" FontSize="10"
+                                               Background="White" Foreground="#333"
+                                               VerticalScrollBarVisibility="Hidden"
+                                               HorizontalScrollBarVisibility="Hidden"
+                                               ShowLineNumbers="False"
+                                               WordWrap="False"
+                                               Padding="2,0,0,0"
+                                               KeyDown="PreviewEditor_KeyDown"
+                                               LostFocus="PreviewEditor_LostFocus"
+                                               TextChanged="PreviewEditor_TextChanged"/>
+                    </Border>
+
+                    <!-- DEPRECATED: TextBox antiguo - mantener para referencia temporal -->
+                    <TextBox x:Name="PreviewEditTextBox" FontFamily="Consolas" FontSize="10"
+                             Foreground="#333" VerticalAlignment="Center" MinWidth="200"
+                             MaxWidth="600" Visibility="Collapsed" BorderThickness="1"
+                             BorderBrush="#1976D2" Background="White" Padding="2,0"
+                             KeyDown="PreviewEditTextBox_KeyDown"
+                             LostFocus="PreviewEditTextBox_LostFocus"
+                             TextChanged="PreviewEditTextBox_TextChanged"
+                             AutomationProperties.AutomationId="PreviewEditTextBox"/>
                 </StackPanel>
 
                 <!-- Toggle Código/Visual y Zoom -->
