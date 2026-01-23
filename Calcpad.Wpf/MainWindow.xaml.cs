@@ -122,6 +122,7 @@ namespace Calcpad.Wpf
         private bool _isSaving;
         private bool _isSaved;
         private bool _isParsing;
+        private readonly SemaphoreSlim _parsingSemaphore = new(1, 1); // Thread-safe parser access
         private bool _isPasting;
         private bool _isTextChangedEnabled;
         private readonly double _inputHeight;
@@ -1433,9 +1434,20 @@ namespace Calcpad.Wpf
         {
             var sw = CalcpadTelemetry.BeginOperation("CalculateAsync", new { ToWebForm = toWebForm });
 
+            // Thread-safe check: try to acquire semaphore without blocking
+            if (!await _parsingSemaphore.WaitAsync(0))
+            {
+                CalcpadTelemetry.LogEvent("CALCULATE", "Skipped - already parsing (semaphore busy)");
+                return;
+            }
+
+            try
+            {
+            // Legacy flag for UI state tracking
             if (_isParsing)
             {
                 CalcpadTelemetry.LogEvent("CALCULATE", "Skipped - already parsing");
+                _parsingSemaphore.Release();
                 return;
             }
 
@@ -1861,6 +1873,13 @@ namespace Calcpad.Wpf
             catch { }
 
             CalcpadTelemetry.EndOperation("CalculateAsync", sw, new { Success = true });
+            }
+            finally
+            {
+                // Always reset parsing flag and release the semaphore when done
+                _isParsing = false;
+                _parsingSemaphore.Release();
+            }
         }
 
         private void FreezeOutputButtons(bool freeze)
@@ -2969,16 +2988,138 @@ namespace Calcpad.Wpf
         }
 
         /// <summary>
-        /// Export to Mathcad Prime (.mcdx) - placeholder for future implementation
+        /// Export to Mathcad Prime (.mcdx) with version selection
         /// </summary>
         private void ExportMathcadPrime_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "Exportar a Mathcad Prime (.mcdx) estará disponible en una versión futura.\n\n" +
-                "Esta función convertirá el archivo .cpd actual al formato Mathcad Prime.",
-                "Función en desarrollo",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            // Create version selection dialog
+            var versionDialog = new Window
+            {
+                Title = "Exportar a Mathcad Prime",
+                Width = 350,
+                Height = 250,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this,
+                ResizeMode = ResizeMode.NoResize,
+                ShowInTaskbar = false
+            };
+
+            var stackPanel = new StackPanel { Margin = new Thickness(20) };
+
+            var titleLabel = new TextBlock
+            {
+                Text = "Seleccione la versión de Mathcad Prime:",
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(0, 0, 0, 15)
+            };
+            stackPanel.Children.Add(titleLabel);
+
+            var versionCombo = new ComboBox
+            {
+                Margin = new Thickness(0, 0, 0, 15),
+                FontSize = 14
+            };
+            // Add Mathcad Prime versions (6.0 through 11.0)
+            versionCombo.Items.Add("Mathcad Prime 6.0");
+            versionCombo.Items.Add("Mathcad Prime 7.0");
+            versionCombo.Items.Add("Mathcad Prime 8.0");
+            versionCombo.Items.Add("Mathcad Prime 9.0");
+            versionCombo.Items.Add("Mathcad Prime 10.0 (Recomendado)");
+            versionCombo.Items.Add("Mathcad Prime 11.0");
+            versionCombo.SelectedIndex = 4; // Default to version 10.0
+            stackPanel.Children.Add(versionCombo);
+
+            var noteLabel = new TextBlock
+            {
+                Text = "Nota: Versiones más recientes tienen mejor soporte\npara funciones avanzadas de Calcpad.",
+                Foreground = new SolidColorBrush(Color.FromRgb(100, 100, 100)),
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 0, 20),
+                TextWrapping = TextWrapping.Wrap
+            };
+            stackPanel.Children.Add(noteLabel);
+
+            var buttonPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+
+            var exportButton = new Button
+            {
+                Content = "Exportar",
+                Width = 80,
+                Height = 30,
+                Margin = new Thickness(0, 0, 10, 0),
+                IsDefault = true
+            };
+            var cancelButton = new Button
+            {
+                Content = "Cancelar",
+                Width = 80,
+                Height = 30,
+                IsCancel = true
+            };
+
+            int? selectedVersion = null;
+            exportButton.Click += (s, args) =>
+            {
+                selectedVersion = versionCombo.SelectedIndex + 6; // 6, 7, 8, 9, 10, 11
+                versionDialog.DialogResult = true;
+            };
+            cancelButton.Click += (s, args) =>
+            {
+                versionDialog.DialogResult = false;
+            };
+
+            buttonPanel.Children.Add(exportButton);
+            buttonPanel.Children.Add(cancelButton);
+            stackPanel.Children.Add(buttonPanel);
+
+            versionDialog.Content = stackPanel;
+
+            if (versionDialog.ShowDialog() == true && selectedVersion.HasValue)
+            {
+                // Show save file dialog
+                var saveDialog = new SaveFileDialog
+                {
+                    DefaultExt = ".mcdx",
+                    Filter = "Mathcad Prime Files (*.mcdx)|*.mcdx",
+                    Title = $"Exportar como Mathcad Prime {selectedVersion.Value}.0",
+                    FileName = !string.IsNullOrEmpty(CurrentFileName)
+                        ? Path.GetFileNameWithoutExtension(CurrentFileName) + ".mcdx"
+                        : "documento.mcdx"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                {
+                    try
+                    {
+                        // Get current document content
+                        string content = InputText;
+
+                        // TODO: Implement actual McdxExporter when available
+                        // For now, show placeholder message with version info
+                        MessageBox.Show(
+                            $"Exportación a Mathcad Prime {selectedVersion.Value}.0\n\n" +
+                            $"Archivo: {saveDialog.FileName}\n" +
+                            $"Versión seleccionada: {selectedVersion.Value}.0\n\n" +
+                            "La funcionalidad de exportación completa estará disponible\n" +
+                            "en una próxima versión.",
+                            "Exportación en desarrollo",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            $"Error al exportar: {ex.Message}",
+                            "Error de exportación",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -3088,6 +3229,30 @@ namespace Calcpad.Wpf
                 "Función en desarrollo",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// Mathcad button click - opens context menu
+        /// </summary>
+        private void MathcadBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.ContextMenu != null)
+            {
+                btn.ContextMenu.PlacementTarget = btn;
+                btn.ContextMenu.IsOpen = true;
+            }
+        }
+
+        /// <summary>
+        /// SMath button click - opens context menu
+        /// </summary>
+        private void SMathBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.ContextMenu != null)
+            {
+                btn.ContextMenu.PlacementTarget = btn;
+                btn.ContextMenu.IsOpen = true;
+            }
         }
 
         private void InsertImage(string filePath)
@@ -3533,31 +3698,215 @@ namespace Calcpad.Wpf
 
         private void PasteImage(string name)
         {
-            if (string.IsNullOrEmpty(name))
+            // Show dialog with 3 options
+            var dialog = new PasteImageDialog();
+            dialog.Owner = this;
+            var result = dialog.ShowDialog();
+
+            if (result != true)
+                return;
+
+            switch (dialog.SelectedOption)
             {
-                Random rand = new();
-                name = $"image_{rand.NextInt64()}";
-                InputBox.Show("Calcpad", "Image name:", ref name);
-                name += ".png";
+                case PasteImageOption.Base64:
+                    PasteImageAsBase64();
+                    break;
+                case PasteImageOption.LocalFile:
+                    PasteImageAsFile(name);
+                    break;
+                case PasteImageOption.Imgur:
+                    PasteImageToImgur(dialog.ImgurClientId);
+                    break;
             }
-            string path;
-            if (!string.IsNullOrEmpty(CurrentFileName))
-                path = Path.GetDirectoryName(CurrentFileName) + "\\Images\\";
-            else
-                path = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\Calcpad\\";
+        }
 
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
-            path += name;
+        /// <summary>
+        /// Paste image from clipboard as Base64 embedded in the document
+        /// </summary>
+        private void PasteImageAsBase64()
+        {
             try
             {
-                BitmapPaster.PasteImageFromClipboard(path);
-                InsertImage(path);
+                if (!Clipboard.ContainsImage())
+                {
+                    ShowErrorMessage("No hay imagen en el portapapeles");
+                    return;
+                }
+
+                var bitmapSource = Clipboard.GetImage();
+                if (bitmapSource == null)
+                {
+                    ShowErrorMessage("No se pudo obtener la imagen del portapapeles");
+                    return;
+                }
+
+                // Convert BitmapSource to PNG bytes
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+
+                using var memoryStream = new MemoryStream();
+                encoder.Save(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+
+                // Convert to Base64
+                var base64String = Convert.ToBase64String(imageBytes);
+
+                // Create the @{image} block
+                var imageBlock = $"@{{image png base64}}\n{base64String}\n@{{end image}}";
+
+                // Insert into editor
+                InsertTextAtCursor(imageBlock);
             }
             catch (Exception ex)
             {
-                ShowErrorMessage(ex.Message);
+                ShowErrorMessage($"Error al pegar imagen como Base64: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Paste image from clipboard by uploading to Imgur and inserting URL
+        /// </summary>
+        /// <param name="clientId">Imgur API Client-ID provided by user</param>
+        private async void PasteImageToImgur(string clientId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(clientId))
+                {
+                    ShowErrorMessage("Se requiere un Client-ID de Imgur.\n\nRegistre una aplicación gratuita en:\nhttps://api.imgur.com/oauth2/addclient");
+                    return;
+                }
+
+                if (!Clipboard.ContainsImage())
+                {
+                    ShowErrorMessage("No hay imagen en el portapapeles");
+                    return;
+                }
+
+                var bitmapSource = Clipboard.GetImage();
+                if (bitmapSource == null)
+                {
+                    ShowErrorMessage("No se pudo obtener la imagen del portapapeles");
+                    return;
+                }
+
+                // Show progress message
+                Mouse.OverrideCursor = Cursors.Wait;
+
+                // Convert BitmapSource to PNG bytes
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+
+                using var memoryStream = new MemoryStream();
+                encoder.Save(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+                var base64Image = Convert.ToBase64String(imageBytes);
+
+                // Upload to Imgur using user's Client-ID
+                using var httpClient = new System.Net.Http.HttpClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(30);
+
+                // Use user-provided Client-ID
+                httpClient.DefaultRequestHeaders.Add("Authorization", $"Client-ID {clientId}");
+
+                var formContent = new System.Net.Http.FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("image", base64Image),
+                    new KeyValuePair<string, string>("type", "base64")
+                });
+
+                var response = await httpClient.PostAsync("https://api.imgur.com/3/image", formContent);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                Mouse.OverrideCursor = null;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse JSON response to get the image URL
+                    var linkMatch = System.Text.RegularExpressions.Regex.Match(
+                        responseString, @"""link""\s*:\s*""([^""]+)""");
+
+                    if (linkMatch.Success)
+                    {
+                        var imageUrl = linkMatch.Groups[1].Value.Replace("\\/", "/");
+
+                        // Insert as HTML image tag
+                        var imageTag = $"'<img src=\"{imageUrl}\" alt=\"Imagen Imgur\">'";
+                        InsertTextAtCursor(imageTag);
+
+                        MessageBox.Show($"Imagen subida exitosamente:\n{imageUrl}", "Imgur", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        ShowErrorMessage($"No se pudo obtener la URL.\nRespuesta: {responseString.Substring(0, Math.Min(200, responseString.Length))}");
+                    }
+                }
+                else
+                {
+                    ShowErrorMessage($"Error Imgur ({response.StatusCode}):\n{responseString.Substring(0, Math.Min(300, responseString.Length))}");
+                }
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                Mouse.OverrideCursor = null;
+                ShowErrorMessage($"Error de conexión a Imgur:\n{ex.Message}\n\nVerifique su conexión a Internet.");
+            }
+            catch (TaskCanceledException)
+            {
+                Mouse.OverrideCursor = null;
+                ShowErrorMessage("Tiempo de espera agotado al subir a Imgur.\nIntente de nuevo.");
+            }
+            catch (Exception ex)
+            {
+                Mouse.OverrideCursor = null;
+                ShowErrorMessage($"Error al subir imagen a Imgur:\n{ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Paste image from clipboard as external file (original behavior)
+        /// </summary>
+        private void PasteImageAsFile(string name)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    Random rand = new();
+                    name = $"image_{rand.NextInt64()}";
+                    InputBox.Show("Calcpad", "Image name:", ref name);
+                    name += ".png";
+                }
+                string path;
+                if (!string.IsNullOrEmpty(CurrentFileName))
+                    path = Path.GetDirectoryName(CurrentFileName) + "\\Images\\";
+                else
+                    path = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\Calcpad\\";
+
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                path += name;
+
+                BitmapPaster.PasteImageFromClipboard(path);
+
+                // Build image tag - use InsertTextAtCursor for AvalonEdit compatibility
+                var fileName = Path.GetFileName(path);
+                var size = GetImageSize(path);
+                var fileDir = Path.GetDirectoryName(path);
+                string src;
+                if (!string.IsNullOrEmpty(CurrentFileName) &&
+                    string.Equals(Path.GetDirectoryName(CurrentFileName), fileDir, StringComparison.OrdinalIgnoreCase))
+                    src = "./" + fileName;
+                else
+                    src = path.Replace('\\', '/');
+
+                var imageTag = $"'<img style=\"height:{size.Height}pt; width:{size.Width}pt;\" src=\"{src}\" alt=\"{fileName}\">'";
+                InsertTextAtCursor(imageTag);
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage($"Error al guardar imagen: {ex.Message}");
             }
         }
 
@@ -5092,33 +5441,78 @@ namespace Calcpad.Wpf
 
         private void InsertTextAtCursor(string text)
         {
-            // If in MathEditor mode, switch to Code mode first
-            if (_currentEditorMode == EditorMode.Visual)
+            try
             {
-                SwitchToCodeEditorMode();
+                // If in MathEditor mode, switch to Code mode first
+                if (_currentEditorMode == EditorMode.Visual)
+                {
+                    SwitchToCodeEditorMode();
+                }
+
+                // ALWAYS prefer AvalonEdit (TextEditor) if it exists and is visible
+                if (TextEditor != null && TextEditor.Visibility == Visibility.Visible && TextEditor.Document != null)
+                {
+                    // Insert into AvalonEdit
+                    TextEditor.Focus();
+                    int caretOffset = TextEditor.CaretOffset;
+
+                    // Ensure caret is within valid range
+                    if (caretOffset < 0) caretOffset = 0;
+                    if (caretOffset > TextEditor.Document.TextLength) caretOffset = TextEditor.Document.TextLength;
+
+                    TextEditor.Document.Insert(caretOffset, text);
+                    // Move caret to end of inserted text
+                    TextEditor.CaretOffset = caretOffset + text.Length;
+
+                    // Sync to RichTextBox to keep them in sync
+                    try { SyncContentToRichTextBox(); } catch { }
+                    return;
+                }
+
+                // Fallback to RichTextBox only if AvalonEdit is not available
+                if (RichTextBox.Visibility != Visibility.Visible)
+                {
+                    RichTextBox.Visibility = Visibility.Visible;
+                }
+
+                RichTextBox.Focus();
+
+                // Use a safer method to insert text
+                var selection = RichTextBox.Selection;
+                if (selection != null && !selection.IsEmpty)
+                {
+                    // Replace selected text
+                    selection.Text = text;
+                }
+                else
+                {
+                    // Insert at caret position using TextPointer
+                    var caretPosition = RichTextBox.CaretPosition;
+                    if (caretPosition != null)
+                    {
+                        var run = new Run(text);
+                        caretPosition.Paragraph?.Inlines.Add(run);
+                    }
+                    else
+                    {
+                        // Append to document
+                        var paragraph = new Paragraph(new Run(text));
+                        _document.Blocks.Add(paragraph);
+                    }
+                }
             }
-
-            // Ensure RichTextBox is visible and focused
-            if (RichTextBox.Visibility != Visibility.Visible)
+            catch (Exception ex)
             {
-                RichTextBox.Visibility = Visibility.Visible;
-            }
-
-            RichTextBox.Focus();
-
-            var caretPosition = RichTextBox.CaretPosition;
-            if (caretPosition == null)
-            {
-                // If no caret position, insert at the end
-                caretPosition = _document.ContentEnd;
-            }
-
-            caretPosition.InsertTextInRun(text);
-
-            var newPosition = caretPosition.GetPositionAtOffset(text.Length / 2);
-            if (newPosition != null)
-            {
-                RichTextBox.CaretPosition = newPosition;
+                System.Diagnostics.Debug.WriteLine($"InsertTextAtCursor error: {ex.Message}");
+                // Last resort: just set the text
+                try
+                {
+                    if (_isAvalonEditActive && TextEditor != null)
+                    {
+                        TextEditor.Text += "\n" + text;
+                    }
+                }
+                catch { }
             }
         }
 

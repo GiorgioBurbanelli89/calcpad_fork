@@ -376,6 +376,23 @@ namespace Calcpad.Wpf
                 return;
             }
 
+            // Ctrl+V - Check if pasting an image
+            var modifiers = e.KeyboardDevice.Modifiers;
+            var isCtrl = modifiers == ModifierKeys.Control;
+            var isCtrlShift = modifiers == (ModifierKeys.Control | ModifierKeys.Shift);
+
+            if (e.Key == Key.V && isCtrl && !isCtrlShift)
+            {
+                if (System.Windows.Clipboard.ContainsImage())
+                {
+                    // Image in clipboard - show paste dialog
+                    e.Handled = true;
+                    Dispatcher.InvokeAsync(() => PasteImage(null), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                    return;
+                }
+                // Text paste - let AvalonEdit handle it normally
+            }
+
             // Delegate other keys to RichTextBox_PreviewKeyDown for compatibility
             RichTextBox_PreviewKeyDown(sender, e);
         }
