@@ -1,0 +1,66 @@
+"Calcpad Multi-Column Layout Demo
+'This demonstrates the new #columns feature
+
+"Example 1: Two Columns - Calcpad + Image
+#columns 2
+'Left column: Calcpad calculations
+a = 5
+b = 10
+c = a + b
+Area = a*b
+#column
+'Right column: An image
+'<img src="https://via.placeholder.com/200x150" alt="Placeholder">'
+#end columns
+
+"Example 2: Three Columns - Mixed Content
+#columns 3
+'Column 1: Variables
+x = 100
+y = 200
+z = x + y
+#column
+'Column 2: More calculations
+r = 5
+Circumference = 2*π*r
+Area_circle = π*r^2
+#column
+'Column 3: Results summary
+'Total x+y = 'z'
+'Circle area = 'Area_circle'
+#end columns
+
+"Example 3: Two Columns with Code Blocks
+#columns 2
+'Calcpad side:
+f(x) = x^2 + 2*x + 1
+f(3)
+f(5)
+#column
+'Python side:
+@{python}
+def f(x):
+    return x**2 + 2*x + 1
+
+print(f"f(3) = {f(3)}")
+print(f"f(5) = {f(5)}")
+@{end python}
+#end columns
+
+"Example 4: Four Columns Layout
+#columns 4
+'Col 1
+a = 1
+#column
+'Col 2
+b = 2
+#column
+'Col 3
+c = 3
+#column
+'Col 4
+d = 4
+Total = a+b+c+d
+#end columns
+
+'End of demo

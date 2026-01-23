@@ -1,8 +1,9 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 
 namespace Calcpad.Core
 {
@@ -48,6 +49,9 @@ namespace Calcpad.Core
             Append,
             Phasor,
             Complex,
+            Columns,
+            Column,
+            End_Columns,
             SkipLine
         }
         private enum KeywordResult  
@@ -208,6 +212,15 @@ namespace Calcpad.Core
                     break;
                 case Keyword.Complex:
                     _parser.Phasor = false;
+                    break;
+                case Keyword.Columns:
+                    ParseKeywordColumns(s);
+                    break;
+                case Keyword.Column:
+                    ParseKeywordColumn();
+                    break;
+                case Keyword.End_Columns:
+                    ParseKeywordEndColumns();
                     break;
 
                 default:
@@ -695,6 +708,93 @@ namespace Calcpad.Core
             }
             _sb.Append($" <small>TYPE</small>={options.Type}");
             _sb.Append("</p>");
+        }
+
+        /// <summary>
+        /// Parse #columns N directive - starts a multi-column layout
+        /// </summary>
+        private void ParseKeywordColumns(ReadOnlySpan<char> s)
+        {
+            if (_columnCount > 0)
+            {
+                AppendError(s.ToString(), "Nested #columns blocks are not allowed", _currentLine);
+                return;
+            }
+
+            // Parse number of columns from "#columns N"
+            int count = 2; // Default to 2 columns
+            if (s.Length > 8)
+            {
+                var expr = s[8..].Trim();
+                if (int.TryParse(expr, out int n) && n >= 2 && n <= 4)
+                    count = n;
+                else if (!expr.IsWhiteSpace())
+                {
+                    AppendError(s.ToString(), "Number of columns must be 2, 3, or 4", _currentLine);
+                    return;
+                }
+            }
+
+            _columnCount = count;
+            _currentColumn = 1;
+            _columnBuffer = new StringBuilder(2000);
+
+            if (_isVisible)
+            {
+                // Calculate column width percentage
+                var widthPercent = 100.0 / count;
+                _sb.Append($"<div{HtmlId} class=\"columns-container\" style=\"display:flex;gap:1em;flex-wrap:wrap;\">");
+                _sb.Append($"<div class=\"column\" style=\"flex:1;min-width:{widthPercent - 5}%;max-width:{widthPercent + 5}%;\">");
+            }
+        }
+
+        /// <summary>
+        /// Parse #column directive - moves to next column
+        /// </summary>
+        private void ParseKeywordColumn()
+        {
+            if (_columnCount == 0)
+            {
+                AppendError("#column", "#column without a corresponding #columns", _currentLine);
+                return;
+            }
+
+            if (_currentColumn >= _columnCount)
+            {
+                AppendError("#column", $"Cannot add more than {_columnCount} columns", _currentLine);
+                return;
+            }
+
+            _currentColumn++;
+
+            if (_isVisible)
+            {
+                // Close previous column and start new one
+                var widthPercent = 100.0 / _columnCount;
+                _sb.Append($"</div><div class=\"column\" style=\"flex:1;min-width:{widthPercent - 5}%;max-width:{widthPercent + 5}%;\">");
+            }
+        }
+
+        /// <summary>
+        /// Parse #end columns directive - ends the multi-column layout
+        /// </summary>
+        private void ParseKeywordEndColumns()
+        {
+            if (_columnCount == 0)
+            {
+                AppendError("#end columns", "#end columns without a corresponding #columns", _currentLine);
+                return;
+            }
+
+            if (_isVisible)
+            {
+                // Close the last column and the container
+                _sb.Append("</div></div>");
+            }
+
+            _columnCount = 0;
+            _currentColumn = 0;
+            _columnBuffer = null;
         }
     }
 }

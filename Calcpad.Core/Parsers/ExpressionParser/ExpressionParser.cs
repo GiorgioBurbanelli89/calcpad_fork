@@ -33,6 +33,11 @@ namespace Calcpad.Core
         private SvgParser _svgParser;
         private bool _isSvgBlock;
 
+        // Column layout state
+        private int _columnCount;           // Number of columns (0 = not in column mode)
+        private int _currentColumn;         // Current column index (1-based)
+        private StringBuilder _columnBuffer; // Buffer for column content
+
         public Settings Settings { get; set; } = new();
         public string HtmlResult { get; private set; }
         public static bool IsUs
@@ -170,6 +175,71 @@ namespace Calcpad.Core
 
                         continue;
                     }
+
+                    // Check for MULTILANG_OUTPUT marker - these contain Base64-encoded HTML
+                    // that should be decoded and inserted directly without parsing
+                    var lineString = textSpan.ToString();
+
+                    // Debug logging
+                    try
+                    {
+                        if (lineString.Contains("MULTILANG"))
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] ExpressionParser: Found MULTILANG in line: {lineString.Substring(0, Math.Min(100, lineString.Length))}\n");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] ExpressionParser: StartsWith check: {lineString.StartsWith("<!--MULTILANG_OUTPUT:", StringComparison.OrdinalIgnoreCase)}\n");
+                        }
+                    }
+                    catch { }
+
+                    if (lineString.StartsWith("<!--MULTILANG_OUTPUT:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] ExpressionParser: MATCHED! Decoding marker...\n");
+
+                            // Extract Base64 content between : and -->
+                            var startIdx = lineString.IndexOf(':') + 1;
+                            var endIdx = lineString.IndexOf("-->");
+                            if (endIdx > startIdx)
+                            {
+                                var base64Content = lineString.Substring(startIdx, endIdx - startIdx);
+                                // Decode Base64 to get original HTML
+                                var htmlBytes = Convert.FromBase64String(base64Content);
+                                var decodedHtml = System.Text.Encoding.UTF8.GetString(htmlBytes);
+
+                                System.IO.File.AppendAllText(debugPath,
+                                    $"[{DateTime.Now:HH:mm:ss}] ExpressionParser: Decoded HTML length: {decodedHtml.Length}\n");
+
+                                // Append decoded HTML directly to output
+                                if (_isVisible && _isVal != 1 && _htmlLines < MaxHtmlLines && IsEnabled())
+                                {
+                                    _sb.Append(decodedHtml);
+                                    System.IO.File.AppendAllText(debugPath,
+                                        $"[{DateTime.Now:HH:mm:ss}] ExpressionParser: HTML appended to output\n");
+                                }
+                                else
+                                {
+                                    System.IO.File.AppendAllText(debugPath,
+                                        $"[{DateTime.Now:HH:mm:ss}] ExpressionParser: NOT appending (_isVisible={_isVisible}, _isVal={_isVal}, IsEnabled={IsEnabled()})\n");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // If decoding fails, show error
+                            if (_isVisible && _isVal != 1 && _htmlLines < MaxHtmlLines && IsEnabled())
+                            {
+                                _sb.AppendLine($"<p style='color:red;'>Error decoding MULTILANG_OUTPUT: {ex.Message}</p>");
+                            }
+                        }
+                        continue; // Skip normal parsing for this line
+                    }
+
                     var lineCache = _currentLine;
                     var result = ParseKeyword(textSpan, ref keyword);
                     if (keyword != currentLineCache.Keyword)
@@ -665,7 +735,13 @@ namespace Calcpad.Core
                     }
                 }
                 else if (isOutput)
-                    _sb.Append(token.Value);
+                {
+                    // In #noc mode (_isVal == -1), wrap text in eq class for consistent formatting
+                    if (_isVal == -1 && token.Type == TokenTypes.Text)
+                        _sb.Append($"<span class=\"eq\">{token.Value}</span>");
+                    else
+                        _sb.Append(token.Value);
+                }
             }
         }
 
@@ -679,7 +755,7 @@ namespace Calcpad.Core
         }
 
         private static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line + 1}\">{line + 1}</a>]";
-        private string ErrHtml(string text, int line) => $"<p class=\"err\"{Id(line)}\">{text}</p>";
+        private string ErrHtml(string text, int line) => $"<p class=\"err\"{Id(line)}>{text}</p>";
         private string Id(int line) => Debug ? $" id=\"line-{line + 1}\"" : string.Empty;
 
         private static string InsertAttribute(ReadOnlySpan<char> s, string attr)
