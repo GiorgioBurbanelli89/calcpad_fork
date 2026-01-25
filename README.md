@@ -1,3 +1,113 @@
+# Calcpad Fork - Symbolic Math & Expression Parsers Edition
+
+> 🚀 **Fork mejorado de Calcpad con soporte completo para cálculo simbólico y parsers de expresiones matemáticas**
+
+[![Version](https://img.shields.io/badge/version-7.5.8--symbolic-blue.svg)](https://github.com/GiorgioBurbanelli89/calcpad_fork)
+[![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
+
+---
+
+## 🌟 Nuevas Características del Fork (v7.5.8-symbolic)
+
+### ✨ Parser Simbólico con AngouriMath
+
+Cálculo simbólico completo usando AngouriMath v1.3.0:
+
+```calcpad
+@{symbolic}
+' Derivadas
+f = d/dx(x^3 + 2*x^2 - 5*x + 3)
+
+' Integrales
+i = integrate(3*x^2 + 4*x - 5, x)
+
+' Expansión
+exp = expand((x + a)^2)
+
+' Límites
+lim = limit((x^2 - 1)/(x - 1), x, 1)
+@{end symbolic}
+```
+
+### 📐 Sistema de Expression Parsers
+
+- **LaTeX Parser** - `@{latex}...@{end latex}`
+- **Python Math Parser** - `@{pymath}...@{end pymath}`
+- **Mathcad Parser** - `@{mathcad}...@{end mathcad}`
+
+### 📑 Columnas Multi-Layout
+
+```calcpad
+@{columns 3}
+Columna 1
+---
+Columna 2
+---
+Columna 3
+@{end columns}
+```
+
+## 📥 Instalación Rápida
+
+```bash
+git clone https://github.com/GiorgioBurbanelli89/calcpad_fork.git
+cd calcpad_fork
+dotnet build -c Release
+```
+
+## 📖 Documentación
+
+- **[CALCPAD_CLI_MEJORAS.md](CALCPAD_CLI_MEJORAS.md)** - Documentación completa de mejoras
+- **[Examples/](Examples/)** - Ejemplos: `Test-Symbolic-Only.cpd`, `demo-simbolico.cpd`
+
+## 🎯 Uso con CLI
+
+```bash
+./Cli.exe "archivo.cpd output.html -s"
+```
+
+## 📊 Parsers Disponibles
+
+| Parser | Directiva | Funcionalidad |
+|--------|-----------|---------------|
+| Simbólico | `@{symbolic}` | Derivadas, integrales, límites, expansión |
+| LaTeX | `@{latex}` | Expresiones LaTeX → Calcpad |
+| Python Math | `@{pymath}` | Sintaxis Python → Calcpad |
+| Mathcad | `@{mathcad}` | Sintaxis Mathcad → Calcpad |
+| Columnas | `@{columns N}` | Layout 2-4 columnas |
+
+## 🛠️ Cambios Técnicos
+
+### Añadido
+- AngouriMath v1.3.0 dependency
+- 7 nuevos archivos en `Calcpad.Common/ExpressionParsers/`
+- MultLangProcessor.ExpressionParsers.cs
+- Debug logging extensivo
+
+### Modificado
+- MultLangProcessor.cs (+500 líneas)
+- MultLangConfig.json (+4 parsers)
+- GlobalParser.cs (detección código mixto)
+- CalcpadInstaller.iss (v7.5.8-symbolic)
+
+## 📄 Changelog v7.5.8-symbolic (2026-01-25)
+
+✅ Parser Simbólico completo
+✅ Sistema Expression Parsers
+✅ Soporte columnas multi-layout
+✅ +2,500 líneas de código
+🐛 Fixes: reflection, límites, expand
+
+## 🙏 Créditos
+
+- **Calcpad Original:** [Proektsoft](https://github.com/Proektsoftbg/Calcpad)
+- **AngouriMath:** [ASC Community](https://github.com/asc-community/AngouriMath)
+- **Fork Mejoras:** Claude (Anthropic) + Desarrollo
+
+---
+
+## 📜 README Original de Calcpad
+
 # Calcpad Readme  
   
 Project Website: [https://calcpad.eu](https://calcpad.eu)  
