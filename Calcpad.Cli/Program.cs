@@ -305,15 +305,31 @@ namespace Calcpad.Cli
             var i = fileName.IndexOf(".mcdx");
             bool isMcdx = i >= 0;
             bool isSMath = false;
+            bool isXlsx = false;
+            bool isDocx = false;
 
             if (!isMcdx)
+            {
+                // Check for .xlsx (Excel) files
+                i = fileName.IndexOf(".xlsx");
+                isXlsx = i >= 0;
+            }
+
+            if (!isMcdx && !isXlsx)
+            {
+                // Check for .docx (Word) files
+                i = fileName.IndexOf(".docx");
+                isDocx = i >= 0;
+            }
+
+            if (!isMcdx && !isXlsx && !isDocx)
             {
                 // Check for .sm (SMath Studio) files
                 i = fileName.IndexOf(".sm");
                 isSMath = i >= 0 && (i + 3 == fileName.Length || fileName[i + 3] == ' ');
             }
 
-            if (!isMcdx && !isSMath)
+            if (!isMcdx && !isSMath && !isXlsx && !isDocx)
             {
                 i = fileName.IndexOf(".cpd");
                 if (i < 0)
@@ -331,7 +347,7 @@ namespace Calcpad.Cli
                     }
                 }
             }
-            i += isMcdx ? 5 : (isSMath ? 3 : 4);
+            i += isMcdx ? 5 : (isXlsx ? 5 : (isDocx ? 5 : (isSMath ? 3 : 4)));
             var outFile = fileName[i..].Trim();
             var isSilent = outFile.EndsWith(" -s");
             if (isSilent)
@@ -350,6 +366,31 @@ namespace Calcpad.Cli
                     outFile = "";
             }
 
+            // Check for --sheet option (for xlsx files)
+            string selectedSheet = null;
+            var sheetIndex = outFile.IndexOf("--sheet ", StringComparison.OrdinalIgnoreCase);
+            if (sheetIndex >= 0)
+            {
+                var afterSheet = outFile[(sheetIndex + 8)..].Trim();
+                // Extract sheet name (might be quoted)
+                if (afterSheet.StartsWith("\""))
+                {
+                    var endQuote = afterSheet.IndexOf('"', 1);
+                    if (endQuote > 0)
+                    {
+                        selectedSheet = afterSheet[1..endQuote];
+                        outFile = outFile[..sheetIndex].Trim() + " " + afterSheet[(endQuote + 1)..].Trim();
+                    }
+                }
+                else
+                {
+                    var spaceIdx = afterSheet.IndexOf(' ');
+                    selectedSheet = spaceIdx > 0 ? afterSheet[..spaceIdx] : afterSheet;
+                    outFile = outFile[..sheetIndex].Trim() + (spaceIdx > 0 ? " " + afterSheet[(spaceIdx + 1)..].Trim() : "");
+                }
+                outFile = outFile.Trim();
+            }
+
             fileName = fileName[..i].Trim();
             if (!File.Exists(fileName))
             {
@@ -357,8 +398,8 @@ namespace Calcpad.Cli
                 return true;
             }
 
-            // Handle -cpd option for mcdx/sm files (convert without processing)
-            if ((isMcdx || isSMath) && cpdOnly)
+            // Handle -cpd option for mcdx/sm/xlsx/docx files (convert without processing)
+            if ((isMcdx || isSMath || isXlsx || isDocx) && cpdOnly)
             {
                 if (string.IsNullOrWhiteSpace(outFile))
                     outFile = Path.ChangeExtension(fileName, ".cpd");
@@ -379,6 +420,53 @@ namespace Calcpad.Cli
                         {
                             Console.WriteLine($"  Warnings ({mcdxConverter.Warnings.Count}):");
                             foreach (var warning in mcdxConverter.Warnings)
+                                Console.WriteLine($"    - {warning}");
+                        }
+                        Console.WriteLine($"Output: {outFile}");
+                    }
+                }
+                else if (isXlsx)
+                {
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"Converting Excel to Calcpad: {Path.GetFileName(fileName)}");
+                        if (!string.IsNullOrEmpty(selectedSheet))
+                            Console.WriteLine($"  Selected sheet: {selectedSheet}");
+                    }
+
+                    var xlsxConverter = new XlsxConverter();
+                    var convertedCode = xlsxConverter.Convert(fileName, selectedSheet);
+                    File.WriteAllText(outFile, convertedCode);
+
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"  Excel version: {xlsxConverter.ExcelVersion}");
+                        Console.WriteLine($"  Sheets: {string.Join(", ", xlsxConverter.SheetNames.Values)}");
+                        if (xlsxConverter.Warnings.Count > 0)
+                        {
+                            Console.WriteLine($"  Warnings ({xlsxConverter.Warnings.Count}):");
+                            foreach (var warning in xlsxConverter.Warnings)
+                                Console.WriteLine($"    - {warning}");
+                        }
+                        Console.WriteLine($"Output: {outFile}");
+                    }
+                }
+                else if (isDocx)
+                {
+                    if (!isSilent)
+                        Console.WriteLine($"Converting Word to Calcpad: {Path.GetFileName(fileName)}");
+
+                    var docxConverter = new DocxConverter();
+                    var convertedCode = docxConverter.Convert(fileName);
+                    File.WriteAllText(outFile, convertedCode);
+
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"  Word version: {docxConverter.WordVersion}");
+                        if (docxConverter.Warnings.Count > 0)
+                        {
+                            Console.WriteLine($"  Warnings ({docxConverter.Warnings.Count}):");
+                            foreach (var warning in docxConverter.Warnings)
                                 Console.WriteLine($"    - {warning}");
                         }
                         Console.WriteLine($"Output: {outFile}");
@@ -443,6 +531,53 @@ namespace Calcpad.Cli
                         {
                             Console.WriteLine($"  Warnings ({mcdxConverter.Warnings.Count}):");
                             foreach (var warning in mcdxConverter.Warnings)
+                                Console.WriteLine($"    - {warning}");
+                        }
+                        Console.WriteLine();
+                    }
+                }
+                // Handle .xlsx files (Excel)
+                else if (isXlsx)
+                {
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"Converting Excel file: {Path.GetFileName(fileName)}");
+                        if (!string.IsNullOrEmpty(selectedSheet))
+                            Console.WriteLine($"  Selected sheet: {selectedSheet}");
+                    }
+
+                    var xlsxConverter = new XlsxConverter();
+                    code = xlsxConverter.Convert(fileName, selectedSheet);
+
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"  Excel version: {xlsxConverter.ExcelVersion}");
+                        Console.WriteLine($"  Sheets: {string.Join(", ", xlsxConverter.SheetNames.Values)}");
+                        if (xlsxConverter.Warnings.Count > 0)
+                        {
+                            Console.WriteLine($"  Warnings ({xlsxConverter.Warnings.Count}):");
+                            foreach (var warning in xlsxConverter.Warnings)
+                                Console.WriteLine($"    - {warning}");
+                        }
+                        Console.WriteLine();
+                    }
+                }
+                // Handle .docx files (Word)
+                else if (isDocx)
+                {
+                    if (!isSilent)
+                        Console.WriteLine($"Converting Word file: {Path.GetFileName(fileName)}");
+
+                    var docxConverter = new DocxConverter();
+                    code = docxConverter.Convert(fileName);
+
+                    if (!isSilent)
+                    {
+                        Console.WriteLine($"  Word version: {docxConverter.WordVersion}");
+                        if (docxConverter.Warnings.Count > 0)
+                        {
+                            Console.WriteLine($"  Warnings ({docxConverter.Warnings.Count}):");
+                            foreach (var warning in docxConverter.Warnings)
                                 Console.WriteLine($"    - {warning}");
                         }
                         Console.WriteLine();

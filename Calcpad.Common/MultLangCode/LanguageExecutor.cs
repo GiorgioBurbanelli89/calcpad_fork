@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Calcpad.Common.MultLangCode
@@ -34,21 +35,44 @@ namespace Calcpad.Common.MultLangCode
         {
             _tracker?.EnterMethod("LanguageExecutor", "Execute", $"Language: {block.Language}");
 
-            _tracker?.ReportStep($"Checking if language '{block.Language}' is configured");
-            if (!_config.Languages.TryGetValue(block.Language, out var langDef))
+            // Extract base language and custom filename from patterns like "ts:getColorMap"
+            // Also handle patterns like "vite C:/path/to/project" where we only want "vite"
+            var languageName = block.Language;
+            string? customFilename = null;
+
+            // Check for space first (e.g., "vite C:/path/to/project")
+            var spaceIndex = languageName.IndexOf(' ');
+            if (spaceIndex > 0)
             {
-                _tracker?.ReportStep($"ERROR: Language '{block.Language}' not found in config");
+                // Extract only the language name before the space
+                languageName = languageName.Substring(0, spaceIndex);
+                _tracker?.ReportStep($"Detected space in language, extracted base: '{languageName}'");
+            }
+
+            // Then check for colon pattern (e.g., "ts:getColorMap")
+            var colonIndex = languageName.IndexOf(':');
+            if (colonIndex > 0)
+            {
+                customFilename = languageName.Substring(colonIndex + 1);
+                languageName = languageName.Substring(0, colonIndex);
+                _tracker?.ReportStep($"Detected custom filename pattern: base='{languageName}', filename='{customFilename}'");
+            }
+
+            _tracker?.ReportStep($"Checking if language '{languageName}' is configured");
+            if (!_config.Languages.TryGetValue(languageName, out var langDef))
+            {
+                _tracker?.ReportStep($"ERROR: Language '{languageName}' not found in config");
                 return new ExecutionResult
                 {
                     Success = false,
-                    Error = $"Language '{block.Language}' not configured"
+                    Error = $"Language '{languageName}' not configured"
                 };
             }
 
             _tracker?.ReportStep($"Language configured: Command={langDef.Command}, Extension={langDef.Extension}");
 
             // Special handling for XAML, WPF, Avalonia, C#, CSS, and HTML
-            var language = block.Language.ToLower();
+            var language = languageName.ToLower();
             if (language == "xaml" || language == "wpf")
             {
                 _tracker?.ReportStep("Detected WPF project, routing to ExecuteWpfProject");
@@ -72,6 +96,20 @@ namespace Calcpad.Common.MultLangCode
                 code = InjectVariables(code, variables, langDef);
             }
 
+            // Special handling for Three.js Viewer (awatif-style structure)
+            if (language == "three")
+            {
+                _tracker?.ReportStep("Detected Three.js block, generating 3D viewer HTML");
+                return ExecuteThreeCode(code);
+            }
+
+            // Special handling for Vite (runs TypeScript projects with Vite dev server)
+            if (language == "vite")
+            {
+                _tracker?.ReportStep("Detected vite block, executing project with Vite");
+                return ExecuteViteProject(code, block.StartDirective);
+            }
+
             // Special handling for CSS and HTML (no command execution needed)
             if (language == "css")
             {
@@ -87,14 +125,36 @@ namespace Calcpad.Common.MultLangCode
                 };
             }
 
-            if (language == "html")
+            if (language == "html" || language == "html:embed")
             {
                 // HTML: Save and inject references to CSS and JS if they exist
                 var htmlPath = Path.Combine(_tempDir, "index.html");
                 var modifiedHtml = InjectCssAndJsReferences(code, _tempDir);
                 File.WriteAllText(htmlPath, modifiedHtml);
 
-                // Open HTML in default browser
+                // If html:embed, return the HTML as an iframe with srcdoc for embedding
+                if (language == "html:embed" || block.Language.ToLower() == "html:embed")
+                {
+                    _tracker?.ReportStep("HTML embed mode - returning iframe with srcdoc");
+                    // Escape quotes and special chars for srcdoc attribute
+                    var escapedHtml = modifiedHtml
+                        .Replace("&", "&amp;")
+                        .Replace("\"", "&quot;")
+                        .Replace("<", "&lt;")
+                        .Replace(">", "&gt;");
+
+                    // Return an iframe that will display the HTML inline
+                    var iframeHtml = $"<iframe srcdoc=\"{escapedHtml}\" style=\"width:100%; height:500px; border:1px solid #ccc; border-radius:4px;\"></iframe>";
+
+                    return new ExecutionResult
+                    {
+                        Success = true,
+                        Output = iframeHtml,
+                        IsHtmlOutput = true
+                    };
+                }
+
+                // Regular html - Open HTML in default browser
                 try
                 {
                     var process = new Process
@@ -123,44 +183,102 @@ namespace Calcpad.Common.MultLangCode
             }
 
             // Now check if language is available in PATH (for languages that need execution)
-            _tracker?.ReportStep($"Checking if '{block.Language}' is available in PATH");
-            if (!MultLangManager.IsLanguageAvailable(block.Language))
+            _tracker?.ReportStep($"Checking if '{languageName}' is available in PATH");
+            if (!MultLangManager.IsLanguageAvailable(languageName))
             {
-                _tracker?.ReportStep($"ERROR: '{block.Language}' not found in PATH");
+                _tracker?.ReportStep($"ERROR: '{languageName}' not found in PATH");
                 return new ExecutionResult
                 {
                     Success = false,
-                    Error = $"Language '{block.Language}' not found in PATH. Please install {langDef.Command}"
+                    Error = $"Language '{languageName}' not found in PATH. Please install {langDef.Command}"
                 };
             }
 
-            _tracker?.ReportStep($"'{block.Language}' is available in PATH");
+            _tracker?.ReportStep($"'{languageName}' is available in PATH");
 
-            if (language == "typescript" || language == "ts")
+            // Special handling for TypeScript with custom filename: @{ts:filename} or @{typescript:filename}
+            if (language == "ts" || language == "typescript")
             {
-                // TypeScript: Compile and save .js, then execute
-                var tsPath = Path.Combine(_tempDir, "script.ts");
-                var jsPath = Path.Combine(_tempDir, "script.js");
+                // Use the customFilename extracted earlier, or default to "script"
+                var customName = !string.IsNullOrEmpty(customFilename) ? customFilename : "script";
+                // Sanitize filename
+                customName = System.Text.RegularExpressions.Regex.Replace(customName, @"[^\w\-]", "_");
 
+                var tsPath = Path.Combine(_tempDir, $"{customName}.ts");
+                var jsPath = Path.Combine(_tempDir, $"{customName}.js");
+
+                _tracker?.ReportStep($"TypeScript file: {customName}.ts");
                 File.WriteAllText(tsPath, code);
 
-                // Execute with ts-node (this will compile and run)
+                // Check if this is a module (has exports but no direct execution code)
+                // Modules with only exports don't need to be executed directly
+                var isModuleOnly = code.Contains("export ") &&
+                                   !code.Contains("console.log") &&
+                                   !code.Contains("document.") &&
+                                   customName != "main";
+
+                if (isModuleOnly)
+                {
+                    // Just save the file, don't execute - it will be imported by main.ts
+                    _tracker?.ReportStep($"Module saved: {customName}.ts (will be imported)");
+                    return new ExecutionResult
+                    {
+                        Success = true,
+                        Output = $"Module saved: {tsPath}\nReady for import from other TypeScript files."
+                    };
+                }
+
+                // Execute with tsx (this will compile and run, supporting imports)
                 var result = ExecuteFile(tsPath, langDef, progressCallback);
 
-                // After execution, if successful, try to get the compiled .js
-                // (ts-node doesn't output .js by default, but we can compile separately)
-                if (result.Success)
+                // After execution, if main.ts was executed successfully, generate HTML for WebView2
+                if (result.Success && customName == "main")
                 {
                     try
                     {
-                        // Compile TypeScript to JavaScript for the HTML to use
-                        var tscResult = RunProcess("tsc", $"\"{tsPath}\" --outFile \"{jsPath}\" --target ES2015 --module none", "Compilando TS a JS", progressCallback);
-                        if (tscResult.Success)
+                        // Find all .ts files in temp directory
+                        var tsFiles = Directory.GetFiles(_tempDir, "*.ts");
+                        _tracker?.ReportStep($"Found {tsFiles.Length} TypeScript files");
+
+                        // Compile all TypeScript files to JavaScript with esbuild (faster) or tsc
+                        var allJsFiles = new List<string>();
+                        foreach (var tsFile in tsFiles)
                         {
-                            result.Output += $"\n\nJavaScript compiled to: {jsPath}";
+                            var jsFile = Path.ChangeExtension(tsFile, ".js");
+                            var tsFileName = Path.GetFileName(tsFile);
+
+                            // Use esbuild for fast bundling (if available), otherwise tsc
+                            var esbuildResult = RunProcess("npx",
+                                $"esbuild \"{tsFile}\" --bundle --format=esm --outfile=\"{jsFile}\" --platform=browser",
+                                $"Compilando {tsFileName}", progressCallback);
+
+                            if (!esbuildResult.Success)
+                            {
+                                // Fallback to tsc
+                                var tscResult = RunProcess("tsc",
+                                    $"\"{tsFile}\" --outDir \"{_tempDir}\" --target ES2020 --module ES2020 --moduleResolution node",
+                                    $"Compilando {tsFileName} con tsc", progressCallback);
+                            }
+
+                            if (File.Exists(jsFile))
+                            {
+                                allJsFiles.Add(jsFile);
+                            }
                         }
+
+                        // Generate index.html with importmap for browser
+                        var htmlPath = Path.Combine(_tempDir, "index.html");
+                        var htmlContent = GenerateModuleHtml(allJsFiles, _tempDir);
+                        File.WriteAllText(htmlPath, htmlContent);
+
+                        _tracker?.ReportStep($"Generated index.html with {allJsFiles.Count} modules");
+                        result.Output += $"\n\nGenerated browser-ready HTML: {htmlPath}";
+                        result.Output += $"\nModules compiled: {string.Join(", ", allJsFiles.Select(Path.GetFileName))}";
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        _tracker?.ReportStep($"Error generating HTML: {ex.Message}");
+                    }
                 }
 
                 return result;
@@ -268,7 +386,14 @@ namespace Calcpad.Common.MultLangCode
                 // This prevents "Access denied" errors on Windows
                 System.Threading.Thread.Sleep(500);
 
-                // Step 2: Execute compiled binary with retry logic for access denied errors
+                // Step 2: Execute compiled binary
+                // For GUI applications (Qt, GTK, etc.), start without waiting
+                if (langDef.IsGuiApplication)
+                {
+                    return RunGuiProcess(exePath, langDef, progressCallback);
+                }
+
+                // For console applications, wait for completion with retry logic
                 ExecutionResult runResult = null;
                 int maxRetries = 3;
                 int retryCount = 0;
@@ -340,6 +465,69 @@ namespace Calcpad.Common.MultLangCode
             catch { }
 
             return RunProcess(langDef.Command, arguments, "Ejecutando", progressCallback);
+        }
+
+        /// <summary>
+        /// Runs a GUI process without waiting for it to complete
+        /// Used for Qt, GTK, WPF and other GUI applications
+        /// </summary>
+        private ExecutionResult RunGuiProcess(string exePath, LanguageDefinition langDef, Action<string>? progressCallback)
+        {
+            try
+            {
+                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath,
+                    $"[{DateTime.Now:HH:mm:ss}] RunGuiProcess START: {exePath}\n");
+
+                // For Qt applications, we need to set PATH to include Qt DLLs
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = exePath,
+                    UseShellExecute = false,
+                    CreateNoWindow = false,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false
+                };
+
+                // Add Qt/library paths to environment
+                var currentPath = Environment.GetEnvironmentVariable("PATH") ?? "";
+                var qtPaths = "C:\\msys64\\ucrt64\\bin;C:\\msys64\\mingw64\\bin";
+                startInfo.Environment["PATH"] = $"{qtPaths};{currentPath}";
+
+                var process = Process.Start(startInfo);
+
+                if (process != null)
+                {
+                    System.IO.File.AppendAllText(debugPath,
+                        $"[{DateTime.Now:HH:mm:ss}] RunGuiProcess: Started PID {process.Id}\n");
+
+                    // Give the window time to appear
+                    System.Threading.Thread.Sleep(500);
+
+                    return new ExecutionResult
+                    {
+                        Success = true,
+                        Output = $"GUI application started (PID: {process.Id})\nWindow should be visible now.",
+                        ExitCode = 0
+                    };
+                }
+                else
+                {
+                    return new ExecutionResult
+                    {
+                        Success = false,
+                        Error = "Failed to start GUI process"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ExecutionResult
+                {
+                    Success = false,
+                    Error = $"Error starting GUI process: {ex.Message}"
+                };
+            }
         }
 
         /// <summary>
@@ -1224,6 +1412,557 @@ namespace " + Path.GetFileName(projectDir) + @"
         }
 
         /// <summary>
+        /// Generates an HTML file with importmap for loading TypeScript modules in the browser
+        /// </summary>
+        private string GenerateModuleHtml(List<string> jsFiles, string tempDir)
+        {
+            var sb = new StringBuilder();
+
+            // Build importmap for local modules
+            var importMapEntries = new List<string>();
+            foreach (var jsFile in jsFiles)
+            {
+                var moduleName = "./" + Path.GetFileNameWithoutExtension(jsFile);
+                var fileName = Path.GetFileName(jsFile);
+                importMapEntries.Add($"      \"{moduleName}\": \"./{fileName}\"");
+            }
+
+            // Check if styles.css exists
+            var cssPath = Path.Combine(tempDir, "styles.css");
+            var hasCss = File.Exists(cssPath);
+
+            sb.AppendLine("<!DOCTYPE html>");
+            sb.AppendLine("<html lang=\"en\">");
+            sb.AppendLine("<head>");
+            sb.AppendLine("  <meta charset=\"UTF-8\">");
+            sb.AppendLine("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+            sb.AppendLine("  <title>Calcpad - TypeScript Modules</title>");
+
+            if (hasCss)
+            {
+                sb.AppendLine("  <link rel=\"stylesheet\" href=\"styles.css\">");
+            }
+
+            // Add importmap for external libraries (Three.js, Tweakpane, VanJS)
+            sb.AppendLine("  <script type=\"importmap\">");
+            sb.AppendLine("  {");
+            sb.AppendLine("    \"imports\": {");
+            sb.AppendLine("      \"three\": \"https://unpkg.com/three@0.160.0/build/three.module.js\",");
+            sb.AppendLine("      \"three/addons/\": \"https://unpkg.com/three@0.160.0/examples/jsm/\",");
+            sb.AppendLine("      \"tweakpane\": \"https://unpkg.com/tweakpane@4.0.3/dist/tweakpane.min.js\",");
+            sb.AppendLine("      \"vanjs-core\": \"https://unpkg.com/vanjs-core@1.5.0/src/van.js\",");
+
+            // Add local module mappings
+            if (importMapEntries.Count > 0)
+            {
+                sb.AppendLine(string.Join(",\n", importMapEntries));
+            }
+
+            sb.AppendLine("    }");
+            sb.AppendLine("  }");
+            sb.AppendLine("  </script>");
+
+            sb.AppendLine("  <style>");
+            sb.AppendLine("    body { margin: 0; background: #1a1a2e; color: white; font-family: Arial, sans-serif; }");
+            sb.AppendLine("    #container { width: 100%; height: 100vh; }");
+            sb.AppendLine("  </style>");
+            sb.AppendLine("</head>");
+            sb.AppendLine("<body>");
+            sb.AppendLine("  <div id=\"container\"></div>");
+
+            // Load main.js as module
+            var mainJs = jsFiles.FirstOrDefault(f => Path.GetFileNameWithoutExtension(f) == "main");
+            if (mainJs != null)
+            {
+                sb.AppendLine($"  <script type=\"module\" src=\"{Path.GetFileName(mainJs)}\"></script>");
+            }
+            else if (jsFiles.Count > 0)
+            {
+                // If no main.js, load the first one
+                sb.AppendLine($"  <script type=\"module\" src=\"{Path.GetFileName(jsFiles[0])}\"></script>");
+            }
+
+            sb.AppendLine("</body>");
+            sb.AppendLine("</html>");
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Executes Three.js code - generates HTML with 3D viewer components (awatif-style)
+        /// </summary>
+        private ExecutionResult ExecuteThreeCode(string userCode)
+        {
+            try
+            {
+                // Generate Three.js HTML with user's code embedded
+                var html = GenerateThreeHtml(userCode);
+
+                // Save to temp directory
+                var htmlPath = Path.Combine(_tempDir, "three-viewer.html");
+                File.WriteAllText(htmlPath, html);
+
+                _tracker?.ReportStep($"Three.js HTML generated: {htmlPath}");
+
+                // Return as embedded iframe
+                var escapedHtml = html
+                    .Replace("&", "&amp;")
+                    .Replace("\"", "&quot;")
+                    .Replace("<", "&lt;")
+                    .Replace(">", "&gt;");
+
+                var iframeHtml = $"<iframe srcdoc=\"{escapedHtml}\" style=\"width:100%; height:600px; border:none; border-radius:4px;\"></iframe>";
+
+                return new ExecutionResult
+                {
+                    Success = true,
+                    Output = iframeHtml,
+                    IsHtmlOutput = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ExecutionResult
+                {
+                    Success = false,
+                    Error = $"Error generating Three.js viewer: {ex.Message}"
+                };
+            }
+        }
+
+        /// <summary>
+        /// Generates HTML with Three.js viewer components and user's code
+        /// </summary>
+        private string GenerateThreeHtml(string userCode)
+        {
+            return $@"<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Calcpad - Three.js Viewer</title>
+    <style>
+        * {{ box-sizing: border-box; }}
+        body {{ margin: 0; background: #000; font-family: Arial, sans-serif; overflow: hidden; }}
+        #viewer {{ width: 100%; height: 100vh; position: relative; }}
+        #viewer canvas {{ width: 100% !important; height: 100% !important; }}
+        #settings {{ position: absolute; top: 10px; right: 10px; z-index: 100; }}
+        #parameters {{ position: absolute; top: 10px; left: 10px; z-index: 100; }}
+        #legend {{
+            width: 20px; height: 200px;
+            background: linear-gradient(#ff0000, #ffff00 25%, #00ff00 50%, #00ffff 75%, #0000ff);
+            position: absolute; right: 50px; bottom: 50px; z-index: 2;
+        }}
+        #legend .marker {{ width: 10px; height: 1px; margin-left: 20px; background: white; position: relative; }}
+        #legend .marker span {{ position: absolute; color: white; font-size: 11px; top: -6px; left: 12px; font-family: monospace; }}
+        #toolbar {{ position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; gap: 5px; }}
+        #toolbar button {{ padding: 8px 16px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; cursor: pointer; }}
+        #toolbar button:hover {{ background: #444; }}
+        #report {{ position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 4px; z-index: 100; }}
+    </style>
+    <script type=""importmap"">
+    {{
+        ""imports"": {{
+            ""three"": ""https://unpkg.com/three@0.169.0/build/three.module.js"",
+            ""three/addons/"": ""https://unpkg.com/three@0.169.0/examples/jsm/"",
+            ""tweakpane"": ""https://unpkg.com/tweakpane@4.0.4/dist/tweakpane.min.js"",
+            ""vanjs-core"": ""https://unpkg.com/vanjs-core@1.5.2/src/van.js""
+        }}
+    }}
+    </script>
+</head>
+<body>
+    <div id=""app""></div>
+    <script type=""module"">
+        import * as THREE from 'three';
+        import {{ OrbitControls }} from 'three/addons/controls/OrbitControls.js';
+        import {{ Lut }} from 'three/addons/math/Lut.js';
+        import van from 'vanjs-core';
+
+        // Make available globally
+        window.van = van;
+        window.THREE = THREE;
+        window.OrbitControls = OrbitControls;
+        window.Lut = Lut;
+
+        // ========== AWATIF-UI COMPONENTS ==========
+
+        // getColorMap - Creates mesh with vertex colors
+        window.getColorMap = function(nodes, elements, values) {{
+            const lut = new Lut('rainbow', 512);
+            lut.setMin(Math.min(...values));
+            lut.setMax(Math.max(...values));
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(nodes.flat(), 3));
+            geometry.setIndex(new THREE.Uint16BufferAttribute(elements.filter(e => e.length !== 2).flat(), 1));
+
+            const colors = new Float32Array(nodes.length * 3);
+            for (let i = 0; i < values.length; i++) {{
+                const c = lut.getColor(values[i]) || new THREE.Color(0, 0, 0);
+                colors[i * 3] = c.r * 0.8;
+                colors[i * 3 + 1] = c.g * 0.8;
+                colors[i * 3 + 2] = c.b * 0.8;
+            }}
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            return new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({{ vertexColors: true, side: THREE.DoubleSide }}));
+        }};
+
+        // getLegend - Creates color legend
+        window.getLegend = function(values, numMarkers = 5) {{
+            const legend = document.createElement('div');
+            legend.id = 'legend';
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+
+            for (let i = 0; i < numMarkers; i++) {{
+                const ratio = i / (numMarkers - 1);
+                const value = (max - (max - min) * ratio).toFixed(2);
+                const marker = document.createElement('div');
+                marker.className = 'marker';
+                marker.style.marginTop = i === 0 ? '0' : `${{(200 / (numMarkers - 1)) - 1}}px`;
+                const span = document.createElement('span');
+                span.textContent = value;
+                marker.appendChild(span);
+                legend.appendChild(marker);
+            }}
+            return legend;
+        }};
+
+        // getViewer - Creates 3D viewer with Three.js
+        window.getViewer = function(config = {{}}) {{
+            const {{ mesh, objects3D, gridSize = 20 }} = config;
+            THREE.Object3D.DEFAULT_UP = new THREE.Vector3(0, 0, 1);
+
+            const viewer = document.createElement('div');
+            viewer.id = 'viewer';
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2e6);
+            camera.position.set(gridSize * 0.5, -gridSize * 0.8, gridSize * 0.5);
+            camera.up.set(0, 0, 1);
+
+            const renderer = new THREE.WebGLRenderer({{ antialias: true }});
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            viewer.appendChild(renderer.domElement);
+
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.target.set(gridSize * 0.5, gridSize * 0.5, 0);
+            controls.update();
+
+            // Grid
+            const grid = new THREE.GridHelper(gridSize, gridSize, 0x444444, 0x222222);
+            grid.rotation.x = Math.PI / 2;
+            scene.add(grid);
+            scene.add(new THREE.AxesHelper(gridSize * 0.2));
+
+            // Add mesh wireframe
+            if (mesh && mesh.nodes && mesh.elements) {{
+                const nodes = mesh.nodes.val || mesh.nodes;
+                const elements = mesh.elements.val || mesh.elements;
+                const geom = new THREE.BufferGeometry();
+                geom.setAttribute('position', new THREE.Float32BufferAttribute(nodes.flat(), 3));
+                geom.setIndex(new THREE.Uint16BufferAttribute(elements.flat(), 1));
+                scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(geom), new THREE.LineBasicMaterial({{ color: 0x00ff00 }})));
+            }}
+
+            // Add custom objects
+            if (objects3D) {{
+                const objs = objects3D.val || objects3D;
+                objs.forEach(obj => scene.add(obj));
+            }}
+
+            function animate() {{ requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }}
+            animate();
+
+            window.addEventListener('resize', () => {{
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }});
+
+            viewer._scene = scene;
+            viewer._camera = camera;
+            viewer._renderer = renderer;
+            viewer._controls = controls;
+
+            return viewer;
+        }};
+
+        // getParameters - Creates parameter panel with Tweakpane
+        window.getParameters = async function(params) {{
+            const {{ Pane }} = await import('tweakpane');
+            const container = document.createElement('div');
+            container.id = 'parameters';
+            const pane = new Pane({{ title: 'Parameters', container }});
+
+            const tweakParams = {{}};
+            Object.entries(params).forEach(([key, config]) => {{
+                tweakParams[key] = config.value.val !== undefined ? config.value.val : config.value;
+            }});
+
+            Object.entries(params).forEach(([key, config]) => {{
+                pane.addBinding(tweakParams, key, {{
+                    min: config.min || 0,
+                    max: config.max || 100,
+                    step: config.step || 1,
+                    label: config.label || key
+                }});
+            }});
+
+            pane.on('change', (e) => {{
+                const param = params[e.target.key];
+                if (param && param.value.val !== undefined) {{ param.value.val = e.value; }}
+            }});
+
+            return container;
+        }};
+
+        // getToolbar
+        window.getToolbar = function(buttons) {{
+            const toolbar = document.createElement('div');
+            toolbar.id = 'toolbar';
+            buttons.forEach(btn => {{
+                const button = document.createElement('button');
+                button.textContent = btn.label || btn.text;
+                button.onclick = btn.onClick || btn.action;
+                toolbar.appendChild(button);
+            }});
+            return toolbar;
+        }};
+
+        // getReport
+        window.getReport = function(data) {{
+            const report = document.createElement('div');
+            report.id = 'report';
+            if (typeof data === 'string') {{ report.innerHTML = data; }}
+            else {{ report.innerHTML = Object.entries(data).map(([k, v]) => `<strong>${{k}}:</strong> ${{v}}`).join(' | '); }}
+            return report;
+        }};
+
+        // ========== USER CODE ==========
+        {userCode}
+    </script>
+</body>
+</html>";
+        }
+
+        /// <summary>
+        /// Executes a Vite project - writes main.ts, starts Vite dev server and returns iframe for WebView2
+        /// Format: @{vite C:/path/to/awatif-ui} followed by main.ts code
+        /// </summary>
+        private ExecutionResult ExecuteViteProject(string code, string startDirective)
+        {
+            try
+            {
+                // Extract project path from directive: @{vite C:/path/to/awatif-ui}
+                string projectPath = "";
+                string subFolder = "src/calcpad"; // Default subfolder for calcpad examples
+
+                // Parse directive to get path
+                // Format: @{vite C:/path/to/project} or @{vite C:/path/to/project src/viewer}
+                var match = System.Text.RegularExpressions.Regex.Match(
+                    startDirective,
+                    @"@\{vite\s+([^\s\}]+)(?:\s+([^\}]+))?\}?",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                if (match.Success)
+                {
+                    projectPath = match.Groups[1].Value.Trim();
+                    if (match.Groups[2].Success)
+                    {
+                        subFolder = match.Groups[2].Value.Trim();
+                    }
+                }
+
+                // If no path in directive, check if code starts with a path
+                if (string.IsNullOrEmpty(projectPath))
+                {
+                    var lines = code.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (lines.Length > 0 && (lines[0].Contains(":/") || lines[0].Contains(":\\")))
+                    {
+                        projectPath = lines[0].Trim();
+                        code = string.Join("\n", lines.Skip(1));
+                    }
+                }
+
+                if (string.IsNullOrEmpty(projectPath))
+                {
+                    return new ExecutionResult
+                    {
+                        Success = false,
+                        Error = "No project path specified. Use: @{vite C:/path/to/awatif-ui}"
+                    };
+                }
+
+                // Normalize path
+                projectPath = projectPath.Replace("\\", "/").TrimEnd('/');
+
+                // Validate path exists
+                if (!Directory.Exists(projectPath))
+                {
+                    return new ExecutionResult
+                    {
+                        Success = false,
+                        Error = $"Project directory not found: {projectPath}"
+                    };
+                }
+
+                _tracker?.ReportStep($"Project path: {projectPath}");
+                _tracker?.ReportStep($"Subfolder: {subFolder}");
+
+                // Create subfolder for calcpad examples if it doesn't exist
+                var exampleDir = Path.Combine(projectPath, subFolder.Replace("/", Path.DirectorySeparatorChar.ToString()));
+                Directory.CreateDirectory(exampleDir);
+
+                // Write main.ts from the code block
+                var mainTsPath = Path.Combine(exampleDir, "main.ts");
+                var mainTsCode = code.Trim();
+
+                // If code is empty, create a default main.ts
+                if (string.IsNullOrWhiteSpace(mainTsCode))
+                {
+                    mainTsCode = @"import van from 'vanjs-core';
+import { getViewer } from '../viewer/getViewer';
+import { Node } from 'awatif-fem';
+
+// Ejemplo básico de viewer
+const nodes = van.state([
+  [0, 0, 0],
+  [5, 0, 0],
+  [5, 5, 0],
+  [0, 5, 0],
+] as Node[]);
+
+const elements = van.state([
+  [0, 1, 2],
+  [0, 2, 3],
+]);
+
+const viewerElm = getViewer({
+  mesh: { nodes, elements },
+  settingsObj: { nodes: true, elements: true },
+});
+
+document.body.appendChild(viewerElm);
+";
+                }
+
+                File.WriteAllText(mainTsPath, mainTsCode);
+                _tracker?.ReportStep($"Written main.ts to: {mainTsPath}");
+
+                // Create index.html if it doesn't exist
+                var indexHtmlPath = Path.Combine(exampleDir, "index.html");
+                if (!File.Exists(indexHtmlPath))
+                {
+                    var indexHtml = @"<!DOCTYPE html>
+<html lang=""en"">
+  <head>
+    <meta charset=""UTF-8"" />
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+    <title>Calcpad - Awatif Viewer</title>
+  </head>
+  <body>
+    <script type=""module"" src=""main.ts""></script>
+  </body>
+</html>";
+                    File.WriteAllText(indexHtmlPath, indexHtml);
+                    _tracker?.ReportStep($"Created index.html at: {indexHtmlPath}");
+                }
+
+                // Start Vite dev server using cmd.exe (npx is a batch script on Windows)
+                // --no-open: don't open browser automatically (overrides vite.config.ts open setting)
+                // --host: allow access from any host (needed for WebView2)
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = "/c npx vite --host --no-open",
+                    WorkingDirectory = projectPath,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                var process = new Process { StartInfo = psi };
+                var output = new StringBuilder();
+                var error = new StringBuilder();
+                string serverUrl = "http://127.0.0.1:4600"; // awatif-ui uses port 4600 by default
+
+                process.OutputDataReceived += (s, e) =>
+                {
+                    if (e.Data != null)
+                    {
+                        output.AppendLine(e.Data);
+                        // Parse URL from Vite output: "Local:   http://localhost:5173/"
+                        // Replace localhost with 127.0.0.1 for WebView2 compatibility
+                        if (e.Data.Contains("Local:") && e.Data.Contains("http"))
+                        {
+                            var urlStart = e.Data.IndexOf("http");
+                            if (urlStart >= 0)
+                            {
+                                serverUrl = e.Data.Substring(urlStart).Trim().TrimEnd('/')
+                                    .Replace("localhost", "127.0.0.1");
+                            }
+                        }
+                    }
+                };
+                process.ErrorDataReceived += (s, e) => { if (e.Data != null) error.AppendLine(e.Data); };
+
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                // Wait for Vite to start
+                int waitTime = 0;
+                while (waitTime < 15000 && !output.ToString().Contains("Local:"))
+                {
+                    System.Threading.Thread.Sleep(500);
+                    waitTime += 500;
+                }
+
+                // Check if process is still running
+                if (!process.HasExited)
+                {
+                    // Build full URL with subfolder
+                    string fullUrl = $"{serverUrl}/{subFolder}/";
+
+                    _tracker?.ReportStep($"Vite server running at: {fullUrl}");
+
+                    // Return iframe for WebView2
+                    var iframeHtml = $"<iframe src=\"{fullUrl}\" style=\"width:100%; height:600px; border:none; border-radius:4px;\"></iframe>";
+
+                    return new ExecutionResult
+                    {
+                        Success = true,
+                        Output = iframeHtml,
+                        IsHtmlOutput = true
+                    };
+                }
+                else
+                {
+                    return new ExecutionResult
+                    {
+                        Success = false,
+                        Error = $"Vite failed to start:\n{error}\n{output}"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ExecutionResult
+                {
+                    Success = false,
+                    Error = $"Error: {ex.Message}"
+                };
+            }
+        }
+
+        /// <summary>
         /// Cleans up temporary files
         /// </summary>
         public void Cleanup()
@@ -1248,6 +1987,12 @@ namespace " + Path.GetFileName(projectDir) + @"
         public string Output { get; set; } = string.Empty;
         public string Error { get; set; } = string.Empty;
         public int ExitCode { get; set; }
+
+        /// <summary>
+        /// If true, Output contains raw HTML that should be inserted directly
+        /// without escaping (e.g., for embedded iframes)
+        /// </summary>
+        public bool IsHtmlOutput { get; set; } = false;
 
         /// <summary>
         /// Gets formatted output for display

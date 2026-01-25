@@ -51,6 +51,13 @@ namespace Calcpad.Common.MultLangCode
         /// </summary>
         [JsonPropertyName("runArgs")]
         public string RunArgs { get; set; } = "\"{file}\"";
+
+        /// <summary>
+        /// True if this is a GUI application that should not block (Qt, GTK, WPF, etc.)
+        /// When true, the process is started but not waited on
+        /// </summary>
+        [JsonPropertyName("isGuiApplication")]
+        public bool IsGuiApplication { get; set; } = false;
     }
 
     /// <summary>

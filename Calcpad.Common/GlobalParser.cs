@@ -32,6 +32,14 @@ namespace Calcpad.Common
         {
             _tracker?.EnterMethod("GlobalParser", "Process", $"Code length: {code.Length} chars");
 
+            // CHECK FOR PAGE MODE: @{page markdown}
+            // This switches the entire page to Markdown mode with Calcpad support
+            if (IsMarkdownPageMode(code, out var markdownContent))
+            {
+                hasExternalCode = true; // Signal that we handled it externally (return HTML)
+                return ProcessMarkdownPage(markdownContent, progressCallback);
+            }
+
             // DECISION POINT: Check if there are external code blocks
             _tracker?.ReportStep("Checking for external language blocks");
             hasExternalCode = MultLangManager.HasLanguageCode(code);
@@ -418,6 +426,458 @@ namespace Calcpad.Common
             catch { }
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Checks if the code starts with @{page markdown} directive
+        /// </summary>
+        /// <param name="code">Input code</param>
+        /// <param name="markdownContent">Content after the directive (if found)</param>
+        /// <returns>True if @{page markdown} was found</returns>
+        private bool IsMarkdownPageMode(string code, out string markdownContent)
+        {
+            markdownContent = code;
+
+            if (string.IsNullOrWhiteSpace(code))
+                return false;
+
+            var lines = code.Split('\n');
+            foreach (var line in lines)
+            {
+                var trimmed = line.Trim().ToLower();
+
+                // Skip empty lines and comments at the start
+                if (string.IsNullOrWhiteSpace(trimmed))
+                    continue;
+                if (trimmed.StartsWith("'"))
+                    continue;
+
+                // Check for @{page markdown} directive
+                if (trimmed == "@{page markdown}" || trimmed.StartsWith("@{page markdown}"))
+                {
+                    // Find where this line ends and get everything after
+                    var idx = code.IndexOf(line) + line.Length;
+                    markdownContent = idx < code.Length ? code.Substring(idx).TrimStart('\r', '\n') : "";
+                    return true;
+                }
+
+                // If first non-empty, non-comment line is not @{page markdown}, stop checking
+                break;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Processes entire page as Markdown with support for ALL parsers:
+        /// - $$expression$$ = Calcpad block (evaluated and rendered as math)
+        /// - $variable = Inline value substitution
+        /// - @{table}...@{end table} = Table from matrix/vector
+        /// - @{columns N}...@{column}...@{end columns} = Multi-column layout
+        /// - @{python}...@{end python} = Python code
+        /// - @{octave}...@{end octave} = Octave/MATLAB code
+        /// - @{typescript}...@{end typescript} = TypeScript code
+        /// - Any other @{language}...@{end language} = External code
+        /// - Everything else = Markdown
+        /// </summary>
+        private string ProcessMarkdownPage(string content, Action<string>? progressCallback)
+        {
+            try
+            {
+                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath,
+                    $"[{DateTime.Now:HH:mm:ss}] ProcessMarkdownPage: Processing {content.Length} chars\n");
+            }
+            catch { }
+
+            var variables = new System.Collections.Generic.Dictionary<string, object>();
+            var result = new StringBuilder();
+
+            // Process in segments: Calcpad blocks ($$...$$), @{lang}, @{table}, and Markdown
+            int i = 0;
+            var markdownBuffer = new StringBuilder();
+
+            while (i < content.Length)
+            {
+                // Check for Calcpad block: $$...$$
+                if (i + 2 < content.Length && content.Substring(i, 2) == "$$")
+                {
+                    // Flush markdown buffer first
+                    if (markdownBuffer.Length > 0)
+                    {
+                        result.Append(RenderMarkdownSegment(markdownBuffer.ToString(), variables));
+                        markdownBuffer.Clear();
+                    }
+
+                    i += 2; // Skip opening $$
+                    int endCalcpad = content.IndexOf("$$", i);
+                    if (endCalcpad > i)
+                    {
+                        var calcpadCode = content.Substring(i, endCalcpad - i).Trim();
+                        // Mark for Calcpad processing
+                        var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(calcpadCode));
+                        result.Append($"<!--CALCPAD_INLINE:{base64}-->");
+                        i = endCalcpad + 2;
+                    }
+                    else
+                    {
+                        markdownBuffer.Append("$$");
+                    }
+                }
+                // Check for @{...} external code blocks (including @{table}, @{columns})
+                else if (i + 2 < content.Length && content.Substring(i, 2) == "@{")
+                {
+                    // Find the closing } of the directive
+                    int closeDirective = content.IndexOf('}', i + 2);
+                    if (closeDirective > i + 2)
+                    {
+                        var directiveContent = content.Substring(i + 2, closeDirective - i - 2).Trim();
+                        var langName = directiveContent.Split(' ')[0].ToLower();
+
+                        // Special handling for @{columns N}
+                        if (langName == "columns")
+                        {
+                            // Flush markdown buffer first
+                            if (markdownBuffer.Length > 0)
+                            {
+                                result.Append(RenderMarkdownSegment(markdownBuffer.ToString(), variables));
+                                markdownBuffer.Clear();
+                            }
+
+                            // Process columns block
+                            var endColumnsDirective = "@{end columns}";
+                            int endColumnsBlock = content.IndexOf(endColumnsDirective, closeDirective, StringComparison.OrdinalIgnoreCase);
+
+                            if (endColumnsBlock > closeDirective)
+                            {
+                                var columnsContent = content.Substring(closeDirective + 1, endColumnsBlock - closeDirective - 1);
+                                var columnsHtml = ProcessColumnsBlock(directiveContent, columnsContent, variables, progressCallback);
+                                result.Append(columnsHtml);
+                                i = endColumnsBlock + endColumnsDirective.Length;
+                            }
+                            else
+                            {
+                                // No end directive found, treat as regular text
+                                markdownBuffer.Append("@{");
+                                i += 2;
+                            }
+                        }
+                        else
+                        {
+                            // Find the end directive
+                            var endDirective = $"@{{end {langName}}}";
+                            int endBlock = content.IndexOf(endDirective, closeDirective, StringComparison.OrdinalIgnoreCase);
+
+                            if (endBlock > closeDirective)
+                            {
+                                // Flush markdown buffer
+                                if (markdownBuffer.Length > 0)
+                                {
+                                    result.Append(RenderMarkdownSegment(markdownBuffer.ToString(), variables));
+                                    markdownBuffer.Clear();
+                                }
+
+                                // Extract the code block
+                                var codeStart = closeDirective + 1;
+                                var codeContent = content.Substring(codeStart, endBlock - codeStart);
+
+                                // Process based on language type
+                                if (langName == "table")
+                                {
+                                    // Table is handled by MultLangProcessor
+                                    result.Append(_multLangProcessor.ProcessTableBlockPublic(codeContent.Trim(), variables));
+                                }
+                                else
+                                {
+                                    // External language - process with MultLangProcessor
+                                    var fullBlock = $"@{{{directiveContent}}}\n{codeContent}\n{endDirective}";
+                                    var blockHtml = _multLangProcessor.Process(fullBlock, returnHtml: true, enableCollapse: false, progressCallback: progressCallback);
+
+                                    // Extract variables from execution
+                                    foreach (var kv in _multLangProcessor.ExportedVariables)
+                                    {
+                                        variables[kv.Key] = kv.Value;
+                                    }
+
+                                    result.Append(blockHtml);
+                                }
+
+                                i = endBlock + endDirective.Length;
+                            }
+                            else
+                            {
+                                // No end directive found, treat as regular text
+                                markdownBuffer.Append("@{");
+                                i += 2;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        markdownBuffer.Append("@{");
+                        i += 2;
+                    }
+                }
+                else
+                {
+                    markdownBuffer.Append(content[i]);
+                    i++;
+                }
+            }
+
+            // Flush remaining markdown
+            if (markdownBuffer.Length > 0)
+            {
+                result.Append(RenderMarkdownSegment(markdownBuffer.ToString(), variables));
+            }
+
+            // Wrap in basic HTML structure
+            var html = $@"<div class='markdown-page'>
+{result}
+</div>";
+
+            return html;
+        }
+
+        /// <summary>
+        /// Processes @{columns N}...@{column}...@{end columns} blocks
+        /// </summary>
+        /// <param name="directive">The full directive content (e.g., "columns 3")</param>
+        /// <param name="content">Content between @{columns N} and @{end columns}</param>
+        /// <param name="variables">Variables dictionary for substitution</param>
+        /// <param name="progressCallback">Progress callback for external code</param>
+        /// <returns>HTML with CSS grid layout</returns>
+        private string ProcessColumnsBlock(string directive, string content, System.Collections.Generic.Dictionary<string, object> variables, Action<string>? progressCallback)
+        {
+            // Parse number of columns from directive "columns N"
+            var parts = directive.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            int numColumns = 2; // Default
+            if (parts.Length >= 2 && int.TryParse(parts[1], out int n) && n > 0)
+            {
+                numColumns = Math.Min(n, 12); // Max 12 columns
+            }
+
+            // Split content by @{column} separator
+            var columnSeparator = "@{column}";
+            var columnContents = new System.Collections.Generic.List<string>();
+
+            int pos = 0;
+            while (pos < content.Length)
+            {
+                int nextSep = content.IndexOf(columnSeparator, pos, StringComparison.OrdinalIgnoreCase);
+                if (nextSep >= 0)
+                {
+                    columnContents.Add(content.Substring(pos, nextSep - pos));
+                    pos = nextSep + columnSeparator.Length;
+                }
+                else
+                {
+                    columnContents.Add(content.Substring(pos));
+                    break;
+                }
+            }
+
+            // If no separators found, use numColumns to split evenly (or just use as single column)
+            if (columnContents.Count == 0)
+            {
+                columnContents.Add(content);
+            }
+
+            // Build HTML with CSS Grid
+            var html = new StringBuilder();
+            html.AppendLine($"<div class=\"calcpad-columns\" style=\"display: grid; grid-template-columns: repeat({numColumns}, 1fr); gap: 1rem;\">");
+
+            foreach (var colContent in columnContents)
+            {
+                html.AppendLine("<div class=\"calcpad-column\" style=\"padding: 0.5rem;\">");
+
+                // Process the column content recursively (may contain Calcpad blocks, external code, etc.)
+                var processedColumn = ProcessMarkdownPageContent(colContent.Trim(), variables, progressCallback);
+                html.Append(processedColumn);
+
+                html.AppendLine("</div>");
+            }
+
+            html.AppendLine("</div>");
+            return html.ToString();
+        }
+
+        /// <summary>
+        /// Processes content for Markdown page mode (reusable for columns, etc.)
+        /// </summary>
+        private string ProcessMarkdownPageContent(string content, System.Collections.Generic.Dictionary<string, object> variables, Action<string>? progressCallback)
+        {
+            var result = new StringBuilder();
+            int i = 0;
+            var markdownBuffer = new StringBuilder();
+
+            while (i < content.Length)
+            {
+                // Check for Calcpad block: $$...$$
+                if (i + 2 < content.Length && content.Substring(i, 2) == "$$")
+                {
+                    // Flush markdown buffer first
+                    if (markdownBuffer.Length > 0)
+                    {
+                        result.Append(RenderMarkdownSegment(markdownBuffer.ToString(), variables));
+                        markdownBuffer.Clear();
+                    }
+
+                    i += 2; // Skip opening $$
+                    int endCalcpad = content.IndexOf("$$", i);
+                    if (endCalcpad > i)
+                    {
+                        var calcpadCode = content.Substring(i, endCalcpad - i).Trim();
+                        var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(calcpadCode));
+                        result.Append($"<!--CALCPAD_INLINE:{base64}-->");
+                        i = endCalcpad + 2;
+                    }
+                    else
+                    {
+                        markdownBuffer.Append("$$");
+                    }
+                }
+                // Check for @{...} external code blocks
+                else if (i + 2 < content.Length && content.Substring(i, 2) == "@{")
+                {
+                    int closeDirective = content.IndexOf('}', i + 2);
+                    if (closeDirective > i + 2)
+                    {
+                        var directiveContent = content.Substring(i + 2, closeDirective - i - 2).Trim();
+                        var langName = directiveContent.Split(' ')[0].ToLower();
+
+                        // Skip @{column} - it's just a separator, handled by parent
+                        if (langName == "column")
+                        {
+                            i = closeDirective + 1;
+                            continue;
+                        }
+
+                        // Nested @{columns} support
+                        if (langName == "columns")
+                        {
+                            if (markdownBuffer.Length > 0)
+                            {
+                                result.Append(RenderMarkdownSegment(markdownBuffer.ToString(), variables));
+                                markdownBuffer.Clear();
+                            }
+
+                            var endColDir = "@{end columns}";
+                            int endCol = content.IndexOf(endColDir, closeDirective, StringComparison.OrdinalIgnoreCase);
+                            if (endCol > closeDirective)
+                            {
+                                var nestedContent = content.Substring(closeDirective + 1, endCol - closeDirective - 1);
+                                result.Append(ProcessColumnsBlock(directiveContent, nestedContent, variables, progressCallback));
+                                i = endCol + endColDir.Length;
+                            }
+                            else
+                            {
+                                markdownBuffer.Append("@{");
+                                i += 2;
+                            }
+                        }
+                        else
+                        {
+                            var endDirective = $"@{{end {langName}}}";
+                            int endBlock = content.IndexOf(endDirective, closeDirective, StringComparison.OrdinalIgnoreCase);
+
+                            if (endBlock > closeDirective)
+                            {
+                                if (markdownBuffer.Length > 0)
+                                {
+                                    result.Append(RenderMarkdownSegment(markdownBuffer.ToString(), variables));
+                                    markdownBuffer.Clear();
+                                }
+
+                                var codeStart = closeDirective + 1;
+                                var codeContent = content.Substring(codeStart, endBlock - codeStart);
+
+                                if (langName == "table")
+                                {
+                                    result.Append(_multLangProcessor.ProcessTableBlockPublic(codeContent.Trim(), variables));
+                                }
+                                else
+                                {
+                                    var fullBlock = $"@{{{directiveContent}}}\n{codeContent}\n{endDirective}";
+                                    var blockHtml = _multLangProcessor.Process(fullBlock, returnHtml: true, enableCollapse: false, progressCallback: progressCallback);
+
+                                    foreach (var kv in _multLangProcessor.ExportedVariables)
+                                    {
+                                        variables[kv.Key] = kv.Value;
+                                    }
+
+                                    result.Append(blockHtml);
+                                }
+
+                                i = endBlock + endDirective.Length;
+                            }
+                            else
+                            {
+                                markdownBuffer.Append("@{");
+                                i += 2;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        markdownBuffer.Append("@{");
+                        i += 2;
+                    }
+                }
+                else
+                {
+                    markdownBuffer.Append(content[i]);
+                    i++;
+                }
+            }
+
+            // Flush remaining markdown
+            if (markdownBuffer.Length > 0)
+            {
+                result.Append(RenderMarkdownSegment(markdownBuffer.ToString(), variables));
+            }
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// Renders a segment of Markdown to HTML, with $variable substitution
+        /// </summary>
+        private string RenderMarkdownSegment(string markdown, System.Collections.Generic.Dictionary<string, object> variables)
+        {
+            // Process $variable substitution
+            var processed = System.Text.RegularExpressions.Regex.Replace(
+                markdown,
+                @"(?<!\\)\$([a-zA-Z_][a-zA-Z0-9_]*)",
+                m =>
+                {
+                    var varName = m.Groups[1].Value;
+                    if (variables.TryGetValue(varName, out var value))
+                    {
+                        if (value is double d)
+                            return d.ToString("G10", System.Globalization.CultureInfo.InvariantCulture);
+                        return value?.ToString() ?? "";
+                    }
+                    // Variable not found - create marker for Calcpad to resolve
+                    var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(varName));
+                    return $"<!--CALCPAD_INLINE:{base64}-->";
+                }
+            );
+
+            // Escape \$ to $
+            processed = processed.Replace("\\$", "$");
+
+            // Render Markdown to HTML using Markdig
+            try
+            {
+                // Use basic pipeline (extensions are in separate package)
+                return Markdig.Markdown.ToHtml(processed);
+            }
+            catch
+            {
+                // Fallback: basic HTML conversion
+                return $"<p>{System.Web.HttpUtility.HtmlEncode(processed)}</p>";
+            }
         }
     }
 }

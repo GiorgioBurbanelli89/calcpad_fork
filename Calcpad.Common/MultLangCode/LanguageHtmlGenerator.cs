@@ -96,6 +96,13 @@ namespace Calcpad.Common.MultLangCode
         /// </summary>
         private static string GenerateSimpleHtml(string language, ExecutionResult result, bool enableCollapse = true)
         {
+            // If IsHtmlOutput is true, return the raw HTML directly without any wrapper
+            // This is used for embedded iframes, color maps, etc.
+            if (result.IsHtmlOutput && result.Success)
+            {
+                return result.Output;
+            }
+
             var displayName = GetDisplayName(language);
             var output = result.Output;
             var error = result.Error;

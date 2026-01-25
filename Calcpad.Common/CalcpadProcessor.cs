@@ -61,9 +61,14 @@ namespace Calcpad.Common
 
             try
             {
+                // STEP 0: Process expression parser blocks (LaTeX, Mathcad, Python, Symbolic)
+                // This translates external syntax to Calcpad syntax BEFORE any other processing
+                var multilangProcessor = new MultLangProcessor();
+                result.ProcessedCode = multilangProcessor.ProcessExpressionBlocks(code);
+
                 // GLOBAL PARSER DECISION: External code OR Calcpad (NEVER both)
                 bool hasExternalCode;
-                result.ProcessedCode = _globalParser.Process(code, out hasExternalCode, progressCallback);
+                result.ProcessedCode = _globalParser.Process(result.ProcessedCode, out hasExternalCode, progressCallback);
                 result.MultilangProcessed = hasExternalCode;
 
                 try

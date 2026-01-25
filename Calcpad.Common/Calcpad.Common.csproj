@@ -35,4 +35,18 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Plugin configuration files - all parser definitions in JSON -->
+    <Content Include="Plugins\ParserDefinition.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>Plugins\ParserDefinition.json</Link>
+    </Content>
+    <Content Include="Plugins\PluginConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>Plugins\PluginConfig.json</Link>
+    </Content>
+  </ItemGroup>
 </Project>

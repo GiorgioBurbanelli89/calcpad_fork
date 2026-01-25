@@ -20,7 +20,7 @@ namespace Calcpad.Common.MultLangCode
     ///   Example in C++: cout << "CALCPAD:resultado=3.14159" << endl;
     /// - The variable will be available in subsequent Calcpad calculations
     /// </summary>
-    public class MultLangProcessor
+    public partial class MultLangProcessor
     {
         private readonly LanguageExecutor _executor;
         private readonly Dictionary<string, object> _exportedVariables;
@@ -130,7 +130,21 @@ namespace Calcpad.Common.MultLangCode
                         var mcdxPath = block.Code.Trim();
                         output = ProcessMcdxFile(mcdxPath);
                     }
+                    // Special handling for image - embed Base64 images
+                    else if (language.Equals("image", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing IMAGE block, directive='{block.StartDirective}'\n");
+                        }
+                        catch { }
+
+                        output = ProcessImageBlock(block.Code, block.StartDirective);
+                    }
                     // Special handling for markdown - render to HTML
+                    // Supports: @{calcpad:expr}, $varName for variable values, keywords #val, #nosub, etc.
                     else if (language.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                     {
                         try
@@ -141,56 +155,103 @@ namespace Calcpad.Common.MultLangCode
                         }
                         catch { }
 
+                        // Process variable substitution: $varName -> value
+                        var codeWithVars = ProcessMarkdownVariables(block.Code, variables);
                         // Process inline Calcpad code: @{calcpad:...}
+                        var processedCode = ProcessInlineCalcpad(codeWithVars);
                         // Then render markdown to HTML
-                        var processedCode = ProcessInlineCalcpad(block.Code);
                         output = RenderMarkdown(processedCode);
                     }
-                    // C#, XAML, WPF, CSS, HTML always execute (handled specially in LanguageExecutor)
-                    else if (language.Equals("csharp", StringComparison.OrdinalIgnoreCase) ||
-                             language.Equals("xaml", StringComparison.OrdinalIgnoreCase) ||
-                             language.Equals("wpf", StringComparison.OrdinalIgnoreCase) ||
-                             language.Equals("css", StringComparison.OrdinalIgnoreCase) ||
-                             language.Equals("html", StringComparison.OrdinalIgnoreCase) ||
-                             MultLangManager.IsLanguageAvailable(language))
+                    // Special handling for table - generate HTML table from matrix/vector
+                    // Syntax: @{table}
+                    //         matrixName
+                    //         headers=A,B,C style=bordered export=file.xlsx
+                    //         @{end table}
+                    else if (language.Equals("table", StringComparison.OrdinalIgnoreCase))
                     {
-                        var execResult = _executor.Execute(block, variables, progressCallback);
-
-                        // Extract CALCPAD:var=value from output
-                        if (execResult.Success && !string.IsNullOrWhiteSpace(execResult.Output))
+                        output = ProcessTableBlock(block.Code, variables);
+                    }
+                    // Special handling for plot - generate SVG chart from vectors
+                    // Syntax: @{plot}
+                    //         x: vectorX   or  x: [1; 2; 3]
+                    //         y: vectorY   or  y: [4; 5; 6]
+                    //         xlabel: "X axis"
+                    //         ylabel: "Y axis"
+                    //         title: "Chart Title"
+                    //         xlim: 0, 10
+                    //         ylim: 0, 100
+                    //         grid: true
+                    //         legend: "Serie 1"
+                    //         color: #0000FF
+                    //         style: solid|dash|dot
+                    //         @{end plot}
+                    else if (language.Equals("plot", StringComparison.OrdinalIgnoreCase))
+                    {
+                        output = ProcessPlotBlock(block.Code, variables);
+                    }
+                    // Special handling for columns - multi-column layout
+                    // Syntax: @{columns N}
+                    //         content1
+                    //         @{column}
+                    //         content2
+                    //         @{end columns}
+                    else if (language.StartsWith("columns", StringComparison.OrdinalIgnoreCase))
+                    {
+                        output = ProcessColumnsBlock(language, block.Code, variables, progressCallback);
+                    }
+                    // C#, XAML, WPF, CSS, HTML, three, vite always execute (handled specially in LanguageExecutor)
+                    // Extract base language name for checking (e.g., "vite C:/path" -> "vite")
+                    else
+                    {
+                        var baseLang = language.Contains(' ') ? language.Split(' ')[0] : language;
+                        if (baseLang.Equals("csharp", StringComparison.OrdinalIgnoreCase) ||
+                            baseLang.Equals("xaml", StringComparison.OrdinalIgnoreCase) ||
+                            baseLang.Equals("wpf", StringComparison.OrdinalIgnoreCase) ||
+                            baseLang.Equals("css", StringComparison.OrdinalIgnoreCase) ||
+                            baseLang.Equals("html", StringComparison.OrdinalIgnoreCase) ||
+                            baseLang.Equals("html:embed", StringComparison.OrdinalIgnoreCase) ||
+                            baseLang.Equals("three", StringComparison.OrdinalIgnoreCase) ||
+                            baseLang.Equals("vite", StringComparison.OrdinalIgnoreCase) ||
+                            MultLangManager.IsLanguageAvailable(baseLang))
                         {
-                            extractedVars = ExtractCalcpadVariables(execResult.Output);
+                            var execResult = _executor.Execute(block, variables, progressCallback);
 
-                            // Store in exported variables dictionary
-                            foreach (var (name, value) in extractedVars)
+                            // Extract CALCPAD:var=value from output
+                            if (execResult.Success && !string.IsNullOrWhiteSpace(execResult.Output))
                             {
-                                if (double.TryParse(value, System.Globalization.NumberStyles.Any,
-                                    System.Globalization.CultureInfo.InvariantCulture, out var numValue))
+                                extractedVars = ExtractCalcpadVariables(execResult.Output);
+
+                                // Store in exported variables dictionary
+                                foreach (var (name, value) in extractedVars)
                                 {
-                                    _exportedVariables[name] = numValue;
-                                }
-                                else
-                                {
-                                    _exportedVariables[name] = value;
+                                    if (double.TryParse(value, System.Globalization.NumberStyles.Any,
+                                        System.Globalization.CultureInfo.InvariantCulture, out var numValue))
+                                    {
+                                        _exportedVariables[name] = numValue;
+                                    }
+                                    else
+                                    {
+                                        _exportedVariables[name] = value;
+                                    }
                                 }
                             }
-                        }
 
-                        // Generate output based on returnHtml mode
-                        if (returnHtml)
-                        {
-                            // HTML mode: Generate formatted HTML output
-                            output = LanguageHtmlGenerator.GenerateOutput(language, block.Code, execResult, enableCollapse);
+                            // Generate output based on returnHtml mode
+                            if (returnHtml)
+                            {
+                                // HTML mode: Generate formatted HTML output
+                                output = LanguageHtmlGenerator.GenerateOutput(language, block.Code, execResult, enableCollapse);
+                            }
+                            else
+                            {
+                                // Mixed mode: Return plain text output (will be wrapped in Calcpad comments)
+                                output = execResult.Success ? execResult.Output : execResult.Error;
+                            }
                         }
                         else
                         {
-                            // Mixed mode: Return plain text output (will be wrapped in Calcpad comments)
-                            output = execResult.Success ? execResult.Output : execResult.Error;
+                            output = LanguageHtmlGenerator.GenerateNotAvailable(baseLang, block.Code);
                         }
-                    }
-                    else
-                    {
-                        output = LanguageHtmlGenerator.GenerateNotAvailable(language, block.Code);
                     }
                     processedRanges.Add((block.StartLine, block.EndLine, output, extractedVars));
 
@@ -685,6 +746,2440 @@ namespace Calcpad.Common.MultLangCode
             catch { }
 
             return resultString;
+        }
+
+        /// <summary>
+        /// Process image block with Base64 data
+        /// Format: @{image png base64}
+        ///         [base64 data here]
+        ///         @{end image}
+        /// </summary>
+        /// <param name="content">The Base64 content (without the directive line)</param>
+        /// <param name="startDirective">The original start directive (e.g., "@{image png base64}")</param>
+        private string ProcessImageBlock(string content, string startDirective = "")
+        {
+            try
+            {
+                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath,
+                    $"[{DateTime.Now:HH:mm:ss}] ProcessImageBlock: Content length = {content.Length}, directive = '{startDirective}'\n");
+            }
+            catch { }
+
+            try
+            {
+                // Default format
+                var format = "png";
+
+                // Extract format from start directive (e.g., "@{image png base64}" -> "png")
+                if (!string.IsNullOrEmpty(startDirective))
+                {
+                    var directiveLower = startDirective.ToLower();
+                    if (directiveLower.Contains("jpg") || directiveLower.Contains("jpeg"))
+                        format = "jpeg";
+                    else if (directiveLower.Contains("bmp"))
+                        format = "bmp";
+                    else if (directiveLower.Contains("gif"))
+                        format = "gif";
+                    else if (directiveLower.Contains("png"))
+                        format = "png";
+                }
+
+                // The content is already pure Base64 data (no metadata line)
+                var base64Content = content;
+
+                // Clean up the Base64 string (remove whitespace, newlines)
+                base64Content = base64Content
+                    .Replace("\n", "")
+                    .Replace("\r", "")
+                    .Replace(" ", "")
+                    .Replace("\t", "")
+                    .Trim();
+
+                if (string.IsNullOrWhiteSpace(base64Content))
+                {
+                    return "<p style='color:red;'>Error: No se encontró contenido Base64</p>";
+                }
+
+                // Validate Base64 format (basic check)
+                if (base64Content.Length % 4 != 0)
+                {
+                    // Add padding if needed
+                    int padding = 4 - (base64Content.Length % 4);
+                    if (padding < 4)
+                    {
+                        base64Content += new string('=', padding);
+                    }
+                }
+
+                try
+                {
+                    var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                    System.IO.File.AppendAllText(debugPath,
+                        $"[{DateTime.Now:HH:mm:ss}] ProcessImageBlock: Format={format}, Base64 length={base64Content.Length}\n");
+                }
+                catch { }
+
+                // Generate HTML with embedded image
+                var html = $"<div style='text-align:center; margin: 20px 0;'>" +
+                          $"<img src='data:image/{format};base64,{base64Content}' " +
+                          $"style='max-width:100%; height:auto; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);' " +
+                          $"alt='Imagen embebida' />" +
+                          $"</div>";
+
+                return html;
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                    System.IO.File.AppendAllText(debugPath,
+                        $"[{DateTime.Now:HH:mm:ss}] ProcessImageBlock ERROR: {ex.Message}\n");
+                }
+                catch { }
+
+                return $"<p style='color:red;'>Error al procesar imagen: {ex.Message}</p>";
+            }
+        }
+
+        /// <summary>
+        /// Process variable substitution in markdown: $varName -> value
+        /// This allows writing clean markdown with embedded variable values
+        /// Example: "El resultado es $x" -> "El resultado es 42"
+        /// </summary>
+        private string ProcessMarkdownVariables(string content, Dictionary<string, object> variables)
+        {
+            if (variables == null || variables.Count == 0)
+                return content;
+
+            var result = content;
+
+            // Replace $varName with variable value
+            // Pattern: $followed by word characters, not preceded by backslash
+            result = System.Text.RegularExpressions.Regex.Replace(
+                result,
+                @"(?<!\\)\$([a-zA-Z_][a-zA-Z0-9_]*)",
+                m =>
+                {
+                    var varName = m.Groups[1].Value;
+                    if (variables.TryGetValue(varName, out var value))
+                    {
+                        // Format based on type
+                        if (value is double d)
+                            return d.ToString("G10", System.Globalization.CultureInfo.InvariantCulture);
+                        else if (value is int i)
+                            return i.ToString();
+                        else if (value is double[] arr)
+                            return "[" + string.Join(", ", arr.Select(x => x.ToString("G6", System.Globalization.CultureInfo.InvariantCulture))) + "]";
+                        else if (value is double[,] matrix)
+                            return FormatMatrixCompact(matrix);
+                        else
+                            return value?.ToString() ?? "";
+                    }
+                    return m.Value; // Keep original if variable not found
+                }
+            );
+
+            // Allow escaping: \$ -> $
+            result = result.Replace("\\$", "$");
+
+            return result;
+        }
+
+        /// <summary>
+        /// Format a 2D matrix in compact form for markdown display
+        /// </summary>
+        private string FormatMatrixCompact(double[,] matrix)
+        {
+            var rows = matrix.GetLength(0);
+            var cols = matrix.GetLength(1);
+            var sb = new StringBuilder("[");
+            for (int i = 0; i < rows; i++)
+            {
+                if (i > 0) sb.Append("; ");
+                for (int j = 0; j < cols; j++)
+                {
+                    if (j > 0) sb.Append(", ");
+                    sb.Append(matrix[i, j].ToString("G6", System.Globalization.CultureInfo.InvariantCulture));
+                }
+            }
+            sb.Append("]");
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Process @{table} block - generates HTML table from Calcpad matrix/vector
+        /// Syntax:
+        ///   @{table}
+        ///   matrixName
+        ///   headers=A,B,C  (optional column headers)
+        ///   rows=1,2,3     (optional row headers)
+        ///   style=bordered (optional: bordered, striped, minimal)
+        ///   export=file.xlsx (optional: export to Excel)
+        ///   @{end table}
+        /// </summary>
+        public string ProcessTableBlockPublic(string content, Dictionary<string, object> variables)
+        {
+            return ProcessTableBlock(content, variables);
+        }
+
+        private string ProcessTableBlock(string content, Dictionary<string, object> variables)
+        {
+            try
+            {
+                var lines = content.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(l => l.Trim())
+                    .Where(l => !string.IsNullOrEmpty(l))
+                    .ToList();
+
+                if (lines.Count == 0)
+                    return "<p style='color:red;'>Error: Bloque @{table} vacío</p>";
+
+                // First line should be the matrix/vector name
+                var matrixName = lines[0];
+                string[] headers = null;
+                string[] rowHeaders = null;
+                string style = "bordered";
+                string exportFile = null;
+
+                // Parse options from remaining lines
+                for (int i = 1; i < lines.Count; i++)
+                {
+                    var line = lines[i].ToLower();
+                    if (line.StartsWith("headers="))
+                        headers = lines[i].Substring(8).Split(',').Select(h => h.Trim()).ToArray();
+                    else if (line.StartsWith("rows="))
+                        rowHeaders = lines[i].Substring(5).Split(',').Select(r => r.Trim()).ToArray();
+                    else if (line.StartsWith("style="))
+                        style = lines[i].Substring(6).Trim().ToLower();
+                    else if (line.StartsWith("export="))
+                        exportFile = lines[i].Substring(7).Trim();
+                }
+
+                // Get matrix/vector from variables
+                if (!variables.TryGetValue(matrixName, out var data))
+                    return $"<p style='color:red;'>Error: Variable '{matrixName}' no encontrada</p>";
+
+                // Convert to 2D array if needed
+                double[,] matrix;
+                if (data is double[,] m)
+                    matrix = m;
+                else if (data is double[] arr)
+                {
+                    // Convert vector to single-row or single-column matrix
+                    matrix = new double[1, arr.Length];
+                    for (int j = 0; j < arr.Length; j++)
+                        matrix[0, j] = arr[j];
+                }
+                else if (data is double d)
+                {
+                    // Single value
+                    matrix = new double[1, 1] { { d } };
+                }
+                else
+                    return $"<p style='color:red;'>Error: '{matrixName}' no es un matriz/vector numérico</p>";
+
+                // Generate HTML table
+                var sb = new StringBuilder();
+                var tableStyle = GetTableStyle(style);
+
+                sb.Append($"<table style='{tableStyle}'>");
+
+                // Header row
+                if (headers != null && headers.Length > 0)
+                {
+                    sb.Append("<thead><tr>");
+                    if (rowHeaders != null) sb.Append("<th></th>"); // Empty corner cell
+                    foreach (var h in headers)
+                        sb.Append($"<th style='padding: 8px; text-align: center;'>{System.Web.HttpUtility.HtmlEncode(h)}</th>");
+                    sb.Append("</tr></thead>");
+                }
+
+                // Data rows
+                sb.Append("<tbody>");
+                var rows = matrix.GetLength(0);
+                var cols = matrix.GetLength(1);
+
+                for (int i = 0; i < rows; i++)
+                {
+                    sb.Append("<tr>");
+
+                    // Row header
+                    if (rowHeaders != null && i < rowHeaders.Length)
+                        sb.Append($"<th style='padding: 8px; text-align: left;'>{System.Web.HttpUtility.HtmlEncode(rowHeaders[i])}</th>");
+
+                    // Data cells
+                    for (int j = 0; j < cols; j++)
+                    {
+                        var value = matrix[i, j];
+                        var formatted = FormatNumber(value);
+                        sb.Append($"<td style='padding: 8px; text-align: right;'>{formatted}</td>");
+                    }
+                    sb.Append("</tr>");
+                }
+                sb.Append("</tbody></table>");
+
+                // Export to file if requested
+                if (!string.IsNullOrEmpty(exportFile))
+                {
+                    try
+                    {
+                        ExportTableToFile(matrix, headers, rowHeaders, exportFile);
+                        sb.Append($"<p style='font-size:0.8em; color:#666;'>Exportado a: {System.Web.HttpUtility.HtmlEncode(exportFile)}</p>");
+                    }
+                    catch (Exception ex)
+                    {
+                        sb.Append($"<p style='color:orange;'>Advertencia: No se pudo exportar: {ex.Message}</p>");
+                    }
+                }
+
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                return $"<p style='color:red;'>Error en @{{table}}: {ex.Message}</p>";
+            }
+        }
+
+        /// <summary>
+        /// Get CSS style for table based on style name
+        /// </summary>
+        private string GetTableStyle(string style)
+        {
+            return style switch
+            {
+                "bordered" => "border-collapse: collapse; border: 1px solid #333; width: 100%;",
+                "striped" => "border-collapse: collapse; width: 100%;",
+                "minimal" => "border-collapse: collapse; width: 100%; border: none;",
+                _ => "border-collapse: collapse; border: 1px solid #333; width: 100%;"
+            };
+        }
+
+        /// <summary>
+        /// Format number for table display
+        /// </summary>
+        private string FormatNumber(double value)
+        {
+            if (Math.Abs(value) < 1e-10) return "0";
+            if (Math.Abs(value) >= 1e6 || Math.Abs(value) < 1e-3)
+                return value.ToString("0.####E+0", System.Globalization.CultureInfo.InvariantCulture);
+            return value.ToString("G6", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Process @{plot} block - generate SVG chart from vectors
+        /// Syntax:
+        ///   @{plot}
+        ///   x: vectorX   or  x: [1; 2; 3]
+        ///   y: vectorY   or  y: [4; 5; 6]
+        ///   xlabel: "X axis label"
+        ///   ylabel: "Y axis label"
+        ///   title: "Chart Title"
+        ///   xlim: min, max
+        ///   ylim: min, max
+        ///   grid: true|false
+        ///   legend: "Serie Name"
+        ///   color: #0000FF
+        ///   style: solid|dash|dot
+        ///   @{end plot}
+        /// </summary>
+        private string ProcessPlotBlock(string content, Dictionary<string, object> variables)
+        {
+            try
+            {
+                var lines = content.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(l => l.Trim())
+                    .Where(l => !string.IsNullOrEmpty(l))
+                    .ToList();
+
+                if (lines.Count == 0)
+                    return "<p style='color:red;'>Error: Bloque @{plot} vacío</p>";
+
+                // Parse plot options - global settings
+                string xData = null;
+                string xlabel = "x", ylabel = "y", title = null;
+                double? xmin = null, xmax = null, ymin = null, ymax = null;
+                bool grid = true;
+                bool showLegend = true;
+                string background = "paper";  // "paper" (azul milimetrado) or "white" (blanco limpio)
+                int width = 600, height = 400;
+
+                // Multiple series support - track current series being configured
+                var series = new List<PlotSeries>();
+                PlotSeries currentSeries = null;
+
+                // Default colors for multiple series (similar to Mathcad/Matlab)
+                var defaultColors = new[] { "#0033CC", "#CC0000", "#006600", "#9900CC", "#FF6600", "#00CCCC", "#CC00CC", "#666666" };
+
+                // Annotations: text, arrows, lines, shapes
+                var annotations = new List<PlotAnnotation>();
+
+                foreach (var line in lines)
+                {
+                    var colonIdx = line.IndexOf(':');
+                    if (colonIdx <= 0) continue;
+
+                    var key = line.Substring(0, colonIdx).Trim().ToLower();
+                    var value = line.Substring(colonIdx + 1).Trim();
+
+                    // Handle annotations specially (don't strip quotes yet)
+                    if (key == "text" || key == "texto" || key == "label" || key == "etiqueta")
+                    {
+                        var annotation = ParseTextAnnotation(value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    if (key == "arrow" || key == "flecha")
+                    {
+                        var annotation = ParseArrowAnnotation(value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    if (key == "line" || key == "linea" || key == "hline" || key == "vline")
+                    {
+                        var annotation = ParseLineAnnotation(key, value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    if (key == "rect" || key == "rectangulo" || key == "circle" || key == "circulo")
+                    {
+                        var annotation = ParseShapeAnnotation(key, value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    // Projection lines from point to axes (like in derivative diagrams)
+                    if (key == "proj" || key == "projection" || key == "proyeccion")
+                    {
+                        var annotation = ParseProjectionAnnotation(value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    // Axis tick labels (custom labels at specific positions)
+                    if (key == "xtick" || key == "ytick" || key == "tickx" || key == "ticky")
+                    {
+                        var annotation = ParseTickAnnotation(key, value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    // Angle annotation (arc with label)
+                    if (key == "angle" || key == "angulo")
+                    {
+                        var annotation = ParseAngleAnnotation(value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    // Dimension bracket/brace (curly braces)
+                    if (key == "brace" || key == "bracket" || key == "llave")
+                    {
+                        var annotation = ParseBraceAnnotation(value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    // Filled point/dot marker
+                    if (key == "point" || key == "punto" || key == "dot")
+                    {
+                        var annotation = ParsePointAnnotation(value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+                    // Dimension with double-headed arrow (like in technical drawings)
+                    if (key == "dim" || key == "dimension" || key == "cota" || key == "measure")
+                    {
+                        var annotation = ParseDimensionAnnotation(value);
+                        if (annotation != null) annotations.Add(annotation);
+                        continue;
+                    }
+
+                    // Remove quotes from string values
+                    if (value.StartsWith("\"") && value.EndsWith("\""))
+                        value = value.Substring(1, value.Length - 2);
+                    else if (value.StartsWith("'") && value.EndsWith("'"))
+                        value = value.Substring(1, value.Length - 2);
+
+                    // Check for numbered keys (y2, color2, etc.)
+                    var numMatch = System.Text.RegularExpressions.Regex.Match(key, @"^(.+?)(\d+)$");
+                    int seriesIndex = 0;
+                    string baseKey = key;
+                    if (numMatch.Success)
+                    {
+                        baseKey = numMatch.Groups[1].Value;
+                        seriesIndex = int.Parse(numMatch.Groups[2].Value) - 1; // y2 -> index 1
+                    }
+
+                    // Ensure series list is large enough
+                    while (series.Count <= seriesIndex)
+                    {
+                        var newSeries = new PlotSeries();
+                        newSeries.Color = defaultColors[series.Count % defaultColors.Length];
+                        series.Add(newSeries);
+                    }
+
+                    switch (baseKey)
+                    {
+                        case "x": xData = value; break;
+                        case "y":
+                            series[seriesIndex].YData = value;
+                            currentSeries = series[seriesIndex];
+                            break;
+                        case "xlabel": xlabel = value; break;
+                        case "ylabel": ylabel = value; break;
+                        case "title": title = value; break;
+                        case "xlim":
+                            var xlimParts = value.Split(',');
+                            if (xlimParts.Length >= 2)
+                            {
+                                if (double.TryParse(xlimParts[0].Trim(), out var xminVal)) xmin = xminVal;
+                                if (double.TryParse(xlimParts[1].Trim(), out var xmaxVal)) xmax = xmaxVal;
+                            }
+                            break;
+                        case "ylim":
+                            var ylimParts = value.Split(',');
+                            if (ylimParts.Length >= 2)
+                            {
+                                if (double.TryParse(ylimParts[0].Trim(), out var yminVal)) ymin = yminVal;
+                                if (double.TryParse(ylimParts[1].Trim(), out var ymaxVal)) ymax = ymaxVal;
+                            }
+                            break;
+                        case "grid":
+                            grid = !value.Equals("false", StringComparison.OrdinalIgnoreCase) &&
+                                   !value.Equals("0", StringComparison.OrdinalIgnoreCase);
+                            break;
+                        case "showlegend":
+                        case "mostrarleyenda":
+                            if (value.Equals("false", StringComparison.OrdinalIgnoreCase) ||
+                                value.Equals("0", StringComparison.OrdinalIgnoreCase) ||
+                                value.Equals("no", StringComparison.OrdinalIgnoreCase))
+                                showLegend = false;
+                            break;
+                        case "background":
+                        case "bg":
+                        case "fondo":
+                            background = value.ToLower();
+                            break;
+                        case "legend":
+                            series[seriesIndex].Legend = value;
+                            break;
+                        case "color":
+                            series[seriesIndex].Color = value;
+                            break;
+                        case "style":
+                            series[seriesIndex].LineStyle = value.ToLower();
+                            break;
+                        case "symbol":
+                        case "marker":
+                            series[seriesIndex].Symbol = value.ToLower();
+                            break;
+                        case "symbolsize":
+                        case "markersize":
+                            if (int.TryParse(value, out var ss)) series[seriesIndex].SymbolSize = ss;
+                            break;
+                        case "linewidth":
+                        case "lw":
+                            if (double.TryParse(value, System.Globalization.NumberStyles.Any,
+                                System.Globalization.CultureInfo.InvariantCulture, out var lw))
+                                series[seriesIndex].LineWidth = lw;
+                            break;
+                        case "width":
+                            if (int.TryParse(value, out var w)) width = w;
+                            break;
+                        case "height":
+                            if (int.TryParse(value, out var h)) height = h;
+                            break;
+                        case "smooth":
+                        case "suavizado":
+                        case "spline":
+                            series[seriesIndex].Smooth = !value.Equals("false", StringComparison.OrdinalIgnoreCase) &&
+                                     !value.Equals("0", StringComparison.OrdinalIgnoreCase) &&
+                                     !value.Equals("no", StringComparison.OrdinalIgnoreCase);
+                            break;
+                        case "tension":
+                        case "smoothtension":
+                            if (double.TryParse(value, System.Globalization.NumberStyles.Any,
+                                System.Globalization.CultureInfo.InvariantCulture, out var t))
+                                series[seriesIndex].SmoothTension = Math.Max(0, Math.Min(1, t));
+                            break;
+                    }
+                }
+
+                // Remove series without data
+                series = series.Where(s => !string.IsNullOrEmpty(s.YData)).ToList();
+
+                if (series.Count == 0)
+                    return "<p style='color:red;'>Error: No se definieron datos y para graficar</p>";
+
+                // Get X data
+                double[] xValues = GetPlotData(xData, variables);
+                if (xValues == null)
+                    return "<p style='color:red;'>Error: No se pudo obtener datos para x</p>";
+
+                // Get all Y data and validate
+                var allYValues = new List<double[]>();
+                foreach (var s in series)
+                {
+                    var yVals = GetPlotData(s.YData, variables);
+                    if (yVals == null)
+                        return $"<p style='color:red;'>Error: No se pudo obtener datos para y</p>";
+                    if (yVals.Length != xValues.Length)
+                        return $"<p style='color:red;'>Error: Las longitudes de x ({xValues.Length}) y y ({yVals.Length}) no coinciden</p>";
+                    allYValues.Add(yVals);
+                }
+
+                if (xValues.Length < 2)
+                    return "<p style='color:red;'>Error: Se necesitan al menos 2 puntos para graficar</p>";
+
+                // Calculate limits if not specified (considering all series)
+                if (!xmin.HasValue) xmin = xValues.Min() - (xValues.Max() - xValues.Min()) * 0.05;
+                if (!xmax.HasValue) xmax = xValues.Max() + (xValues.Max() - xValues.Min()) * 0.05;
+
+                double globalYMin = allYValues.SelectMany(y => y).Min();
+                double globalYMax = allYValues.SelectMany(y => y).Max();
+                if (!ymin.HasValue) ymin = globalYMin - (globalYMax - globalYMin) * 0.05;
+                if (!ymax.HasValue) ymax = globalYMax + (globalYMax - globalYMin) * 0.05;
+
+                // Handle case where all values are the same
+                if (Math.Abs(xmax.Value - xmin.Value) < 1e-10) { xmin -= 1; xmax += 1; }
+                if (Math.Abs(ymax.Value - ymin.Value) < 1e-10) { ymin -= 1; ymax += 1; }
+
+                // Generate SVG with multiple series
+                return GeneratePlotSvgMultiSeries(xValues, allYValues, series, xmin.Value, xmax.Value, ymin.Value, ymax.Value,
+                    xlabel, ylabel, title, grid, showLegend, background, width, height, annotations);
+            }
+            catch (Exception ex)
+            {
+                return $"<p style='color:red;'>Error en @{{plot}}: {ex.Message}</p>";
+            }
+        }
+
+        /// <summary>
+        /// Series class for multiple data series in a plot
+        /// </summary>
+        private class PlotSeries
+        {
+            public string YData { get; set; }
+            public string Color { get; set; } = "#4169E1";
+            public string LineStyle { get; set; } = "solid";
+            public string Symbol { get; set; } = "none";
+            public int SymbolSize { get; set; } = 6;
+            public double LineWidth { get; set; } = 2.0;
+            public string Legend { get; set; }
+            public bool Smooth { get; set; } = false;
+            public double SmoothTension { get; set; } = 0.3;
+        }
+
+        /// <summary>
+        /// Annotation class for plot elements
+        /// </summary>
+        private class PlotAnnotation
+        {
+            public string Type { get; set; } = "text";  // text, arrow, line, hline, vline, rect, circle
+            public double X { get; set; }
+            public double Y { get; set; }
+            public double X2 { get; set; }  // For arrows, lines, rects
+            public double Y2 { get; set; }
+            public string Text { get; set; } = "";
+            public string Color { get; set; } = "#003366";
+            public int FontSize { get; set; } = 12;
+            public string Anchor { get; set; } = "start";  // start, middle, end
+            public bool Bold { get; set; } = false;
+            public bool Italic { get; set; } = true;
+            public double Rotation { get; set; } = 0;
+            public double StrokeWidth { get; set; } = 1.5;
+            public string Fill { get; set; } = "none";
+        }
+
+        /// <summary>
+        /// Parse text annotation: x, y, "text" [, color, fontsize, anchor, bold, italic, rotation]
+        /// </summary>
+        private PlotAnnotation ParseTextAnnotation(string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = "text" };
+
+                // Find the quoted text
+                int quoteStart = value.IndexOf('"');
+                int quoteEnd = value.LastIndexOf('"');
+                if (quoteStart < 0 || quoteEnd <= quoteStart)
+                {
+                    quoteStart = value.IndexOf('\'');
+                    quoteEnd = value.LastIndexOf('\'');
+                }
+
+                if (quoteStart < 0 || quoteEnd <= quoteStart)
+                    return null;
+
+                annotation.Text = value.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+
+                // Parse coordinates before the quote
+                var coordsPart = value.Substring(0, quoteStart).Trim().TrimEnd(',');
+                var coords = coordsPart.Split(',');
+                if (coords.Length >= 2)
+                {
+                    double.TryParse(coords[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x);
+                    double.TryParse(coords[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y);
+                    annotation.X = x;
+                    annotation.Y = y;
+                }
+
+                // Parse options after the quote
+                if (quoteEnd < value.Length - 1)
+                {
+                    var optionsPart = value.Substring(quoteEnd + 1).Trim().TrimStart(',');
+                    var options = optionsPart.Split(',');
+                    foreach (var opt in options)
+                    {
+                        var o = opt.Trim().ToLower();
+                        if (o.StartsWith("#") || o.StartsWith("rgb"))
+                            annotation.Color = opt.Trim();
+                        else if (int.TryParse(o, out var fs) && fs >= 6 && fs <= 72)
+                            annotation.FontSize = fs;
+                        else if (o == "start" || o == "middle" || o == "end" || o == "center")
+                            annotation.Anchor = o == "center" ? "middle" : o;
+                        else if (o == "bold" || o == "negrita")
+                            annotation.Bold = true;
+                        else if (o == "italic" || o == "cursiva")
+                            annotation.Italic = true;
+                        else if (o == "normal")
+                            annotation.Italic = false;
+                        else if (o.StartsWith("rot") || o.EndsWith("°") || o.EndsWith("deg"))
+                        {
+                            var rotVal = o.Replace("rot", "").Replace("°", "").Replace("deg", "").Trim();
+                            double.TryParse(rotVal, System.Globalization.NumberStyles.Any,
+                                System.Globalization.CultureInfo.InvariantCulture, out var rot);
+                            annotation.Rotation = rot;
+                        }
+                    }
+                }
+
+                return annotation;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Parse arrow annotation: x1, y1, x2, y2 [, color, strokewidth]
+        /// </summary>
+        private PlotAnnotation ParseArrowAnnotation(string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = "arrow" };
+                var parts = value.Split(',');
+                if (parts.Length >= 4)
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x1);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y1);
+                    double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x2);
+                    double.TryParse(parts[3].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y2);
+                    annotation.X = x1;
+                    annotation.Y = y1;
+                    annotation.X2 = x2;
+                    annotation.Y2 = y2;
+
+                    // Parse optional color and strokewidth
+                    for (int i = 4; i < parts.Length; i++)
+                    {
+                        var p = parts[i].Trim();
+                        if (p.StartsWith("#") || p.StartsWith("rgb"))
+                            annotation.Color = p;
+                        else if (double.TryParse(p, System.Globalization.NumberStyles.Any,
+                            System.Globalization.CultureInfo.InvariantCulture, out var sw))
+                            annotation.StrokeWidth = sw;
+                    }
+                }
+                return annotation;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Parse line annotation: x1, y1, x2, y2 or hline: y or vline: x [, color, strokewidth]
+        /// </summary>
+        private PlotAnnotation ParseLineAnnotation(string key, string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = key };
+                var parts = value.Split(',');
+
+                if (key == "hline")
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y);
+                    annotation.Y = y;
+                    // Parse optional color
+                    for (int i = 1; i < parts.Length; i++)
+                    {
+                        var p = parts[i].Trim();
+                        if (p.StartsWith("#")) annotation.Color = p;
+                    }
+                }
+                else if (key == "vline")
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x);
+                    annotation.X = x;
+                    for (int i = 1; i < parts.Length; i++)
+                    {
+                        var p = parts[i].Trim();
+                        if (p.StartsWith("#")) annotation.Color = p;
+                    }
+                }
+                else if (parts.Length >= 4)
+                {
+                    annotation.Type = "line";
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x1);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y1);
+                    double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x2);
+                    double.TryParse(parts[3].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y2);
+                    annotation.X = x1;
+                    annotation.Y = y1;
+                    annotation.X2 = x2;
+                    annotation.Y2 = y2;
+                    for (int i = 4; i < parts.Length; i++)
+                    {
+                        var p = parts[i].Trim();
+                        if (p.StartsWith("#")) annotation.Color = p;
+                    }
+                }
+                return annotation;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Parse shape annotation: rect x, y, w, h or circle x, y, r [, color, fill]
+        /// </summary>
+        private PlotAnnotation ParseShapeAnnotation(string key, string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = key.StartsWith("rect") ? "rect" : "circle" };
+                var parts = value.Split(',');
+
+                if (annotation.Type == "rect" && parts.Length >= 4)
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y);
+                    double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var w);
+                    double.TryParse(parts[3].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var h);
+                    annotation.X = x;
+                    annotation.Y = y;
+                    annotation.X2 = w;  // width
+                    annotation.Y2 = h;  // height
+                    for (int i = 4; i < parts.Length; i++)
+                    {
+                        var p = parts[i].Trim();
+                        if (p.StartsWith("#"))
+                        {
+                            if (string.IsNullOrEmpty(annotation.Fill) || annotation.Fill == "none")
+                                annotation.Color = p;
+                            else
+                                annotation.Fill = p;
+                        }
+                        else if (p == "fill" || p == "filled" || p == "lleno")
+                            annotation.Fill = annotation.Color;
+                    }
+                }
+                else if (annotation.Type == "circle" && parts.Length >= 3)
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y);
+                    double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var r);
+                    annotation.X = x;
+                    annotation.Y = y;
+                    annotation.X2 = r;  // radius
+                    for (int i = 3; i < parts.Length; i++)
+                    {
+                        var p = parts[i].Trim();
+                        if (p.StartsWith("#"))
+                        {
+                            if (string.IsNullOrEmpty(annotation.Fill) || annotation.Fill == "none")
+                                annotation.Color = p;
+                            else
+                                annotation.Fill = p;
+                        }
+                        else if (p == "fill" || p == "filled" || p == "lleno")
+                            annotation.Fill = annotation.Color;
+                    }
+                }
+                return annotation;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Parse projection annotation: x, y [, color, style]
+        /// Draws dashed lines from point (x,y) to both axes
+        /// </summary>
+        private PlotAnnotation ParseProjectionAnnotation(string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = "projection" };
+                var parts = value.Split(',');
+
+                if (parts.Length >= 2)
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y);
+                    annotation.X = x;
+                    annotation.Y = y;
+                    annotation.Color = "#666666";  // Default gray dashed
+                    annotation.StrokeWidth = 1;
+
+                    for (int i = 2; i < parts.Length; i++)
+                    {
+                        var p = parts[i].Trim();
+                        if (p.StartsWith("#")) annotation.Color = p;
+                    }
+                }
+                return annotation;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// Parse tick annotation: value, "label" [, color]
+        /// Adds custom label at axis position
+        /// </summary>
+        private PlotAnnotation ParseTickAnnotation(string key, string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = key.Contains("x") ? "xtick" : "ytick" };
+
+                // Find quoted text
+                int quoteStart = value.IndexOf('"');
+                int quoteEnd = value.LastIndexOf('"');
+                if (quoteStart < 0 || quoteEnd <= quoteStart)
+                {
+                    quoteStart = value.IndexOf('\'');
+                    quoteEnd = value.LastIndexOf('\'');
+                }
+
+                if (quoteStart >= 0 && quoteEnd > quoteStart)
+                {
+                    annotation.Text = value.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+                    var beforeQuote = value.Substring(0, quoteStart).Trim().TrimEnd(',');
+                    double.TryParse(beforeQuote, System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var pos);
+
+                    if (annotation.Type == "xtick")
+                        annotation.X = pos;
+                    else
+                        annotation.Y = pos;
+
+                    // Parse options after quote
+                    if (quoteEnd < value.Length - 1)
+                    {
+                        var afterQuote = value.Substring(quoteEnd + 1).Split(',');
+                        foreach (var p in afterQuote)
+                        {
+                            var pt = p.Trim();
+                            if (pt.StartsWith("#")) annotation.Color = pt;
+                        }
+                    }
+                }
+                annotation.FontSize = 12;
+                annotation.Italic = true;
+                return annotation;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// Parse angle annotation: x, y, startAngle, endAngle, radius, "label" [, color]
+        /// Draws an arc indicating an angle
+        /// </summary>
+        private PlotAnnotation ParseAngleAnnotation(string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = "angle" };
+
+                // Find quoted text for label
+                int quoteStart = value.IndexOf('"');
+                int quoteEnd = value.LastIndexOf('"');
+                if (quoteStart < 0 || quoteEnd <= quoteStart)
+                {
+                    quoteStart = value.IndexOf('\'');
+                    quoteEnd = value.LastIndexOf('\'');
+                }
+
+                string numericPart = quoteStart > 0 ? value.Substring(0, quoteStart) : value;
+                var parts = numericPart.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length >= 5)
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y);
+                    double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var startAngle);
+                    double.TryParse(parts[3].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var endAngle);
+                    double.TryParse(parts[4].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var radius);
+
+                    annotation.X = x;
+                    annotation.Y = y;
+                    annotation.X2 = startAngle;  // Store start angle
+                    annotation.Y2 = endAngle;    // Store end angle
+                    annotation.Rotation = radius; // Store radius (reusing Rotation field)
+                }
+
+                if (quoteStart >= 0 && quoteEnd > quoteStart)
+                {
+                    annotation.Text = value.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+                }
+
+                // Parse color after quote
+                if (quoteEnd > 0 && quoteEnd < value.Length - 1)
+                {
+                    var afterQuote = value.Substring(quoteEnd + 1).Split(',');
+                    foreach (var p in afterQuote)
+                    {
+                        var pt = p.Trim();
+                        if (pt.StartsWith("#")) annotation.Color = pt;
+                    }
+                }
+
+                annotation.FontSize = 11;
+                return annotation;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// Parse brace/bracket annotation: x1, y1, x2, y2, "label" [, color, position]
+        /// Draws a curly brace between two points with a label
+        /// position: above/below/left/right
+        /// </summary>
+        private PlotAnnotation ParseBraceAnnotation(string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = "brace" };
+
+                // Find quoted text
+                int quoteStart = value.IndexOf('"');
+                int quoteEnd = value.LastIndexOf('"');
+                if (quoteStart < 0 || quoteEnd <= quoteStart)
+                {
+                    quoteStart = value.IndexOf('\'');
+                    quoteEnd = value.LastIndexOf('\'');
+                }
+
+                string numericPart = quoteStart > 0 ? value.Substring(0, quoteStart) : value;
+                var parts = numericPart.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length >= 4)
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x1);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y1);
+                    double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x2);
+                    double.TryParse(parts[3].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y2);
+
+                    annotation.X = x1;
+                    annotation.Y = y1;
+                    annotation.X2 = x2;
+                    annotation.Y2 = y2;
+                }
+
+                if (quoteStart >= 0 && quoteEnd > quoteStart)
+                {
+                    annotation.Text = value.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+                }
+
+                // Parse options after quote
+                annotation.Anchor = "below";  // Default position
+                if (quoteEnd > 0 && quoteEnd < value.Length - 1)
+                {
+                    var afterQuote = value.Substring(quoteEnd + 1).Split(',');
+                    foreach (var p in afterQuote)
+                    {
+                        var pt = p.Trim().ToLower();
+                        if (pt.StartsWith("#")) annotation.Color = pt;
+                        else if (pt == "above" || pt == "arriba" || pt == "top") annotation.Anchor = "above";
+                        else if (pt == "below" || pt == "abajo" || pt == "bottom") annotation.Anchor = "below";
+                        else if (pt == "left" || pt == "izquierda") annotation.Anchor = "left";
+                        else if (pt == "right" || pt == "derecha") annotation.Anchor = "right";
+                    }
+                }
+
+                annotation.FontSize = 11;
+                return annotation;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// Parse point annotation: x, y [, color, size, filled]
+        /// Draws a point/dot marker
+        /// </summary>
+        private PlotAnnotation ParsePointAnnotation(string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = "point" };
+                var parts = value.Split(',');
+
+                if (parts.Length >= 2)
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y);
+                    annotation.X = x;
+                    annotation.Y = y;
+                    annotation.X2 = 5;  // Default radius
+                    annotation.Fill = "filled";  // Default filled
+
+                    for (int i = 2; i < parts.Length; i++)
+                    {
+                        var p = parts[i].Trim();
+                        if (p.StartsWith("#")) annotation.Color = p;
+                        else if (double.TryParse(p, System.Globalization.NumberStyles.Any,
+                            System.Globalization.CultureInfo.InvariantCulture, out var size))
+                            annotation.X2 = size;
+                        else if (p == "empty" || p == "vacio" || p == "outline")
+                            annotation.Fill = "none";
+                        else if (p == "filled" || p == "lleno" || p == "fill")
+                            annotation.Fill = "filled";
+                    }
+                }
+                return annotation;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// Parse dimension annotation with double-headed arrow: x1, y1, x2, y2, "label" [, color, offset]
+        /// Draws a line with arrows at both ends and a label
+        /// </summary>
+        private PlotAnnotation ParseDimensionAnnotation(string value)
+        {
+            try
+            {
+                var annotation = new PlotAnnotation { Type = "dimension" };
+
+                // Find quoted text
+                int quoteStart = value.IndexOf('"');
+                int quoteEnd = value.LastIndexOf('"');
+                if (quoteStart < 0 || quoteEnd <= quoteStart)
+                {
+                    quoteStart = value.IndexOf('\'');
+                    quoteEnd = value.LastIndexOf('\'');
+                }
+
+                string numericPart = quoteStart > 0 ? value.Substring(0, quoteStart) : value;
+                var parts = numericPart.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length >= 4)
+                {
+                    double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x1);
+                    double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y1);
+                    double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var x2);
+                    double.TryParse(parts[3].Trim(), System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var y2);
+
+                    annotation.X = x1;
+                    annotation.Y = y1;
+                    annotation.X2 = x2;
+                    annotation.Y2 = y2;
+                }
+
+                if (quoteStart >= 0 && quoteEnd > quoteStart)
+                {
+                    annotation.Text = value.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+                }
+
+                // Parse options after quote
+                annotation.Rotation = 0;  // Used for offset
+                annotation.Color = "#333333";
+                if (quoteEnd > 0 && quoteEnd < value.Length - 1)
+                {
+                    var afterQuote = value.Substring(quoteEnd + 1).Split(',');
+                    foreach (var p in afterQuote)
+                    {
+                        var pt = p.Trim();
+                        if (pt.StartsWith("#")) annotation.Color = pt;
+                        else if (double.TryParse(pt, System.Globalization.NumberStyles.Any,
+                            System.Globalization.CultureInfo.InvariantCulture, out var offset))
+                            annotation.Rotation = offset;  // Store offset in Rotation
+                    }
+                }
+
+                annotation.FontSize = 11;
+                return annotation;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// Get plot data from variable name or inline array
+        /// </summary>
+        private double[] GetPlotData(string dataSpec, Dictionary<string, object> variables)
+        {
+            if (string.IsNullOrEmpty(dataSpec)) return null;
+
+            // Check if it's an inline array: [1; 2; 3] or [1, 2, 3]
+            if (dataSpec.StartsWith("[") && dataSpec.EndsWith("]"))
+            {
+                var inner = dataSpec.Substring(1, dataSpec.Length - 2);
+                var values = inner.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var result = new List<double>();
+                foreach (var v in values)
+                {
+                    var cleanVal = v.Trim();
+                    // Remove unit if present (e.g., "2.5'm" -> "2.5")
+                    var quoteIdx = cleanVal.IndexOf('\'');
+                    if (quoteIdx > 0) cleanVal = cleanVal.Substring(0, quoteIdx);
+
+                    if (double.TryParse(cleanVal, System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture, out var val))
+                        result.Add(val);
+                }
+                return result.Count > 0 ? result.ToArray() : null;
+            }
+
+            // It's a variable name
+            var varName = dataSpec.Trim();
+            if (!variables.TryGetValue(varName, out var data))
+                return null;
+
+            // Convert to double array
+            if (data is double[] arr) return arr;
+            if (data is double d) return new[] { d };
+            if (data is double[,] matrix)
+            {
+                // Flatten matrix (column-first)
+                var rows = matrix.GetLength(0);
+                var cols = matrix.GetLength(1);
+                var flat = new double[rows * cols];
+                int idx = 0;
+                for (int c = 0; c < cols; c++)
+                    for (int r = 0; r < rows; r++)
+                        flat[idx++] = matrix[r, c];
+                return flat;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Generate SVG plot with Mathcad Prime style (arrows, grid paper, italic labels, markers, annotations)
+        /// </summary>
+        private string GeneratePlotSvg(double[] x, double[] y, double xmin, double xmax, double ymin, double ymax,
+            string xlabel, string ylabel, string title, string legend, string color, string lineStyle,
+            string symbol, int symbolSize, double lineWidth, bool showGrid, int width, int height,
+            bool smooth = false, double smoothTension = 0.3, List<PlotAnnotation> annotations = null)
+        {
+            const int margin = 70;
+            const int marginTop = 30;
+            const int marginRight = 30;
+            const int marginBottom = 50;
+
+            var plotWidth = width - margin - marginRight;
+            var plotHeight = height - marginTop - marginBottom;
+
+            var scaleX = plotWidth / (xmax - xmin);
+            var scaleY = plotHeight / (ymax - ymin);
+
+            var sb = new StringBuilder();
+
+            // SVG header with defs for arrow markers
+            sb.Append($"<svg class=\"plot\" width=\"{width}\" height=\"{height}\" xmlns=\"http://www.w3.org/2000/svg\">");
+
+            // Define arrow markers (for axes and annotations)
+            sb.Append("<defs>");
+            sb.Append("<marker id=\"arrowhead\" markerWidth=\"10\" markerHeight=\"7\" refX=\"9\" refY=\"3.5\" orient=\"auto\">");
+            sb.Append("<polygon points=\"0 0, 10 3.5, 0 7\" fill=\"#333\"/>");
+            sb.Append("</marker>");
+            sb.Append("<marker id=\"arrowhead-annotation\" markerWidth=\"8\" markerHeight=\"6\" refX=\"7\" refY=\"3\" orient=\"auto\">");
+            sb.Append("<polygon points=\"0 0, 8 3, 0 6\" fill=\"currentColor\"/>");
+            sb.Append("</marker>");
+            sb.Append("</defs>");
+
+            // Background - papel milimetrado (azul claro)
+            sb.Append($"<rect width=\"{width}\" height=\"{height}\" fill=\"#f0f8ff\"/>");
+
+            // Plot area background - slightly lighter
+            sb.Append($"<rect x=\"{margin}\" y=\"{marginTop}\" width=\"{plotWidth}\" height=\"{plotHeight}\" fill=\"#f8fbff\"/>");
+
+            // Grid - papel milimetrado style
+            if (showGrid)
+            {
+                sb.Append(GenerateMathcadGrid(margin, marginTop, plotWidth, plotHeight, xmin, xmax, ymin, ymax, scaleX, scaleY));
+            }
+
+            // Axes with arrows (drawn over grid)
+            // Y-axis with arrow pointing up
+            sb.Append($"<line x1=\"{margin}\" y1=\"{marginTop + plotHeight}\" x2=\"{margin}\" y2=\"{marginTop - 10}\" stroke=\"#333\" stroke-width=\"1.5\" marker-end=\"url(#arrowhead)\"/>");
+            // X-axis with arrow pointing right
+            sb.Append($"<line x1=\"{margin}\" y1=\"{marginTop + plotHeight}\" x2=\"{margin + plotWidth + 15}\" y2=\"{marginTop + plotHeight}\" stroke=\"#333\" stroke-width=\"1.5\" marker-end=\"url(#arrowhead)\"/>");
+
+            // Convert line style to SVG dash array
+            string dashArray = lineStyle switch
+            {
+                "dash" or "dashed" or "---" => "10,5",
+                "dot" or "dotted" or "..." => "3,3",
+                "dashdot" or "-.-" => "10,3,3,3",
+                "longdash" or "--" => "15,5",
+                "shortdash" => "5,3",
+                "none" => "0,1000", // effectively invisible line
+                _ => "" // solid
+            };
+
+            // Calculate point coordinates
+            var points = new List<(double px, double py)>();
+            for (int i = 0; i < x.Length; i++)
+            {
+                var px = margin + (x[i] - xmin) * scaleX;
+                var py = marginTop + plotHeight - (y[i] - ymin) * scaleY;
+                // Clip to plot area
+                px = Math.Max(margin, Math.Min(margin + plotWidth, px));
+                py = Math.Max(marginTop, Math.Min(marginTop + plotHeight, py));
+                points.Add((px, py));
+            }
+
+            // Data line (if style is not "none")
+            if (lineStyle != "none")
+            {
+                if (smooth && points.Count >= 2)
+                {
+                    // Use smooth Bezier curves (Catmull-Rom spline converted to cubic Bezier)
+                    sb.Append($"<path d=\"{GenerateSmoothPath(points, smoothTension)}\" fill=\"none\" stroke=\"{color}\" stroke-width=\"{lineWidth:F1}\"");
+                }
+                else
+                {
+                    // Use straight line segments (polyline)
+                    sb.Append($"<polyline points=\"");
+                    foreach (var (px, py) in points)
+                    {
+                        sb.Append($"{px:F2},{py:F2} ");
+                    }
+                    sb.Append($"\" fill=\"none\" stroke=\"{color}\" stroke-width=\"{lineWidth:F1}\"");
+                }
+                if (!string.IsNullOrEmpty(dashArray))
+                    sb.Append($" stroke-dasharray=\"{dashArray}\"");
+                sb.Append("/>");
+            }
+
+            // Draw markers/symbols at each data point
+            if (symbol != "none" && symbol != "ninguno")
+            {
+                foreach (var (px, py) in points)
+                {
+                    sb.Append(GenerateMarker(px, py, symbol, symbolSize, color));
+                }
+            }
+
+            // Draw annotations (text, arrows, lines, shapes)
+            if (annotations != null && annotations.Count > 0)
+            {
+                sb.Append(GenerateAnnotations(annotations, margin, marginTop, plotWidth, plotHeight, xmin, xmax, ymin, ymax, scaleX, scaleY));
+            }
+
+            // X-axis label (italic, with underline like Mathcad)
+            var xlabelX = margin + plotWidth / 2;
+            var xlabelY = height - 8;
+            sb.Append($"<text x=\"{xlabelX}\" y=\"{xlabelY}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"14\" font-style=\"italic\" fill=\"#003366\">{System.Web.HttpUtility.HtmlEncode(xlabel)}</text>");
+            // Underline for x label
+            var xlabelWidth = xlabel.Length * 7;
+            sb.Append($"<line x1=\"{xlabelX - xlabelWidth/2}\" y1=\"{xlabelY + 3}\" x2=\"{xlabelX + xlabelWidth/2}\" y2=\"{xlabelY + 3}\" stroke=\"#003366\" stroke-width=\"1\"/>");
+
+            // Y-axis label (italic, rotated, with underline like Mathcad)
+            var ylabelX = 15;
+            var ylabelY = marginTop + plotHeight / 2;
+            sb.Append($"<g transform=\"rotate(-90, {ylabelX}, {ylabelY})\">");
+            sb.Append($"<text x=\"{ylabelX}\" y=\"{ylabelY}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"14\" font-style=\"italic\" fill=\"#003366\">{System.Web.HttpUtility.HtmlEncode(ylabel)}</text>");
+            // Underline for y label (fixed: was using xlabelX instead of ylabelX)
+            var ylabelWidth = ylabel.Length * 7;
+            sb.Append($"<line x1=\"{ylabelX - ylabelWidth/2}\" y1=\"{ylabelY + 3}\" x2=\"{ylabelX + ylabelWidth/2}\" y2=\"{ylabelY + 3}\" stroke=\"#003366\" stroke-width=\"1\"/>");
+            sb.Append("</g>");
+
+            // Title (if provided)
+            if (!string.IsNullOrEmpty(title))
+            {
+                sb.Append($"<text x=\"{width / 2}\" y=\"18\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"13\" font-weight=\"bold\" fill=\"#003366\">{System.Web.HttpUtility.HtmlEncode(title)}</text>");
+            }
+
+            // Legend (if provided)
+            if (!string.IsNullOrEmpty(legend))
+            {
+                var legendX = margin + plotWidth - 90;
+                var legendY = marginTop + 20;
+                sb.Append($"<rect x=\"{legendX - 5}\" y=\"{legendY - 12}\" width=\"95\" height=\"22\" fill=\"white\" fill-opacity=\"0.9\" stroke=\"#ccc\" rx=\"3\"/>");
+                // Legend line
+                sb.Append($"<line x1=\"{legendX}\" y1=\"{legendY}\" x2=\"{legendX + 20}\" y2=\"{legendY}\" stroke=\"{color}\" stroke-width=\"{lineWidth:F1}\"");
+                if (!string.IsNullOrEmpty(dashArray))
+                    sb.Append($" stroke-dasharray=\"{dashArray}\"");
+                sb.Append("/>");
+                // Legend marker
+                if (symbol != "none" && symbol != "ninguno")
+                {
+                    sb.Append(GenerateMarker(legendX + 10, legendY, symbol, symbolSize, color));
+                }
+                sb.Append($"<text x=\"{legendX + 25}\" y=\"{legendY + 4}\" font-family=\"Times New Roman, serif\" font-size=\"11\" font-style=\"italic\" fill=\"#003366\">{System.Web.HttpUtility.HtmlEncode(legend)}</text>");
+            }
+
+            sb.Append("</svg>");
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generate SVG plot with multiple data series support
+        /// </summary>
+        private string GeneratePlotSvgMultiSeries(double[] x, List<double[]> allYValues, List<PlotSeries> series,
+            double xmin, double xmax, double ymin, double ymax,
+            string xlabel, string ylabel, string title, bool showGrid, bool showLegend, string background, int width, int height,
+            List<PlotAnnotation> annotations = null)
+        {
+            const int margin = 70;
+            const int marginTop = 30;
+            const int marginRight = 30;
+            const int marginBottom = 50;
+
+            var plotWidth = width - margin - marginRight;
+            var plotHeight = height - marginTop - marginBottom;
+
+            var scaleX = plotWidth / (xmax - xmin);
+            var scaleY = plotHeight / (ymax - ymin);
+
+            var sb = new StringBuilder();
+
+            // SVG header with defs for arrow markers
+            sb.Append($"<svg class=\"plot\" width=\"{width}\" height=\"{height}\" xmlns=\"http://www.w3.org/2000/svg\">");
+
+            // Define arrow markers (for axes and annotations)
+            sb.Append("<defs>");
+            sb.Append("<marker id=\"arrowhead\" markerWidth=\"10\" markerHeight=\"7\" refX=\"9\" refY=\"3.5\" orient=\"auto\">");
+            sb.Append("<polygon points=\"0 0, 10 3.5, 0 7\" fill=\"#333\"/>");
+            sb.Append("</marker>");
+            sb.Append("<marker id=\"arrowhead-annotation\" markerWidth=\"8\" markerHeight=\"6\" refX=\"7\" refY=\"3\" orient=\"auto\">");
+            sb.Append("<polygon points=\"0 0, 8 3, 0 6\" fill=\"currentColor\"/>");
+            sb.Append("</marker>");
+            // Double-headed arrow markers for dimensions
+            sb.Append("<marker id=\"arrowhead-start\" markerWidth=\"8\" markerHeight=\"6\" refX=\"1\" refY=\"3\" orient=\"auto\">");
+            sb.Append("<polygon points=\"8 0, 0 3, 8 6\" fill=\"#333\"/>");
+            sb.Append("</marker>");
+            sb.Append("<marker id=\"arrowhead-end\" markerWidth=\"8\" markerHeight=\"6\" refX=\"7\" refY=\"3\" orient=\"auto\">");
+            sb.Append("<polygon points=\"0 0, 8 3, 0 6\" fill=\"#333\"/>");
+            sb.Append("</marker>");
+            sb.Append("</defs>");
+
+            // Background - depends on style
+            bool isWhiteBackground = background == "white" || background == "blanco" || background == "clean" || background == "limpio";
+            if (isWhiteBackground)
+            {
+                sb.Append($"<rect width=\"{width}\" height=\"{height}\" fill=\"white\"/>");
+                sb.Append($"<rect x=\"{margin}\" y=\"{marginTop}\" width=\"{plotWidth}\" height=\"{plotHeight}\" fill=\"white\"/>");
+            }
+            else
+            {
+                sb.Append($"<rect width=\"{width}\" height=\"{height}\" fill=\"#f0f8ff\"/>");
+                sb.Append($"<rect x=\"{margin}\" y=\"{marginTop}\" width=\"{plotWidth}\" height=\"{plotHeight}\" fill=\"#f8fbff\"/>");
+            }
+
+            // Grid
+            if (showGrid)
+            {
+                if (isWhiteBackground)
+                {
+                    sb.Append(GenerateSimpleGrid(margin, marginTop, plotWidth, plotHeight, xmin, xmax, ymin, ymax, scaleX, scaleY));
+                }
+                else
+                {
+                    sb.Append(GenerateMathcadGrid(margin, marginTop, plotWidth, plotHeight, xmin, xmax, ymin, ymax, scaleX, scaleY));
+                }
+            }
+
+            // Axes with arrows (drawn over grid)
+            sb.Append($"<line x1=\"{margin}\" y1=\"{marginTop + plotHeight}\" x2=\"{margin}\" y2=\"{marginTop - 10}\" stroke=\"#333\" stroke-width=\"1.5\" marker-end=\"url(#arrowhead)\"/>");
+            sb.Append($"<line x1=\"{margin}\" y1=\"{marginTop + plotHeight}\" x2=\"{margin + plotWidth + 15}\" y2=\"{marginTop + plotHeight}\" stroke=\"#333\" stroke-width=\"1.5\" marker-end=\"url(#arrowhead)\"/>");
+
+            // Draw all data series
+            for (int seriesIdx = 0; seriesIdx < series.Count && seriesIdx < allYValues.Count; seriesIdx++)
+            {
+                var s = series[seriesIdx];
+                var y = allYValues[seriesIdx];
+
+                // Convert line style to SVG dash array
+                string dashArray = s.LineStyle switch
+                {
+                    "dash" or "dashed" or "---" => "10,5",
+                    "dot" or "dotted" or "..." => "3,3",
+                    "dashdot" or "-.-" => "10,3,3,3",
+                    "longdash" or "--" => "15,5",
+                    "shortdash" => "5,3",
+                    "none" => "0,1000",
+                    _ => ""
+                };
+
+                // Calculate point coordinates
+                var points = new List<(double px, double py)>();
+                for (int i = 0; i < x.Length; i++)
+                {
+                    var px = margin + (x[i] - xmin) * scaleX;
+                    var py = marginTop + plotHeight - (y[i] - ymin) * scaleY;
+                    px = Math.Max(margin, Math.Min(margin + plotWidth, px));
+                    py = Math.Max(marginTop, Math.Min(marginTop + plotHeight, py));
+                    points.Add((px, py));
+                }
+
+                // Data line (if style is not "none")
+                if (s.LineStyle != "none")
+                {
+                    if (s.Smooth && points.Count >= 2)
+                    {
+                        sb.Append($"<path d=\"{GenerateSmoothPath(points, s.SmoothTension)}\" fill=\"none\" stroke=\"{s.Color}\" stroke-width=\"{s.LineWidth:F1}\"");
+                    }
+                    else
+                    {
+                        sb.Append($"<polyline points=\"");
+                        foreach (var (px, py) in points)
+                        {
+                            sb.Append($"{px:F2},{py:F2} ");
+                        }
+                        sb.Append($"\" fill=\"none\" stroke=\"{s.Color}\" stroke-width=\"{s.LineWidth:F1}\"");
+                    }
+                    if (!string.IsNullOrEmpty(dashArray))
+                        sb.Append($" stroke-dasharray=\"{dashArray}\"");
+                    sb.Append("/>");
+                }
+
+                // Draw markers/symbols at each data point
+                if (s.Symbol != "none" && s.Symbol != "ninguno")
+                {
+                    foreach (var (px, py) in points)
+                    {
+                        sb.Append(GenerateMarker(px, py, s.Symbol, s.SymbolSize, s.Color));
+                    }
+                }
+            }
+
+            // Draw annotations (text, arrows, lines, shapes)
+            if (annotations != null && annotations.Count > 0)
+            {
+                sb.Append(GenerateAnnotations(annotations, margin, marginTop, plotWidth, plotHeight, xmin, xmax, ymin, ymax, scaleX, scaleY));
+            }
+
+            // X-axis label
+            var xlabelX = margin + plotWidth / 2;
+            var xlabelY = height - 8;
+            sb.Append($"<text x=\"{xlabelX}\" y=\"{xlabelY}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"14\" font-style=\"italic\" fill=\"#003366\">{System.Web.HttpUtility.HtmlEncode(xlabel)}</text>");
+            var xlabelWidth = xlabel.Length * 7;
+            sb.Append($"<line x1=\"{xlabelX - xlabelWidth/2}\" y1=\"{xlabelY + 3}\" x2=\"{xlabelX + xlabelWidth/2}\" y2=\"{xlabelY + 3}\" stroke=\"#003366\" stroke-width=\"1\"/>");
+
+            // Y-axis label
+            var ylabelX = 15;
+            var ylabelY = marginTop + plotHeight / 2;
+            sb.Append($"<g transform=\"rotate(-90, {ylabelX}, {ylabelY})\">");
+            sb.Append($"<text x=\"{ylabelX}\" y=\"{ylabelY}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"14\" font-style=\"italic\" fill=\"#003366\">{System.Web.HttpUtility.HtmlEncode(ylabel)}</text>");
+            // Underline for y label (fixed: was using xlabelX instead of ylabelX)
+            var ylabelWidth = ylabel.Length * 7;
+            sb.Append($"<line x1=\"{ylabelX - ylabelWidth/2}\" y1=\"{ylabelY + 3}\" x2=\"{ylabelX + ylabelWidth/2}\" y2=\"{ylabelY + 3}\" stroke=\"#003366\" stroke-width=\"1\"/>");
+            sb.Append("</g>");
+
+            // Title (if provided)
+            if (!string.IsNullOrEmpty(title))
+            {
+                sb.Append($"<text x=\"{width / 2}\" y=\"18\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"13\" font-weight=\"bold\" fill=\"#003366\">{System.Web.HttpUtility.HtmlEncode(title)}</text>");
+            }
+
+            // Legend for multiple series (only if showLegend is true)
+            var legendSeries = series.Where(s => !string.IsNullOrEmpty(s.Legend)).ToList();
+            if (showLegend && legendSeries.Count > 0)
+            {
+                var legendX = margin + plotWidth - 100;
+                var legendY = marginTop + 15;
+                var legendHeight = legendSeries.Count * 18 + 8;
+
+                sb.Append($"<rect x=\"{legendX - 5}\" y=\"{legendY - 12}\" width=\"105\" height=\"{legendHeight}\" fill=\"white\" fill-opacity=\"0.9\" stroke=\"#ccc\" rx=\"3\"/>");
+
+                for (int i = 0; i < legendSeries.Count; i++)
+                {
+                    var s = legendSeries[i];
+                    var ly = legendY + i * 18;
+
+                    // Legend line style
+                    string dashArray = s.LineStyle switch
+                    {
+                        "dash" or "dashed" => "6,3",
+                        "dot" or "dotted" => "2,2",
+                        "dashdot" => "6,2,2,2",
+                        _ => ""
+                    };
+
+                    sb.Append($"<line x1=\"{legendX}\" y1=\"{ly}\" x2=\"{legendX + 20}\" y2=\"{ly}\" stroke=\"{s.Color}\" stroke-width=\"{s.LineWidth:F1}\"");
+                    if (!string.IsNullOrEmpty(dashArray))
+                        sb.Append($" stroke-dasharray=\"{dashArray}\"");
+                    sb.Append("/>");
+
+                    if (s.Symbol != "none" && s.Symbol != "ninguno")
+                    {
+                        sb.Append(GenerateMarker(legendX + 10, ly, s.Symbol, s.SymbolSize, s.Color));
+                    }
+
+                    sb.Append($"<text x=\"{legendX + 25}\" y=\"{ly + 4}\" font-family=\"Times New Roman, serif\" font-size=\"11\" font-style=\"italic\" fill=\"{s.Color}\">{System.Web.HttpUtility.HtmlEncode(s.Legend)}</text>");
+                }
+            }
+
+            sb.Append("</svg>");
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generate SVG for all annotations
+        /// </summary>
+        private string GenerateAnnotations(List<PlotAnnotation> annotations, int margin, int marginTop,
+            int plotWidth, int plotHeight, double xmin, double xmax, double ymin, double ymax, double scaleX, double scaleY)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var ann in annotations)
+            {
+                // Convert data coordinates to pixel coordinates
+                double px = margin + (ann.X - xmin) * scaleX;
+                double py = marginTop + plotHeight - (ann.Y - ymin) * scaleY;
+                double px2 = margin + (ann.X2 - xmin) * scaleX;
+                double py2 = marginTop + plotHeight - (ann.Y2 - ymin) * scaleY;
+
+                switch (ann.Type)
+                {
+                    case "text":
+                        var fontStyle = ann.Italic ? "italic" : "normal";
+                        var fontWeight = ann.Bold ? "bold" : "normal";
+                        if (Math.Abs(ann.Rotation) > 0.01)
+                        {
+                            sb.Append($"<g transform=\"rotate({-ann.Rotation:F1}, {px:F1}, {py:F1})\">");
+                            sb.Append($"<text x=\"{px:F1}\" y=\"{py:F1}\" text-anchor=\"{ann.Anchor}\" font-family=\"Times New Roman, serif\" font-size=\"{ann.FontSize}\" font-style=\"{fontStyle}\" font-weight=\"{fontWeight}\" fill=\"{ann.Color}\">{System.Web.HttpUtility.HtmlEncode(ann.Text)}</text>");
+                            sb.Append("</g>");
+                        }
+                        else
+                        {
+                            sb.Append($"<text x=\"{px:F1}\" y=\"{py:F1}\" text-anchor=\"{ann.Anchor}\" font-family=\"Times New Roman, serif\" font-size=\"{ann.FontSize}\" font-style=\"{fontStyle}\" font-weight=\"{fontWeight}\" fill=\"{ann.Color}\">{System.Web.HttpUtility.HtmlEncode(ann.Text)}</text>");
+                        }
+                        break;
+
+                    case "arrow":
+                        sb.Append($"<line x1=\"{px:F1}\" y1=\"{py:F1}\" x2=\"{px2:F1}\" y2=\"{py2:F1}\" stroke=\"{ann.Color}\" stroke-width=\"{ann.StrokeWidth:F1}\" marker-end=\"url(#arrowhead-annotation)\"/>");
+                        break;
+
+                    case "line":
+                        sb.Append($"<line x1=\"{px:F1}\" y1=\"{py:F1}\" x2=\"{px2:F1}\" y2=\"{py2:F1}\" stroke=\"{ann.Color}\" stroke-width=\"{ann.StrokeWidth:F1}\"/>");
+                        break;
+
+                    case "hline":
+                        // Horizontal line at Y value across full width
+                        sb.Append($"<line x1=\"{margin}\" y1=\"{py:F1}\" x2=\"{margin + plotWidth}\" y2=\"{py:F1}\" stroke=\"{ann.Color}\" stroke-width=\"{ann.StrokeWidth:F1}\" stroke-dasharray=\"5,3\"/>");
+                        break;
+
+                    case "vline":
+                        // Vertical line at X value across full height
+                        sb.Append($"<line x1=\"{px:F1}\" y1=\"{marginTop}\" x2=\"{px:F1}\" y2=\"{marginTop + plotHeight}\" stroke=\"{ann.Color}\" stroke-width=\"{ann.StrokeWidth:F1}\" stroke-dasharray=\"5,3\"/>");
+                        break;
+
+                    case "rect":
+                        // Rectangle: X, Y is bottom-left corner; X2, Y2 are width and height in data units
+                        var rectW = ann.X2 * scaleX;
+                        var rectH = ann.Y2 * scaleY;
+                        var rectY = py - rectH;  // SVG Y is at top
+                        sb.Append($"<rect x=\"{px:F1}\" y=\"{rectY:F1}\" width=\"{rectW:F1}\" height=\"{rectH:F1}\" fill=\"{ann.Fill}\" stroke=\"{ann.Color}\" stroke-width=\"{ann.StrokeWidth:F1}\" fill-opacity=\"0.3\"/>");
+                        break;
+
+                    case "circle":
+                        // Circle: X, Y is center; X2 is radius in data units (use average of X and Y scale)
+                        var avgScale = (scaleX + scaleY) / 2;
+                        var circleR = ann.X2 * avgScale;
+                        sb.Append($"<circle cx=\"{px:F1}\" cy=\"{py:F1}\" r=\"{circleR:F1}\" fill=\"{ann.Fill}\" stroke=\"{ann.Color}\" stroke-width=\"{ann.StrokeWidth:F1}\" fill-opacity=\"0.3\"/>");
+                        break;
+
+                    case "projection":
+                        // Projection lines from point to both axes (dashed)
+                        var projAxisY = marginTop + plotHeight;  // X-axis
+                        var projAxisX = margin;                   // Y-axis
+                        // Horizontal line to Y-axis
+                        sb.Append($"<line x1=\"{projAxisX}\" y1=\"{py:F1}\" x2=\"{px:F1}\" y2=\"{py:F1}\" stroke=\"{ann.Color}\" stroke-width=\"{ann.StrokeWidth:F1}\" stroke-dasharray=\"4,3\"/>");
+                        // Vertical line to X-axis
+                        sb.Append($"<line x1=\"{px:F1}\" y1=\"{py:F1}\" x2=\"{px:F1}\" y2=\"{projAxisY}\" stroke=\"{ann.Color}\" stroke-width=\"{ann.StrokeWidth:F1}\" stroke-dasharray=\"4,3\"/>");
+                        break;
+
+                    case "xtick":
+                        // Custom X-axis tick label
+                        var xtickY = marginTop + plotHeight + 18;
+                        sb.Append($"<text x=\"{px:F1}\" y=\"{xtickY}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"{ann.FontSize}\" font-style=\"italic\" fill=\"{ann.Color}\">{System.Web.HttpUtility.HtmlEncode(ann.Text)}</text>");
+                        // Tick mark
+                        sb.Append($"<line x1=\"{px:F1}\" y1=\"{marginTop + plotHeight}\" x2=\"{px:F1}\" y2=\"{marginTop + plotHeight + 5}\" stroke=\"{ann.Color}\" stroke-width=\"1\"/>");
+                        break;
+
+                    case "ytick":
+                        // Custom Y-axis tick label - positioned to the LEFT of Y-axis
+                        sb.Append($"<text x=\"{margin - 12}\" y=\"{py + 4:F1}\" text-anchor=\"end\" font-family=\"Times New Roman, serif\" font-size=\"{ann.FontSize}\" font-style=\"italic\" fill=\"{ann.Color}\">{System.Web.HttpUtility.HtmlEncode(ann.Text)}</text>");
+                        // Tick mark - small horizontal line extending left from axis
+                        sb.Append($"<line x1=\"{margin - 5}\" y1=\"{py:F1}\" x2=\"{margin}\" y2=\"{py:F1}\" stroke=\"{ann.Color}\" stroke-width=\"1\"/>");
+                        break;
+
+                    case "angle":
+                        // Draw angle arc with label - Technical drawing style (angle dimension)
+                        // Format: angle: x, y, startAngle, endAngle, radius, "label", color
+                        // The arc represents the angle swept from startAngle to endAngle.
+                        // Positive sweep (end > start) = counterclockwise in math = visually upward
+                        // Negative sweep (end < start) = clockwise in math = visually downward
+
+                        // Convert radius from data units to pixels
+                        var angleRadiusPx = ann.Rotation * scaleX;
+                        if (angleRadiusPx < 5) angleRadiusPx = 5;  // Minimum visible
+
+                        // Get the two angles specified by user
+                        var startAngleDeg = ann.X2;
+                        var endAngleDeg = ann.Y2;
+
+                        // Convert to radians for point calculation
+                        var startAngleRad = startAngleDeg * Math.PI / 180.0;
+                        var endAngleRad = endAngleDeg * Math.PI / 180.0;
+
+                        // Arc points at radius distance from the vertex (px, py)
+                        // In SVG, Y increases downward, so we subtract sin() to flip the Y coordinate
+                        var arcStartX = px + angleRadiusPx * Math.Cos(startAngleRad);
+                        var arcStartY = py - angleRadiusPx * Math.Sin(startAngleRad);
+                        var arcEndX = px + angleRadiusPx * Math.Cos(endAngleRad);
+                        var arcEndY = py - angleRadiusPx * Math.Sin(endAngleRad);
+
+                        // Calculate angular difference (preserving sign for direction)
+                        var angleDiff = endAngleDeg - startAngleDeg;
+
+                        // The arc should represent the actual angle the user specified
+                        // |angleDiff| is the size of the arc
+                        // sign of angleDiff determines direction:
+                        //   positive = counterclockwise in math (increasing angles)
+                        //   negative = clockwise in math (decreasing angles)
+
+                        // For SVG arc:
+                        // - largeArc: 1 if |angle| > 180, 0 otherwise
+                        // - sweepFlag: Controls arc direction (inverted due to SVG Y-axis)
+                        //   * sweepFlag=0 for positive angles (arc curves inside the angle)
+                        //   * sweepFlag=1 for negative angles (arc curves inside the angle)
+
+                        int largeArc = Math.Abs(angleDiff) > 180 ? 1 : 0;
+                        int sweepFlag = angleDiff >= 0 ? 0 : 1;
+
+                        // Draw the arc
+                        sb.Append($"<path d=\"M {arcStartX:F1},{arcStartY:F1} A {angleRadiusPx:F1},{angleRadiusPx:F1} 0 {largeArc},{sweepFlag} {arcEndX:F1},{arcEndY:F1}\" fill=\"none\" stroke=\"{ann.Color}\" stroke-width=\"1.5\"/>");
+
+                        // Label at the midpoint of the arc
+                        if (!string.IsNullOrEmpty(ann.Text))
+                        {
+                            // Midpoint is at the average of start and end angles
+                            var midAngleDeg = (startAngleDeg + endAngleDeg) / 2.0;
+                            var midAngleRad = midAngleDeg * Math.PI / 180.0;
+                            // Label slightly outside the arc for readability
+                            var labelRadius = angleRadiusPx + 15.0;
+                            var labelX = px + labelRadius * Math.Cos(midAngleRad);
+                            var labelY = py - labelRadius * Math.Sin(midAngleRad) + 4;
+                            sb.Append($"<text x=\"{labelX:F1}\" y=\"{labelY:F1}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"{ann.FontSize + 2}\" font-style=\"italic\" fill=\"{ann.Color}\">{System.Web.HttpUtility.HtmlEncode(ann.Text)}</text>");
+                        }
+                        break;
+
+                    case "brace":
+                        // Draw brace/bracket between two points with label
+                        // Determine orientation based on points
+                        var braceIsHorizontal = Math.Abs(ann.Y - ann.Y2) < Math.Abs(ann.X - ann.X2);
+                        var midX = (px + px2) / 2;
+                        var midY = (py + py2) / 2;
+                        var braceOffset = 15;
+
+                        if (braceIsHorizontal)
+                        {
+                            // Horizontal brace (for Δx)
+                            var braceY = ann.Anchor == "above" || ann.Anchor == "top" ? Math.Min(py, py2) - braceOffset : Math.Max(py, py2) + braceOffset;
+                            // Draw brace shape using path
+                            var leftX = Math.Min(px, px2);
+                            var rightX = Math.Max(px, px2);
+                            var curveHeight = ann.Anchor == "above" || ann.Anchor == "top" ? -8 : 8;
+
+                            // Simple brace: |_____|  with middle peak
+                            sb.Append($"<path d=\"M {leftX:F1},{braceY - curveHeight:F1} L {leftX:F1},{braceY:F1} L {midX - 5:F1},{braceY:F1} L {midX:F1},{braceY + curveHeight:F1} L {midX + 5:F1},{braceY:F1} L {rightX:F1},{braceY:F1} L {rightX:F1},{braceY - curveHeight:F1}\" fill=\"none\" stroke=\"{ann.Color}\" stroke-width=\"1\"/>");
+
+                            // Label
+                            if (!string.IsNullOrEmpty(ann.Text))
+                            {
+                                var labelY2 = braceY + curveHeight * 2;
+                                sb.Append($"<text x=\"{midX:F1}\" y=\"{labelY2:F1}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"{ann.FontSize}\" font-style=\"italic\" fill=\"{ann.Color}\">{System.Web.HttpUtility.HtmlEncode(ann.Text)}</text>");
+                            }
+                        }
+                        else
+                        {
+                            // Vertical brace (for Δy)
+                            var braceX = ann.Anchor == "left" || ann.Anchor == "izquierda" ? Math.Min(px, px2) - braceOffset : Math.Max(px, px2) + braceOffset;
+                            var topY = Math.Min(py, py2);
+                            var bottomY = Math.Max(py, py2);
+                            var curveWidth = ann.Anchor == "left" || ann.Anchor == "izquierda" ? -8 : 8;
+
+                            // Vertical brace
+                            sb.Append($"<path d=\"M {braceX - curveWidth:F1},{topY:F1} L {braceX:F1},{topY:F1} L {braceX:F1},{midY - 5:F1} L {braceX + curveWidth:F1},{midY:F1} L {braceX:F1},{midY + 5:F1} L {braceX:F1},{bottomY:F1} L {braceX - curveWidth:F1},{bottomY:F1}\" fill=\"none\" stroke=\"{ann.Color}\" stroke-width=\"1\"/>");
+
+                            // Label
+                            if (!string.IsNullOrEmpty(ann.Text))
+                            {
+                                var labelX2 = braceX + curveWidth * 2;
+                                sb.Append($"<text x=\"{labelX2:F1}\" y=\"{midY + 4:F1}\" text-anchor=\"{(ann.Anchor == "left" ? "end" : "start")}\" font-family=\"Times New Roman, serif\" font-size=\"{ann.FontSize}\" font-style=\"italic\" fill=\"{ann.Color}\">{System.Web.HttpUtility.HtmlEncode(ann.Text)}</text>");
+                            }
+                        }
+                        break;
+
+                    case "point":
+                        // Draw point/dot at coordinates
+                        var pointRadius = ann.X2;
+                        if (ann.Fill == "filled")
+                        {
+                            sb.Append($"<circle cx=\"{px:F1}\" cy=\"{py:F1}\" r=\"{pointRadius:F1}\" fill=\"{ann.Color}\" stroke=\"none\"/>");
+                        }
+                        else
+                        {
+                            sb.Append($"<circle cx=\"{px:F1}\" cy=\"{py:F1}\" r=\"{pointRadius:F1}\" fill=\"white\" stroke=\"{ann.Color}\" stroke-width=\"1.5\"/>");
+                        }
+                        break;
+
+                    case "dimension":
+                        // Draw dimension line with double arrows at both ends (like technical drawings)
+                        var dimX2 = margin + (ann.X2 - xmin) * scaleX;
+                        var dimY2 = marginTop + plotHeight - (ann.Y2 - ymin) * scaleY;
+                        var dimColor = string.IsNullOrEmpty(ann.Color) ? "#333333" : ann.Color;
+                        var dimStroke = ann.FontSize > 0 ? 1.5 : 1.2;
+
+                        // Determine if horizontal or vertical dimension
+                        var isHorizontal = Math.Abs(dimY2 - py) < Math.Abs(dimX2 - px);
+
+                        // Draw the dimension line with arrow markers
+                        sb.Append($"<line x1=\"{px:F1}\" y1=\"{py:F1}\" x2=\"{dimX2:F1}\" y2=\"{dimY2:F1}\" stroke=\"{dimColor}\" stroke-width=\"{dimStroke:F1}\" marker-start=\"url(#arrowhead-start)\" marker-end=\"url(#arrowhead-end)\"/>");
+
+                        // Draw extension lines (small perpendicular lines at the ends)
+                        var extLen = 8.0;
+                        if (isHorizontal)
+                        {
+                            // Vertical extension lines
+                            sb.Append($"<line x1=\"{px:F1}\" y1=\"{py - extLen:F1}\" x2=\"{px:F1}\" y2=\"{py + extLen:F1}\" stroke=\"{dimColor}\" stroke-width=\"1\"/>");
+                            sb.Append($"<line x1=\"{dimX2:F1}\" y1=\"{dimY2 - extLen:F1}\" x2=\"{dimX2:F1}\" y2=\"{dimY2 + extLen:F1}\" stroke=\"{dimColor}\" stroke-width=\"1\"/>");
+                        }
+                        else
+                        {
+                            // Horizontal extension lines
+                            sb.Append($"<line x1=\"{px - extLen:F1}\" y1=\"{py:F1}\" x2=\"{px + extLen:F1}\" y2=\"{py:F1}\" stroke=\"{dimColor}\" stroke-width=\"1\"/>");
+                            sb.Append($"<line x1=\"{dimX2 - extLen:F1}\" y1=\"{dimY2:F1}\" x2=\"{dimX2 + extLen:F1}\" y2=\"{dimY2:F1}\" stroke=\"{dimColor}\" stroke-width=\"1\"/>");
+                        }
+
+                        // Draw label in the middle
+                        if (!string.IsNullOrEmpty(ann.Text))
+                        {
+                            var labelMidX = (px + dimX2) / 2;
+                            var labelMidY = (py + dimY2) / 2;
+                            var labelOffset = 12.0;
+
+                            if (isHorizontal)
+                            {
+                                // Label above or below horizontal line
+                                labelMidY -= labelOffset;
+                            }
+                            else
+                            {
+                                // Label to the right of vertical line
+                                labelMidX += labelOffset;
+                            }
+
+                            sb.Append($"<text x=\"{labelMidX:F1}\" y=\"{labelMidY:F1}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"{(ann.FontSize > 0 ? ann.FontSize : 11)}\" font-style=\"italic\" fill=\"{dimColor}\">{System.Web.HttpUtility.HtmlEncode(ann.Text)}</text>");
+                        }
+                        break;
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generate SVG marker symbol at given coordinates
+        /// </summary>
+        private string GenerateMarker(double cx, double cy, string symbol, int size, string color)
+        {
+            var s = size / 2.0;
+            var sb = new StringBuilder();
+
+            switch (symbol.ToLower())
+            {
+                case "x":
+                case "cross":
+                    // X marker
+                    sb.Append($"<line x1=\"{cx - s:F1}\" y1=\"{cy - s:F1}\" x2=\"{cx + s:F1}\" y2=\"{cy + s:F1}\" stroke=\"{color}\" stroke-width=\"2\"/>");
+                    sb.Append($"<line x1=\"{cx + s:F1}\" y1=\"{cy - s:F1}\" x2=\"{cx - s:F1}\" y2=\"{cy + s:F1}\" stroke=\"{color}\" stroke-width=\"2\"/>");
+                    break;
+
+                case "+":
+                case "plus":
+                    // Plus marker
+                    sb.Append($"<line x1=\"{cx}\" y1=\"{cy - s:F1}\" x2=\"{cx}\" y2=\"{cy + s:F1}\" stroke=\"{color}\" stroke-width=\"2\"/>");
+                    sb.Append($"<line x1=\"{cx - s:F1}\" y1=\"{cy}\" x2=\"{cx + s:F1}\" y2=\"{cy}\" stroke=\"{color}\" stroke-width=\"2\"/>");
+                    break;
+
+                case "o":
+                case "circle":
+                case "circulo":
+                    // Circle (outline)
+                    sb.Append($"<circle cx=\"{cx:F1}\" cy=\"{cy:F1}\" r=\"{s:F1}\" fill=\"none\" stroke=\"{color}\" stroke-width=\"1.5\"/>");
+                    break;
+
+                case ".":
+                case "dot":
+                case "punto":
+                    // Filled circle (dot)
+                    sb.Append($"<circle cx=\"{cx:F1}\" cy=\"{cy:F1}\" r=\"{s:F1}\" fill=\"{color}\" stroke=\"none\"/>");
+                    break;
+
+                case "s":
+                case "square":
+                case "cuadrado":
+                    // Square (outline)
+                    sb.Append($"<rect x=\"{cx - s:F1}\" y=\"{cy - s:F1}\" width=\"{size}\" height=\"{size}\" fill=\"none\" stroke=\"{color}\" stroke-width=\"1.5\"/>");
+                    break;
+
+                case "sf":
+                case "squarefilled":
+                case "cuadradolleno":
+                    // Filled square
+                    sb.Append($"<rect x=\"{cx - s:F1}\" y=\"{cy - s:F1}\" width=\"{size}\" height=\"{size}\" fill=\"{color}\" stroke=\"none\"/>");
+                    break;
+
+                case "d":
+                case "diamond":
+                case "diamante":
+                case "rombo":
+                    // Diamond (outline)
+                    sb.Append($"<polygon points=\"{cx},{cy - s:F1} {cx + s:F1},{cy} {cx},{cy + s:F1} {cx - s:F1},{cy}\" fill=\"none\" stroke=\"{color}\" stroke-width=\"1.5\"/>");
+                    break;
+
+                case "df":
+                case "diamondfilled":
+                    // Filled diamond
+                    sb.Append($"<polygon points=\"{cx},{cy - s:F1} {cx + s:F1},{cy} {cx},{cy + s:F1} {cx - s:F1},{cy}\" fill=\"{color}\" stroke=\"none\"/>");
+                    break;
+
+                case "^":
+                case "t":
+                case "triangle":
+                case "triangulo":
+                    // Triangle up (outline)
+                    sb.Append($"<polygon points=\"{cx},{cy - s:F1} {cx + s:F1},{cy + s:F1} {cx - s:F1},{cy + s:F1}\" fill=\"none\" stroke=\"{color}\" stroke-width=\"1.5\"/>");
+                    break;
+
+                case "tf":
+                case "trianglefilled":
+                    // Filled triangle
+                    sb.Append($"<polygon points=\"{cx},{cy - s:F1} {cx + s:F1},{cy + s:F1} {cx - s:F1},{cy + s:F1}\" fill=\"{color}\" stroke=\"none\"/>");
+                    break;
+
+                case "v":
+                case "triangledown":
+                    // Triangle down (outline)
+                    sb.Append($"<polygon points=\"{cx},{cy + s:F1} {cx + s:F1},{cy - s:F1} {cx - s:F1},{cy - s:F1}\" fill=\"none\" stroke=\"{color}\" stroke-width=\"1.5\"/>");
+                    break;
+
+                case "*":
+                case "star":
+                case "estrella":
+                    // Star (5 points)
+                    var outerR = s;
+                    var innerR = s * 0.4;
+                    var starPoints = new StringBuilder();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var r = (i % 2 == 0) ? outerR : innerR;
+                        var angle = Math.PI / 2 + i * Math.PI / 5;
+                        var sx = cx + r * Math.Cos(angle);
+                        var sy = cy - r * Math.Sin(angle);
+                        starPoints.Append($"{sx:F1},{sy:F1} ");
+                    }
+                    sb.Append($"<polygon points=\"{starPoints}\" fill=\"{color}\" stroke=\"none\"/>");
+                    break;
+
+                case "starempty":
+                case "estrellavacia":
+                    // Star outline
+                    var outerR2 = s;
+                    var innerR2 = s * 0.4;
+                    var starPoints2 = new StringBuilder();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var r = (i % 2 == 0) ? outerR2 : innerR2;
+                        var angle = Math.PI / 2 + i * Math.PI / 5;
+                        var sx = cx + r * Math.Cos(angle);
+                        var sy = cy - r * Math.Sin(angle);
+                        starPoints2.Append($"{sx:F1},{sy:F1} ");
+                    }
+                    sb.Append($"<polygon points=\"{starPoints2}\" fill=\"none\" stroke=\"{color}\" stroke-width=\"1.5\"/>");
+                    break;
+
+                default:
+                    // Default: filled circle
+                    if (symbol != "none" && symbol != "ninguno")
+                        sb.Append($"<circle cx=\"{cx:F1}\" cy=\"{cy:F1}\" r=\"{s:F1}\" fill=\"{color}\" stroke=\"none\"/>");
+                    break;
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generate smooth SVG path using Catmull-Rom spline converted to cubic Bezier curves
+        /// This creates visually smooth curves passing through all data points
+        /// </summary>
+        private string GenerateSmoothPath(List<(double px, double py)> points, double tension = 0.3)
+        {
+            if (points.Count < 2) return "";
+
+            var sb = new StringBuilder();
+
+            // Start at first point
+            sb.Append($"M {points[0].px:F2},{points[0].py:F2}");
+
+            if (points.Count == 2)
+            {
+                // Just draw a line for 2 points
+                sb.Append($" L {points[1].px:F2},{points[1].py:F2}");
+                return sb.ToString();
+            }
+
+            // Use Catmull-Rom to Bezier conversion for smooth curves
+            // tension parameter: 0 = straight lines, 1 = very curved
+            double t = 1 - tension; // Invert so higher tension = smoother curves
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                // Get 4 points for Catmull-Rom: P0, P1 (current), P2 (next), P3
+                var p0 = i > 0 ? points[i - 1] : points[i];
+                var p1 = points[i];
+                var p2 = points[i + 1];
+                var p3 = i < points.Count - 2 ? points[i + 2] : points[i + 1];
+
+                // Convert Catmull-Rom to Bezier control points
+                // CP1 = P1 + (P2 - P0) / (6 * t)
+                // CP2 = P2 - (P3 - P1) / (6 * t)
+                double scale = 6.0 * Math.Max(0.1, t);
+
+                double cp1x = p1.px + (p2.px - p0.px) / scale;
+                double cp1y = p1.py + (p2.py - p0.py) / scale;
+
+                double cp2x = p2.px - (p3.px - p1.px) / scale;
+                double cp2y = p2.py - (p3.py - p1.py) / scale;
+
+                // Cubic Bezier curve to next point
+                sb.Append($" C {cp1x:F2},{cp1y:F2} {cp2x:F2},{cp2y:F2} {p2.px:F2},{p2.py:F2}");
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generate simple subtle grid for white background plots
+        /// </summary>
+        private string GenerateSimpleGrid(int margin, int marginTop, int plotWidth, int plotHeight,
+            double xmin, double xmax, double ymin, double ymax, double scaleX, double scaleY)
+        {
+            var sb = new StringBuilder();
+
+            // Calculate tick intervals
+            var xTicks = CalculateTicks(xmin, xmax, 8);
+            var yTicks = CalculateTicks(ymin, ymax, 8);
+
+            // Subtle gray grid lines
+            foreach (var tick in xTicks)
+            {
+                var px = margin + (tick - xmin) * scaleX;
+                if (px >= margin && px <= margin + plotWidth)
+                {
+                    sb.Append($"<line x1=\"{px:F1}\" y1=\"{marginTop}\" x2=\"{px:F1}\" y2=\"{marginTop + plotHeight}\" stroke=\"#e0e0e0\" stroke-width=\"0.5\"/>");
+                    sb.Append($"<line x1=\"{px:F1}\" y1=\"{marginTop + plotHeight}\" x2=\"{px:F1}\" y2=\"{marginTop + plotHeight + 5}\" stroke=\"#333\" stroke-width=\"1\"/>");
+                    sb.Append($"<text x=\"{px:F1}\" y=\"{marginTop + plotHeight + 18}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"11\" fill=\"#333\">{FormatTickLabel(tick)}</text>");
+                }
+            }
+
+            foreach (var tick in yTicks)
+            {
+                var py = marginTop + plotHeight - (tick - ymin) * scaleY;
+                if (py >= marginTop && py <= marginTop + plotHeight)
+                {
+                    sb.Append($"<line x1=\"{margin}\" y1=\"{py:F1}\" x2=\"{margin + plotWidth}\" y2=\"{py:F1}\" stroke=\"#e0e0e0\" stroke-width=\"0.5\"/>");
+                    sb.Append($"<line x1=\"{margin - 5}\" y1=\"{py:F1}\" x2=\"{margin}\" y2=\"{py:F1}\" stroke=\"#333\" stroke-width=\"1\"/>");
+                    sb.Append($"<text x=\"{margin - 8}\" y=\"{py + 4:F1}\" text-anchor=\"end\" font-family=\"Times New Roman, serif\" font-size=\"11\" fill=\"#333\">{FormatTickLabel(tick)}</text>");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generate SVG grid with Mathcad Prime / graph paper style
+        /// </summary>
+        private string GenerateMathcadGrid(int margin, int marginTop, int plotWidth, int plotHeight,
+            double xmin, double xmax, double ymin, double ymax, double scaleX, double scaleY)
+        {
+            var sb = new StringBuilder();
+
+            // Calculate nice tick intervals for major grid
+            var xTicks = CalculateTicks(xmin, xmax, 8);
+            var yTicks = CalculateTicks(ymin, ymax, 8);
+
+            // Calculate minor grid spacing (5 subdivisions)
+            double xMajorInterval = xTicks.Length > 1 ? xTicks[1] - xTicks[0] : (xmax - xmin) / 5;
+            double yMajorInterval = yTicks.Length > 1 ? yTicks[1] - yTicks[0] : (ymax - ymin) / 5;
+            double xMinorInterval = xMajorInterval / 5;
+            double yMinorInterval = yMajorInterval / 5;
+
+            // Minor grid lines (thin, light blue - paper milimetrado)
+            for (double x = Math.Floor(xmin / xMinorInterval) * xMinorInterval; x <= xmax; x += xMinorInterval)
+            {
+                var px = margin + (x - xmin) * scaleX;
+                if (px >= margin && px <= margin + plotWidth)
+                {
+                    sb.Append($"<line x1=\"{px:F1}\" y1=\"{marginTop}\" x2=\"{px:F1}\" y2=\"{marginTop + plotHeight}\" stroke=\"#cce0ff\" stroke-width=\"0.5\"/>");
+                }
+            }
+            for (double y = Math.Floor(ymin / yMinorInterval) * yMinorInterval; y <= ymax; y += yMinorInterval)
+            {
+                var py = marginTop + plotHeight - (y - ymin) * scaleY;
+                if (py >= marginTop && py <= marginTop + plotHeight)
+                {
+                    sb.Append($"<line x1=\"{margin}\" y1=\"{py:F1}\" x2=\"{margin + plotWidth}\" y2=\"{py:F1}\" stroke=\"#cce0ff\" stroke-width=\"0.5\"/>");
+                }
+            }
+
+            // Major grid lines (thicker, darker blue)
+            foreach (var tick in xTicks)
+            {
+                var px = margin + (tick - xmin) * scaleX;
+                if (px >= margin && px <= margin + plotWidth)
+                {
+                    sb.Append($"<line x1=\"{px:F1}\" y1=\"{marginTop}\" x2=\"{px:F1}\" y2=\"{marginTop + plotHeight}\" stroke=\"#99c2ff\" stroke-width=\"1\"/>");
+                    // Tick mark on axis
+                    sb.Append($"<line x1=\"{px:F1}\" y1=\"{marginTop + plotHeight}\" x2=\"{px:F1}\" y2=\"{marginTop + plotHeight + 5}\" stroke=\"#333\" stroke-width=\"1\"/>");
+                    // Tick label
+                    sb.Append($"<text x=\"{px:F1}\" y=\"{marginTop + plotHeight + 18}\" text-anchor=\"middle\" font-family=\"Times New Roman, serif\" font-size=\"11\" fill=\"#333\">{FormatTickLabel(tick)}</text>");
+                }
+            }
+
+            foreach (var tick in yTicks)
+            {
+                var py = marginTop + plotHeight - (tick - ymin) * scaleY;
+                if (py >= marginTop && py <= marginTop + plotHeight)
+                {
+                    sb.Append($"<line x1=\"{margin}\" y1=\"{py:F1}\" x2=\"{margin + plotWidth}\" y2=\"{py:F1}\" stroke=\"#99c2ff\" stroke-width=\"1\"/>");
+                    // Tick mark on axis
+                    sb.Append($"<line x1=\"{margin - 5}\" y1=\"{py:F1}\" x2=\"{margin}\" y2=\"{py:F1}\" stroke=\"#333\" stroke-width=\"1\"/>");
+                    // Tick label
+                    sb.Append($"<text x=\"{margin - 8}\" y=\"{py + 4:F1}\" text-anchor=\"end\" font-family=\"Times New Roman, serif\" font-size=\"11\" fill=\"#333\">{FormatTickLabel(tick)}</text>");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generate SVG grid lines and tick labels (legacy)
+        /// </summary>
+        private string GenerateGrid(int margin, int marginTop, int plotWidth, int plotHeight,
+            double xmin, double xmax, double ymin, double ymax, double scaleX, double scaleY)
+        {
+            var sb = new StringBuilder();
+
+            // Calculate nice tick intervals
+            var xTicks = CalculateTicks(xmin, xmax, 6);
+            var yTicks = CalculateTicks(ymin, ymax, 6);
+
+            // Vertical grid lines and X tick labels
+            foreach (var tick in xTicks)
+            {
+                var px = margin + (tick - xmin) * scaleX;
+                if (px >= margin && px <= margin + plotWidth)
+                {
+                    sb.Append($"<line x1=\"{px:F1}\" y1=\"{marginTop}\" x2=\"{px:F1}\" y2=\"{marginTop + plotHeight}\" stroke=\"#ddd\" stroke-width=\"1\"/>");
+                    sb.Append($"<text x=\"{px:F1}\" y=\"{marginTop + plotHeight + 15}\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"10\">{FormatTickLabel(tick)}</text>");
+                }
+            }
+
+            // Horizontal grid lines and Y tick labels
+            foreach (var tick in yTicks)
+            {
+                var py = marginTop + plotHeight - (tick - ymin) * scaleY;
+                if (py >= marginTop && py <= marginTop + plotHeight)
+                {
+                    sb.Append($"<line x1=\"{margin}\" y1=\"{py:F1}\" x2=\"{margin + plotWidth}\" y2=\"{py:F1}\" stroke=\"#ddd\" stroke-width=\"1\"/>");
+                    sb.Append($"<text x=\"{margin - 5}\" y=\"{py + 4:F1}\" text-anchor=\"end\" font-family=\"Arial\" font-size=\"10\">{FormatTickLabel(tick)}</text>");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Calculate nice tick values for axis
+        /// </summary>
+        private double[] CalculateTicks(double min, double max, int targetCount)
+        {
+            var range = max - min;
+            var rawInterval = range / targetCount;
+
+            // Find nice interval (1, 2, 5 or 10 times a power of 10)
+            var magnitude = Math.Pow(10, Math.Floor(Math.Log10(rawInterval)));
+            var normalized = rawInterval / magnitude;
+
+            double niceInterval;
+            if (normalized <= 1.5) niceInterval = magnitude;
+            else if (normalized <= 3) niceInterval = 2 * magnitude;
+            else if (normalized <= 7) niceInterval = 5 * magnitude;
+            else niceInterval = 10 * magnitude;
+
+            // Generate ticks
+            var result = new List<double>();
+            var start = Math.Ceiling(min / niceInterval) * niceInterval;
+            for (var t = start; t <= max; t += niceInterval)
+            {
+                result.Add(t);
+            }
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Format tick label
+        /// </summary>
+        private string FormatTickLabel(double value)
+        {
+            if (Math.Abs(value) < 1e-10) return "0";
+            if (Math.Abs(value) >= 1e4 || (Math.Abs(value) < 1e-2 && Math.Abs(value) > 0))
+                return value.ToString("0.##E+0", System.Globalization.CultureInfo.InvariantCulture);
+            return value.ToString("G4", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Export table to file (CSV or XLSX)
+        /// </summary>
+        private void ExportTableToFile(double[,] matrix, string[] headers, string[] rowHeaders, string filename)
+        {
+            var ext = System.IO.Path.GetExtension(filename).ToLower();
+            var rows = matrix.GetLength(0);
+            var cols = matrix.GetLength(1);
+
+            if (ext == ".csv")
+            {
+                var sb = new StringBuilder();
+
+                // Headers
+                if (headers != null)
+                {
+                    if (rowHeaders != null) sb.Append(",");
+                    sb.AppendLine(string.Join(",", headers.Select(h => $"\"{h}\"")));
+                }
+
+                // Data
+                for (int i = 0; i < rows; i++)
+                {
+                    if (rowHeaders != null && i < rowHeaders.Length)
+                        sb.Append($"\"{rowHeaders[i]}\",");
+
+                    for (int j = 0; j < cols; j++)
+                    {
+                        if (j > 0) sb.Append(",");
+                        sb.Append(matrix[i, j].ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    sb.AppendLine();
+                }
+
+                System.IO.File.WriteAllText(filename, sb.ToString());
+            }
+            else if (ext == ".xlsx")
+            {
+                // For xlsx, create a simple OpenXML file (requires OpenXML SDK which is already referenced)
+                // For now, fallback to CSV with xlsx extension info
+                var csvFile = System.IO.Path.ChangeExtension(filename, ".csv");
+                ExportTableToFile(matrix, headers, rowHeaders, csvFile);
+                throw new Exception($"XLSX export no implementado, se guardó como CSV: {csvFile}");
+            }
+            else
+            {
+                throw new Exception($"Formato no soportado: {ext}. Use .csv o .xlsx");
+            }
+        }
+
+        /// <summary>
+        /// Process @{columns N} block - generates multi-column HTML layout
+        /// Syntax:
+        ///   @{columns N}
+        ///   content for column 1
+        ///   @{column}
+        ///   content for column 2
+        ///   @{column}
+        ///   content for column 3
+        ///   @{end columns}
+        /// </summary>
+        public string ProcessColumnsBlockPublic(string directive, string content, Dictionary<string, object> variables, Action<string>? progressCallback)
+        {
+            return ProcessColumnsBlock(directive, content, variables, progressCallback);
+        }
+
+        private string ProcessColumnsBlock(string directive, string content, Dictionary<string, object> variables, Action<string>? progressCallback)
+        {
+            try
+            {
+                // Parse number of columns from directive "columns N" or just "columns"
+                int numColumns = 2; // Default
+                var parts = directive.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2 && int.TryParse(parts[1], out int n) && n >= 2 && n <= 4)
+                {
+                    numColumns = n;
+                }
+
+                // Split content by @{column} separator or by ---  (on its own line)
+                var columnContents = new List<string>();
+
+                // Try splitting by "---" on its own line first (common pattern)
+                var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.None);
+                var currentColumn = new StringBuilder();
+                bool foundSeparator = false;
+
+                foreach (var line in lines)
+                {
+                    var trimmed = line.Trim();
+
+                    // Check if this line is a column separator
+                    if (trimmed == "---" || trimmed.Equals("@{column}", StringComparison.OrdinalIgnoreCase))
+                    {
+                        columnContents.Add(currentColumn.ToString());
+                        currentColumn.Clear();
+                        foundSeparator = true;
+                    }
+                    else
+                    {
+                        currentColumn.AppendLine(line);
+                    }
+                }
+
+                // Add the last column
+                if (currentColumn.Length > 0 || foundSeparator)
+                {
+                    columnContents.Add(currentColumn.ToString());
+                }
+
+                // If no separators found, treat as single column
+                if (columnContents.Count == 0)
+                {
+                    columnContents.Add(content);
+                }
+
+                // Calculate column width
+                var widthPercent = 100.0 / numColumns;
+
+                // Build HTML with flexbox layout
+                var html = new StringBuilder();
+                html.Append($"<div class=\"columns-container\" style=\"display:flex;gap:1em;flex-wrap:wrap;\">");
+
+                foreach (var colContent in columnContents)
+                {
+                    html.Append($"<div class=\"column\" style=\"flex:1;min-width:{widthPercent - 5}%;max-width:{widthPercent + 5}%;\">");
+
+                    // Process the column content - may contain other parsers
+                    var trimmedContent = colContent.Trim();
+                    if (!string.IsNullOrEmpty(trimmedContent))
+                    {
+                        // Check if content has external code blocks
+                        var hasLangCode = MultLangManager.HasLanguageCode(trimmedContent);
+
+                        try
+                        {
+                            var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-columns-debug.txt");
+                            System.IO.File.AppendAllText(logPath,
+                                $"[{DateTime.Now:HH:mm:ss}] Column length: {trimmedContent.Length}\n");
+                            System.IO.File.AppendAllText(logPath,
+                                $"[{DateTime.Now:HH:mm:ss}] Contains '@{{': {trimmedContent.Contains("@{")}\n");
+                            System.IO.File.AppendAllText(logPath,
+                                $"[{DateTime.Now:HH:mm:ss}] Contains 'symbolic': {trimmedContent.Contains("symbolic")}\n");
+                            System.IO.File.AppendAllText(logPath,
+                                $"[{DateTime.Now:HH:mm:ss}] HasLanguageCode: {hasLangCode}\n");
+                            if (trimmedContent.Contains("@{"))
+                            {
+                                var atIndex = trimmedContent.IndexOf("@{");
+                                var snippet = trimmedContent.Substring(atIndex, Math.Min(50, trimmedContent.Length - atIndex));
+                                System.IO.File.AppendAllText(logPath,
+                                    $"[{DateTime.Now:HH:mm:ss}] Snippet at @{{: '{snippet}'\n");
+                            }
+                            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] ---\n");
+                        }
+                        catch { }
+
+                        if (hasLangCode)
+                        {
+                            // Recursively process external code in the column
+                            var processedContent = Process(trimmedContent, returnHtml: true, enableCollapse: false, progressCallback: progressCallback);
+                            html.Append(processedContent);
+                        }
+                        else
+                        {
+                            // Plain text/Calcpad content - wrap in paragraph
+                            // Replace newlines with <br> for basic formatting
+                            var escaped = System.Web.HttpUtility.HtmlEncode(trimmedContent);
+                            escaped = escaped.Replace("\n", "<br/>");
+                            html.Append($"<p>{escaped}</p>");
+                        }
+                    }
+
+                    html.Append("</div>");
+                }
+
+                html.Append("</div>");
+                return html.ToString();
+            }
+            catch (Exception ex)
+            {
+                return $"<p style='color:red;'>Error en @{{columns}}: {ex.Message}</p>";
+            }
         }
     }
 }

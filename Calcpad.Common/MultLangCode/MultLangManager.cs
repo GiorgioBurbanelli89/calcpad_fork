@@ -381,6 +381,114 @@ namespace Calcpad.Common.MultLangCode
                         Builtins = new[] { "print", "write", "read", "allocate", "deallocate" },
                         RequiresCompilation = true,
                         CompileArgs = "{input} -o {output}"
+                    },
+                    ["rust"] = new LanguageDefinition
+                    {
+                        Command = "rustc",
+                        Extension = ".rs",
+                        Directive = "@{rust}",
+                        EndDirective = "@{end rust}",
+                        CommentPrefix = "//",
+                        Keywords = new[] { "fn", "let", "mut", "const", "if", "else", "for", "while", "loop", "match", "struct", "enum", "impl", "pub", "mod", "use", "return", "self", "Self" },
+                        Builtins = new[] { "println", "print", "format", "vec", "String", "Option", "Result", "Box" },
+                        RequiresCompilation = true,
+                        CompileArgs = "{input} -o {output}"
+                    },
+                    ["go"] = new LanguageDefinition
+                    {
+                        Command = "go",
+                        Extension = ".go",
+                        Directive = "@{go}",
+                        EndDirective = "@{end go}",
+                        CommentPrefix = "//",
+                        Keywords = new[] { "package", "import", "func", "var", "const", "type", "struct", "interface", "if", "else", "for", "range", "switch", "case", "return", "defer", "go", "chan" },
+                        Builtins = new[] { "fmt", "println", "printf", "print", "len", "cap", "make", "new", "append" },
+                        RequiresCompilation = false,
+                        RunArgs = "run {input}"
+                    },
+                    ["lua"] = new LanguageDefinition
+                    {
+                        Command = "lua",
+                        Extension = ".lua",
+                        Directive = "@{lua}",
+                        EndDirective = "@{end lua}",
+                        CommentPrefix = "--",
+                        Keywords = new[] { "local", "function", "end", "if", "then", "else", "elseif", "for", "while", "do", "repeat", "until", "return", "break", "in", "and", "or", "not", "nil", "true", "false" },
+                        Builtins = new[] { "print", "io", "string", "table", "math", "os", "tonumber", "tostring", "type" }
+                    },
+                    ["perl"] = new LanguageDefinition
+                    {
+                        Command = "perl",
+                        Extension = ".pl",
+                        Directive = "@{perl}",
+                        EndDirective = "@{end perl}",
+                        CommentPrefix = "#",
+                        Keywords = new[] { "my", "our", "local", "sub", "if", "else", "elsif", "unless", "while", "for", "foreach", "do", "return", "last", "next", "use", "require", "package" },
+                        Builtins = new[] { "print", "say", "open", "close", "read", "write", "chomp", "split", "join", "push", "pop" }
+                    },
+                    ["ruby"] = new LanguageDefinition
+                    {
+                        Command = "ruby",
+                        Extension = ".rb",
+                        Directive = "@{ruby}",
+                        EndDirective = "@{end ruby}",
+                        CommentPrefix = "#",
+                        Keywords = new[] { "def", "end", "class", "module", "if", "else", "elsif", "unless", "while", "for", "do", "return", "yield", "begin", "rescue", "ensure", "raise", "require", "attr_accessor" },
+                        Builtins = new[] { "puts", "print", "gets", "p", "pp", "each", "map", "select", "reduce" }
+                    },
+                    ["php"] = new LanguageDefinition
+                    {
+                        Command = "php",
+                        Extension = ".php",
+                        Directive = "@{php}",
+                        EndDirective = "@{end php}",
+                        CommentPrefix = "//",
+                        Keywords = new[] { "function", "class", "public", "private", "protected", "static", "if", "else", "elseif", "while", "for", "foreach", "do", "switch", "case", "return", "new", "echo", "print", "use", "namespace" },
+                        Builtins = new[] { "echo", "print", "printf", "sprintf", "array", "isset", "empty", "strlen", "count" }
+                    },
+                    ["haskell"] = new LanguageDefinition
+                    {
+                        Command = "runhaskell",
+                        Extension = ".hs",
+                        Directive = "@{haskell}",
+                        EndDirective = "@{end haskell}",
+                        CommentPrefix = "--",
+                        Keywords = new[] { "module", "import", "where", "let", "in", "if", "then", "else", "case", "of", "do", "data", "type", "newtype", "class", "instance", "deriving" },
+                        Builtins = new[] { "main", "putStrLn", "print", "show", "read", "map", "filter", "foldr", "foldl" }
+                    },
+                    ["d"] = new LanguageDefinition
+                    {
+                        Command = "dmd",
+                        Extension = ".d",
+                        Directive = "@{d}",
+                        EndDirective = "@{end d}",
+                        CommentPrefix = "//",
+                        Keywords = new[] { "void", "int", "float", "double", "char", "string", "bool", "if", "else", "for", "foreach", "while", "do", "switch", "case", "return", "import", "module", "class", "struct" },
+                        Builtins = new[] { "writeln", "writef", "readln", "to", "format" },
+                        RequiresCompilation = true,
+                        CompileArgs = "{input} -of={output}"
+                    },
+                    ["ts"] = new LanguageDefinition
+                    {
+                        Command = "npx",
+                        Extension = ".ts",
+                        Directive = "@{ts}",
+                        EndDirective = "@{end ts}",
+                        CommentPrefix = "//",
+                        Keywords = new[] { "function", "class", "interface", "type", "const", "let", "var", "if", "else", "for", "while", "do", "switch", "case", "return", "import", "export", "async", "await", "new", "extends", "implements" },
+                        Builtins = new[] { "console", "log", "error", "warn", "JSON", "parse", "stringify", "Array", "Object", "String", "Number", "Boolean" },
+                        RunArgs = "tsx \"{file}\""
+                    },
+                    ["typescript"] = new LanguageDefinition
+                    {
+                        Command = "npx",
+                        Extension = ".ts",
+                        Directive = "@{typescript}",
+                        EndDirective = "@{end typescript}",
+                        CommentPrefix = "//",
+                        Keywords = new[] { "function", "class", "interface", "type", "const", "let", "var", "if", "else", "for", "while", "do", "switch", "case", "return", "import", "export", "async", "await", "new", "extends", "implements" },
+                        Builtins = new[] { "console", "log", "error", "warn", "JSON", "parse", "stringify", "Array", "Object", "String", "Number", "Boolean" },
+                        RunArgs = "tsx \"{file}\""
                     }
                 },
                 Settings = new MultLangSettings
@@ -438,6 +546,11 @@ namespace Calcpad.Common.MultLangCode
         /// </summary>
         public static bool IsCommandAvailable(string command)
         {
+            // Empty command means the language doesn't need external execution
+            // (e.g., "three" which generates HTML directly, or "css" which just saves files)
+            if (string.IsNullOrWhiteSpace(command))
+                return true;
+
             try
             {
                 var startInfo = new ProcessStartInfo
@@ -468,7 +581,17 @@ namespace Calcpad.Common.MultLangCode
             if (_availableLanguages.Count == 0)
                 CheckAvailableLanguages();
 
-            return _availableLanguages.TryGetValue(languageName.ToLower(), out var available) && available;
+            var lang = languageName.ToLower();
+
+            // Support for ts:filename or typescript:filename syntax
+            if (lang.StartsWith("ts:") || lang.StartsWith("typescript:"))
+            {
+                // Check if base TypeScript is available
+                return _availableLanguages.TryGetValue("ts", out var tsAvail) && tsAvail ||
+                       _availableLanguages.TryGetValue("typescript", out var tsAvail2) && tsAvail2;
+            }
+
+            return _availableLanguages.TryGetValue(lang, out var available) && available;
         }
 
         /// <summary>
@@ -507,26 +630,67 @@ namespace Calcpad.Common.MultLangCode
 
             foreach (var (name, lang) in Config.Languages)
             {
-                if (trimmed.Equals(lang.Directive, StringComparison.OrdinalIgnoreCase))
+                // Match start directive: "@{image png base64}" should match "@{image}"
+                // Remove trailing } from directive and check if line starts with it
+                // But ensure we don't match "@{r}" when the line is "@{rust}"
+                string startPattern = lang.Directive.TrimEnd('}');  // "@{image}" → "@{image"
+                if (trimmed.StartsWith(startPattern, StringComparison.OrdinalIgnoreCase))
                 {
-                    try
+                    // Verify the character after the pattern is '}' or whitespace or ':' (for @{ts:filename}) or end
+                    int afterIdx = startPattern.Length;
+                    if (afterIdx >= trimmed.Length ||
+                        trimmed[afterIdx] == '}' ||
+                        trimmed[afterIdx] == ':' ||  // Support for @{ts:filename}
+                        char.IsWhiteSpace(trimmed[afterIdx]))
                     {
-                        var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
-                        File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] DetectDirective MATCH: '{trimmed}' == '{lang.Directive}' (lang={name})\n");
+                        // For @{ts:filename}, return the full directive name including the filename part
+                        string returnName = name;
+                        if (afterIdx < trimmed.Length && trimmed[afterIdx] == ':')
+                        {
+                            // Extract the full name with filename, e.g., "ts:getColorMap"
+                            var endIdx = trimmed.IndexOf('}', afterIdx);
+                            if (endIdx > afterIdx)
+                            {
+                                returnName = name + trimmed.Substring(afterIdx, endIdx - afterIdx);
+                            }
+                        }
+                        try
+                        {
+                            var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                            File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] DetectDirective MATCH: '{trimmed}' startswith '{startPattern}' (lang={returnName})\n");
+                        }
+                        catch { }
+                        return (true, returnName, false);
                     }
-                    catch { }
-                    return (true, name, false);
                 }
 
-                if (trimmed.Equals(lang.EndDirective, StringComparison.OrdinalIgnoreCase))
+                // Match end directive: "@{end ts}" or "@{end ts:filename}"
+                string endPattern = lang.EndDirective.TrimEnd('}');  // "@{end ts}" → "@{end ts"
+                if (trimmed.StartsWith(endPattern, StringComparison.OrdinalIgnoreCase))
                 {
-                    try
+                    int afterIdx = endPattern.Length;
+                    if (afterIdx >= trimmed.Length ||
+                        trimmed[afterIdx] == '}' ||
+                        trimmed[afterIdx] == ':' ||  // Support for @{end ts:filename}
+                        char.IsWhiteSpace(trimmed[afterIdx]))
                     {
-                        var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
-                        File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] DetectDirective MATCH END: '{trimmed}' == '{lang.EndDirective}' (lang={name})\n");
+                        string returnName = name;
+                        if (afterIdx < trimmed.Length && trimmed[afterIdx] == ':')
+                        {
+                            var endIdx = trimmed.IndexOf('}', afterIdx);
+                            if (endIdx > afterIdx)
+                            {
+                                returnName = name + trimmed.Substring(afterIdx, endIdx - afterIdx);
+                            }
+                        }
+                        try
+                        {
+                            var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                            File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] DetectDirective MATCH END: '{trimmed}' startswith '{endPattern}' (lang={returnName})\n");
+                        }
+                        catch { }
+                        return (true, returnName, true);
                     }
-                    catch { }
-                    return (true, name, true);
                 }
             }
 
@@ -542,6 +706,7 @@ namespace Calcpad.Common.MultLangCode
             var lines = code.Split('\n');
 
             string currentLanguage = null;
+            string currentStartDirective = null;  // Store the original start directive
             int blockStart = -1;
             var currentBlock = new StringBuilder();
 
@@ -590,29 +755,32 @@ namespace Calcpad.Common.MultLangCode
                             Language = currentLanguage,
                             Code = currentBlock.ToString().TrimEnd(),
                             StartLine = blockStart,
-                            EndLine = i
+                            EndLine = i,
+                            StartDirective = currentStartDirective ?? string.Empty
                         });
 
                         try
                         {
                             var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
-                            File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Block closed: '{currentLanguage}', code length={currentBlock.Length}\n");
+                            File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Block closed: '{currentLanguage}', code length={currentBlock.Length}, directive='{currentStartDirective}'\n");
                         }
                         catch { }
 
                         currentLanguage = null;
+                        currentStartDirective = null;
                         currentBlock.Clear();
                     }
                     else if (!isEnd && currentLanguage == null)
                     {
                         // Start of block
                         currentLanguage = langName;
+                        currentStartDirective = lines[i].Trim();  // Save original directive (e.g., "@{image png base64}")
                         blockStart = i;
 
                         try
                         {
                             var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
-                            File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Block started: '{currentLanguage}'\n");
+                            File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Block started: '{currentLanguage}', directive: '{currentStartDirective}'\n");
                         }
                         catch { }
                     }
@@ -654,10 +822,60 @@ namespace Calcpad.Common.MultLangCode
                 foreach (var lang in Config.Languages.Values)
                 {
                     File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] Checking directive: '{lang.Directive}'\n");
-                    if (code.Contains(lang.Directive, StringComparison.OrdinalIgnoreCase))
+
+                    // Special logging for @{image}
+                    if (lang.Directive == "@{image}")
                     {
-                        File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] FOUND: '{lang.Directive}' in code! Returning TRUE\n");
-                        return true;
+                        // Show exact bytes of directive
+                        var directiveBytes = System.Text.Encoding.UTF8.GetBytes(lang.Directive);
+                        var directiveHex = BitConverter.ToString(directiveBytes).Replace("-", " ");
+                        File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] Directive bytes: {directiveHex}\n");
+                        File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] Directive length: {lang.Directive.Length}\n");
+
+                        var debugIdx = code.IndexOf("@{", StringComparison.OrdinalIgnoreCase);
+                        if (debugIdx >= 0)
+                        {
+                            var snippet = code.Substring(debugIdx, Math.Min(30, code.Length - debugIdx));
+                            File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] Found '@{{' at index {debugIdx}: '{snippet}'\n");
+
+                            // Show bytes of what's at that position
+                            var codeBytes = System.Text.Encoding.UTF8.GetBytes(snippet.Substring(0, Math.Min(8, snippet.Length)));
+                            var codeHex = BitConverter.ToString(codeBytes).Replace("-", " ");
+                            File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] Code bytes at {debugIdx}: {codeHex}\n");
+                        }
+
+                        // Check different variations
+                        bool hasAtBrace = code.Contains("@{");
+                        bool hasImage = code.Contains("image", StringComparison.OrdinalIgnoreCase);
+                        bool hasDirective = code.Contains(lang.Directive, StringComparison.OrdinalIgnoreCase);
+                        bool hasDirectiveSimple = code.IndexOf("@{image") >= 0;
+
+                        File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] Contains '@{{': {hasAtBrace}\n");
+                        File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] Contains 'image': {hasImage}\n");
+                        File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] Contains directive '@{{image}}': {hasDirective}\n");
+                        File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] IndexOf '@{{image' >= 0: {hasDirectiveSimple}\n");
+                    }
+
+                    // Check if directive appears in code
+                    // For directives like "@{image}", also match "@{image " (with space or other chars after)
+                    // But we need to ensure we don't match "@{r}" when looking for "@{rust}"
+                    string searchPattern = lang.Directive.TrimEnd('}');  // "@{image}" → "@{image"
+                    int idx = code.IndexOf(searchPattern, StringComparison.OrdinalIgnoreCase);
+                    while (idx >= 0)
+                    {
+                        // Check if the next character after the pattern is '}', ':', or whitespace or end of string
+                        // The ':' supports @{ts:filename} syntax for TypeScript modules
+                        int afterIdx = idx + searchPattern.Length;
+                        if (afterIdx >= code.Length ||
+                            code[afterIdx] == '}' ||
+                            code[afterIdx] == ':' ||  // Support for @{ts:filename}
+                            char.IsWhiteSpace(code[afterIdx]))
+                        {
+                            File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] FOUND: '{searchPattern}' in code at {idx}! Returning TRUE\n");
+                            return true;
+                        }
+                        // Try to find the next occurrence
+                        idx = code.IndexOf(searchPattern, afterIdx, StringComparison.OrdinalIgnoreCase);
                     }
                 }
                 File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] No directives found. Returning FALSE\n");
@@ -686,5 +904,10 @@ namespace Calcpad.Common.MultLangCode
         public string Code { get; set; } = string.Empty;
         public int StartLine { get; set; }
         public int EndLine { get; set; }
+        /// <summary>
+        /// The original start directive line (e.g., "@{image png base64}")
+        /// Used to extract additional parameters like image format
+        /// </summary>
+        public string StartDirective { get; set; } = string.Empty;
     }
 }

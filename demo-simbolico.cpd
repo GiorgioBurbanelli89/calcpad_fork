@@ -1,0 +1,72 @@
+"Demostración de Cálculo Simbólico con AngouriMath"
+
+'<h2>Derivadas Simbólicas</h2>
+
+@{symbolic}
+' Derivada de polinomio
+f1 = d/dx(x^3 + 2*x^2 - 5*x + 3)
+
+' Derivada de producto
+f2 = d/dx(sin(x) * cos(x))
+
+' Derivada de exponencial
+f3 = d/dx(e^(a*x))
+
+' Derivada de función compuesta
+f4 = d/dx((x^2 + 1)^3)
+@{end symbolic}
+
+'<h2>Integrales Simbólicas</h2>
+
+@{symbolic}
+' Integral de polinomio
+i1 = integrate(3*x^2 + 4*x - 5, x)
+
+' Integral de exponencial
+i2 = integrate(e^x, x)
+
+' Integral de potencia
+i3 = integrate(x^5, x)
+@{end symbolic}
+
+'<h2>Expansión de Expresiones</h2>
+
+@{symbolic}
+' Binomio al cuadrado
+exp1 = expand((x + a)^2)
+
+' Binomio al cubo
+exp2 = expand((x + 1)^3)
+
+' Producto de binomios
+exp3 = expand((x + a)*(x + b))
+
+' Diferencia de cuadrados
+exp4 = expand((x + 1)*(x - 1))
+@{end symbolic}
+
+'<h2>Límites</h2>
+
+@{symbolic}
+' Límite clásico
+lim1 = limit((x^2 - 1)/(x - 1), x, 1)
+
+' Límite trigonométrico
+lim2 = limit(sin(x)/x, x, 0)
+
+' Límite al infinito
+lim3 = limit((3*x^2 + 2*x)/(x^2 - 1), x, inf)
+@{end symbolic}
+
+'<h2>Simplificación</h2>
+
+@{symbolic}
+' Simplificar expresión algebraica
+simp1 = simplify(x^2 - x^2 + a)
+
+' Simplificar fracción
+simp2 = simplify((x^2 - 1)/(x - 1))
+
+' Simplificar expresión con raíces
+simp3 = simplify((x + 1)^2 - 2*(x + 1) + 1)
+@{end symbolic}
