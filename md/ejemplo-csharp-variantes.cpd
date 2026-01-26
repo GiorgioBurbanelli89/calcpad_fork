@@ -1,0 +1,72 @@
+﻿'Ejemplo: Diferentes Directivas de C#
+'
+'Calcpad tiene varias directivas para C#, cada una con un propÃ³sito:
+
+'=== 1. #csharp - C# GenÃ©rico ===
+'Usa: dotnet run
+'Para: CÃ³digo C# de consola general
+@{csharp}
+using System;
+
+class Ejemplo1 {
+    static void Main() {
+        Console.WriteLine("C# GenÃ©rico - Consola");
+        double pi = 3.14159;
+        double radio = 5.0;
+        double area = pi * radio * radio;
+        Console.WriteLine($"Ãrea del cÃ­rculo: {area:F2}");
+    }
+}
+@{end csharp}
+
+'=== 2. #avalonia - C# para UI Cross-Platform ===
+'Usa: dotnet run
+'Para: CÃ³digo que usarÃ­a Avalonia UI (Windows/Linux/macOS)
+'Nota: Este ejemplo solo muestra consola, pero la directiva
+'      indica que es para aplicaciones Avalonia
+@{avalonia}
+using System;
+
+class EjemploAvalonia {
+    static void Main() {
+        Console.WriteLine("Avalonia - Framework UI Cross-Platform");
+        Console.WriteLine("Similar a WPF pero funciona en Linux/macOS");
+
+        // En una app real de Avalonia:
+        // var app = new Application();
+        // var window = new Window { Title = "Mi App" };
+    }
+}
+@{end avalonia}
+
+'=== 3. #wpf - Windows Presentation Foundation ===
+'Usa: dotnet run
+'Para: Aplicaciones WPF (solo Windows)
+@{wpf}
+using System;
+
+class EjemploWPF {
+    static void Main() {
+        Console.WriteLine("WPF - Windows Presentation Foundation");
+        Console.WriteLine("Framework UI de Microsoft (solo Windows)");
+
+        // En una app WPF real:
+        // var app = new Application();
+        // var window = new Window { Title = "WPF App" };
+    }
+}
+@{end wpf}
+
+'RESUMEN:
+'â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+'â”‚ Directiva    â”‚ Comando        â”‚ PropÃ³sito             â”‚
+'â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+'â”‚ #csharp      â”‚ dotnet run     â”‚ C# genÃ©rico           â”‚
+'â”‚ #avalonia    â”‚ dotnet run     â”‚ UI Cross-platform     â”‚
+'â”‚ #wpf         â”‚ dotnet run     â”‚ UI Windows            â”‚
+'â”‚ #cpp         â”‚ g++            â”‚ C++ genÃ©rico          â”‚
+'â”‚ #qt          â”‚ g++ con Qt     â”‚ UI C++ cross-platform â”‚
+'â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+'IMPORTANTE: NO se puede combinar como #avalonia.cpp
+'Cada bloque usa UNA SOLA directiva.

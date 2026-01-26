@@ -1,0 +1,18 @@
+"SVG Test with #hide
+
+'Some calculations first:
+x = 10
+y = 20
+w = 400
+h = 300
+
+#post
+
+#hide
+$svg{width:w; height:h; viewbox:0,0,w,h}
+circle{cx:50; cy:50; r:30; fill:red}
+line{x1:100; y1:100; x2:200; y2:200; stroke:blue; stroke-width:2}
+$end
+#show
+
+'This should show the SVG image above, but hide the SVG code.

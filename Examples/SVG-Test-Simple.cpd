@@ -1,0 +1,6 @@
+"SVG Test Simple
+'Width -'w = ? {200}'px
+$svg{width:200; height:200; viewbox:0,0,200,200}
+circle{cx:100; cy:100; r:50; fill:red}
+$end
+'Done

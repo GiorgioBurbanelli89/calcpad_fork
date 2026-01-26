@@ -1,0 +1,6 @@
+'Test de Calcpad.Common
+'Este archivo prueba que la biblioteca compartida funciona
+
+x = 5
+y = x + 1
+"Resultado: "y

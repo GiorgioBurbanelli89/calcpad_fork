@@ -1,0 +1,23 @@
+' ============================================================
+' Convertido de MathCad Prime: Solucion de una ecuacion diferencial.mcdx
+' ============================================================
+
+' [Imagen no encontrada]
+
+K = tonnef m
+M = (3.877 tonnef) * (m)
+ = m s
+t' = 0 s..0.01 s
+' ---- Solve Block ----
+' Restricción: (d(?) t) ( t)
+' Restricción:  
+' Restricción: d(?) 
+' Solver: odesolve
+' (Solve blocks no implementados en Calcpad)
+
+' ---- Componente de Gráfica ----
+' (Charts no implementados en Calcpad)
+
+' [Imagen no encontrada]
+
+' [Imagen no encontrada]

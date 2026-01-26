@@ -1,0 +1,19 @@
+'Test de directivas de importación @{mathcad} y @{smathstudio}
+'Estas directivas permiten importar archivos de otros programas
+
+'Ejemplo de sintaxis:
+'@{mathcad:ruta/archivo.mcdx}
+'@{smathstudio:ruta/archivo.sm}
+'@{smath:ruta/archivo.sm}
+
+'Las directivas se procesan durante la lectura del archivo
+'y se reemplazan por el código Calcpad convertido.
+
+'Ejemplo práctico (descomentarlo si tiene archivos):
+'@{mathcad:test_mathcad.mcdx}
+'@{smath:test_smath.sm}
+
+'Cálculo de prueba en Calcpad
+a = 10
+b = 20
+c = a + b

@@ -1,0 +1,20 @@
+'================================================
+' PRUEBA: Imagen real con texto CALCPAD
+'================================================
+
+'Módulo de Elasticidad
+E = 2.535
+ν = 0.20
+G = E/(2*(1 + ν))
+
+'================================================
+' IMAGEN REAL (200x100 px - fondo azul, rect rojo, texto negro)
+'================================================
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAMgAAABkCAYAAADDhn8LAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAARZSURBVHhe7dq9UdxQGIXhbYmcgAoogow2GFJicmJcAg1QgStwG/KYAXF17v/VzBm+8Rs8gS1pdXX0HY3W68uv3382AGUX/QsA3ygI0EBBgAYKAjRQEKCBggANFARooCBAAwUBGoYLsl0uOEHzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzRAwUxETzXPe+3V9ftstFXD9tz9m+uYe79Lib7f4t32f3cr/ve/X4nm/vmlvr8+NNvq+qHJuaucbuOfWAGr3hmKN5rjje+LLmIL89bVd6zN1rvt+XEwVZWWt3WHeNoZ+8xu459YAaveGYo3nO6t7IxO1Lfnz9M+63h8K+HxYLUj5PWbrWmeNqQ1/+jPo1lvdP6AE1esMxR/Ocok9FHQ7dXnwNSV93brbbu+/BqBVqqSC6lom1psNaOt9xmEtDP3+NvXNSEBPNc0b6ulK6iR8+B6+3fR9K/bPu/89CQc6stTesxwIUCqLXpH/W/QfOSUFMNM9xx6di9d27Ix+Egc+dLsjAZzbka6xvLxUkP76/nvyY43YKYqJ5jnvdbhtDMaY8KL3hmC/IubV2vw+k9NVt8Rp72ymIieY5Lhm6ymtCVzLox8HqDPSZgiysdbwg7bXOXCMF+SE0z3HtGzwi/V6gX1Zb204VZGGtIwWpraN1Ha1tFOSH0DzHlV8dxqVD26GvLdMFObfW3rDWrV9j75wUxETznHH40U2HePc5JLo9ffXokqGeLsi5tfaGterENfbOSUFMNM8p+ttBNnj6BP1+vRn5RTt1GJKFgpxZa29Ya85cY++cFMRE85w18n7+ZX/PPgxr4ztB+gROv1wPP5nrT+We2i/ppWEtOnmN3bVmH1ShNxxzNM8V3ZvZeDrmT/LU8am+D+1iQbJzV2gJVgpy9hq768w/qExvOOZonutG/4fscT/91xtVHLQTBSmtYZetNV/DWEHOXyMF+SE0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8RAQUw0T8QwXBDgf0RBgAYKAjRQEKCBggANFARooCBAAwUBGigI0EBBgIa/1uODOccndOYAAAAASUVORK5CYII=
+@{end image}
+
+'================================================
+' Resultado
+'================================================
+resultado = G

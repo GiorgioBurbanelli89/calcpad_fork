@@ -1,0 +1,941 @@
+' ============================================
+' Importado de Excel (.xlsx)
+' Versión: Microsoft Excel 16.0300
+' Archivo: hoja de calculo 23-01-2026.xlsx
+' Fecha: 2026-01-24 07:27:46
+' Hojas: 24
+' ============================================
+
+"<hr/>
+"COL
+'<h2>COL</h2>
+
+'<h3>Datos de entrada</h3>
+#val
+'<table class="bordered">
+'<tr><th>Variable</th><th>Valor</th><th>Descripción</th></tr>
+Longitud_X1 = 6.1
+'<tr><td><b>Longitud_X1</b></td><td>'Longitud_X1' m</td><td>Longitud X1</td></tr>
+b = 35
+'<tr><td><b>b</b></td><td>'b' cm</td><td>b</td></tr>
+Longitud_X2 = 6
+'<tr><td><b>Longitud_X2</b></td><td>'Longitud_X2' m</td><td>Longitud X2</td></tr>
+h = 45
+'<tr><td><b>h</b></td><td>'h' cm</td><td>h</td></tr>
+Carga_Muerta_1 = 0.62
+'<tr><td><b>Carga_Muerta_1</b></td><td>'Carga_Muerta_1' t/m2</td><td>Carga Muerta 1</td></tr>
+Longitud_X3 = 6.55
+'<tr><td><b>Longitud_X3</b></td><td>'Longitud_X3' m</td><td>Longitud X3</td></tr>
+rec = 2.5
+'<tr><td><b>rec</b></td><td>'rec' cm</td><td>rec</td></tr>
+Carga_Viva_1 = 0.2
+'<tr><td><b>Carga_Viva_1</b></td><td>'Carga_Viva_1' t/m2</td><td>Carga Viva 1</td></tr>
+Longitud_X4 = 6.55
+'<tr><td><b>Longitud_X4</b></td><td>'Longitud_X4' m</td><td>Longitud X4</td></tr>
+fi_est = 10
+'<tr><td><b>fi_est</b></td><td>'fi_est' mm</td><td>fi est</td></tr>
+Sobre_Carga_ = 0.35
+'<tr><td><b>Sobre_Carga_</b></td><td>'Sobre_Carga_' t/m2</td><td>Sobre Carga </td></tr>
+ancho = 55
+'<tr><td><b>ancho</b></td><td>'ancho' cm</td><td>ancho</td></tr>
+var = 6
+'<tr><td><b>var</b></td><td>'var'</td><td>var</td></tr>
+Pisos = 1
+'<tr><td><b>Pisos</b></td><td>'Pisos' u</td><td>Pisos</td></tr>
+prof = 55
+'<tr><td><b>prof</b></td><td>'prof' cm</td><td>prof</td></tr>
+fi = 16
+'<tr><td><b>fi</b></td><td>'fi'</td><td>fi</td></tr>
+Carga_muerta_2 = 0.62
+'<tr><td><b>Carga_muerta_2</b></td><td>'Carga_muerta_2' t/m2</td><td>Carga muerta 2</td></tr>
+var_a = 6
+'<tr><td><b>var_a</b></td><td>'var_a' u</td><td>var a</td></tr>
+Carga_viva_2 = 0.2
+'<tr><td><b>Carga_viva_2</b></td><td>'Carga_viva_2' t/m2</td><td>Carga viva 2</td></tr>
+var_p = 6
+'<tr><td><b>var_p</b></td><td>'var_p' u</td><td>var p</td></tr>
+fi_long = 16
+'<tr><td><b>fi_long</b></td><td>'fi_long' mm</td><td>fi long</td></tr>
+Carga_muerta_3 = 0.62
+'<tr><td><b>Carga_muerta_3</b></td><td>'Carga_muerta_3' t/m2</td><td>Carga muerta 3</td></tr>
+fi_esq = 18
+'<tr><td><b>fi_esq</b></td><td>'fi_esq' mm</td><td>fi esq</td></tr>
+Carga_viva_3 = 0.48
+'<tr><td><b>Carga_viva_3</b></td><td>'Carga_viva_3' t/m2</td><td>Carga viva 3</td></tr>
+Carga_Muerta_3 = 0.62
+'<tr><td><b>Carga_Muerta_3</b></td><td>'Carga_Muerta_3' t/m2</td><td>Carga Muerta 3</td></tr>
+INT = 5.3
+'<tr><td><b>INT</b></td><td>'INT'</td><td>INT</td></tr>
+Carga_Muerta = 0.62
+'<tr><td><b>Carga_Muerta</b></td><td>'Carga_Muerta' t/m2</td><td>Carga Muerta</td></tr>
+MED = 4
+'<tr><td><b>MED</b></td><td>'MED'</td><td>MED</td></tr>
+Carga_Viva = 0.48
+'<tr><td><b>Carga_Viva</b></td><td>'Carga_Viva' t/m2</td><td>Carga Viva</td></tr>
+ESQ = 3.2
+'<tr><td><b>ESQ</b></td><td>'ESQ'</td><td>ESQ</td></tr>
+He = 3.6
+'<tr><td><b>He</b></td><td>'He' m</td><td>He</td></tr>
+Fm = 1
+'<tr><td><b>Fm</b></td><td>'Fm'</td><td>Fm</td></tr>
+fc = 210
+'<tr><td><b>fc</b></td><td>'fc' kg/cm2</td><td>fc</td></tr>
+fy = 4200
+'<tr><td><b>fy</b></td><td>'fy' kg/cm2</td><td>fy</td></tr>
+Esfuerzo_adm_suelo_ = 21
+'<tr><td><b>Esfuerzo_adm_suelo_</b></td><td>'Esfuerzo_adm_suelo_'</td><td>Esfuerzo adm suelo.</td></tr>
+Dimensiones_de_Zapata_ = 1.5
+'<tr><td><b>Dimensiones_de_Zapata_</b></td><td>'Dimensiones_de_Zapata_'</td><td>Dimensiones de Zapata.</td></tr>
+C31 = 1.5
+'<tr><td><b>C31</b></td><td>'C31'</td><td>C31</td></tr>
+N_pisos = 9
+'<tr><td><b>N_pisos</b></td><td>'N_pisos'</td><td>N pisos</td></tr>
+Simb_central = 1.4999999999999999E-2
+'<tr><td><b>Simb_central</b></td><td>'Simb_central' cm2</td><td>Simb central</td></tr>
+Luz_en_X = 21.85
+'<tr><td><b>Luz_en_X</b></td><td>'Luz_en_X'</td><td>Luz en X</td></tr>
+Luz_en_Y = 8.4499999999999993
+'<tr><td><b>Luz_en_Y</b></td><td>'Luz_en_Y'</td><td>Luz en Y</td></tr>
+Cantidad_col = 14
+'<tr><td><b>Cantidad_col</b></td><td>'Cantidad_col' u</td><td>Cantidad col</td></tr>
+v1_a_4 = 0.25
+'<tr><td><b>v1_a_4</b></td><td>'v1_a_4'</td><td>1 a 4</td></tr>
+v5_a_10 = 0.3
+'<tr><td><b>v5_a_10</b></td><td>'v5_a_10'</td><td>5 a 10</td></tr>
+'</table>
+#equ
+
+'<h3>Cálculos</h3>
+'<table class="bordered">
+'<tr><th>Variable</th><th>Fórmula</th><th>Calcpad</th><th>Excel</th><th>Diferencia</th></tr>
+num = var_a*2+(var_p-2)*2
+#hide
+diff_num = abs(num - 20)
+#show
+'<tr><td><b>num</b></td>
+'<td><code>+F9*2+(F10-2)*2</code></td>
+'<td>'num' u</td>
+'<td>20 u</td>
+'<td>'diff_num'</td></tr>
+
+At = (Longitud_X1/2+Longitud_X2/2)*(Longitud_X3/2+Longitud_X4/2)
+#hide
+diff_At = abs(At - 39.627499999999998)
+#show
+'<tr><td><b>At</b></td>
+'<td><code>+(B2/2+B3/2)*(B4/2+B5/2)</code></td>
+'<td>'At' m2</td>
+'<td>39.627499999999998 m2</td>
+'<td>'diff_At'</td></tr>
+
+bc = ancho-2*rec
+#hide
+diff_bc = abs(bc - 49)
+#show
+'<tr><td><b>bc</b></td>
+'<td><code>+F7-2*F14</code></td>
+'<td>'bc' cm</td>
+'<td>49 cm</td>
+'<td>'diff_bc'</td></tr>
+
+d = h-rec-fi_est/10-fi/20
+#hide
+diff_d = abs(d - 40.700000000000003)
+#show
+'<tr><td><b>d</b></td>
+'<td><code>+N3-N4-N5/10-N8/20</code></td>
+'<td>'d' cm</td>
+'<td>40.700000000000003 cm</td>
+'<td>'diff_d'</td></tr>
+
+Cu = 1.2*(Carga_Muerta_1*Pisos+Carga_muerta_2*Pisos+Carga_muerta_3*Pisos+Carga_Muerta*Pisos)+1.6*(Carga_Viva_1*Pisos+Carga_viva_2*Pisos+Carga_viva_3*Pisos+Carga_Viva*Pisos)
+#hide
+diff_Cu = abs(Cu - 4.68)
+#show
+'<tr><td><b>Cu</b></td>
+'<td><code>1.2*(B6*B8+B9*B11+B12*B14+B15*B17)+1.6*(B7*B8+B10*B11+B13*B14+B16*B17)</code></td>
+'<td>'Cu' t/m2</td>
+'<td>4.68 t/m2</td>
+'<td>'diff_Cu'</td></tr>
+
+Ac = bc*(prof-2*rec)
+#hide
+diff_Ac = abs(Ac - 2401)
+#show
+'<tr><td><b>Ac</b></td>
+'<td><code>+J2*(F8-2*F14)</code></td>
+'<td>'Ac' cm2</td>
+'<td>2401 cm2</td>
+'<td>'diff_Ac'</td></tr>
+
+As = 4*0.00785*fi_esq^2+(num-4)*0.00785*fi_long^2
+#hide
+diff_As = abs(As - 42.327199999999998)
+#show
+'<tr><td><b>As</b></td>
+'<td><code>4*0.00785*F12^2+(J1-4)*0.00785*F11^2</code></td>
+'<td>'As' cm2</td>
+'<td>42.327199999999998 cm2</td>
+'<td>'diff_As'</td></tr>
+
+T1 = 1.25*As*fy/1000
+#hide
+diff_T1 = abs(T1 - 63.302399999999992)
+#show
+'<tr><td><b>T1</b></td>
+'<td><code>1.25*N9*B26/1000</code></td>
+'<td>'T1' t</td>
+'<td>63.302399999999992 t</td>
+'<td>'diff_T1'</td></tr>
+
+Pu = Cu*At*Fm/0.85
+#hide
+diff_Pu = abs(Pu - 218.18435294117646)
+#show
+'<tr><td><b>Pu</b></td>
+'<td><code>+F3*F2*B19/0.85</code></td>
+'<td>'Pu' t</td>
+'<td>218.18435294117646 t</td>
+'<td>'diff_Pu'</td></tr>
+
+T2 = 1.25*As*fy/1000
+#hide
+diff_T2 = abs(T2 - 31.651199999999996)
+#show
+'<tr><td><b>T2</b></td>
+'<td><code>1.25*N13*B26/1000</code></td>
+'<td>'T2' t</td>
+'<td>31.651199999999996 t</td>
+'<td>'diff_T2'</td></tr>
+
+Ag = 3*Pu*1000/(0.85*fc+0.012*fy)
+#hide
+diff_Ag = abs(Ag - 2859.5590162670574)
+#show
+'<tr><td><b>Ag</b></td>
+'<td><code>3*F4*1000/(0.85*B25+0.012*B26)</code></td>
+'<td>'Ag' cm2</td>
+'<td>2859.5590162670574 cm2</td>
+'<td>'diff_Ag'</td></tr>
+
+Mpr1 = T1*1000*(d-T1*1000/1.7/fc/b)/100000
+#hide
+diff_Mpr1 = abs(Mpr1 - 22.557038908235295)
+#show
+'<tr><td><b>Mpr1</b></td>
+'<td><code>Q3*1000*(Q2-Q3*1000/1.7/B25/N2)/100000</code></td>
+'<td>'Mpr1' t-m</td>
+'<td>22.557038908235295 t-m</td>
+'<td>'diff_Mpr1'</td></tr>
+
+Mpr2 = T2*1000*(d-T2*1000/1.7/fc/b)/100000
+#hide
+diff_Mpr2 = abs(Mpr2 - 12.080278927058822)
+#show
+'<tr><td><b>Mpr2</b></td>
+'<td><code>Q4*1000*(Q2-Q4*1000/1.7/B25/N2)/100000</code></td>
+'<td>'Mpr2' t-m</td>
+'<td>12.080278927058822 t-m</td>
+'<td>'diff_Mpr2'</td></tr>
+
+cuant = As/Ag
+#hide
+diff_cuant = abs(cuant - 0.0139924628)
+#show
+'<tr><td><b>cuant</b></td>
+'<td><code>+J6/J5</code></td>
+'<td>'cuant' OK</td>
+'<td>0.0139924628 OK</td>
+'<td>'diff_cuant'</td></tr>
+
+K7 = (cuant<1%)
+'<tr><td><b>K7</b></td>
+'<td><code>+IF(J7&lt;1%,"NO","OK")</code></td>
+'<td>'K7'</td>
+'<td>OK</td>
+'<td>-</td></tr>
+
+Vcol = (Mpr1+Mpr2)/He
+#hide
+diff_Vcol = abs(Vcol - 9.621477176470588)
+#show
+'<tr><td><b>Vcol</b></td>
+'<td><code>+(Q5+Q6)/B18</code></td>
+'<td>'Vcol' t</td>
+'<td>9.621477176470588 t</td>
+'<td>'diff_Vcol'</td></tr>
+
+sepa = (10*bc-2*fi_est-2*fi_esq-(var_a-2)*fi_long)/10/(var_a-1)
+#hide
+diff_sepa = abs(sepa - 7.4)
+#show
+'<tr><td><b>sepa</b></td>
+'<td><code>+(10*J2-2*F13-2*F12-(F9-2)*F11)/10/(F9-1)</code></td>
+'<td>'sepa' OK</td>
+'<td>7.4 OK</td>
+'<td>'diff_sepa'</td></tr>
+
+K8 = (sepa<15)
+'<tr><td><b>K8</b></td>
+'<td><code>+IF(J8&lt;15,"OK","NO")</code></td>
+'<td>'K8'</td>
+'<td>OK</td>
+'<td>-</td></tr>
+
+Vj = T1+T2-Vcol
+#hide
+diff_Vj = abs(Vj - 85.332122823529403)
+#show
+'<tr><td><b>Vj</b></td>
+'<td><code>+Q3+Q4-Q7</code></td>
+'<td>'Vj' t</td>
+'<td>85.332122823529403 t</td>
+'<td>'diff_Vj'</td></tr>
+
+sepp = (10*prof-20*rec-2*fi_est-2*fi_esq-(var_p-2)*fi_long)/10/(var_p-1)
+#hide
+diff_sepp = abs(sepp - 7.4)
+#show
+'<tr><td><b>sepp</b></td>
+'<td><code>+(10*F8-20*F14-2*F13-2*F12-(F10-2)*F11)/10/(F10-1)</code></td>
+'<td>'sepp' OK</td>
+'<td>7.4 OK</td>
+'<td>'diff_sepp'</td></tr>
+
+K9 = (sepp<15)
+'<tr><td><b>K9</b></td>
+'<td><code>+IF(J9&lt;15,"OK","NO")</code></td>
+'<td>'K9'</td>
+'<td>OK</td>
+'<td>-</td></tr>
+
+Lo = max(45,max(ancho;prof),He*100/6)
+#hide
+diff_Lo = abs(Lo - 60)
+#show
+'<tr><td><b>Lo</b></td>
+'<td><code>+MAX(45,MAX(F7:F8),B18*100/6)</code></td>
+'<td>'Lo' cm</td>
+'<td>60 cm</td>
+'<td>'diff_Lo'</td></tr>
+
+a = if(Q9=M14,INT,if(Q9=M15,MED,ESQ))
+#hide
+diff_a = abs(a - 4)
+#show
+'<tr><td><b>a</b></td>
+'<td><code>+IF(Q9=M14,N14,IF(Q9=M15,N15,N16))</code></td>
+'<td>'a'</td>
+'<td>4</td>
+'<td>'diff_a'</td></tr>
+
+s_Lo = min(6*min(fi_long;fi_esq)/10,10)
+#hide
+diff_s_Lo = abs(s_Lo - 9.6)
+#show
+'<tr><td><b>s_Lo</b><br/><small>s (Lo)</small></td>
+'<td><code>+MIN(6*MIN(F11:F12)/10,10)</code></td>
+'<td>'s_Lo' cm</td>
+'<td>9.6 cm</td>
+'<td>'diff_s_Lo'</td></tr>
+
+cond = (b<0.75*ancho)
+'<tr><td><b>cond</b></td>
+'<td><code>+IF(N2&lt;0.75*F7,"Baje","Mantenga")</code></td>
+'<td>'cond'</td>
+'<td>Baje</td>
+'<td>-</td></tr>
+
+s_cent = min(6*min(fi_long;fi_esq)/10,15)
+#hide
+diff_s_cent = abs(s_cent - 9.6)
+#show
+'<tr><td><b>s_cent</b><br/><small>s (cent)</small></td>
+'<td><code>+MIN(6*MIN(F11:F12)/10,15)</code></td>
+'<td>'s_cent' cm</td>
+'<td>9.6 cm</td>
+'<td>'diff_s_cent'</td></tr>
+
+Ash = max(0.3*bc*s_Lo*fc/fy*(Ag/Ac-1),0.09*bc*s_Lo*fc/fy)
+#hide
+diff_Ash = abs(Ash - 2.1168)
+#show
+'<tr><td><b>Ash</b></td>
+'<td><code>+MAX(0.3*J2*J11*B25/B26*(J5/J3-1),0.09*J2*J11*B25/B26)</code></td>
+'<td>'Ash' cm2</td>
+'<td>2.1168 cm2</td>
+'<td>'diff_Ash'</td></tr>
+
+vinchas = Ash/0.00785/fi_est^2
+#hide
+diff_vinchas = abs(vinchas - 2.6965605095541405)
+#show
+'<tr><td><b>vinchas</b></td>
+'<td><code>+J13/0.00785/F13^2</code></td>
+'<td>'vinchas' u</td>
+'<td>2.6965605095541405 u</td>
+'<td>'diff_vinchas'</td></tr>
+
+Vn = a*fc^0.5*Ac/1000
+#hide
+diff_Vn = abs(Vn - 179.33078723409432)
+#show
+'<tr><td><b>Vn</b></td>
+'<td><code>+Q12*B25^0.5*Q13/1000</code></td>
+'<td>'Vn' t</td>
+'<td>179.33078723409432 t</td>
+'<td>'diff_Vn'</td></tr>
+
+f_Vn = Vn*0.85
+#hide
+diff_f_Vn = abs(f_Vn - 152.43116914898016)
+#show
+'<tr><td><b>f_Vn</b><br/><small>f Vn</small></td>
+'<td><code>+Q14*0.85</code></td>
+'<td>'f_Vn' t</td>
+'<td>152.43116914898016 t</td>
+'<td>'diff_f_Vn'</td></tr>
+
+F16 = Pu/76
+#hide
+diff_F16 = abs(F16 - 2.8708467492260059)
+#show
+'<tr><td><b>F16</b></td>
+'<td><code>+F4/76</code></td>
+'<td>'F16'</td>
+'<td>2.8708467492260059</td>
+'<td>'diff_F16'</td></tr>
+
+J18 = 60*60
+#hide
+diff_J18 = abs(J18 - 3600)
+#show
+'<tr><td><b>J18</b></td>
+'<td><code>60*60</code></td>
+'<td>'J18'</td>
+'<td>3600</td>
+'<td>'diff_J18'</td></tr>
+
+Vc = Vj
+#hide
+diff_Vc = abs(Vc - 85.332122823529403)
+#show
+'<tr><td><b>Vc</b></td>
+'<td><code>+Q8</code></td>
+'<td>'Vc'</td>
+'<td>85.332122823529403</td>
+'<td>'diff_Vc'</td></tr>
+
+Q18 = f_Vn
+#hide
+diff_Q18 = abs(Q18 - 152.43116914898016)
+#show
+'<tr><td><b>Q18</b></td>
+'<td><code>+Q15</code></td>
+'<td>'Q18' OK</td>
+'<td>152.43116914898016 OK</td>
+'<td>'diff_Q18'</td></tr>
+
+R18 = (152.43116914898016>Vc)
+'<tr><td><b>R18</b></td>
+'<td><code>+IF(Q18&gt;P18,"OK","NO")</code></td>
+'<td>'R18'</td>
+'<td>OK</td>
+'<td>-</td></tr>
+
+OK = Vc/152.43116914898016
+#hide
+diff_OK = abs(OK - 0.55980757282081317)
+#show
+'<tr><td><b>OK</b></td>
+'<td><code>+P18/Q18</code></td>
+'<td>'OK'</td>
+'<td>0.55980757282081317</td>
+'<td>'diff_OK'</td></tr>
+
+Vh = h
+#hide
+diff_Vh = abs(Vh - 45)
+#show
+'<tr><td><b>Vh</b></td>
+'<td><code>+N3</code></td>
+'<td>'Vh'</td>
+'<td>45</td>
+'<td>'diff_Vh'</td></tr>
+
+Q19 = prof
+#hide
+diff_Q19 = abs(Q19 - 55)
+#show
+'<tr><td><b>Q19</b></td>
+'<td><code>+F8</code></td>
+'<td>'Q19' OK</td>
+'<td>55 OK</td>
+'<td>'diff_Q19'</td></tr>
+
+R19 = (55≥Vh)
+'<tr><td><b>R19</b></td>
+'<td><code>+IF(Q19&gt;=P19,"OK","NO")</code></td>
+'<td>'R19'</td>
+'<td>OK</td>
+'<td>-</td></tr>
+
+J20 = 30*30
+#hide
+diff_J20 = abs(J20 - 900)
+#show
+'<tr><td><b>J20</b></td>
+'<td><code>30*30</code></td>
+'<td>'J20'</td>
+'<td>900</td>
+'<td>'diff_J20'</td></tr>
+
+Ader = 20*fi/10
+#hide
+diff_Ader = abs(Ader - 32)
+#show
+'<tr><td><b>Ader</b></td>
+'<td><code>20*N8/10</code></td>
+'<td>'Ader'</td>
+'<td>32</td>
+'<td>'diff_Ader'</td></tr>
+
+Q20 = prof
+#hide
+diff_Q20 = abs(Q20 - 55)
+#show
+'<tr><td><b>Q20</b></td>
+'<td><code>+F8</code></td>
+'<td>'Q20' OK</td>
+'<td>55 OK</td>
+'<td>'diff_Q20'</td></tr>
+
+R20 = (55>Ader)
+'<tr><td><b>R20</b></td>
+'<td><code>+IF(Q20&gt;P20,"OK","NO")</code></td>
+'<td>'R20'</td>
+'<td>OK</td>
+'<td>-</td></tr>
+
+U20 = 0.18*2400
+#hide
+diff_U20 = abs(U20 - 432)
+#show
+'<tr><td><b>U20</b></td>
+'<td><code>0.18*2400</code></td>
+'<td>'U20'</td>
+'<td>432</td>
+'<td>'diff_U20'</td></tr>
+
+F25 = 133000/76
+#hide
+diff_F25 = abs(F25 - 1750)
+#show
+'<tr><td><b>F25</b></td>
+'<td><code>133000/76</code></td>
+'<td>'F25'</td>
+'<td>1750</td>
+'<td>'diff_F25'</td></tr>
+
+G25 = 45*45
+#hide
+diff_G25 = abs(G25 - 2025)
+#show
+'<tr><td><b>G25</b></td>
+'<td><code>45*45</code></td>
+'<td>'G25'</td>
+'<td>2025</td>
+'<td>'diff_G25'</td></tr>
+
+losa_de_25_cm = (0.18*2400)+40+40+108
+#hide
+diff_losa_de_25_cm = abs(losa_de_25_cm - 620)
+#show
+'<tr><td><b>losa_de_25_cm</b><br/><small>losa de 25 cm</small></td>
+'<td><code>(0.18*2400)+40+40+108</code></td>
+'<td>'losa_de_25_cm'</td>
+'<td>620</td>
+'<td>'diff_losa_de_25_cm'</td></tr>
+
+U26 = losa_de_25_cm-432
+#hide
+diff_U26 = abs(U26 - 188)
+#show
+'<tr><td><b>U26</b></td>
+'<td><code>+U25-U20</code></td>
+'<td>'U26'</td>
+'<td>188</td>
+'<td>'diff_U26'</td></tr>
+
+Z26 = 200+300
+#hide
+diff_Z26 = abs(Z26 - 500)
+#show
+'<tr><td><b>Z26</b></td>
+'<td><code>200+300</code></td>
+'<td>'Z26'</td>
+'<td>500</td>
+'<td>'diff_Z26'</td></tr>
+
+Carga_que_baja_a_Plinto_ = Pu
+#hide
+diff_Carga_que_baja_a_Plinto_ = abs(Carga_que_baja_a_Plinto_ - 218.18435294117646)
+#show
+'<tr><td><b>Carga_que_baja_a_Plinto_</b><br/><small>Carga que baja a Plinto.</small></td>
+'<td><code>+F4</code></td>
+'<td>'Carga_que_baja_a_Plinto_'</td>
+'<td>218.18435294117646</td>
+'<td>'diff_Carga_que_baja_a_Plinto_'</td></tr>
+
+N28 = 50*50
+#hide
+diff_N28 = abs(N28 - 2500)
+#show
+'<tr><td><b>N28</b></td>
+'<td><code>50*50</code></td>
+'<td>'N28'</td>
+'<td>2500</td>
+'<td>'diff_N28'</td></tr>
+
+U28 = 0.145*2400
+#hide
+diff_U28 = abs(U28 - 348)
+#show
+'<tr><td><b>U28</b></td>
+'<td><code>0.145*2400</code></td>
+'<td>'U28'</td>
+'<td>348</td>
+'<td>'diff_U28'</td></tr>
+
+P29 = 40*40
+#hide
+diff_P29 = abs(P29 - 1600)
+#show
+'<tr><td><b>P29</b></td>
+'<td><code>40*40</code></td>
+'<td>'P29'</td>
+'<td>1600</td>
+'<td>'diff_P29'</td></tr>
+
+losa_de_20 = (0.145*2400)+40+40+108
+#hide
+diff_losa_de_20 = abs(losa_de_20 - 536)
+#show
+'<tr><td><b>losa_de_20</b><br/><small>losa de 20</small></td>
+'<td><code>(0.145*2400)+40+40+108</code></td>
+'<td>'losa_de_20'</td>
+'<td>536</td>
+'<td>'diff_losa_de_20'</td></tr>
+
+Area_de_Zapata_ = Carga_que_baja_a_Plinto_/Esfuerzo_adm_suelo_
+#hide
+diff_Area_de_Zapata_ = abs(Area_de_Zapata_ - 10.389731092436975)
+#show
+'<tr><td><b>Area_de_Zapata_</b><br/><small>Area de Zapata.</small></td>
+'<td><code>+B28/B29</code></td>
+'<td>'Area_de_Zapata_' m2</td>
+'<td>10.389731092436975 m2</td>
+'<td>'diff_Area_de_Zapata_'</td></tr>
+
+U30 = losa_de_20-348
+#hide
+diff_U30 = abs(U30 - 188)
+#show
+'<tr><td><b>U30</b></td>
+'<td><code>+U29-U28</code></td>
+'<td>'U30'</td>
+'<td>188</td>
+'<td>'diff_U30'</td></tr>
+
+P31 = ((3.1416*1.2*1.2)/4)*20
+#hide
+diff_P31 = abs(P31 - 22.619520000000001)
+#show
+'<tr><td><b>P31</b></td>
+'<td><code>+((3.1416*1.2*1.2)/4)*20</code></td>
+'<td>'P31'</td>
+'<td>22.619520000000001</td>
+'<td>'diff_P31'</td></tr>
+
+Area_de_Zapata = Dimensiones_de_Zapata_*1.5
+#hide
+diff_Area_de_Zapata = abs(Area_de_Zapata - 2.25)
+#show
+'<tr><td><b>Area_de_Zapata</b><br/><small>Area de Zapata</small></td>
+'<td><code>+B31*C31</code></td>
+'<td>'Area_de_Zapata' m2</td>
+'<td>2.25 m2</td>
+'<td>'diff_Area_de_Zapata'</td></tr>
+
+P33 = (22.619520000000001/1600)*100
+#hide
+diff_P33 = abs(P33 - 1.4137200000000001)
+#show
+'<tr><td><b>P33</b></td>
+'<td><code>+(P31/P29)*100</code></td>
+'<td>'P33'</td>
+'<td>1.4137200000000001</td>
+'<td>'diff_P33'</td></tr>
+
+Normativa_para__Viga = (4.12/10.98)
+#hide
+diff_Normativa_para__Viga = abs(Normativa_para__Viga - 0.37522768670309653)
+#show
+'<tr><td><b>Normativa_para__Viga</b><br/><small>Normativa para  Viga</small></td>
+'<td><code>(4.12/10.98)</code></td>
+'<td>'Normativa_para__Viga'</td>
+'<td>0.37522768670309653</td>
+'<td>'diff_Normativa_para__Viga'</td></tr>
+
+Cuantia_de_acero_en_viga_para_ = ((3.1416*(1.6*1.6)*3)/4)+(3.1416*(1.6)*(1.6)*2)/4
+#hide
+diff_Cuantia_de_acero_en_viga_para_ = abs(Cuantia_de_acero_en_viga_para_ - 10.053120000000002)
+#show
+'<tr><td><b>Cuantia_de_acero_en_viga_para_</b><br/><small>Cuantia de acero en viga para momento negativo y acero de refuerzo</small></td>
+'<td><code>+((3.1416*(1.6*1.6)*3)/4)+(3.1416*(1.6)*(1.6)*2)/4</code></td>
+'<td>'Cuantia_de_acero_en_viga_para_' cm2</td>
+'<td>10.053120000000002 cm2</td>
+'<td>'diff_Cuantia_de_acero_en_viga_para_'</td></tr>
+
+Cuantia_para_columna = ((3.1416*(1.6*1.6)/4))*8
+#hide
+diff_Cuantia_para_columna = abs(Cuantia_para_columna - 16.084992000000003)
+#show
+'<tr><td><b>Cuantia_para_columna</b><br/><small>Cuantia para columna</small></td>
+'<td><code>+((3.1416*(1.6*1.6)/4))*8</code></td>
+'<td>'Cuantia_para_columna' cm2</td>
+'<td>16.084992000000003 cm2</td>
+'<td>'diff_Cuantia_para_columna'</td></tr>
+
+Area_de_columna = 40*40
+#hide
+diff_Area_de_columna = abs(Area_de_columna - 1600)
+#show
+'<tr><td><b>Area_de_columna</b><br/><small>Area de columna</small></td>
+'<td><code>40*40</code></td>
+'<td>'Area_de_columna' cm2</td>
+'<td>1600 cm2</td>
+'<td>'diff_Area_de_columna'</td></tr>
+
+Cuantia_de_acero = (Cuantia_para_columna/Area_de_columna)*100
+#hide
+diff_Cuantia_de_acero = abs(Cuantia_de_acero - 1.0053120000000002)
+#show
+'<tr><td><b>Cuantia_de_acero</b><br/><small>Cuantia de acero</small></td>
+'<td><code>+(B40/B41)*100</code></td>
+'<td>'Cuantia_de_acero'</td>
+'<td>1.0053120000000002</td>
+'<td>'diff_Cuantia_de_acero'</td></tr>
+
+L_critica = Longitud_X1
+#hide
+diff_L_critica = abs(L_critica - 6.1)
+#show
+'<tr><td><b>L_critica</b><br/><small>L critica</small></td>
+'<td><code>+B2</code></td>
+'<td>'L_critica'</td>
+'<td>6.1</td>
+'<td>'diff_L_critica'</td></tr>
+
+h_vida = L_critica/11
+#hide
+diff_h_vida = abs(h_vida - 0.55454545454545456)
+#show
+'<tr><td><b>h_vida</b><br/><small>h vida</small></td>
+'<td><code>+F44/11</code></td>
+'<td>'h_vida'</td>
+'<td>0.55454545454545456</td>
+'<td>'diff_h_vida'</td></tr>
+
+Q45 = 0.85*0.85*(210/4200)*((6100/(6100+4200)))/2
+#hide
+diff_Q45 = abs(Q45 - 0.0106972087)
+#show
+'<tr><td><b>Q45</b></td>
+'<td><code>0.85*0.85*(210/4200)*((6100/(6100+4200)))/2</code></td>
+'<td>'Q45'</td>
+'<td>0.0106972087</td>
+'<td>'diff_Q45'</td></tr>
+
+B_viga = ((Longitud_X1+Longitud_X3)/2)/20
+#hide
+diff_B_viga = abs(B_viga - 0.31624999999999998)
+#show
+'<tr><td><b>B_viga</b><br/><small>B viga</small></td>
+'<td><code>+((B2+B4)/2)/20</code></td>
+'<td>'B_viga'</td>
+'<td>0.31624999999999998</td>
+'<td>'diff_B_viga'</td></tr>
+
+Q47 = 30*40
+#hide
+diff_Q47 = abs(Q47 - 1200)
+#show
+'<tr><td><b>Q47</b></td>
+'<td><code>30*40</code></td>
+'<td>'Q47'</td>
+'<td>1200</td>
+'<td>'diff_Q47'</td></tr>
+
+Atrib = ((5.41+5.41)/2)*((4.4+2.58)/2)
+#hide
+diff_Atrib = abs(Atrib - 18.8809)
+#show
+'<tr><td><b>Atrib</b></td>
+'<td><code>+((5.41+5.41)/2)*((4.4+2.58)/2)</code></td>
+'<td>'Atrib' m2</td>
+'<td>18.8809 m2</td>
+'<td>'diff_Atrib'</td></tr>
+
+Pu_central = N_pisos*Pu*Atrib
+#hide
+diff_Pu_central = abs(Pu_central - 203913.72)
+#show
+'<tr><td><b>Pu_central</b><br/><small>Pu central</small></td>
+'<td><code>B46*B45*B48</code></td>
+'<td>'Pu_central' Kgf</td>
+'<td>203913.72 Kgf</td>
+'<td>'diff_Pu_central'</td></tr>
+
+Lado_LargoL1 = Longitud_X1
+#hide
+diff_Lado_LargoL1 = abs(Lado_LargoL1 - 6.1)
+#show
+'<tr><td><b>Lado_LargoL1</b><br/><small>Lado Largo(L1)</small></td>
+'<td><code>+B2</code></td>
+'<td>'Lado_LargoL1'</td>
+'<td>6.1</td>
+'<td>'diff_Lado_LargoL1'</td></tr>
+
+Q49 = 1200*1.0697208737864077E-2
+#hide
+diff_Q49 = abs(Q49 - 12.836650485436893)
+#show
+'<tr><td><b>Q49</b></td>
+'<td><code>+Q47*Q45</code></td>
+'<td>'Q49'</td>
+'<td>12.836650485436893</td>
+'<td>'diff_Q49'</td></tr>
+
+A_central = Pu_central*Simb_central
+#hide
+diff_A_central = abs(A_central - 3058.7057999999997)
+#show
+'<tr><td><b>A_central</b><br/><small>A central</small></td>
+'<td><code>+B49*B47</code></td>
+'<td>'A_central' cm2</td>
+'<td>3058.7057999999997 cm2</td>
+'<td>'diff_A_central'</td></tr>
+
+Lado_largo2 = Longitud_X2
+#hide
+diff_Lado_largo2 = abs(Lado_largo2 - 6)
+#show
+'<tr><td><b>Lado_largo2</b><br/><small>Lado largo(2)</small></td>
+'<td><code>+B3</code></td>
+'<td>'Lado_largo2'</td>
+'<td>6</td>
+'<td>'diff_Lado_largo2'</td></tr>
+
+acentral = sqr(A_central)
+#hide
+diff_acentral = abs(acentral - 55.305567531668991)
+#show
+'<tr><td><b>acentral</b></td>
+'<td><code>+SQRT(B50)</code></td>
+'<td>'acentral' cm2</td>
+'<td>55.305567531668991 cm2</td>
+'<td>'diff_acentral'</td></tr>
+
+e_ = Lado_LargoL1/Lado_largo2
+#hide
+diff_e_ = abs(e_ - 1.0166666666666666)
+#show
+'<tr><td><b>e_</b><br/><small>e=</small></td>
+'<td><code>+F49/F50</code></td>
+'<td>'e_'</td>
+'<td>1.0166666666666666</td>
+'<td>'diff_e_'</td></tr>
+
+Q51 = 3.1416*(1.6*1.6)/4
+#hide
+diff_Q51 = abs(Q51 - 2.0106240000000004)
+#show
+'<tr><td><b>Q51</b></td>
+'<td><code>3.1416*(1.6*1.6)/4</code></td>
+'<td>'Q51' cm2</td>
+'<td>2.0106240000000004 cm2</td>
+'<td>'diff_Q51'</td></tr>
+
+axt = acentral
+#hide
+diff_axt = abs(axt - 55.305567531668991)
+#show
+'<tr><td><b>axt</b></td>
+'<td><code>+B51</code></td>
+'<td>'axt'</td>
+'<td>55.305567531668991</td>
+'<td>'diff_axt'</td></tr>
+
+Q53 = 2.0106240000000004*6
+#hide
+diff_Q53 = abs(Q53 - 12.063744000000003)
+#show
+'<tr><td><b>Q53</b></td>
+'<td><code>+Q51*6</code></td>
+'<td>'Q53'</td>
+'<td>12.063744000000003</td>
+'<td>'diff_Q53'</td></tr>
+
+Q57 = 12.836650485436893*0.5
+#hide
+diff_Q57 = abs(Q57 - 6.4183252427184465)
+#show
+'<tr><td><b>Q57</b></td>
+'<td><code>+Q49*0.5</code></td>
+'<td>'Q57'</td>
+'<td>6.4183252427184465</td>
+'<td>'diff_Q57'</td></tr>
+
+U57 = 2.0106240000000004*3
+#hide
+diff_U57 = abs(U57 - 6.0318720000000017)
+#show
+'<tr><td><b>U57</b></td>
+'<td><code>+Q51*3</code></td>
+'<td>'U57' cm2</td>
+'<td>6.0318720000000017 cm2</td>
+'<td>'diff_U57'</td></tr>
+
+Area_de_losa = Luz_en_Y*Luz_en_X
+#hide
+diff_Area_de_losa = abs(Area_de_losa - 184.63249999999999)
+#show
+'<tr><td><b>Area_de_losa</b><br/><small>Area de losa</small></td>
+'<td><code>+F60*F59</code></td>
+'<td>'Area_de_losa' m2</td>
+'<td>184.63249999999999 m2</td>
+'<td>'diff_Area_de_losa'</td></tr>
+
+Area_de_col = 0.65*0.65*14
+#hide
+diff_Area_de_col = abs(Area_de_col - 5.9150000000000009)
+#show
+'<tr><td><b>Area_de_col</b><br/><small>Area de col</small></td>
+'<td><code>0.65*0.65*14</code></td>
+'<td>'Area_de_col' m2</td>
+'<td>5.9150000000000009 m2</td>
+'<td>'diff_Area_de_col'</td></tr>
+
+Densidad_sismik = (Area_de_col/Area_de_losa)*100
+#hide
+diff_Densidad_sismik = abs(Densidad_sismik - 3.2036613272311221)
+#show
+'<tr><td><b>Densidad_sismik</b><br/><small>Densidad sismik</small></td>
+'<td><code>+(F63/F61)*100</code></td>
+'<td>'Densidad_sismik'</td>
+'<td>3.2036613272311221</td>
+'<td>'diff_Densidad_sismik'</td></tr>
+
+'</table>
+

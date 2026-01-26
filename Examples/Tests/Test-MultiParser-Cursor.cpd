@@ -1,0 +1,40 @@
+'Test de Cursor en MathEditor con Múltiples Parsers
+'==================================================
+
+'Línea 1: Parser Calcpad - Fórmula matemática
+a = 5 + 3
+
+'Línea 2: Parser Calcpad - Otra fórmula
+b = a * 2
+
+'Línea 3-7: Parser Externo C
+@{c}
+#include <stdio.h>
+int main() {
+    printf("Hola desde C!\n");
+    return 0;
+}
+@{end c}
+
+'Línea 8: Parser Calcpad - Continúa con fórmulas
+c = b + 10
+
+'Línea 9-12: Parser Externo HTML
+@{html}
+<div style="color: red;">
+    <p>Texto HTML de prueba</p>
+</div>
+@{end html}
+
+'Línea 13: Parser Calcpad - Más fórmulas
+resultado = a + b + c
+
+'Línea 14-17: Parser Externo TypeScript
+@{ts}
+function saludar(nombre: string): string {
+    return `Hola, ${nombre}!`;
+}
+@{end ts}
+
+'Línea 18: Parser Calcpad - Resultado final
+total = resultado * 2

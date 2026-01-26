@@ -1,0 +1,12 @@
+"Test Rust Simple
+@{rust}
+fn main() {
+    let a = 5;
+    let b = 10;
+    let suma = a + b;
+    println!("a = {}", a);
+    println!("b = {}", b);
+    println!("suma = {}", suma);
+}
+@{end rust}
+'Fin

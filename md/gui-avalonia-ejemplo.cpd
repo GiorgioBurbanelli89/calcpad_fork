@@ -1,0 +1,78 @@
+﻿'GUI con Avalonia UI (C# + XAML para Linux/Windows/macOS)
+
+"Avalonia UI es un framework cross-platform que usa XAML (como WPF)."
+"Es la opciÃ³n mÃ¡s fÃ¡cil si ya conoces C# y WPF."
+
+"Ventajas:"
+"- Usa C# y XAML (como WPF)"
+"- Cross-platform nativo"
+"- Gran comunidad"
+"- Excelente documentaciÃ³n"
+
+"Ejemplo de ventana simple:"
+
+@{csharp}
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using System;
+
+namespace AvaloniaApp
+{
+    public class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            // Buscar el botÃ³n y agregar evento
+            var button = this.FindControl<Button>("MyButton");
+            if (button != null)
+            {
+                button.Click += Button_Click;
+            }
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
+        private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            Console.WriteLine("Â¡BotÃ³n presionado!");
+
+            var label = this.FindControl<TextBlock>("ResultLabel");
+            if (label != null)
+            {
+                label.Text = "Â¡Hola desde Avalonia UI!";
+            }
+        }
+    }
+}
+@{end csharp}
+
+XAML (MainWindow.axaml):
+@{xaml}
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AvaloniaApp.MainWindow"
+        Title="Mi AplicaciÃ³n Avalonia"
+        Width="400" Height="300">
+    <StackPanel Margin="20">
+        <TextBlock Text="Ejemplo de Avalonia UI" FontSize="20" Margin="0,0,0,10"/>
+        <Button Name="MyButton" Content="PresiÃ³name" Width="150" Height="40"/>
+        <TextBlock Name="ResultLabel" Margin="0,20,0,0" FontSize="16" Foreground="Blue"/>
+    </StackPanel>
+</Window>
+@{end xaml}
+
+Para crear un proyecto Avalonia:
+$ dotnet new install Avalonia.Templates
+$ dotnet new avalonia.app -n MiApp
+$ cd MiApp
+$ dotnet run
+
+Recursos:
+- https://avaloniaui.net/
+- https://docs.avaloniaui.net/

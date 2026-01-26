@@ -1,0 +1,48 @@
+﻿'Test de XAML UI
+
+'Probando interfaz XAML simple:
+
+@{xaml}
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Calculadora Simple" Height="300" Width="400">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Calculadora de Ãrea"
+                   FontSize="24" FontWeight="Bold"
+                   Margin="0,0,0,20" HorizontalAlignment="Center"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10">
+            <TextBlock Text="Base:" Width="80" VerticalAlignment="Center"/>
+            <TextBox Width="200" Height="30" Text="10"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10">
+            <TextBlock Text="Altura:" Width="80" VerticalAlignment="Center"/>
+            <TextBox Width="200" Height="30" Text="5"/>
+        </StackPanel>
+
+        <Button Grid.Row="3" Content="Calcular Ãrea"
+                Width="150" Height="35" Margin="0,20"
+                Background="#4CAF50" Foreground="White"
+                FontSize="14" FontWeight="Bold"/>
+
+        <Border Grid.Row="4" Background="#f0f0f0"
+                BorderBrush="#ddd" BorderThickness="1"
+                Padding="10" Margin="0,10">
+            <TextBlock Text="Resultado: Ãrea = 50 mÂ²"
+                      FontSize="16" FontWeight="Bold"
+                      VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        </Border>
+    </Grid>
+</Window>
+@{end xaml}
+
+'Fin del test de XAML

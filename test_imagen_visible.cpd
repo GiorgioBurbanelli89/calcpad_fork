@@ -1,0 +1,20 @@
+'================================================
+' PRUEBA: Imagen visible (100x100 pixels)
+'================================================
+
+'Módulo de Elasticidad
+E = 2.535
+ν = 0.20
+G = E/(2*(1 + ν))
+
+'================================================
+' IMAGEN DE PRUEBA (100x100 px - cuadrado rojo)
+'================================================
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAXklEQVR42u3PMREAAAgEIL9/aWvsMyAIlBzNOJICEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhJaBPEAuMgBzZuBMDcAAAAASUVORK5CYII=
+@{end image}
+
+'================================================
+' Resultado
+'================================================
+resultado = G

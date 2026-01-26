@@ -1,0 +1,15 @@
+"Test: Columnas Solo con Octave
+#columns 2
+'Octave Col 1:
+@{octave}
+a = 5;
+fprintf('a = %d\n', a);
+@{end octave}
+#column
+'Octave Col 2:
+@{octave}
+b = 10;
+fprintf('b = %d\n', b);
+@{end octave}
+#end columns
+'Fin

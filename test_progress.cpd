@@ -1,0 +1,29 @@
+'==============================================
+'TEST DE MENSAJES DE PROGRESO DINÁMICOS
+'==============================================
+
+'Este archivo prueba los mensajes dinámicos durante la ejecución de código externo
+
+@{python}
+import time
+
+print("Iniciando cálculo...")
+time.sleep(0.5)  # Pausa de 500ms para ver los mensajes de progreso
+
+# Cálculo simple
+resultado = 0
+for i in range(1000000):
+    resultado += i
+
+print(f"Resultado: {resultado}")
+
+# Exportar variable a Calcpad
+print(f"CALCPAD:resultado_python={resultado}")
+@{end python}
+
+'Ahora usamos el resultado en Calcpad:
+a = 100
+b = 200
+suma = a + b
+
+'Fin del test

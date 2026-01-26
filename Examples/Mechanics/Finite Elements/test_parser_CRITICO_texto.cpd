@@ -1,0 +1,27 @@
+"TEST CRITICO: Variables definidas en texto
+'====================================
+'
+'Este test demuestra el PROBLEMA CRITICO del parser CLI
+'
+'CASO 1: Variable definida en linea de texto
+'Definiendo n -'n = 16
+'Usando n directamente despues:
+n
+'
+'CASO 2: Variable definida en linea de texto con unidades
+'Modulo de elasticidad -'E = 35000'MPa
+'Usando E:
+E
+'
+'CASO 3: Variable en ecuacion pura (sin texto)
+m = 20
+'Usando m:
+m
+'
+'CASO 4: Variable definida en texto, usada en #hide
+'Definiendo k -'k = 100
+#hide
+resultado = k * 2
+#show
+'Resultado (k*2):
+resultado

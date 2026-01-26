@@ -1,0 +1,109 @@
+"Demo de @{plot} con Anotaciones de Texto y Formas"
+
+'1. Gráfica con etiquetas de texto en puntos específicos
+@{plot}
+x: [0; 1; 2; 3; 4; 5]
+y: [0; 2; 5; 9; 14; 20]
+xlabel: "t (s)"
+ylabel: "d (m)"
+title: "Movimiento con anotaciones"
+color: #003399
+symbol: circle
+symbolsize: 7
+linewidth: 2
+legend: "d(t)"
+# Anotaciones de texto
+text: 1, 2.5, "Punto A"
+text: 3, 10, "Punto B", #CC0000, 14, bold
+text: 4.5, 18, "Máximo", #006600, 12, middle
+text: 2, 3, "v = 2 m/s", #666666, 10, italic
+@{end plot}
+
+'2. Gráfica con líneas horizontales y verticales de referencia
+@{plot}
+x: [0; 1; 2; 3; 4; 5; 6]
+y: [5; 8; 12; 15; 12; 8; 5]
+xlabel: "x"
+ylabel: "y"
+title: "Con líneas de referencia"
+color: #006600
+symbol: square
+linewidth: 2
+# Líneas de referencia
+hline: 15, #CC0000
+vline: 3, #0066CC
+text: 3.2, 15.5, "Pico máximo", #CC0000, 11
+text: 0.2, 15.3, "y = 15", #CC0000, 10
+@{end plot}
+
+'3. Gráfica con flechas señalando puntos importantes
+@{plot}
+x: [1; 2; 3; 4; 5]
+y: [1; 4; 2; 8; 5]
+xlabel: "n"
+ylabel: "f(n)"
+title: "Señalando con flechas"
+color: #9900CC
+symbol: star
+symbolsize: 10
+linewidth: 1.5
+# Flechas de anotación
+arrow: 3.5, 6, 4, 7.8, #CC0000, 1.5
+text: 3.2, 5.5, "Máximo local", #CC0000, 11
+arrow: 2.5, 5, 3, 2.2, #006600, 1.5
+text: 2.2, 5.5, "Mínimo local", #006600, 11
+@{end plot}
+
+'4. Gráfica con rectángulo y círculo de zona
+@{plot}
+x: [0; 1; 2; 3; 4; 5; 6; 7; 8]
+y: [2; 3; 5; 8; 7; 6; 9; 11; 10]
+xlabel: "Tiempo"
+ylabel: "Valor"
+title: "Zonas destacadas"
+color: #003366
+symbol: dot
+symbolsize: 5
+linewidth: 2
+# Zona rectangular
+rect: 4, 5, 2, 5, #FFCC00, fill
+text: 5, 11, "Zona crítica", #996600, 12, middle, bold
+# Círculo en punto importante
+circle: 3, 8, 0.5, #FF0000
+text: 3.2, 8.8, "P₁", #FF0000, 14
+@{end plot}
+
+'5. Gráfica con texto rotado
+@{plot}
+x: [0; 2; 4; 6; 8; 10]
+y: [0; 4; 8; 12; 16; 20]
+xlabel: "x"
+ylabel: "y = 2x"
+title: "Texto con rotación"
+color: #0066CC
+symbol: triangle
+linewidth: 2.5
+# Texto rotado
+text: 5, 8, "Pendiente = 2", #990000, 12, middle, rot45
+text: 8, 14, "Lineal", #006600, 14, bold
+vline: 5, #CCCCCC
+@{end plot}
+
+'6. Etiquetas en coordenadas específicas (estilo Mathcad)
+@{plot}
+x: [2; 2.5; 3; 4; 5; 6]
+y: [2; 2.9; 3.2; 3.8; 4.5; 5]
+xlabel: "x (m)"
+ylabel: "F (kN)"
+title: "Diagrama de fuerzas"
+color: #003399
+symbol: circle
+symbolsize: 8
+linewidth: 2
+# Etiquetas de puntos
+text: 2, 1.7, "(2, 2)", #666666, 10
+text: 4, 3.5, "(4, 3.8)", #666666, 10
+text: 6, 5.3, "(6, 5)", #666666, 10
+# Anotación principal
+text: 4, 4.8, "F = f(x)", #003399, 14, italic, middle
+@{end plot}

@@ -1,0 +1,267 @@
+
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="Originator" content="ImportDoc">
+<meta name="OriginalFile" content="SetPreference Concrete Australian AS 3600-09.doc">
+ <meta name="generator" content="Adobe RoboHelp 2019">
+<title>GetOverwrite {Concrete AS 3600-09}</title>
+<link rel="StyleSheet" href="../../../../SAP2000.CSS" type="text/css">
+</head>
+
+<body lang="EN-US" xml:lang="EN-US"><a name="642b3b9347ca42c9b00b820c00c373fa=1"></a>
+<script type="text/javascript" src="../../../../ehlpdhtm.js"></script>
+
+<h1>GetOverwrite</h1>
+<h2>Syntax</h2>
+<p class="Comment">SapObject.SapModel.DesignConcrete.AS_3600_09.GetOverwrite</p>
+<h2>VB6 Procedure</h2>
+<p class="Comment">Function GetOverwrite(ByVal Name As String, ByVal Item 
+ As Long, ByRef Value As Double, ByRef ProgDet As Boolean) As Long</p>
+<h2>Parameters</h2>
+<p class="ParameterName">Name</p>
+<p class="Comment">The name of a frame object with a concrete frame design 
+ procedure.</p>
+<p class="ParameterName">Item</p>
+<p class="Comment">This is an integer between 1 and 15, inclusive, indicating 
+ the overwrite item considered.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">1 = Framing type (beam 
+ and column)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">2 = Live load reduction 
+ factor (beam and column)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">3 = Unbraced length ratio, 
+ Major (beam and column)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">4 = Unbraced length ratio, 
+ Minor (beam and column)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">5 = Effective length factor, 
+ K Major (column only)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">6 = Effective length factor, 
+ K Minor (column only)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">7 = Moment coefficient, 
+ km Major (column only)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">8 = Moment coefficient, 
+ km Minor (column only)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">9 = Nonsway moment factor, 
+ Db Major (column only)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">10 = Nonsway moment factor, 
+ Db Minor (column only)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">11 = Sway moment factor, 
+ Ds Major (column only)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">12 = Sway moment factor, 
+ Ds Minor (column only)</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 67.5pt; line-height: normal;"><span style="line-height: normal;">13 
+ = Tangent of the angle of concrete compressive strut (beam only)</span></p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 67.5pt; line-height: normal;">14 = Consider torsion (beam 
+ only)</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 66.0pt; line-height: normal;">15 = Concrete cover for 
+ closed stirrups (beam only)</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">&#160;</p>
+<p class="ParameterName">Value</p>
+<p class="Comment" style="margin-left: 88px;">The value of the considered 
+ overwrite item.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">1 = Framing type</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">0 = As specified in preferences</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">1 = Sway special</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">2 = Sway intermediate</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">3 = Sway ordinary</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">4 = Nonsway</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">2 = Live load reduction 
+ factor</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">3 = Unbraced length ratio, 
+ Major</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">4 = Unbraced length ratio, 
+ Minor</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">5 = Effective length factor, 
+ K Major</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">6 = Effective length factor, 
+ K Minor</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">7 = Moment coefficient, 
+ km Major</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">8 = Moment coefficient, 
+ km Minor</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">9 = Nonsway moment factor, 
+ Db Major</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">10 = Nonsway moment factor, 
+ Db Minor</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt;= 
+ 0; 0 means use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">11 = Sway moment factor, 
+ Ds Major</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt;= 
+ 0; 0 means use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">12 = Sway moment factor, 
+ Ds Minor</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt;= 
+ 0; 0 means use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 66.0pt; line-height: normal;">13 = Tangent of the angle 
+ of concrete compressive strut</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 1.25in; line-height: normal;">Value &gt;= 0; 0 means 
+ use program determined value.</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 84.0pt; line-height: normal;">&#160;</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 66.0pt; line-height: normal;">14 = Consider torsion</p>
+<p class="parameterdescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: 0in; margin-left: 1.25in;">0 = No</p>
+<p class="parameterdescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: 0in; margin-left: 1.25in;">Any other value = Yes</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 84.0pt; line-height: normal;">&#160;</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 66.0pt; line-height: normal;">15 = Concrete cover for 
+ closed stirrups</p>
+<p class="Parameter_Description" style="margin-left: 84pt;">Value &gt;= 
+ 0; 0 means use program determined value.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterName">ProgDet</p>
+<p class="Comment">If this item is True then the specified value is program 
+ determined.</p>
+<h2>Remarks</h2>
+<p class="Comment">This function retrieves the value of a concrete design 
+ overwrite item.</p>
+<p class="Comment">The function returns zero if the item is successfully 
+ retrieved, otherwise it returns a nonzero value.</p>
+<h2>VBA Example</h2>
+<p class="Coding">Sub GetConcreteDesignOverwriteItemAS_3600_09()<br>
+&#160;&#160;&#160;'dimension variables<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim SapObject as cOAPI<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim SapModel As cSapModel<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim ret As Long<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim Value As Double<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim ProgDet As Boolean<br>
+<br>
+&#160;&#160;&#160;'create Sap2000 object<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapObject = CreateObject(&quot;CSI.SAP2000.API.SapObject&quot;)<br>
+<br>
+&#160;&#160;&#160;'start Sap2000 application<br>
+&#160;&#160;&#160;&#160;&#160;&#160;SapObject.ApplicationStart<br>
+<br>
+&#160;&#160;&#160;'create SapModel object<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapModel = SapObject.SapModel<br>
+<br>
+&#160;&#160;&#160;'initialize model<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.InitializeNewModel<br>
+<br>
+&#160;&#160;&#160;'create new concrete frame section property<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.PropFrame.SetRectangle(&quot;R1&quot;, 
+ &quot;4000Psi&quot;, 20, 12)<br>
+<br>
+&#160;&#160;&#160;'create model from template<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.File.New2DFrame(PortalFrame, 
+ 2, 144, 2, 288, True, &quot;R1&quot;, &quot;R1&quot;)<br>
+<br>
+&#160;&#160;&#160;'set concrete design code<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.DesignConcrete.SetCode(&quot;AS 
+ 3600-09&quot;)<br>
+<br>
+&#160;&#160;&#160;'run analysis<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.File.Save(&quot;C:\SapAPI\x.sdb&quot;)<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.Analyze.RunAnalysis<br>
+<br>
+&#160;&#160;&#160;'start concrete design<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.DesignConcrete.StartDesign<br>
+<br>
+&#160;&#160;&#160;'get overwrite item<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.DesignConcrete.AS_3600_09.GetOverwrite(&quot;8&quot;, 
+ 1, Value, ProgDet)<br>
+<br>
+&#160;&#160;&#160;'close Sap2000<br>
+&#160;&#160;&#160;&#160;&#160;&#160;SapObject.ApplicationExit False<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapModel = Nothing<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapObject = Nothing<br>
+End Sub</p>
+<h2>Release Notes</h2>
+<p class="Comment">Initial release in version 15.0.1.</p>
+<p class="Comment">Added items 13~15 in version 23.4.0</p>
+<h2>See Also</h2>
+<p class="Comment"><a href="SetOverwrite_{Concrete_AS_3600-09}.htm">SetOverwrite</a></p>
+</body>
+</html>

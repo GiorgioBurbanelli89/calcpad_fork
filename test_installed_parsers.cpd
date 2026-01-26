@@ -1,0 +1,121 @@
+"Test: Parsers Instalados en Sistema
+'Solo lenguajes que estan instalados: Python, JS, Rust, Lua, Perl, Octave, Fortran, C, C++, C#, Bash, Julia
+
+"1. Python + JavaScript + Rust
+#columns 3
+'Python:
+@{python}
+suma = 5 + 10
+print(f"suma = {suma}")
+@{end python}
+#column
+'JavaScript:
+@{js}
+const suma = 5 + 10;
+console.log(`suma = ${suma}`);
+@{end js}
+#column
+'Rust:
+@{rust}
+fn main() {
+    let suma = 5 + 10;
+    println!("suma = {}", suma);
+}
+@{end rust}
+#end columns
+
+"2. Lua + Perl + TypeScript
+#columns 3
+'Lua:
+@{lua}
+local suma = 5 + 10
+print("suma = " .. suma)
+@{end lua}
+#column
+'Perl:
+@{perl}
+my $suma = 5 + 10;
+print "suma = $suma\n";
+@{end perl}
+#column
+'TypeScript:
+@{ts}
+const suma: number = 5 + 10;
+console.log(`suma = ${suma}`);
+@{end ts}
+#end columns
+
+"3. Octave + Fortran + Bash
+#columns 3
+'Octave:
+@{octave}
+suma = 5 + 10;
+fprintf('suma = %d\n', suma);
+@{end octave}
+#column
+'Fortran:
+@{fortran}
+program test
+    implicit none
+    integer :: suma
+    suma = 5 + 10
+    write(*,'(A,I0)') 'suma = ', suma
+end program test
+@{end fortran}
+#column
+'Bash:
+@{bash}
+suma=$((5 + 10))
+echo "suma = $suma"
+@{end bash}
+#end columns
+
+"4. C + C++ + C#
+#columns 3
+'C:
+@{c}
+#include <stdio.h>
+int main() {
+    int suma = 5 + 10;
+    printf("suma = %d\n", suma);
+    return 0;
+}
+@{end c}
+#column
+'C++:
+@{cpp}
+#include <iostream>
+int main() {
+    int suma = 5 + 10;
+    std::cout << "suma = " << suma << std::endl;
+    return 0;
+}
+@{end cpp}
+#column
+'C#:
+@{csharp}
+using System;
+class Test {
+    static void Main() {
+        int suma = 5 + 10;
+        Console.WriteLine($"suma = {suma}");
+    }
+}
+@{end csharp}
+#end columns
+
+"5. Julia + Calcpad
+#columns 2
+'Julia:
+@{julia}
+suma = 5 + 10
+println("suma = $suma")
+@{end julia}
+#column
+'Calcpad:
+a = 5
+b = 10
+suma = a + b
+#end columns
+
+'Fin - 12 parsers probados

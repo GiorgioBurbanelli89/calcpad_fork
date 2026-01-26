@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Calcpad - Solver de ODEs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --card: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .ode-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Arial Nova', Helvetica, sans-serif;
+            margin: 1em 0 0.5em 0;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: var(--primary);
+            text-align: center;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: var(--primary);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: var(--secondary);
+            margin-top: 30px;
+        }
+
+        h3::before {
+            content: "📐 ";
+        }
+
+        p {
+            margin: 15px 0;
+        }
+
+        p b {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 0.95em;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #78350f;
+        }
+
+        .eq {
+            font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', serif;
+        }
+
+        .eq var {
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        .eq b {
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .eq sup {
+            font-size: 0.75em;
+        }
+
+        .err {
+            color: #dc2626;
+            background-color: #fee2e2;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #dc2626;
+            display: inline-block;
+        }
+
+        .ok {
+            color: #059669;
+            background-color: #d1fae5;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #059669;
+            display: inline-block;
+        }
+
+        .matrix {
+            display: inline-table;
+            font-family: 'Georgia', 'Cambria Math', serif;
+        }
+
+        .matrix .tr {
+            display: table-row;
+        }
+
+        .matrix .td {
+            display: table-cell;
+            padding: 0 6px;
+            text-align: center;
+        }
+
+        .matrix .td:first-child {
+            border-left: 2px solid black;
+        }
+
+        .matrix .td:last-child {
+            border-right: 2px solid black;
+        }
+
+        .matrix .tr:first-child .td {
+            border-top: 2px solid black;
+        }
+
+        .matrix .tr:last-child .td {
+            border-bottom: 2px solid black;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .ode-container {
+                box-shadow: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .ode-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ode-container">
+<h3>Solver de Ecuaciones Diferenciales Ordinarias </h3>
+<p>&nbsp;</p>
+<h2>Ejemplos de ODEs Resueltas</h2> 
+<p>&nbsp;</p>
+<h3>Ejemplo 1: ODE Separable</h3> 
+<p><b>Ecuación:</b> <code>y&#39; - x^2 = 0</code></p> 
+<p><b>Solución:</b> sol1 = y = x ^ 3 / 3 + C</p> 
+<h3>Ejemplo 2: ODE Lineal Primer Orden</h3> 
+<p><b>Ecuación:</b> <code>y&#39; + 3*y = 0</code></p> 
+<p><b>Solución:</b> sol2 = y = C*e^(-(3)*x)</p> 
+<h3>Ejemplo 3: ODE Segundo Orden - Raices Reales</h3> 
+<p><b>Ecuación:</b> <code>y&#39;&#39; - 3*y&#39; + 2*y = 0</code></p> 
+<p><b>Solución:</b> sol3 = y = C1*e^(2.0000*x) + C2*e^(1.0000*x)</p> 
+<h3>Ejemplo 4: ODE Segundo Orden - Raiz Doble</h3> 
+<p><b>Ecuación:</b> <code>y&#39;&#39; - 4*y&#39; + 4*y = 0</code></p> 
+<p><b>Solución:</b> sol4 = y = (C1 + C2*x)*e^(2.0000*x)</p> 
+<h3>Ejemplo 5: ODE Segundo Orden - Raices Complejas</h3> 
+<p><b>Ecuación:</b> <code>y&#39;&#39; + 4*y = 0</code></p> 
+<p><b>Solución:</b> sol5 = y = e^(-0.0000*x)*(C1*cos(2.0000*x) + C2*sin(2.0000*x))</p> 
+<h3>Ejemplo 6: ODE con Raices Complejas</h3> 
+<p><b>Ecuación:</b> <code>y&#39;&#39; + 2*y&#39; + 5*y = 0</code></p> 
+<p><b>Solución:</b> sol6 = y = e^(-1.0000*x)*(C1*cos(2.0000*x) + C2*sin(2.0000*x))</p> 
+<h3>Ejemplo 7: ODE Separable 2</h3> 
+<p><b>Ecuación:</b> <code>y&#39; - 2*x = 0</code></p> 
+<p><b>Solución:</b> sol7 = y = 2 * x ^ 2 / 2 + C</p> 
+<h3>Ejemplo 8: ODE Lineal 2</h3> 
+<p><b>Ecuación:</b> <code>y&#39; + 5*y = 0</code></p> 
+<p><b>Solución:</b> sol8 = y = C*e^(-(5)*x)</p> 
+<p>&nbsp;</p>
+<hr> 
+<h3>Resultados Verificados</h3> 
+<p>Todos los resultados son matematicamente correctos.</p> 
+<p>Ver <code>ODE_SOLVER_README.md</code> para mas informacion.</p> 
+</div> </body></html>

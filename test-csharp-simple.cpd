@@ -1,0 +1,21 @@
+"Test de C# Simple
+
+'Probando código C# básico:
+
+@{csharp}
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Hola desde C#!");
+        int a = 10;
+        int b = 20;
+        int suma = a + b;
+        Console.WriteLine("La suma de " + a + " + " + b + " = " + suma);
+    }
+}
+@{end csharp}
+
+'Fin del test

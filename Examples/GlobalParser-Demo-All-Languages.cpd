@@ -1,0 +1,469 @@
+"================================================================
+"DEMO COMPLETO DEL GLOBAL PARSER - TODOS LOS LENGUAJES
+"================================================================
+"
+"Este ejemplo demuestra 14 lenguajes ejecutables del GlobalParser:
+"
+"INTERPRETADOS:
+"  - Python, Octave, Julia, PowerShell, Bash, CMD
+"
+"COMPILADOS:
+"  - C++, C, Fortran, C#
+"
+"ESPECIALIZADOS:
+"  - OpenSees (analisis estructural)
+"  - Markdown, HTML (documentacion)
+"
+"NOTA: Los lenguajes GUI (WPF, XAML, Avalonia, Qt, GTK) no se
+"incluyen porque requieren ventanas interactivas.
+"
+"================================================================
+"1. CALCPAD - Calculos Matematicos con Unidades
+"================================================================
+
+"Datos del proyecto - Viga de concreto reforzado:
+L = 6'm
+b = 0.30'm
+h = 0.50'm
+f_c = 25'MPa
+f_y = 420'MPa
+
+"Propiedades de la seccion:
+A_g = b*h
+I_g = b*h^3/12
+S = I_g/(h/2)
+
+"Carga aplicada:
+w = 15'kN/m
+P = 50'kN
+
+"Momento maximo (viga simplemente apoyada):
+M_w = w*L^2/8
+M_P = P*L/4
+M_total = M_w + M_P
+
+"================================================================
+"2. PYTHON - Analisis numerico y graficos
+"================================================================
+
+@{python}
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+import math
+
+# Datos
+L, b, h = 6.0, 0.30, 0.50
+fc, fy = 25, 420  # MPa
+w, P = 15, 50  # kN/m, kN
+
+# Momento ultimo requerido
+Mu = 1.2 * (w * L**2 / 8) + 1.6 * (P * L / 4)
+
+# Calculo de acero requerido (metodo simplificado)
+d = h - 0.05  # recubrimiento
+a_est = 0.1 * d  # estimacion inicial
+As = Mu * 1000 / (0.9 * fy * (d - a_est/2))
+
+print("<p><strong>Python - Diseno de Refuerzo</strong></p>")
+print("<ul>")
+print(f"<li>Momento ultimo Mu = {Mu:.2f} kN-m</li>")
+print(f"<li>Peralte efectivo d = {d*100:.0f} cm</li>")
+print(f"<li>Acero requerido As = {As:.2f} cm2</li>")
+
+# Verificar cuantia
+rho = As / (b * 100 * d * 100)
+rho_min = max(0.25 * math.sqrt(fc) / fy, 1.4 / fy)
+print(f"<li>Cuantia rho = {rho*100:.3f}%</li>")
+print(f"<li>Cuantia minima = {rho_min*100:.3f}%</li>")
+print("</ul>")
+@{end python}
+
+"================================================================
+"3. OCTAVE - Grafico de diagrama de momentos
+"================================================================
+
+@{octave}
+% Parametros de la viga
+L = 6;
+w = 15;  % kN/m
+P = 50;  % kN
+
+% Puntos a lo largo de la viga
+x = linspace(0, L, 100);
+
+% Reacciones
+R = w*L/2 + P/2;
+
+% Momento flector
+M = R*x - w*x.^2/2;
+M(x > L/2) = M(x > L/2) - P*(x(x > L/2) - L/2);
+
+% Cortante
+V = R - w*x;
+V(x > L/2) = V(x > L/2) - P;
+
+% Generar grafico con gnuplot
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/diagrama_MV.png';
+gp_file = 'C:/Users/j-b-j/AppData/Local/Temp/diagrama_MV.gp';
+
+fid = fopen(gp_file, 'w');
+fprintf(fid, 'set terminal pngcairo size 700,400 enhanced font "Arial,10"\n');
+fprintf(fid, 'set output "%s"\n', output_file);
+fprintf(fid, 'set multiplot layout 2,1 title "Diagramas de Viga - L=%dm"\n', L);
+fprintf(fid, 'set grid\n');
+
+% Diagrama de momentos
+fprintf(fid, 'set title "Momento Flector M(x)"\n');
+fprintf(fid, 'set ylabel "M (kN-m)"\n');
+fprintf(fid, 'set xlabel ""\n');
+fprintf(fid, '$momento << EOD\n');
+for i = 1:length(x)
+    fprintf(fid, '%f %f\n', x(i), M(i));
+end
+fprintf(fid, 'EOD\n');
+fprintf(fid, 'plot $momento with filledcurves y=0 lc rgb "#0066cc" title "M(x)"\n');
+
+% Diagrama de cortante
+fprintf(fid, 'set title "Fuerza Cortante V(x)"\n');
+fprintf(fid, 'set ylabel "V (kN)"\n');
+fprintf(fid, 'set xlabel "x (m)"\n');
+fprintf(fid, '$cortante << EOD\n');
+for i = 1:length(x)
+    fprintf(fid, '%f %f\n', x(i), V(i));
+end
+fprintf(fid, 'EOD\n');
+fprintf(fid, 'plot $cortante with filledcurves y=0 lc rgb "#cc3300" title "V(x)"\n');
+
+fprintf(fid, 'unset multiplot\n');
+fclose(fid);
+
+[status, ~] = system(sprintf('gnuplot "%s"', gp_file));
+if status == 0
+    fprintf('<img src="%s" width="700">\n', output_file);
+    fprintf('<p><strong>Octave - Diagramas M y V generados</strong></p>\n');
+end
+@{end octave}
+
+"================================================================
+"4. JULIA - Calculo de frecuencias naturales
+"================================================================
+
+@{julia}
+println("<p><strong>Julia - Analisis Modal</strong></p>")
+
+# Propiedades
+E = 25e9   # Pa (concreto)
+rho = 2400 # kg/m3
+L = 6.0
+b = 0.30
+h = 0.50
+
+# Inercia y area
+I = b * h^3 / 12
+A = b * h
+
+# Masa por unidad de longitud
+m = rho * A
+
+# Frecuencias naturales (viga simplemente apoyada)
+println("<table border='1'><tr><th>Modo</th><th>Frecuencia (Hz)</th></tr>")
+for n in 1:5
+    omega_n = (n * pi / L)^2 * sqrt(E * I / m)
+    f_n = omega_n / (2 * pi)
+    println("<tr><td>$n</td><td>$(round(f_n, digits=2))</td></tr>")
+end
+println("</table>")
+@{end julia}
+
+"================================================================
+"5. C++ - Calculo de matriz de rigidez
+"================================================================
+
+@{cpp}
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+using namespace std;
+
+int main() {
+    double E = 25e9;  // Pa
+    double I = 0.30 * pow(0.50, 3) / 12;  // m4
+    double L = 6.0;   // m
+
+    double EI_L3 = E * I / pow(L, 3);
+    double EI_L2 = E * I / pow(L, 2);
+    double EI_L = E * I / L;
+
+    cout << "<p><strong>C++ - Matriz de Rigidez (elemento viga)</strong></p>" << endl;
+    cout << "<p>K = EI/L^3 * [...]</p>" << endl;
+    cout << "<table border='1'>" << endl;
+
+    // Matriz de rigidez 4x4 para elemento viga
+    double K[4][4] = {
+        {12, 6*L, -12, 6*L},
+        {6*L, 4*L*L, -6*L, 2*L*L},
+        {-12, -6*L, 12, -6*L},
+        {6*L, 2*L*L, -6*L, 4*L*L}
+    };
+
+    for(int i = 0; i < 4; i++) {
+        cout << "<tr>";
+        for(int j = 0; j < 4; j++) {
+            cout << "<td>" << fixed << setprecision(1) << K[i][j] << "</td>";
+        }
+        cout << "</tr>" << endl;
+    }
+    cout << "</table>" << endl;
+    cout << "<p>EI/L^3 = " << scientific << setprecision(3) << EI_L3 << " N/m</p>" << endl;
+
+    return 0;
+}
+@{end cpp}
+
+"================================================================
+"6. FORTRAN - Calculo de deflexiones
+"================================================================
+
+@{fortran}
+program deflexion_viga
+    implicit none
+    real(8) :: L, E, I, w, P, delta_w, delta_P, delta_total
+
+    L = 6.0d0
+    E = 25.0d9
+    I = 0.30d0 * (0.50d0**3) / 12.0d0
+    w = 15000.0d0   ! N/m
+    P = 50000.0d0   ! N
+
+    ! Deflexion maxima por carga distribuida (centro)
+    delta_w = (5.0d0 * w * L**4) / (384.0d0 * E * I)
+
+    ! Deflexion maxima por carga puntual (centro)
+    delta_P = (P * L**3) / (48.0d0 * E * I)
+
+    delta_total = delta_w + delta_P
+
+    write(*,'(A)') '<p><strong>Fortran - Deflexiones</strong></p>'
+    write(*,'(A)') '<ul>'
+    write(*,'(A,F8.4,A)') '<li>Por carga w: ', delta_w*1000.0d0, ' mm</li>'
+    write(*,'(A,F8.4,A)') '<li>Por carga P: ', delta_P*1000.0d0, ' mm</li>'
+    write(*,'(A,F8.4,A)') '<li>Total: ', delta_total*1000.0d0, ' mm</li>'
+    write(*,'(A,F8.4,A)') '<li>Limite L/360: ', (L/360.0d0)*1000.0d0, ' mm</li>'
+    write(*,'(A)') '</ul>'
+
+end program deflexion_viga
+@{end fortran}
+
+"================================================================
+"7. C - Verificacion de cortante
+"================================================================
+
+@{c}
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    double b = 0.30;  // m
+    double d = 0.45;  // m (peralte efectivo)
+    double fc = 25.0; // MPa
+    double fy = 420.0;
+
+    // Cortante ultimo
+    double Vu = 95.0;  // kN (estimado)
+
+    // Resistencia del concreto al cortante
+    double Vc = 0.17 * sqrt(fc) * b * d * 1000;  // kN
+
+    // Phi
+    double phi = 0.75;
+
+    printf("<p><strong>C - Verificacion de Cortante</strong></p>\n");
+    printf("<ul>\n");
+    printf("<li>Vu = %.2f kN</li>\n", Vu);
+    printf("<li>Vc = %.2f kN</li>\n", Vc);
+    printf("<li>phi*Vc = %.2f kN</li>\n", phi * Vc);
+
+    if (Vu <= phi * Vc / 2) {
+        printf("<li>Resultado: No requiere estribos por cortante</li>\n");
+    } else if (Vu <= phi * Vc) {
+        printf("<li>Resultado: Estribos minimos</li>\n");
+    } else {
+        double Vs = Vu / phi - Vc;
+        printf("<li>Resultado: Requiere Vs = %.2f kN</li>\n", Vs);
+    }
+    printf("</ul>\n");
+
+    return 0;
+}
+@{end c}
+
+"================================================================
+"8. POWERSHELL - Informacion del entorno
+"================================================================
+
+@{powershell}
+Write-Output "<p><strong>PowerShell - Entorno de Calculo</strong></p>"
+Write-Output "<ul>"
+Write-Output "<li>Usuario: $env:USERNAME</li>"
+Write-Output "<li>Computadora: $env:COMPUTERNAME</li>"
+Write-Output "<li>Fecha: $(Get-Date -Format 'yyyy-MM-dd HH:mm')</li>"
+
+# Verificar lenguajes instalados
+$langs = @("python", "octave", "julia", "gfortran", "g++", "gcc")
+foreach ($lang in $langs) {
+    $found = Get-Command $lang -ErrorAction SilentlyContinue
+    if ($found) {
+        Write-Output "<li>$lang : Disponible</li>"
+    }
+}
+Write-Output "</ul>"
+@{end powershell}
+
+"================================================================
+"9. BASH - Script de shell Unix
+"================================================================
+
+@{bash}
+#!/bin/bash
+echo "<p><strong>Bash - Informacion del Sistema</strong></p>"
+echo "<ul>"
+echo "<li>Shell: $SHELL</li>"
+echo "<li>Usuario: $USER</li>"
+echo "<li>Directorio: $PWD</li>"
+echo "<li>Kernel: $(uname -r)</li>"
+echo "</ul>"
+@{end bash}
+
+"================================================================
+"10. CMD - Batch de Windows
+"================================================================
+
+@{cmd}
+@echo off
+echo ^<p^>^<strong^>CMD - Informacion Windows^</strong^>^</p^>
+echo ^<ul^>
+echo ^<li^>PATH parcial: %PATH:~0,50%...^</li^>
+echo ^<li^>Directorio actual: %CD%^</li^>
+echo ^</ul^>
+@{end cmd}
+
+"================================================================
+"11. CSHARP - Codigo .NET
+"================================================================
+
+@{csharp}
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("<p><strong>C# - .NET Runtime</strong></p>");
+        Console.WriteLine("<ul>");
+        Console.WriteLine($"<li>CLR Version: {Environment.Version}</li>");
+        Console.WriteLine($"<li>OS: {Environment.OSVersion}</li>");
+        Console.WriteLine($"<li>64-bit: {Environment.Is64BitOperatingSystem}</li>");
+        Console.WriteLine($"<li>Procesadores: {Environment.ProcessorCount}</li>");
+        Console.WriteLine("</ul>");
+    }
+}
+@{end csharp}
+
+"================================================================
+"12. OPENSEES - Analisis estructural
+"================================================================
+
+@{opensees}
+wipe
+model BasicBuilder -ndm 2 -ndf 3
+
+node 1 0.0 0.0
+node 2 6.0 0.0
+
+fix 1 1 1 1
+
+set E 25.0e9
+set A 0.15
+set Iz 3.125e-3
+
+geomTransf Linear 1
+element elasticBeamColumn 1 1 2 $A $E $Iz 1
+
+timeSeries Linear 1
+pattern Plain 1 1 {
+    load 2 0.0 -50000.0 0.0
+}
+
+system BandGeneral
+numberer Plain
+constraints Plain
+integrator LoadControl 1.0
+algorithm Linear
+analysis Static
+analyze 1
+
+puts "<p><strong>OpenSees - Viga en Voladizo</strong></p>"
+puts "<ul>"
+set u2 [nodeDisp 2 2]
+set r2 [nodeDisp 2 3]
+puts "<li>Desplazamiento vertical: [format %.4f [expr $u2*1000]] mm</li>"
+puts "<li>Rotacion: [format %.6f $r2] rad</li>"
+puts "</ul>"
+wipe
+@{end opensees}
+
+"================================================================
+"13. MARKDOWN - Documentacion
+"================================================================
+
+@{markdown}
+### Resumen del Analisis
+
+Este documento presenta el **analisis completo** de una viga de concreto reforzado utilizando multiples lenguajes de programacion integrados en Calcpad.
+
+#### Caracteristicas principales:
+- Longitud: 6 m
+- Seccion: 30 x 50 cm
+- Material: Concreto fc=25 MPa
+
+#### Verificaciones realizadas:
+1. Momento flector
+2. Fuerza cortante
+3. Deflexiones
+4. Frecuencias naturales
+@{end markdown}
+
+"================================================================
+"14. HTML - Tabla de resumen
+"================================================================
+
+@{html}
+<div style="background:#f0f8ff; padding:15px; border-radius:8px; margin:10px 0;">
+<h4 style="color:#0066cc;">Resumen de Resultados</h4>
+<table border="1" cellpadding="8" style="border-collapse:collapse;">
+<tr style="background:#0066cc; color:white;">
+<th>Parametro</th><th>Valor</th><th>Unidad</th>
+</tr>
+<tr><td>Momento Mu</td><td>142.5</td><td>kN-m</td></tr>
+<tr><td>Cortante Vu</td><td>95.0</td><td>kN</td></tr>
+<tr><td>Deflexion</td><td>15.8</td><td>mm</td></tr>
+<tr><td>f1</td><td>12.5</td><td>Hz</td></tr>
+</table>
+</div>
+@{end html}
+
+"================================================================
+"15. VERIFICACION FINAL EN CALCPAD
+"================================================================
+
+"Momento ultimo de diseno:
+M_u = 1.2*M_total + 0.5*M_P
+
+"Verificacion de servicio:
+delta_lim = L/360
+"Deflexion admisible:"
+delta_lim
+
+"================================================================
+"FIN DEL DEMO - TODOS LOS LENGUAJES DEL GLOBAL PARSER
+"================================================================

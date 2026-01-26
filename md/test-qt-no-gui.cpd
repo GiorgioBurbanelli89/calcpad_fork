@@ -1,0 +1,15 @@
+﻿'Test Qt Sin GUI - Solo Console Output
+
+@{qt}
+#include <iostream>
+
+int main(int argc, char *argv[])
+{
+    // Qt sin ventanas - solo output de consola
+    std::cout << "Qt funcionando correctamente!" << std::endl;
+    std::cout << "Test exitoso sin GUI" << std::endl;
+    return 0;
+}
+@{end qt}
+
+Fin del test

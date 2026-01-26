@@ -1,0 +1,368 @@
+"========================================================
+"DEMO COMPLETO: CALCPAD + MÚLTIPLES LENGUAJES EXTERNOS
+"========================================================
+
+"Este ejemplo demuestra la integración de Calcpad con:
+"- Python, Octave, PowerShell, Julia, C++, C, Fortran
+"- Cálculos matemáticos en Calcpad
+"- Gráficos generados con Octave + Gnuplot
+
+"========================================================
+"1. CÁLCULOS EN CALCPAD (Matemáticas Nativas)
+"========================================================
+
+"Definimos las dimensiones de una losa rectangular:
+a = 6'm
+b = 4'm
+t = 0.20'm
+
+"Área y volumen:
+A = a*b
+V = A*t
+
+"Carga distribuida:
+q = 5'kN/m²
+Q_total = q*A
+
+"========================================================
+"2. PYTHON - Análisis numérico
+"========================================================
+
+@{python}
+import math
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
+# Datos de la losa (en metros)
+a, b, t = 6.0, 4.0, 0.20
+
+# Calculo del momento de inercia de la seccion
+I = (b * t**3) / 12
+print("<p><strong>Python - Analisis de Seccion</strong></p>")
+print("<ul>")
+print(f"<li>Momento de inercia I = {I:.6f} m^4</li>")
+
+# Modulo de seccion
+W = I / (t/2)
+print(f"<li>Modulo de seccion W = {W:.6f} m^3</li>")
+
+# Esbeltez
+esbeltez = a / t
+print(f"<li>Esbeltez = {esbeltez:.1f}</li>")
+print("</ul>")
+
+# Serie de Fibonacci (demo algoritmo)
+def fibonacci(n):
+    a, b = 0, 1
+    result = []
+    for _ in range(n):
+        result.append(a)
+        a, b = b, a + b
+    return result
+
+fib = fibonacci(10)
+print(f"<p>Fibonacci(10): {fib}</p>")
+@{end python}
+
+"========================================================
+"3. OCTAVE - Gráfico del Mesh FEM
+"========================================================
+
+@{octave}
+% Parámetros del mesh
+a = 6;
+b = 4;
+n_a = 6;
+n_b = 4;
+
+% Generar coordenadas de nodos
+[X, Y] = meshgrid(linspace(0, a, n_a+1), linspace(0, b, n_b+1));
+x_nodes = X(:);
+y_nodes = Y(:);
+n_nodes = length(x_nodes);
+
+% Generar conectividad de elementos
+elements = [];
+for i = 1:n_a
+    for j = 1:n_b
+        n1 = (i-1)*(n_b+1) + j;
+        n2 = n1 + (n_b+1);
+        n3 = n2 + 1;
+        n4 = n1 + 1;
+        elements = [elements; n1 n2 n3 n4];
+    end
+end
+
+% Archivos de salida
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/mesh_multilang.png';
+gp_file = 'C:/Users/j-b-j/AppData/Local/Temp/mesh_multilang.gp';
+
+% Escribir script gnuplot
+fid = fopen(gp_file, 'w');
+fprintf(fid, 'set terminal pngcairo size 700,500 enhanced font "Arial,10"\n');
+fprintf(fid, 'set output "%s"\n', output_file);
+fprintf(fid, 'set title "Mesh FEM - Losa %dx%d m" font "Arial,12"\n', a, b);
+fprintf(fid, 'set xlabel "X (m)"\n');
+fprintf(fid, 'set ylabel "Y (m)"\n');
+fprintf(fid, 'set grid\n');
+fprintf(fid, 'set key outside right top\n');
+fprintf(fid, 'set xrange [-0.3:%f]\n', a+0.3);
+fprintf(fid, 'set yrange [-0.3:%f]\n', b+0.3);
+fprintf(fid, 'set size ratio -1\n');
+fprintf(fid, 'set style line 1 lc rgb "#008000" lw 1.5\n');
+
+% Elementos
+fprintf(fid, '$elements << EOD\n');
+for e = 1:size(elements, 1)
+    elem_nodes = elements(e, :);
+    for k = 1:4
+        n1_idx = elem_nodes(k);
+        n2_idx = elem_nodes(mod(k, 4) + 1);
+        fprintf(fid, '%f %f\n', x_nodes(n1_idx), y_nodes(n1_idx));
+        fprintf(fid, '%f %f\n', x_nodes(n2_idx), y_nodes(n2_idx));
+        fprintf(fid, '\n');
+    end
+end
+fprintf(fid, 'EOD\n\n');
+
+% Nodos del borde
+fprintf(fid, '$border << EOD\n');
+border = unique([find(x_nodes == 0); find(x_nodes == a); find(y_nodes == 0); find(y_nodes == b)]);
+for i = 1:length(border)
+    fprintf(fid, '%f %f\n', x_nodes(border(i)), y_nodes(border(i)));
+end
+fprintf(fid, 'EOD\n\n');
+
+% Labels
+fprintf(fid, '$labels << EOD\n');
+for e = 1:size(elements, 1)
+    elem_nodes = elements(e, :);
+    fprintf(fid, '%f %f %d\n', mean(x_nodes(elem_nodes)), mean(y_nodes(elem_nodes)), e);
+end
+fprintf(fid, 'EOD\n\n');
+
+fprintf(fid, 'plot $elements with lines ls 1 title "Elementos", ');
+fprintf(fid, '$border with points pt 7 ps 1.2 lc rgb "#ff0000" title "Apoyos", ');
+fprintf(fid, '$labels using 1:2:3 with labels tc rgb "#006400" font "Arial,8" notitle\n');
+fclose(fid);
+
+% Ejecutar gnuplot
+[status, ~] = system(sprintf('gnuplot "%s"', gp_file));
+
+n_elements = size(elements, 1);
+if status == 0
+    fprintf('<img src="%s" width="700">\n', output_file);
+    fprintf('<p><strong>Octave - Mesh FEM generado</strong></p>\n');
+    fprintf('<ul>\n');
+    fprintf('<li>Elementos: %d</li>\n', n_elements);
+    fprintf('<li>Nodos: %d</li>\n', n_nodes);
+    fprintf('</ul>\n');
+end
+@{end octave}
+
+"========================================================
+"4. JULIA - Cálculos científicos de alto rendimiento
+"========================================================
+
+@{julia}
+# Análisis estructural simplificado
+println("<p><strong>Julia - Análisis Estructural</strong></p>")
+
+# Propiedades del material (concreto)
+E = 25e9  # Módulo de elasticidad (Pa)
+ν = 0.2   # Coeficiente de Poisson
+fc = 25e6 # Resistencia a compresión (Pa)
+
+# Dimensiones
+a, b, t = 6.0, 4.0, 0.20
+
+# Rigidez flexural de la losa
+D = (E * t^3) / (12 * (1 - ν^2))
+
+println("<ul>")
+println("<li>Módulo E = $(E/1e9) GPa</li>")
+println("<li>Rigidez flexural D = $(round(D/1e6, digits=2)) MN·m</li>")
+
+# Frecuencia natural (modo 1,1) para losa simplemente apoyada
+ρ = 2400  # Densidad del concreto (kg/m³)
+m = ρ * t  # Masa por unidad de área
+
+ω11 = π^2 * ((1/a^2) + (1/b^2)) * sqrt(D / m)
+f11 = ω11 / (2π)
+
+println("<li>Frecuencia natural f₁₁ = $(round(f11, digits=2)) Hz</li>")
+println("</ul>")
+
+# Calcular primeros 4 modos
+println("<p>Primeros modos de vibración:</p>")
+println("<table border='1' style='border-collapse:collapse;'>")
+println("<tr><th>Modo</th><th>m</th><th>n</th><th>Frecuencia (Hz)</th></tr>")
+for m_mode in 1:2
+    for n_mode in 1:2
+        ω = π^2 * ((m_mode/a)^2 + (n_mode/b)^2) * sqrt(D / m)
+        f = ω / (2π)
+        println("<tr><td>($m_mode,$n_mode)</td><td>$m_mode</td><td>$n_mode</td><td>$(round(f, digits=2))</td></tr>")
+    end
+end
+println("</table>")
+@{end julia}
+
+"========================================================
+"5. C++ - Cálculo matricial de rigidez
+"========================================================
+
+@{cpp}
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+using namespace std;
+
+int main() {
+    // Propiedades del material
+    double E = 25e9;   // Pa
+    double nu = 0.2;
+    double t = 0.20;   // m
+
+    // Matriz constitutiva para estado plano de esfuerzos
+    double factor = E / (1 - nu*nu);
+    double D[3][3] = {
+        {factor, factor*nu, 0},
+        {factor*nu, factor, 0},
+        {0, 0, factor*(1-nu)/2}
+    };
+
+    cout << "<p><strong>C++ - Matriz Constitutiva D</strong></p>" << endl;
+    cout << "<p>Para concreto (E=25 GPa, ν=0.2):</p>" << endl;
+    cout << "<table border='1' style='border-collapse:collapse; font-family:monospace;'>" << endl;
+
+    for(int i = 0; i < 3; i++) {
+        cout << "<tr>";
+        for(int j = 0; j < 3; j++) {
+            cout << "<td style='padding:5px; text-align:right;'>"
+                 << fixed << setprecision(2) << D[i][j]/1e9 << " GPa</td>";
+        }
+        cout << "</tr>" << endl;
+    }
+    cout << "</table>" << endl;
+
+    // Calcular autovalores (simplificado)
+    double trace = D[0][0] + D[1][1] + D[2][2];
+    cout << "<p>Traza de D = " << fixed << setprecision(2) << trace/1e9 << " GPa</p>" << endl;
+
+    return 0;
+}
+@{end cpp}
+
+"========================================================
+"6. FORTRAN - Cálculo numérico tradicional
+"========================================================
+
+@{fortran}
+program calculo_losa
+    implicit none
+    real(8) :: a, b, t, q, M_max, sigma_max
+    real(8) :: E, I, delta_max
+    real(8), parameter :: PI = 3.14159265358979d0
+
+    ! Datos de entrada
+    a = 6.0d0      ! Longitud (m)
+    b = 4.0d0      ! Ancho (m)
+    t = 0.20d0     ! Espesor (m)
+    q = 5000.0d0   ! Carga (N/m²)
+    E = 25.0d9     ! Módulo elástico (Pa)
+
+    ! Momento de inercia
+    I = (b * t**3) / 12.0d0
+
+    ! Momento máximo (aproximación para losa biapoyada)
+    M_max = (q * a**2) / 8.0d0
+
+    ! Esfuerzo máximo
+    sigma_max = M_max * (t/2.0d0) / I
+
+    ! Deflexión máxima
+    delta_max = (5.0d0 * q * a**4) / (384.0d0 * E * I)
+
+    write(*,'(A)') '<p><strong>Fortran - Análisis de Losa</strong></p>'
+    write(*,'(A)') '<ul>'
+    write(*,'(A,F10.4,A)') '<li>Momento máximo M = ', M_max/1000.0d0, ' kN·m/m</li>'
+    write(*,'(A,F10.2,A)') '<li>Esfuerzo máximo σ = ', sigma_max/1.0d6, ' MPa</li>'
+    write(*,'(A,F10.4,A)') '<li>Deflexión máxima δ = ', delta_max*1000.0d0, ' mm</li>'
+    write(*,'(A)') '</ul>'
+
+end program calculo_losa
+@{end fortran}
+
+"========================================================
+"7. POWERSHELL - Información del sistema
+"========================================================
+
+@{powershell}
+Write-Output "<p><strong>PowerShell - Información del Sistema</strong></p>"
+Write-Output "<ul>"
+
+# Información del sistema
+$os = [System.Environment]::OSVersion
+Write-Output "<li>Sistema: $($os.Platform) $($os.Version)</li>"
+
+# Memoria disponible
+$mem = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
+Write-Output "<li>Memoria RAM: $mem GB</li>"
+
+# Procesador
+$cpu = (Get-CimInstance Win32_Processor).Name
+Write-Output "<li>CPU: $cpu</li>"
+
+# Fecha y hora
+$now = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+Write-Output "<li>Fecha/Hora: $now</li>"
+
+Write-Output "</ul>"
+@{end powershell}
+
+"========================================================
+"8. C - Algoritmo de bajo nivel
+"========================================================
+
+@{c}
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    // Datos de la losa
+    double a = 6.0, b = 4.0, t = 0.20;
+    double q = 5000.0;  // N/m²
+
+    // Calcular reacciones en los apoyos (losa simplemente apoyada)
+    double R_total = q * a * b;  // Reacción total
+    double R_esquina = R_total / 4.0;  // Por esquina (simplificado)
+
+    printf("<p><strong>C - Reacciones en Apoyos</strong></p>\n");
+    printf("<ul>\n");
+    printf("<li>Carga total Q = %.2f kN</li>\n", R_total / 1000.0);
+    printf("<li>Reacción por esquina R = %.2f kN</li>\n", R_esquina / 1000.0);
+
+    // Verificación de cortante
+    double V_max = q * a / 2.0;  // Por metro lineal
+    double tau = V_max / (0.9 * t);  // Esfuerzo cortante
+
+    printf("<li>Cortante máximo V = %.2f kN/m</li>\n", V_max / 1000.0);
+    printf("<li>Esfuerzo cortante τ = %.2f MPa</li>\n", tau / 1e6);
+    printf("</ul>\n");
+
+    return 0;
+}
+@{end c}
+
+"========================================================
+"9. RESUMEN DE RESULTADOS (Calcpad)
+"========================================================
+
+"Verificación final en Calcpad:
+"Carga total calculada:
+Q_verificacion = q*a*b
+"Comparación: Q_total ≡ Q_verificacion
+
+"========================================================
+"FIN DEL DEMO
+"========================================================

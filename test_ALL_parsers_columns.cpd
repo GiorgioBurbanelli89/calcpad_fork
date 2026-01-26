@@ -1,0 +1,130 @@
+"=== TEST COMPLETO: TODOS LOS PARSERS EN COLUMNAS ===
+'Usando @{columns N}, @{column}, @{end columns} - sintaxis unificada
+
+"1. LENGUAJES INTERPRETADOS: Python + JavaScript + TypeScript
+@{columns 3}
+'Python:
+@{python}
+print("Python OK: 2+3 =", 2+3)
+@{end python}
+@{column}
+'JavaScript:
+@{js}
+console.log("JS OK: 2+3 =", 2+3);
+@{end js}
+@{column}
+'TypeScript:
+@{ts}
+const result: number = 2 + 3;
+console.log("TS OK: 2+3 =", result);
+@{end ts}
+@{end columns}
+
+"2. LENGUAJES COMPILADOS: C + C++ + C#
+@{columns 3}
+'C:
+@{c}
+#include <stdio.h>
+int main() { printf("C OK: 2+3 = %d\n", 2+3); return 0; }
+@{end c}
+@{column}
+'C++:
+@{cpp}
+#include <iostream>
+int main() { std::cout << "C++ OK: 2+3 = " << 2+3 << std::endl; return 0; }
+@{end cpp}
+@{column}
+'C#:
+@{csharp}
+using System;
+class P { static void Main() { Console.WriteLine("C# OK: 2+3 = " + (2+3)); }}
+@{end csharp}
+@{end columns}
+
+"3. LENGUAJES CIENTIFICOS: Octave + Fortran + Rust
+@{columns 3}
+'Octave:
+@{octave}
+fprintf('Octave OK: 2+3 = %d\n', 2+3);
+@{end octave}
+@{column}
+'Fortran:
+@{fortran}
+program test
+    write(*,'(A,I0)') 'Fortran OK: 2+3 = ', 2+3
+end program test
+@{end fortran}
+@{column}
+'Rust:
+@{rust}
+fn main() { println!("Rust OK: 2+3 = {}", 2+3); }
+@{end rust}
+@{end columns}
+
+"4. SHELL/SCRIPTS: PowerShell + Bash + CMD
+@{columns 3}
+'PowerShell:
+@{powershell}
+Write-Output "PowerShell OK: 2+3 = $(2+3)"
+@{end powershell}
+@{column}
+'Bash:
+@{bash}
+echo "Bash OK: 2+3 = $((2+3))"
+@{end bash}
+@{column}
+'CMD:
+@{cmd}
+@echo off
+set /a result=2+3
+echo CMD OK: 2+3 = %result%
+@{end cmd}
+@{end columns}
+
+"5. MARKUP/DOCUMENTACION: HTML + Markdown + CSS
+@{columns 3}
+'HTML:
+@{html}
+<p style="color:green;font-weight:bold;">HTML OK</p>
+@{end html}
+@{column}
+'Markdown:
+@{markdown}
+**Markdown OK** - _funcionando_
+@{end markdown}
+@{column}
+'CSS:
+@{css}
+.test { color: blue; font-weight: bold; }
+/* CSS OK */
+@{end css}
+@{end columns}
+
+"6. CALCPAD NATIVO + Image
+@{columns 2}
+'Calcpad nativo:
+a = 2
+b = 3
+suma = a + b
+'Calcpad OK: suma = 5
+@{column}
+'Imagen Base64:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAAOUlEQVR42u3OAQkAAAjAsPcvrTUUBguwpg5KS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tL61drAXsrusQtES25AAAAAElFTkSuQmCC
+@{end image}
+@{end columns}
+
+"7. Julia + R (si estan instalados)
+@{columns 2}
+'Julia:
+@{julia}
+println("Julia OK: 2+3 = ", 2+3)
+@{end julia}
+@{column}
+'R:
+@{r}
+cat("R OK: 2+3 =", 2+3, "\n")
+@{end r}
+@{end columns}
+
+'=== FIN DEL TEST DE TODOS LOS PARSERS ===

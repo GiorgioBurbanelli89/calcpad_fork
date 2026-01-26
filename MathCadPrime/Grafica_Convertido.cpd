@@ -1,0 +1,47 @@
+' ============================================
+' Importado de Mathcad Prime (.mcdx)
+' Versión Mathcad: Prime 10.0 (Build 2024.03.25.002)
+' Archivo: Grafica.mcdx
+' Fecha: 2026-01-24 20:10:54
+' ============================================
+
+x = [2; 2; 6]'m
+F = [2; 3; 5]'tonf
+
+' Gráfica: F vs x
+
+#columns 1 python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Datos de Calcpad (convertir vectores a arrays numpy)
+# NOTA: Las variables x y F deben estar definidas arriba
+# Si son vectores de Calcpad, extraer valores manualmente:
+
+# Definir los datos (ajustar según las variables de Calcpad)
+# Los valores deben coincidir con los vectores definidos arriba
+x_data = np.array([2, 2, 6])  # Reemplazar con valores de x
+y_data = np.array([2, 3, 5])  # Reemplazar con valores de F
+
+# Crear figura
+plt.figure(figsize=(8, 6))
+
+# Graficar datos
+plt.plot(x_data, y_data, '-', color='#00008B', linewidth=1, label='F')
+
+# Etiquetas de ejes (con unidades)
+plt.xlabel('x', fontsize=12)
+plt.ylabel('F', fontsize=12)
+
+plt.xlim(2, 6)
+plt.ylim(17500, 45000)
+
+# Configuración adicional
+plt.grid(True, alpha=0.3, linestyle='--')
+plt.legend(loc='best')
+plt.tight_layout()
+
+# Mostrar gráfica
+plt.show()
+#end columns
+

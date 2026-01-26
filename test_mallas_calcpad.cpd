@@ -1,0 +1,42 @@
+"Prueba de Convergencia - Diferentes Mallas
+'<h3>Objetivo: Ver si refinando/modificando la malla convergemos a resultados del PDF</h3>
+
+'<h4>Parámetros fijos</h4>
+a = 6'm
+b = 4'm
+t = 0.1'm
+q = 10'kN/m²
+E = 35000'MPa
+ν = 0.15
+
+'<h4>Resultados del PDF (SAP2000 v6-7)</h4>
+'Mx = 6.22 kN-m/m
+'My = 12.76 kN-m/m
+'Mxy = 7.25 kN-m/m
+
+'<hr>
+'<h3>PRUEBA 1: Malla Original (6×4)</h3>
+n_a_1 = 6
+n_b_1 = 4
+'Malla -'n_a_1'×'n_b_1' = 'n_a_1*n_b_1' elementos
+
+'<hr>
+'<h3>PRUEBA 2: Malla Más Fina (12×8)</h3>
+n_a_2 = 12
+n_b_2 = 8
+'Malla -'n_a_2'×'n_b_2' = 'n_a_2*n_b_2' elementos
+
+'<hr>
+'<h3>PRUEBA 3: Malla Más Gruesa (3×2)</h3>
+n_a_3 = 3
+n_b_3 = 2
+'Malla -'n_a_3'×'n_b_3' = 'n_a_3*n_b_3' elementos
+
+'<hr>
+'<h3>PRUEBA 4: Malla Extra Fina (24×16)</h3>
+n_a_4 = 24
+n_b_4 = 16
+'Malla -'n_a_4'×'n_b_4' = 'n_a_4*n_b_4' elementos
+
+'<hr>
+'<p><b>Nota:</b> Para ver resultados completos, ejecutar "Rectangular Slab FEA.cpd" modificando n_a y n_b en la línea 12</p>

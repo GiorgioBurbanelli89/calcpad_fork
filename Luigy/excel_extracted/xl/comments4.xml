@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<comments xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><authors><author>LEGION</author></authors><commentList><comment ref="F1" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+TIPO DE ESTRUCTURAS VALORES DE LA NORMA PELIGRO SISMICO
+</t></r></text></comment><comment ref="A2" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+PAGINA 50 DE PELIGRO SISMICO
+</t></r></text></comment><comment ref="A3" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+COEFICIENTE DE REGULARIDAD EN PLANTA 
+PELIGRO SISMICO PAGINA 50
+</t></r></text></comment><comment ref="F3" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+VALOR DE LA NORMA DE PELIGRO SISMICO
+</t></r></text></comment><comment ref="A4" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+</t></r></text></comment><comment ref="F4" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+PERIODO 1 DEL EDIFICIO, CALCULADO CON FORMULAS, EL VERDADERO PERIODO ME LO DA EL
+ ETABS, VALOR HORIZONTAL DEL GRAFICO DE LA DERECHA QUE VA DE 0.0-1.0-2.0-3.0-4.05.0
+</t></r></text></comment><comment ref="A5" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+REDUCCION DE LAS FUERZAS DINANIMAS EN RESPUESTA ELASTICA PARA EL DISEÑO
+</t></r></text></comment><comment ref="F5" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+AQUÍ INGRESAMOS EL VALOR REAL DEL PERIODO QUE NOS DA EL ETABS..(PARA COMPROBAR QUE EL DISEÑO ESTA BIEN ECHO HAY QUE VERIFICAR QUE EL CORTAN VASAL QUE DE EL PROGRAMA DEBE DE SER MAYOR QUE EL CORTANTE VASAL MINIMO CALCULADO
+</t></r></text></comment><comment ref="F7" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+Espectro de respuesta elástico de aceleraciones, EL Sa es el  VALOR VERTICAL  DEL GRAFICO de la derecha 0.00-0.10-0.20-0.30-0.40-0.50-0.60-0.70-0.80</t></r></text></comment><comment ref="F8" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+CORTANTE VASAL ESTATICO…EL ANALISIS ESTATICO NOS DICE QUE EL CORTANTE VASAL ES IGUAL A UN PORCENTAJE DEL PESO DEL EDIFICIO SACADO DEL (FA*Sa/Øp*Øe*R)
+
+ESTE ANALISIS CORRESPONDE A ANALISIS ESTATICO</t></r></text></comment><comment ref="A9" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+COEFICIENTE DE AMPLIFICACION DEL SUELO
+</t></r></text></comment><comment ref="G9" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+</t></r></text></comment><comment ref="A10" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">LEGION:COEFICIENTE DE AMPLIFICACION DE LAS ORDENADAS DE ESPECTRO ELASTICO DE RESPUESTA DE DESPLAZAMIENTOS PARA DISEÑO EN ROCA
+</t></r></text></comment><comment ref="F10" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+CARGA REACTIVA DE LA ESTRUCTURA, CARGA REACTIVA SALE DE LA COMBINACION CARGA  MUERTA Y 
+ CARGA VIVA
+</t></r></text></comment><comment ref="A11" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+COMPORTAMIENTO NO LINEAL DE LOS SUELOS</t></r></text></comment><comment ref="F11" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+LA ESTRUCTURA DEBE DE RESISTIR EL VALOR DE ESTE V MIN
+</t></r></text></comment><comment ref="A12" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+FACTOR USADO EN EL ESPECTRO DE DISEÑO ELASTICO
+</t></r></text></comment><comment ref="F12" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+VALOR SACADO DE FUERZAS EN LOS PISOS DEL SISMO ESTATICO X, VP DEBE DE SER IGUAL O MAYOR AL V MIN</t></r></text></comment></commentList></comments>

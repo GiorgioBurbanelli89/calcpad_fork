@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Created with Calcpad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <script src="https://calcpad.local/file:///C:/Users/j-b-j/Documents/Calcpad-7.5.7/Calcpad.Cli/bin/Release/net10.0/doc/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-size: 11pt;
+            font-family: 'Segoe UI', 'Arial Nova', Helvetica, sans-serif;
+            margin-left: 5mm;
+            max-width: 190mm;
+        }
+
+        h1, h2, h3, h4, h5, h6, .errorHeader, .roundBox {
+            font-family: 'Arial Nova', Helvetica, sans-serif;
+            margin: 0.5em 0 0.5em 0;
+            padding: 0;
+            line-height: 150%;
+        }
+
+        h1 {font-size: 2.1em;}
+        h2 {font-size: 1.7em;}
+        h3 {font-size: 1.4em;}
+        h4 {font-size: 1.2em;}
+        h5 {font-size: 1.1em;}
+        h6 {font-size: 1em;}
+
+        p, li {
+            margin: 0.3em 0 0.3em 0;
+            padding: 0;
+            line-height: 150%;
+        }
+
+        select, kbd {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        a:hover {
+            background-color: #e9f6ff;
+        }
+
+        .eq, input[type="text"], table.matrix {
+            font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+        }
+
+            .eq var {
+                color: #06d;
+                font-size: 105%;
+            }
+
+            .eq i {
+                color: #086;
+                font-style: normal;
+                font-size: 90%;
+            }
+
+            i.unit {
+                color: #043!important;
+                font-size: 90%!important;
+                vertical-align: -1pt;
+            }
+
+            sup.unit {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 70%!important;
+            }
+
+            .eq b {
+                font-weight: 600;
+            }
+
+            .eq sub {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 80%;
+                vertical-align: -18%;
+                margin-left: 1pt;
+            }
+
+            .eq sup {
+                display: inline-block;
+                margin-left: 1pt;
+                margin-top: -3pt;
+                font-size: 75%;
+            }
+
+            .eq small {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 70%;
+            }
+
+                .eq small var {
+                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-size: 8.5pt;
+                }
+
+                .eq small i {
+                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-size: 6pt;
+                }
+
+            .eq u, input, select {
+                background-color: LightYellow;
+            }
+
+                input[type="text"], select {
+                    font-size: 10pt;
+                    padding: 0.2em 0.4em;
+                    border: 0.5pt solid #CCC;
+                    border-radius: 0.35em;
+                    box-shadow: 0.06em 0.06em 0.5em #ddd;
+                    min-width: 3em;
+                }
+
+                input[type="text"] {
+                    text-align: right;
+                }
+
+                input[type="checkbox"],
+                input[type="radio"] {
+                    vertical-align: baseline;
+                    position: relative;
+                    bottom: -1pt;
+                    margin-right: 1pt;
+                }
+
+                    input[type="checkbox"].post:disabled:not(:checked),
+                    input[type="checkbox"].post:disabled:not(:checked) + label,
+                    input[type="radio"].post:disabled:not(:checked),
+                    input[type="radio"].post:disabled:not(:checked) + label {
+                        display: none;
+                    }
+
+                select:disabled {
+                    background: none;
+                    color: #444;
+                }
+
+                select.post:disabled {
+                    font-size: 12pt;
+                    border: none;
+                    box-shadow: none;
+                    color: red;
+                    background: none;
+                    appearance: none;
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                }
+
+                select.post:disabled::-ms-expand {
+                    display: none;
+                }
+
+                input[type="text"]:focus {
+                    box-shadow: 0.1em 0.1em 1em #ccc;
+                    color: black;
+                }
+
+        td, th {
+            padding: 2pt 4pt 2pt 4pt;
+            vertical-align: top;
+        }
+
+        small {
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+            table.bordered {
+                margin-top: 1em;
+            }
+
+                table.bordered th {
+                    background-color: #F0F0F0;
+                    border: solid 1pt #AAAAAA;
+                }
+
+                table.bordered td {
+                    border: solid 1pt #CCCCCC;
+                }
+
+            table.centered td, .matrix .td {
+                text-align: center;
+            }
+
+            table.data td {
+                text-align: right;
+            }
+
+                table.data td:first-child {
+                    text-align: left;
+                    padding-left: 0;
+                }
+
+        .matrix {
+            display: inline-table;
+        }
+
+            .matrix .tr {
+                display: table-row;
+            }
+
+            .matrix .td {
+                white-space: nowrap;
+                padding: 0 2pt 0 2pt;
+                min-width: 10pt;
+                display: table-cell;
+                font-size: 10pt;
+            }
+
+                .matrix .td:first-child,
+                .matrix .td:last-child {
+                    width: 0.75pt;
+                    min-width: 0.75pt;
+                    max-width: 0.75pt;
+                    padding: 0 1pt 0 1pt;
+                }
+
+                .matrix .td:first-child {
+                    border-left: solid 1pt black;
+                }
+
+                .matrix .td:last-child {
+                    border-right: solid 1pt black;
+                }
+
+            .matrix .tr:first-child .td:first-child,
+            .matrix .tr:first-child .td:last-child {
+                border-top: solid 1pt black;
+            }
+
+            .matrix .tr:last-child .td:first-child,
+            .matrix .tr:last-child .td:last-child {
+                border-bottom: solid 1pt black;
+            }
+
+        .block {
+            display: inline-block;
+            vertical-align: middle;
+            padding-left: 4pt;
+            margin-left: -1pt;
+            border-left: solid 1pt #80b0e8;
+            background: linear-gradient(to right, rgba(0, 192, 255, 0.06), rgba(0, 192, 255, 0.03));
+        }
+
+            .block .block {
+                background: linear-gradient(to right, rgba(0, 192, 255, 0.04), rgba(0, 192, 255, 0.02));
+            }
+
+        .dvcs:has(.block):not(.block *) {
+            display: inline-block;
+            border-left: solid 1pt #80b0e8;
+            padding-left: 0;
+            margin-left: 3pt;
+        }
+
+            .dvcs:has(.block):not(.block *)::before {
+                content: " 🞀";
+                font-size: 9pt;
+                color: #90c4f0;
+                margin-left: -4.5pt;
+            }
+
+        .arr {
+            color: #90c4f0;
+        }
+
+        .r0, .r1, .r2, .r3,
+        .o0, .o1, .o2, .o3,
+        .b1, .b2, .b3,
+        .c1, .c2, .c3, .c4,
+        .c5, .c6, .c7, .c8 {
+            display: inline-block;
+        }
+
+        .r0, .r1, .r2, .r3 {
+            margin-top: -1.5pt;
+            margin-right: 1.5pt;
+            vertical-align: top;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: right top;
+        }
+
+        .o0, .o1, .o2, .o3 {
+            border-top: solid 0.75pt;
+            line-height: 130%;
+            vertical-align: middle;
+            margin-top: 0.75pt;
+            padding-top: 1.25pt;
+            padding-left: 1pt;
+            padding-right: 1pt;
+        }
+
+        .r {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 150%;
+            display: inline-block;
+            vertical-align: top;
+            margin-left: -9.5pt;
+            position: relative;
+            top: 1pt;
+        }
+
+        .r0 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDEwIDIwIiBoZWlnaHQ9IjE1cHQiIHdpZHRoPSIxMHB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMCwxMyAyLDEyIDUsMTkgOSwwIiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MC42cHQ7IHN0cm9rZS1saW5lam9pbjpyb3VuZDsgc3Ryb2tlLWxpbmVjYXA6cm91bmQ7IGZpbGw6bm9uZSIgLz4NCiAgPGxpbmUgeDE9IjIuMiIgeTE9IjEyLjMiIHgyPSI0LjYiIHkyPSIxOC43IiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MC44cHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 8pt;
+            height: 16pt;
+            margin-left: -8pt;
+        }
+
+        .r1 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE1IDQwIiBoZWlnaHQ9IjMwcHQiIHdpZHRoPSIxNXB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMSwyNiAzLDI0IDgsMzggMTQsMCIgc3R5bGU9InN0cm9rZTpibGFjazsgc3Ryb2tlLXdpZHRoOjAuNnB0OyBzdHJva2UtbGluZWpvaW46cm91bmQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyBmaWxsOm5vbmUiIC8+DQogIDxsaW5lIHgxPSIzLjIiIHkxPSIyNC40IiB4Mj0iNy42IiB5Mj0iMzcuNiIgc3R5bGU9InN0cm9rZTpibGFjazsgc3Ryb2tlLXdpZHRoOjFwdDsgc3Ryb2tlLWxpbmVjYXA6cm91bmQ7IiAvPg0KPC9zdmc+");
+            width: 12pt;
+            height: 32pt;
+            margin-left: -12pt;
+        }
+
+        .r2 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDIwIDYwIiBoZWlnaHQ9IjQ1cHQiIHdpZHRoPSIyMHB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMiwzNyA1LDM0IDExLDU1IDE5LDAiIHN0eWxlPSJzdHJva2U6YmxhY2s7IHN0cm9rZS13aWR0aDowLjZwdDsgc3Ryb2tlLWxpbmVqb2luOnJvdW5kOyBzdHJva2UtbGluZWNhcDpyb3VuZDsgZmlsbDpub25lIiAvPg0KICA8bGluZSB4MT0iNS4xIiB5MT0iMzQuNiIgeDI9IjEwLjYiIHkyPSI1NC40IiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MS4ycHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 16pt;
+            height: 48pt;
+            margin-left: -16pt;
+        }
+
+        .r3 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDI1IDgwIiBoZWlnaHQ9IjYwcHQiIHdpZHRoPSIyNXB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMyw1MCA3LDQ2IDE1LDc0IDI0LDAiIHN0eWxlPSJzdHJva2U6YmxhY2s7IHN0cm9rZS13aWR0aDowLjZwdDsgc3Ryb2tlLWxpbmVqb2luOnJvdW5kOyBzdHJva2UtbGluZWNhcDpyb3VuZDsgZmlsbDpub25lIiAvPg0KICA8bGluZSB4MT0iNy4xIiB5MT0iNDYuOCIgeDI9IjE0LjUiIHkyPSI3My4yIiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MS4ycHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 19pt;
+            height: 62pt;
+            margin-left: -19pt;
+        }
+
+        .nth {
+            position: relative;
+            bottom: 1pt;
+        }
+
+        .eq small.nth {font-size: 70%;}
+        .dvr small {font-size: 65%;}
+        sup.raised {vertical-align: top;}
+
+        sup .r0, sup .r1, sup .r2, sup .r3 {
+            zoom: 0.7;
+            -moz-transform: scale(0.7);
+            -webkit-transform: scale(0.7);
+            transform: scale(0.7);
+            transform-origin: top right;
+            max-height: none;
+        }
+
+        sup .r0 { margin-left: -5pt; }
+        sup .r1 { margin-left: -11pt; }
+        sup .r2 { margin-left: -13pt; }
+        sup .r3 { margin-left: -16pt; }
+
+        .b1, .b2, .b3, .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+            vertical-align: middle;
+            font-weight: 100;
+            font-stretch: ultra-condensed;
+        }
+
+        .b2, .b3, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+            font-family: 'Jost* Hairline', sans-serif;
+        }
+
+        .b0, .b1, .c1 {
+            font-family: 'Jost* Thin', sans-serif;
+        }
+
+        .b0 {
+            font-size: 120%;
+            font-weight: 600;
+            padding: 0 1pt 0 1pt;
+        }
+
+        .b1 {
+            font-size: 240%;
+            margin-top: -3pt;
+            margin-left: -1pt;
+            margin-right: -1pt;
+        }
+
+        .b2 {
+            font-size: 370%;
+            margin-top: -5pt;
+            margin-left: -3pt;
+            margin-right: -3pt;
+        }
+
+        .b3 {
+            font-size: 520%;
+            margin-top: -8pt;
+            margin-left: -5pt;
+            margin-right: -5pt;
+        }
+
+        .c1 {
+            font-size: 240%;
+            margin-top: -4pt;
+        }
+
+        .c2 {
+            font-size: 360%;
+            margin-top: -6pt;
+            margin-left: -2.5pt;
+            margin-right: -0.5pt;
+        }
+
+        .c3 {
+            font-size: 480%;
+            margin-top: -8pt;
+            margin-left: -3pt;
+            margin-right: -1pt;
+        }
+
+        .c4 {
+            font-size: 600%;
+            margin-top: -10pt;
+            margin-left: -4pt;
+            margin-right: -2pt;
+            transform: scaleX(0.9);
+        }
+
+        .c5 {
+            font-size: 710%;
+            margin-top: -11.5pt;
+            margin-left: -6pt;
+            margin-right: -4pt;
+            transform: scaleX(0.8);
+        }
+
+        .c6 {
+            font-size: 820%;
+            margin-top: -13pt;
+            margin-left: -7pt;
+            margin-right: -5pt;
+            transform: scaleX(0.7);
+        }
+
+        .c7 {
+            font-size: 930%;
+            margin-top: -14.5pt;
+            margin-left: -8pt;
+            margin-right: -6pt;
+            transform: scaleX(0.6);
+        }
+
+        .c8 {
+            font-size: 1040%;
+            margin-top: -16pt;
+            margin-left: -9pt;
+            margin-right: -7pt;
+            transform: scaleX(0.5);
+        }
+
+        .dvc, .dvr, .dvs {
+            display: inline-block;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .dvc {
+            padding-left: 2pt;
+            padding-right: 2pt;
+            text-align: center;
+            line-height: 110%;
+        }
+
+        .dvr {
+            text-align: center;
+            line-height: 110%;
+            margin-bottom: 4pt;
+        }
+
+        .dvs {
+            text-align: left;
+            line-height: 110%;
+        }
+
+        .dvl {
+            display: block;
+            border-bottom: solid 1pt black;
+            margin-top: 1pt;
+            margin-bottom: 1pt;
+        }
+
+        .nary {
+            color: #C080F0;
+            font-size: 240%;
+            font-family: Georgia Pro Light, serif;
+            font-weight: 200;
+            line-height: 80%;
+            display: block;
+            margin: -1pt 1pt 3pt 1pt;
+        }
+
+            .nary em {
+                display: block;
+                transform: scaleX(0.7) rotate(7deg);
+            }
+
+        .dvc.down {
+            position: relative;
+            top: 0.5em;
+        }
+
+        .dvc.up {
+            position: relative;
+            bottom: 0.6em;
+        }
+
+        .low {
+            font-size: 70%;
+            display: inline-block;
+            position: relative;
+            top: 1.2em;
+        }
+
+        .cond {
+            color: #E000D0;
+        }
+
+        .err {
+            color: Crimson;
+            background-color: #FEE;
+        }
+
+        .ok {
+            color: Green;
+            background-color: #F0FFF0;
+        }
+
+        .ref {
+            float: right;
+            margin-left: 18pt;
+            color: Green;
+            background-color: #F8FFF0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .side {
+            float: right;
+            max-width: 50%;
+        }
+
+        .plot {
+            max-width: 100%
+        }
+
+        .indent {
+            border-left: 0.75pt solid #dddddd;
+            padding-left: 2em;
+        }
+
+        span.indent {
+            display: inline-block;
+        }
+
+        .fold {
+            height: 2.4em;
+            overflow: hidden;
+        }
+
+        .unfold {
+            height: auto;
+            overflow: auto;
+        }
+
+            .fold > :first-child, .unfold > :first-child {
+                cursor: pointer;
+            }
+
+                .fold > :first-child:hover, .unfold > :first-child:hover {
+                    color: #0066bb;
+                    text-decoration: underline;
+                }
+
+                .fold > :first-child::after {
+                    content: " ... ▼";
+                    font-size: 80%;
+                }
+
+                .unfold > :first-child::after {
+                    content: " ▲";
+                    font-size: 80%;
+                }
+
+        .vec {
+            font-family: 'Cambria Math', serif;
+            color: #8af;
+            font-style: normal;
+            display: inline-block;
+            vertical-align: 2pt;
+            margin-left: 3pt;
+            margin-right: -7pt;
+        }
+
+        small .vec, sup .vec {
+            margin-left: 2pt;
+            margin-right: -6pt;
+        }
+
+        #Units {
+            float: right;
+        }
+
+        @media screen {
+            .no-screen {
+                display: none;
+            }
+        }
+
+        @media print {
+            .side {
+                zoom: 0.8;
+                -moz-transform: scale(0.8);
+            }
+
+            body {
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        @page {
+            size: A4 portrait;
+            margin-left: 20mm;
+            margin-right: 10mm;
+            margin-top: 10mm;
+            margin-bottom: 10mm;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .value {
+            position: relative;
+            background-color: #f4fbff;
+            border-radius: 3pt;
+        }
+
+            .value:after {
+                content: "";
+                position: absolute;
+                left: 100%;
+                top: -100%;
+                transform: translateY(-50%);
+                margin-left: 2pt;
+                height: 16pt;
+                line-height: 16pt;
+                vertical-align: middle;
+                width: fit-content;
+                white-space: nowrap;
+                min-width: 10pt;
+                z-index: 1;
+                padding: 0 6pt 0 6pt;
+                border-radius: 6pt 6pt 6pt 0;
+                background: #000;
+                color: #fff;
+                font-family: 'Segoe UI', sans-serif;
+                font-style: normal;
+                font-size: 10pt;
+                text-align: center;
+                display: none;
+                opacity: 0;
+                transition: opacity 2s;
+                user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                -moz-user-select: none;
+            }
+
+            .value:hover:after {
+                content: attr(data-value);
+                display: block;
+                opacity: 1;
+            }
+
+        .errorHeader {
+            color: white;
+            background-color: crimson;
+            font-size: 10pt;
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 0;
+            width: 100vw;
+            max-width: 100%;
+            height: 1.8em;
+            line-height: 1.2em;
+            padding-left: 6pt;
+            overflow-x: hidden;
+        }
+
+        .roundBox {
+            background-color: #fee;
+            color: crimson;
+            font-size: 9pt;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            display: inline-block;
+            border-radius: 4pt;
+            min-width: 1.1em;
+            padding-left: 2pt;
+            padding-right: 2pt;
+            margin-top: 2pt;
+        }
+
+            .roundBox:hover {
+                background-color: white;
+            }
+
+        .lineLink {
+            background: none;
+            color: #b0e0ff;
+            font-family: Calibri, sans-serif;
+            font-size: 10pt;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: left;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            width: 2em;
+            height: 4em;
+            z-index: 1;
+        }
+
+            .lineLink:hover {
+                background: none;
+                color: #09e;
+            }
+    </style>
+</head>
+<body>
+    <script>
+        var contextMenu = false;
+        function getVerticalPosition(line) { return document.querySelector("[data-text='" + line + "']").getBoundingClientRect().top; }
+        function isNumeric(s) { return s.match(/^-?\d+(?:\.\d+)?$/); }
+        if (window.jQuery) {
+            function getHtmlWithInput() {
+                $("input[type=text]").each(function () {
+                    $(this).attr("value", $(this).val());
+                });
+                $("input[type=hidden]").each(function () {
+                    $(this).attr("value", $(this).val());
+                });
+                $("textarea").each(function () {
+                    $(this).html($(this).val());
+                });
+                $("input[type=radio]").each(function () {
+                    if (this.checked)
+                        $(this).attr("checked", "checked");
+                    else
+                        $(this).removeAttr("checked");
+                });
+                $("input[type=checkbox]").each(function () {
+                    if (this.checked)
+                        $(this).attr("checked", "checked");
+                    else
+                        $(this).removeAttr("checked");
+                });
+                $("select option").each(function () {
+                    if (this.selected) {
+                        $(this).attr("selected", "true");
+                    }
+                    else
+                        $(this).removeAttr("selected");
+                });
+                return document.body.outerHTML;
+            }
+
+            function getTargetId(element) {
+                var id = $(element).attr("name");
+                if (id != null && id.length > 0)
+                    return id;
+
+                return $(element).data("target");
+            }
+
+            function getValue(id, source) {
+                var value = "";
+                var target = $("#" + id + " input");
+                var domObj = target.get(0);
+                if (domObj == null || domObj.Length == 0) {
+                    target = $("#" + id + " .eq u");
+                    target.each(function () {
+                        value += $(this).text() + ";";
+                    });
+                    $(source).prop('disabled', true);
+                }
+                else {
+                    target.each(function () {
+                        value += $(this).val() + ";";
+                    });
+                }
+                if (value.length > 1) {
+                    value = value.slice(0, -1);
+                }
+                return value;
+            }
+
+            $(document).ready(function () {
+
+                $(".dvcs:has(.block) > :first-child").html("&hairsp;");
+
+                $("#Units").change(function () { $(".Units").text($(this).val()); });
+
+                $(".fold > :first-child").click(function () {
+                    if ($(this).parent().hasClass("fold")) {
+                        $(this).parent().removeClass("fold").addClass("unfold");
+                    }
+                    else {
+                        $(this).parent().removeClass("unfold").addClass("fold");
+                    }
+                });
+
+                $("select").each(function (index) {
+                    if ($(this).prop("id") != "Units") {
+                        var id = getTargetId(this);
+                        if (id != null && id.length > 0) {
+                            var value = getValue(id, this);
+                            $(this).val(value);
+                        }
+                    }
+
+                });
+
+                $("select").change(function () {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var target = $("#" + id + " input");
+                        if (target != null) {
+                            var values = $(this).val().split(";");
+                            target.each(function (index) {
+                                $(this).val(values[index]);
+                            });
+                        }
+                    }
+                });
+
+                $("input:radio, input:checkbox").each(function (index) {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var value = getValue(id, this);
+                        $(this).prop("checked", $(this).val() == value);
+                    }
+                });
+
+                $("input:radio, input:checkbox").change(function () {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var target = $("#" + id + " input");
+                        if (target != null) {
+                            if ($(this).prop("checked")) {
+                                var values = $(this).val().split(";");
+                                target.each(function (index) {
+                                    $(this).val(values[index]);
+                                });
+                            }
+                            else if ($(this).prop("type") == "checkbox") {
+                                target.each(function () {
+                                    $(this).val("0");
+                                });
+                            }
+                        }
+                    }
+                });
+
+                $(".line:not(style, script)").each(function () {
+                    var line = $(this).prop("id").split("-")[1];
+                    var $lineLink = $('<a class="lineLink" href="#0" data-text="' + line + '" title="Code line ' + line + '">&larr;</a>');
+                    $(this).append($lineLink);
+                    $lineLink.hide();
+                    $(this).hover(function () {
+                        $(".lineLink").hide();
+                        $lineLink.show();
+                    });
+                    $(window).scroll(function () {
+                        $lineLink.hide();
+                    });
+                });
+
+                $("body").mouseleave(function () {
+                    $(".lineLink").hide();
+                });
+
+                $(".roundBox").click(function () {
+                    var line = $(this).data("line");
+                    var e = document.getElementById("line-" + line);
+                    if (e) {
+                        window.scrollTo(0, e.offsetTop - $(this).outerHeight() - 20);
+                    }
+                });
+                $(".money").each(function () { $(this).text(Number(($(this).text())).toFixed(2)); });
+
+                $("input").change(function() {
+                    var e = $(this);
+                    var s = e.val();
+                    if (isNumeric(s)) {
+                        e.css("color", "black");
+                        e.removeAttr("title");
+                    } else {
+                        e.css("color", "red");
+                        e.attr("title", "Invalid number");
+                    }
+                });
+
+                $("a").click(function () {
+                    chrome.webview.postMessage('clicked');
+                });
+
+                window.addEventListener('click', () => {
+                    chrome.webview.postMessage('focused');
+                });
+            });
+        }
+        document.oncontextmenu = function () { contextMenu = true; };
+        document.onmousedown = function () { contextMenu = false; };
+    </script><p> ============================================ </p>
+<p> Importado de Excel (.xlsx) </p>
+<p> Versión: Microsoft Excel 16.0300 </p>
+<p> Archivo: hoja de calculo 23-01-2026.xlsx </p>
+<p> Fecha: 2026-01-24 07:23:23 </p>
+<p> Hojas: 24 </p>
+<p> ============================================ </p>
+<p>&nbsp;</p>
+<h3><hr/> </h3>
+<h3>LOSA </h3>
+<h2>LOSA</h2> 
+<p>&nbsp;</p>
+<h3>Datos de entrada</h3> 
+<table class="bordered"><tr><th>Variable</th><th>Valor</th><th>Descripción</th></tr>25<tr><td><b>Ht</b></td><td>25 cm</td><td>Ht</td></tr>5<tr><td><b>tc</b></td><td>5 cm</td><td>tc</td></tr>1<tr><td><b>E3</b></td><td>1</td><td>E3</td></tr>10<tr><td><b>bn</b></td><td>10 cm</td><td>bn</td></tr>2<tr><td><b>E4</b></td><td>2</td><td>E4</td></tr>40<tr><td><b>ba</b></td><td>40 cm</td><td>ba</td></tr>3<tr><td><b>E5</b></td><td>3</td><td>E5</td></tr>6.55<tr><td><b>Lmax</b></td><td>6.55 m</td><td>Lmax</td></tr>6<tr><td><b>F9</b></td><td>6</td><td>F9</td></tr>4.8<tr><td><b>F10</b></td><td>4.8</td><td>F10</td></tr>3.6<tr><td><b>F11</b></td><td>3.6</td><td>F11</td></tr></table><p>&nbsp;</p>
+<h3>Cálculos</h3> 
+<table class="bordered"> 
+<tr><th>Variable</th><th>Fórmula</th><th>Calcpad</th><th>Excel</th><th>Diferencia</th></tr> 
+<p><span class="eq"><var>F3</var> = <var>bn</var> ·  ( <var>Ht</var> − <var>tc</var> )  = 10 ·  ( 25 − 5 )  = 200</span></p>
+<tr><td><b>F3</b></td> 
+<td><code>+B4*(B2-B3)</code></td> 
+<td> <span class="eq"><var>F3</var> = 200</span> </td> 
+<td>200</td> 
+<td> <span class="eq"><var>diff</var><sub>F3</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>G3</var> = <span class="dvc"><var>Ht</var> − <var>tc</var><span class="dvl"></span>2</span> = <span class="dvc">25 − 5<span class="dvl"></span>2</span> = 10</span></p>
+<tr><td><b>G3</b></td> 
+<td><code>+(B2-B3)/2</code></td> 
+<td> <span class="eq"><var>G3</var> = 10</span> </td> 
+<td>10</td> 
+<td> <span class="eq"><var>diff</var><sub>G3</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>H3</var> = 200 · 10 = 2000</span></p>
+<tr><td><b>H3</b></td> 
+<td><code>+F3*G3</code></td> 
+<td> <span class="eq"><var>H3</var> = 2000</span> </td> 
+<td>2000</td> 
+<td> <span class="eq"><var>diff</var><sub>H3</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>I3</var> = <span class="dvc"><var>bn</var> ·  ( <var>Ht</var> − <var>tc</var> ) <sup>3</sup><span class="dvl"></span>12</span> = <span class="dvc">10 ·  ( 25 − 5 ) <sup>3</sup><span class="dvl"></span>12</span> = 6666.666667</span></p>
+<tr><td><b>I3</b></td> 
+<td><code>+B4*(B2-B3)^3 /12</code></td> 
+<td> <span class="eq"><var>I3</var> = 6666.666667</span> </td> 
+<td>6666.666666666667</td> 
+<td> <span class="eq"><var>diff</var><sub>I3</sub> = 7.275958×10<sup>-12</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>F5</var> = 100 · <var>tc</var> = 100 · 5 = 500</span></p>
+<tr><td><b>F5</b></td> 
+<td><code>100*B3</code></td> 
+<td> <span class="eq"><var>F5</var> = 500</span> </td> 
+<td>500</td> 
+<td> <span class="eq"><var>diff</var><sub>F5</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>G5</var> = <var>Ht</var> − <span class="dvc"><var>tc</var><span class="dvl"></span>2</span> = 25 − <span class="dvc">5<span class="dvl"></span>2</span> = 22.5</span></p>
+<tr><td><b>G5</b></td> 
+<td><code>+B2-B3/2</code></td> 
+<td> <span class="eq"><var>G5</var> = 22.5</span> </td> 
+<td>22.5</td> 
+<td> <span class="eq"><var>diff</var><sub>G5</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>H5</var> = 500 · 22.5 = 11250</span></p>
+<tr><td><b>H5</b></td> 
+<td><code>+F5*G5</code></td> 
+<td> <span class="eq"><var>H5</var> = 11250</span> </td> 
+<td>11250</td> 
+<td> <span class="eq"><var>diff</var><sub>H5</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>H6</var> = 2000 + 2000 + 11250 = 15250</span></p>
+<tr><td><b>H6</b></td> 
+<td><code>SUM(H3:H5)</code></td> 
+<td> <span class="eq"><var>H6</var> = 15250</span> </td> 
+<td>15250</td> 
+<td> <span class="eq"><var>diff</var><sub>H6</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>F6</var> = 200 + 200 + 500 = 900</span></p>
+<tr><td><b>F6</b></td> 
+<td><code>SUM(F3:F5)</code></td> 
+<td> <span class="eq"><var>F6</var> = 900</span> </td> 
+<td>900</td> 
+<td> <span class="eq"><var>diff</var><sub>F6</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>cg</var> = <span class="dvc">15250<span class="dvl"></span>900</span> = 16.944444</span></p>
+<tr><td><b>cg</b></td> 
+<td><code>+H6/F6</code></td> 
+<td> <span class="eq"><var>cg</var> = 16.944444</span>  cm</td> 
+<td>16.944444444444443 cm</td> 
+<td> <span class="eq"><var>diff</var><sub>cg</sub> = 4.263256×10<sup>-14</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>J3</var> =  ( 10 − <var>cg</var> ) <sup>2</sup> =  ( 10 − 16.944444 ) <sup>2</sup> = 48.225309</span></p>
+<tr><td><b>J3</b></td> 
+<td><code>+(G3-$G$7)^2</code></td> 
+<td> <span class="eq"><var>J3</var> = 48.225309</span> </td> 
+<td>48.225308641975289</td> 
+<td> <span class="eq"><var>diff</var><sub>J3</sub> = 8.526513×10<sup>-14</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K3</var> = 6666.666667 + 200 · 48.225309 = 16311.7284</span></p>
+<tr><td><b>K3</b></td> 
+<td><code>+I3+F3*J3</code></td> 
+<td> <span class="eq"><var>K3</var> = 16311.7284</span> </td> 
+<td>16311.728395061724</td> 
+<td> <span class="eq"><var>diff</var><sub>K3</sub> = 1.818989×10<sup>-12</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>F4</var> = 200</span></p>
+<tr><td><b>F4</b></td> 
+<td><code>+F3</code></td> 
+<td> <span class="eq"><var>F4</var> = 200</span> </td> 
+<td>200</td> 
+<td> <span class="eq"><var>diff</var><sub>F4</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>G4</var> = 10</span></p>
+<tr><td><b>G4</b></td> 
+<td><code>+G3</code></td> 
+<td> <span class="eq"><var>G4</var> = 10</span> </td> 
+<td>10</td> 
+<td> <span class="eq"><var>diff</var><sub>G4</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>H4</var> = 200 · 10 = 2000</span></p>
+<tr><td><b>H4</b></td> 
+<td><code>+F4*G4</code></td> 
+<td> <span class="eq"><var>H4</var> = 2000</span> </td> 
+<td>2000</td> 
+<td> <span class="eq"><var>diff</var><sub>H4</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>I4</var> = 6666.666667</span></p>
+<tr><td><b>I4</b></td> 
+<td><code>+I3</code></td> 
+<td> <span class="eq"><var>I4</var> = 6666.666667</span> </td> 
+<td>6666.666666666667</td> 
+<td> <span class="eq"><var>diff</var><sub>I4</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>J4</var> =  ( 10 − <var>cg</var> ) <sup>2</sup> =  ( 10 − 16.944444 ) <sup>2</sup> = 48.225309</span></p>
+<tr><td><b>J4</b></td> 
+<td><code>+(G4-$G$7)^2</code></td> 
+<td> <span class="eq"><var>J4</var> = 48.225309</span> </td> 
+<td>48.225308641975289</td> 
+<td> <span class="eq"><var>diff</var><sub>J4</sub> = 8.526513×10<sup>-14</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K4</var> = 6666.666667 + 200 · 48.225309 = 16311.7284</span></p>
+<tr><td><b>K4</b></td> 
+<td><code>+I4+F4*J4</code></td> 
+<td> <span class="eq"><var>K4</var> = 16311.7284</span> </td> 
+<td>16311.728395061724</td> 
+<td> <span class="eq"><var>diff</var><sub>K4</sub> = 1.818989×10<sup>-12</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>I5</var> = <span class="dvc">100 · <var>tc</var><sup>3</sup><span class="dvl"></span>12</span> = <span class="dvc">100 · 5<sup>3</sup><span class="dvl"></span>12</span> = 1041.666667</span></p>
+<tr><td><b>I5</b></td> 
+<td><code>100*B3^3 /12</code></td> 
+<td> <span class="eq"><var>I5</var> = 1041.666667</span> </td> 
+<td>1041.6666666666667</td> 
+<td> <span class="eq"><var>diff</var><sub>I5</sub> = 6.82121×10<sup>-12</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>J5</var> =  ( 22.5 − <var>cg</var> ) <sup>2</sup> =  ( 22.5 − 16.944444 ) <sup>2</sup> = 30.864198</span></p>
+<tr><td><b>J5</b></td> 
+<td><code>+(G5-$G$7)^2</code></td> 
+<td> <span class="eq"><var>J5</var> = 30.864198</span> </td> 
+<td>30.864197530864214</td> 
+<td> <span class="eq"><var>diff</var><sub>J5</sub> = 1.421085×10<sup>-14</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K5</var> = 1041.666667 + 500 · 30.864198 = 16473.76543</span></p>
+<tr><td><b>K5</b></td> 
+<td><code>+I5+F5*J5</code></td> 
+<td> <span class="eq"><var>K5</var> = 16473.76543</span> </td> 
+<td>16473.765432098775</td> 
+<td> <span class="eq"><var>diff</var><sub>K5</sub> = 5.820766×10<sup>-11</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K6</var> = 16311.7284 + 16311.7284 + 16473.76543 = 49097.22222</span></p>
+<tr><td><b>K6</b></td> 
+<td><code>SUM(K3:K5)</code></td> 
+<td> <span class="eq"><var>K6</var> = 49097.22222</span> </td> 
+<td>49097.222222222219</td> 
+<td> <span class="eq"><var>diff</var><sub>K6</sub> = 1.018634×10<sup>-10</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>hmin</var> = 0.03 · <var>Lmax</var> · 100 = 0.03 · 6.55 · 100 = 19.65</span></p>
+<tr><td><b>hmin</b></td> 
+<td><code>0.03*B7*100</code></td> 
+<td> <span class="eq"><var>hmin</var> = 19.65</span>  cm</td> 
+<td>19.649999999999999 cm</td> 
+<td> <span class="eq"><var>diff</var><sub>hmin</sub> = 9.947598×10<sup>-14</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Imin</var> = <span class="dvc">100 · <var>hmin</var><sup>3</sup><span class="dvl"></span>12</span> = <span class="dvc">100 · 19.65<sup>3</sup><span class="dvl"></span>12</span> = 63227.55937</span></p>
+<tr><td><b>Imin</b></td> 
+<td><code>100*B8^3 /12</code></td> 
+<td> <span class="eq"><var>Imin</var> = 63227.55937</span> </td> 
+<td>63227.559374999983</td> 
+<td> <span class="eq"><var>diff</var><sub>Imin</sub> = 8.003553×10<sup>-11</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K9</var> = <span class="b1">(</span><span class="dvc">12 · 49097.22222<span class="dvl"></span>100</span><span class="b1">)</span><sup class="raised">0.333</sup> = 18.008988</span></p>
+<tr><td><b>K9</b></td> 
+<td><code>+(12*K6/100)^0.333</code></td> 
+<td> <span class="eq"><var>K9</var> = 18.008988</span> </td> 
+<td>18.008988048517935</td> 
+<td> <span class="eq"><var>diff</var><sub>K9</sub> = 3.197442×10<sup>-14</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K10</var> = <span class="dvc up"><span class="dvc">18.008988<span class="dvl"></span>0.03</span><span class="dvl"></span>100</span> = 6.002996</span></p>
+<tr><td><b>K10</b></td> 
+<td><code>+K9/0.03/100</code></td> 
+<td> <span class="eq"><var>K10</var> = 6.002996</span> </td> 
+<td>6.0029960161726459</td> 
+<td> <span class="eq"><var>diff</var><sub>K10</sub> = 6.217249×10<sup>-15</sup></span> </td></tr> 
+<p>&nbsp;</p>
+</table> 
+<p>&nbsp;</p>
+<h3><hr/> </h3>
+<h3>COL </h3>
+<h2>COL</h2> 
+<p>&nbsp;</p>
+<h3>Datos de entrada</h3> 
+<table class="bordered"><tr><th>Variable</th><th>Valor</th><th>Descripción</th></tr>6.1<tr><td><b>Longitud_X1</b></td><td>6.1 m</td><td>Longitud X1</td></tr>35<tr><td><b>b</b></td><td>35 cm</td><td>b</td></tr>6<tr><td><b>Longitud_X2</b></td><td>6 m</td><td>Longitud X2</td></tr>45<tr><td><b>h</b></td><td>45 cm</td><td>h</td></tr>0.62<tr><td><b>Carga_Muerta_1</b></td><td>0.62 t/m2</td><td>Carga Muerta 1</td></tr>6.55<tr><td><b>Longitud_X3</b></td><td>6.55 m</td><td>Longitud X3</td></tr>2.5<tr><td><b>rec</b></td><td>2.5 cm</td><td>rec</td></tr>0.2<tr><td><b>Carga_Viva_1</b></td><td>0.2 t/m2</td><td>Carga Viva 1</td></tr>6.55<tr><td><b>Longitud_X4</b></td><td>6.55 m</td><td>Longitud X4</td></tr>10<tr><td><b>fi_est</b></td><td>10 mm</td><td>fi est</td></tr>0.35<tr><td><b>Sobre_Carga_</b></td><td>0.35 t/m2</td><td>Sobre Carga </td></tr>55<tr><td><b>ancho</b></td><td>55 cm</td><td>ancho</td></tr>6<tr><td><b>var</b></td><td>6</td><td>var</td></tr>1<tr><td><b>Pisos</b></td><td>1 u</td><td>Pisos</td></tr>55<tr><td><b>prof</b></td><td>55 cm</td><td>prof</td></tr>16<tr><td><b>fi</b></td><td>16</td><td>fi</td></tr>0.62<tr><td><b>Carga_muerta_2</b></td><td>0.62 t/m2</td><td>Carga muerta 2</td></tr>6<tr><td><b>var_a</b></td><td>6 u</td><td>var a</td></tr>0.2<tr><td><b>Carga_viva_2</b></td><td>0.2 t/m2</td><td>Carga viva 2</td></tr>6<tr><td><b>var_p</b></td><td>6 u</td><td>var p</td></tr>16<tr><td><b>fi_long</b></td><td>16 mm</td><td>fi long</td></tr>0.62<tr><td><b>Carga_muerta_3</b></td><td>0.62 t/m2</td><td>Carga muerta 3</td></tr>18<tr><td><b>fi_esq</b></td><td>18 mm</td><td>fi esq</td></tr>0.48<tr><td><b>Carga_viva_3</b></td><td>0.48 t/m2</td><td>Carga viva 3</td></tr>0.62<tr><td><b>Carga_Muerta_3</b></td><td>0.62 t/m2</td><td>Carga Muerta 3</td></tr>5.3<tr><td><b>INT</b></td><td>5.3</td><td>INT</td></tr>0.62<tr><td><b>Carga_Muerta</b></td><td>0.62 t/m2</td><td>Carga Muerta</td></tr>4<tr><td><b>MED</b></td><td>4</td><td>MED</td></tr>0.48<tr><td><b>Carga_Viva</b></td><td>0.48 t/m2</td><td>Carga Viva</td></tr>3.2<tr><td><b>ESQ</b></td><td>3.2</td><td>ESQ</td></tr>3.6<tr><td><b>He</b></td><td>3.6 m</td><td>He</td></tr>1<tr><td><b>Fm</b></td><td>1</td><td>Fm</td></tr>210<tr><td><b>fc</b></td><td>210 kg/cm2</td><td>fc</td></tr>4200<tr><td><b>fy</b></td><td>4200 kg/cm2</td><td>fy</td></tr>21<tr><td><b>Esfuerzo_adm_suelo_</b></td><td>21</td><td>Esfuerzo adm suelo.</td></tr>1.5<tr><td><b>Dimensiones_de_Zapata_</b></td><td>1.5</td><td>Dimensiones de Zapata.</td></tr>1.5<tr><td><b>C31</b></td><td>1.5</td><td>C31</td></tr>9<tr><td><b>N_pisos</b></td><td>9</td><td>N pisos</td></tr><span class="err">Error in "Simb_central = 1.4999999999999999E-2" on line [<a href="#0" data-text="391">391</a>]: Error parsing "E" as units.</span><tr><td><b>Simb_central</b></td><td><span class="err">Error in "Simb_central" on line [<a href="#0" data-text="392">392</a>]: Undefined variable or units: "Simb_central".</span> cm2</td><td>Simb central</td></tr>21.85<tr><td><b>Luz_en_X</b></td><td>21.85</td><td>Luz en X</td></tr>8.45<tr><td><b>Luz_en_Y</b></td><td>8.45</td><td>Luz en Y</td></tr>14<tr><td><b>Cantidad_col</b></td><td>14 u</td><td>Cantidad col</td></tr>0.25<tr><td><b>v1_a_4</b></td><td>0.25</td><td>1 a 4</td></tr>0.3<tr><td><b>v5_a_10</b></td><td>0.3</td><td>5 a 10</td></tr></table><p>&nbsp;</p>
+<h3>Cálculos</h3> 
+<table class="bordered"> 
+<tr><th>Variable</th><th>Fórmula</th><th>Calcpad</th><th>Excel</th><th>Diferencia</th></tr> 
+<p><span class="eq"><var>num</var> = <var>var</var><sub>a</sub> · 2 +  ( <var>var</var><sub>p</sub> − 2 )  · 2 = 6 · 2 +  ( 6 − 2 )  · 2 = 20</span></p>
+<tr><td><b>num</b></td> 
+<td><code>+F9*2+(F10-2)*2</code></td> 
+<td> <span class="eq"><var>num</var> = 20</span>  u</td> 
+<td>20 u</td> 
+<td> <span class="eq"><var>diff</var><sub>num</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>At</var> = <span class="b1">(</span><span class="dvc"><var>Longitud</var><sub>X1</sub><span class="dvl"></span>2</span> + <span class="dvc"><var>Longitud</var><sub>X2</sub><span class="dvl"></span>2</span><span class="b1">)</span> · <span class="b1">(</span><span class="dvc"><var>Longitud</var><sub>X3</sub><span class="dvl"></span>2</span> + <span class="dvc"><var>Longitud</var><sub>X4</sub><span class="dvl"></span>2</span><span class="b1">)</span> = <span class="b1">(</span><span class="dvc">6.1<span class="dvl"></span>2</span> + <span class="dvc">6<span class="dvl"></span>2</span><span class="b1">)</span> · <span class="b1">(</span><span class="dvc">6.55<span class="dvl"></span>2</span> + <span class="dvc">6.55<span class="dvl"></span>2</span><span class="b1">)</span> = 39.6275</span></p>
+<tr><td><b>At</b></td> 
+<td><code>+(B2/2+B3/2)*(B4/2+B5/2)</code></td> 
+<td> <span class="eq"><var>At</var> = 39.6275</span>  m2</td> 
+<td>39.627499999999998 m2</td> 
+<td> <span class="eq"><var>diff</var><sub>At</sub> = 1.065814×10<sup>-13</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>bc</var> = <var>ancho</var> − 2 · <var>rec</var> = 55 − 2 · 2.5 = 50</span></p>
+<tr><td><b>bc</b></td> 
+<td><code>+F7-2*F14</code></td> 
+<td> <span class="eq"><var>bc</var> = 50</span>  cm</td> 
+<td>49 cm</td> 
+<td> <span class="eq"><var>diff</var><sub>bc</sub> = 1</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>d</var> = <var>h</var> − <var>rec</var> − <span class="dvc"><var>fi</var><sub>est</sub><span class="dvl"></span>10</span> − <span class="dvc"><var>fi</var><span class="dvl"></span>20</span> = 45 − 2.5 − <span class="dvc">10<span class="dvl"></span>10</span> − <span class="dvc">16<span class="dvl"></span>20</span> = 40.7</span></p>
+<tr><td><b>d</b></td> 
+<td><code>+N3-N4-N5/10-N8/20</code></td> 
+<td> <span class="eq"><var>d</var> = 40.7</span>  cm</td> 
+<td>40.700000000000003 cm</td> 
+<td> <span class="eq"><var>diff</var><sub>d</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Cu</var> = 1.2 ·  ( <var>Carga</var><sub>Muerta_1</sub> · <var>Pisos</var> + <var>Carga</var><sub>muerta_2</sub> · <var>Pisos</var> + <var>Carga</var><sub>muerta_3</sub> · <var>Pisos</var> + <var>Carga</var><sub>Muerta</sub> · <var>Pisos</var> )  + 1.6 ·  ( <var>Carga</var><sub>Viva_1</sub> · <var>Pisos</var> + <var>Carga</var><sub>viva_2</sub> · <var>Pisos</var> + <var>Carga</var><sub>viva_3</sub> · <var>Pisos</var> + <var>Carga</var><sub>Viva</sub> · <var>Pisos</var> )  = 1.2 ·  ( 0.62 · 1 + 0.62 · 1 + 0.62 · 1 + 0.62 · 1 )  + 1.6 ·  ( 0.2 · 1 + 0.2 · 1 + 0.48 · 1 + 0.48 · 1 )  = 5.152</span></p>
+<tr><td><b>Cu</b></td> 
+<td><code>1.2*(B6*B8+B9*B11+B12*B14+B15*B17)+1.6*(B7*B8+B10*B11+B13*B14+B16*B17)</code></td> 
+<td> <span class="eq"><var>Cu</var> = 5.152</span>  t/m2</td> 
+<td>4.68 t/m2</td> 
+<td> <span class="eq"><var>diff</var><sub>Cu</sub> = 0.472</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Ac</var> = <var>bc</var> ·  ( <var>prof</var> − 2 · <var>rec</var> )  = 50 ·  ( 55 − 2 · 2.5 )  = 2500</span></p>
+<tr><td><b>Ac</b></td> 
+<td><code>+J2*(F8-2*F14)</code></td> 
+<td> <span class="eq"><var>Ac</var> = 2500</span>  cm2</td> 
+<td>2401 cm2</td> 
+<td> <span class="eq"><var>diff</var><sub>Ac</sub> = 99</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>As</var> = 4 · 0.00785 · <var>fi</var><sub>esq</sub><sup>2</sup> +  ( <var>num</var> − 4 )  · 0.00785 · <var>fi</var><sub>long</sub><sup>2</sup> = 4 · 0.00785 · 18<sup>2</sup> +  ( 20 − 4 )  · 0.00785 · 16<sup>2</sup> = 42.3272</span></p>
+<tr><td><b>As</b></td> 
+<td><code>4*0.00785*F12^2+(J1-4)*0.00785*F11^2</code></td> 
+<td> <span class="eq"><var>As</var> = 42.3272</span>  cm2</td> 
+<td>42.327199999999998 cm2</td> 
+<td> <span class="eq"><var>diff</var><sub>As</sub> = 1.065814×10<sup>-13</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>T1</var> = <span class="dvc">1.25 · <var>As</var> · <var>fy</var><span class="dvl"></span>1000</span> = <span class="dvc">1.25 · 42.3272 · 4200<span class="dvl"></span>1000</span> = 222.2178</span></p>
+<tr><td><b>T1</b></td> 
+<td><code>1.25*N9*B26/1000</code></td> 
+<td> <span class="eq"><var>T1</var> = 222.2178</span>  t</td> 
+<td>63.302399999999992 t</td> 
+<td> <span class="eq"><var>diff</var><sub>T1</sub> = 158.9154</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Pu</var> = <span class="dvc"><var>Cu</var> · <var>At</var> · <var>Fm</var><span class="dvl"></span>0.85</span> = <span class="dvc">5.152 · 39.6275 · 1<span class="dvl"></span>0.85</span> = 240.189271</span></p>
+<tr><td><b>Pu</b></td> 
+<td><code>+F3*F2*B19/0.85</code></td> 
+<td> <span class="eq"><var>Pu</var> = 240.189271</span>  t</td> 
+<td>218.18435294117646 t</td> 
+<td> <span class="eq"><var>diff</var><sub>Pu</sub> = 22.004918</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>T2</var> = <span class="dvc">1.25 · <var>As</var> · <var>fy</var><span class="dvl"></span>1000</span> = <span class="dvc">1.25 · 42.3272 · 4200<span class="dvl"></span>1000</span> = 222.2178</span></p>
+<tr><td><b>T2</b></td> 
+<td><code>1.25*N13*B26/1000</code></td> 
+<td> <span class="eq"><var>T2</var> = 222.2178</span>  t</td> 
+<td>31.651199999999996 t</td> 
+<td> <span class="eq"><var>diff</var><sub>T2</sub> = 190.5666</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Ag</var> = <span class="dvc">3 · <var>Pu</var> · 1000<span class="dvl"></span>0.85 · <var>fc</var> + 0.012 · <var>fy</var></span> = <span class="dvc">3 · 240.189271 · 1000<span class="dvl"></span>0.85 · 210 + 0.012 · 4200</span> = 3147.958985</span></p>
+<tr><td><b>Ag</b></td> 
+<td><code>3*F4*1000/(0.85*B25+0.012*B26)</code></td> 
+<td> <span class="eq"><var>Ag</var> = 3147.958985</span>  cm2</td> 
+<td>2859.5590162670574 cm2</td> 
+<td> <span class="eq"><var>diff</var><sub>Ag</sub> = 288.399969</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Mpr1</var> = <var>T1</var> · 1000 · <span class="b3">(</span><span class="dvc down"><var>d</var> − <span class="dvc"><span class="dvc"><span class="dvc"><var>T1</var> · 1000<span class="dvl"></span>1.7</span><span class="dvl"></span><var>fc</var></span><span class="dvl"></span><var>b</var></span></span><span class="b3">)</span> ÷ 100000 = 222.2178 · 1000 · <span class="b3">(</span><span class="dvc down">40.7 − <span class="dvc"><span class="dvc"><span class="dvc">222.2178 · 1000<span class="dvl"></span>1.7</span><span class="dvl"></span>210</span><span class="dvl"></span>35</span></span><span class="b3">)</span> ÷ 100000 = 50.922236</span></p>
+<tr><td><b>Mpr1</b></td> 
+<td><code>Q3*1000*(Q2-Q3*1000/1.7/B25/N2)/100000</code></td> 
+<td> <span class="eq"><var>Mpr1</var> = 50.922236</span>  t-m</td> 
+<td>22.557038908235295 t-m</td> 
+<td> <span class="eq"><var>diff</var><sub>Mpr1</sub> = 28.365197</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Mpr2</var> = <var>T2</var> · 1000 · <span class="b3">(</span><span class="dvc down"><var>d</var> − <span class="dvc"><span class="dvc"><span class="dvc"><var>T2</var> · 1000<span class="dvl"></span>1.7</span><span class="dvl"></span><var>fc</var></span><span class="dvl"></span><var>b</var></span></span><span class="b3">)</span> ÷ 100000 = 222.2178 · 1000 · <span class="b3">(</span><span class="dvc down">40.7 − <span class="dvc"><span class="dvc"><span class="dvc">222.2178 · 1000<span class="dvl"></span>1.7</span><span class="dvl"></span>210</span><span class="dvl"></span>35</span></span><span class="b3">)</span> ÷ 100000 = 50.922236</span></p>
+<tr><td><b>Mpr2</b></td> 
+<td><code>Q4*1000*(Q2-Q4*1000/1.7/B25/N2)/100000</code></td> 
+<td> <span class="eq"><var>Mpr2</var> = 50.922236</span>  t-m</td> 
+<td>12.080278927058822 t-m</td> 
+<td> <span class="eq"><var>diff</var><sub>Mpr2</sub> = 38.841957</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>cuant</var> = <span class="dvc"><var>As</var><span class="dvl"></span><var>Ag</var></span> = <span class="dvc">42.3272<span class="dvl"></span>3147.958985</span> = 0.01344592</span></p>
+<span class="err">Error in "diff_cuant = abs(cuant - 1.3992462809917354E-2)" on line [<a href="#0" data-text="541">541</a>]: Error parsing "E" as units.</span><tr><td><b>cuant</b></td> 
+<td><code>+J6/J5</code></td> 
+<td> <span class="eq"><var>cuant</var> = 0.01344592</span>  OK</td> 
+<td>1.3992462809917354E-2 OK</td> 
+<td> <span class="err">Error in "diff_cuant" on line [<a href="#0" data-text="547">547</a>]: Undefined variable or units: "diff_cuant".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K7</var> = <var>cuant</var> &lt; 1 <i>%</i> = 0.01344592 &lt; 1 <i>%</i> = 0</span></p>
+<tr><td><b>K7</b></td> 
+<td><code>+IF(J7&lt;1%,"NO","OK")</code></td> 
+<td> <span class="eq"><var>K7</var> = 0</span> </td> 
+<td>OK</td> 
+<td>-</td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Vcol</var> = <span class="dvc"><var>Mpr1</var> + <var>Mpr2</var><span class="dvl"></span><var>He</var></span> = <span class="dvc">50.922236 + 50.922236<span class="dvl"></span>3.6</span> = 28.290131</span></p>
+<tr><td><b>Vcol</b></td> 
+<td><code>+(Q5+Q6)/B18</code></td> 
+<td> <span class="eq"><var>Vcol</var> = 28.290131</span>  t</td> 
+<td>9.621477176470588 t</td> 
+<td> <span class="eq"><var>diff</var><sub>Vcol</sub> = 18.668654</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>sepa</var> = <span class="dvc up"><span class="dvc">10 · <var>bc</var> − 2 · <var>fi</var><sub>est</sub> − 2 · <var>fi</var><sub>esq</sub> −  ( <var>var</var><sub>a</sub> − 2 )  · <var>fi</var><sub>long</sub><span class="dvl"></span>10</span><span class="dvl"></span><var>var</var><sub>a</sub> − 1</span> = <span class="dvc up"><span class="dvc">10 · 50 − 2 · 10 − 2 · 18 −  ( 6 − 2 )  · 16<span class="dvl"></span>10</span><span class="dvl"></span>6 − 1</span> = 7.6</span></p>
+<tr><td><b>sepa</b></td> 
+<td><code>+(10*J2-2*F13-2*F12-(F9-2)*F11)/10/(F9-1)</code></td> 
+<td> <span class="eq"><var>sepa</var> = 7.6</span>  OK</td> 
+<td>7.4 OK</td> 
+<td> <span class="eq"><var>diff</var><sub>sepa</sub> = 0.2</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K8</var> = <var>sepa</var> &lt; 15 = 7.6 &lt; 15 = 1</span></p>
+<tr><td><b>K8</b></td> 
+<td><code>+IF(J8&lt;15,"OK","NO")</code></td> 
+<td> <span class="eq"><var>K8</var> = 1</span> </td> 
+<td>OK</td> 
+<td>-</td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Vj</var> = <var>T1</var> + <var>T2</var> − <var>Vcol</var> = 222.2178 + 222.2178 − 28.290131 = 416.145469</span></p>
+<tr><td><b>Vj</b></td> 
+<td><code>+Q3+Q4-Q7</code></td> 
+<td> <span class="eq"><var>Vj</var> = 416.145469</span>  t</td> 
+<td>85.332122823529403 t</td> 
+<td> <span class="eq"><var>diff</var><sub>Vj</sub> = 330.813346</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>sepp</var> = <span class="dvc up"><span class="dvc">10 · <var>prof</var> − 20 · <var>rec</var> − 2 · <var>fi</var><sub>est</sub> − 2 · <var>fi</var><sub>esq</sub> −  ( <var>var</var><sub>p</sub> − 2 )  · <var>fi</var><sub>long</sub><span class="dvl"></span>10</span><span class="dvl"></span><var>var</var><sub>p</sub> − 1</span> = <span class="dvc up"><span class="dvc">10 · 55 − 20 · 2.5 − 2 · 10 − 2 · 18 −  ( 6 − 2 )  · 16<span class="dvl"></span>10</span><span class="dvl"></span>6 − 1</span> = 7.6</span></p>
+<tr><td><b>sepp</b></td> 
+<td><code>+(10*F8-20*F14-2*F13-2*F12-(F10-2)*F11)/10/(F10-1)</code></td> 
+<td> <span class="eq"><var>sepp</var> = 7.6</span>  OK</td> 
+<td>7.4 OK</td> 
+<td> <span class="eq"><var>diff</var><sub>sepp</sub> = 0.2</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>K9</var> = <var>sepp</var> &lt; 15 = 7.6 &lt; 15 = 1</span></p>
+<tr><td><b>K9</b></td> 
+<td><code>+IF(J9&lt;15,"OK","NO")</code></td> 
+<td> <span class="eq"><var>K9</var> = 1</span> </td> 
+<td>OK</td> 
+<td>-</td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "Lo = max(45;max(ancho;prof),He*100/6)" on line [<a href="#0" data-text="610">610</a>]: Invalid character: ','. Variables, functions and units must begin with a letter or ∡, except for the following units: ° ′ ″ % ‰.</span></p>
+<span class="err">Error in "diff_Lo = abs(Lo - 60)" on line [<a href="#0" data-text="612">612</a>]: Undefined variable or units: "Lo".</span><tr><td><b>Lo</b></td> 
+<td><code>+MAX(45,MAX(F7:F8),B18*100/6)</code></td> 
+<td> <span class="err">Error in "Lo" on line [<a href="#0" data-text="616">616</a>]: Undefined variable or units: "Lo".</span>  cm</td> 
+<td>60 cm</td> 
+<td> <span class="err">Error in "diff_Lo" on line [<a href="#0" data-text="618">618</a>]: Undefined variable or units: "diff_Lo".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "a = if(Q9=M14,INT,if(Q9=M15,MED,ESQ))" on line [<a href="#0" data-text="620">620</a>]: Improper use of the assignment operator '='.</span></p>
+<span class="err">Error in "diff_a = abs(a - 4)" on line [<a href="#0" data-text="622">622</a>]: Inconsistent units: "a - unitless".</span><tr><td><b>a</b></td> 
+<td><code>+IF(Q9=M14,N14,IF(Q9=M15,N15,N16))</code></td> 
+<td> <span class="eq"><i>a</i> = 1 <i>a</i></span> </td> 
+<td>4</td> 
+<td> <span class="err">Error in "diff_a" on line [<a href="#0" data-text="628">628</a>]: Undefined variable or units: "diff_a".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "s_Lo = min(6*min(fi_long;fi_esq)/10,10)" on line [<a href="#0" data-text="630">630</a>]: Error parsing "," as units.</span></p>
+<span class="err">Error in "diff_s_Lo = abs(s_Lo - 9.6)" on line [<a href="#0" data-text="632">632</a>]: Undefined variable or units: "s_Lo".</span><tr><td><b>s_Lo</b><br/><small>s (Lo)</small></td> 
+<td><code>+MIN(6*MIN(F11:F12)/10,10)</code></td> 
+<td> <span class="err">Error in "s_Lo" on line [<a href="#0" data-text="636">636</a>]: Undefined variable or units: "s_Lo".</span>  cm</td> 
+<td>9.6 cm</td> 
+<td> <span class="err">Error in "diff_s_Lo" on line [<a href="#0" data-text="638">638</a>]: Undefined variable or units: "diff_s_Lo".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>cond</var> = <var>b</var> &lt; 0.75 · <var>ancho</var> = 35 &lt; 0.75 · 55 = 1</span></p>
+<tr><td><b>cond</b></td> 
+<td><code>+IF(N2&lt;0.75*F7,"Baje","Mantenga")</code></td> 
+<td> <span class="eq"><var>cond</var> = 1</span> </td> 
+<td>Baje</td> 
+<td>-</td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "s_cent = min(6*min(fi_long;fi_esq)/10,15)" on line [<a href="#0" data-text="647">647</a>]: Error parsing "," as units.</span></p>
+<span class="err">Error in "diff_s_cent = abs(s_cent - 9.6)" on line [<a href="#0" data-text="649">649</a>]: Undefined variable or units: "s_cent".</span><tr><td><b>s_cent</b><br/><small>s (cent)</small></td> 
+<td><code>+MIN(6*MIN(F11:F12)/10,15)</code></td> 
+<td> <span class="err">Error in "s_cent" on line [<a href="#0" data-text="653">653</a>]: Undefined variable or units: "s_cent".</span>  cm</td> 
+<td>9.6 cm</td> 
+<td> <span class="err">Error in "diff_s_cent" on line [<a href="#0" data-text="655">655</a>]: Undefined variable or units: "diff_s_cent".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "Ash = max(0.3*bc*s_Lo*fc/fy*(Ag/Ac-1),0.09*bc*s_Lo*fc/fy)" on line [<a href="#0" data-text="657">657</a>]: Invalid character: ','. Variables, functions and units must begin with a letter or ∡, except for the following units: ° ′ ″ % ‰.</span></p>
+<span class="err">Error in "diff_Ash = abs(Ash - 2.1168)" on line [<a href="#0" data-text="659">659</a>]: Undefined variable or units: "Ash".</span><tr><td><b>Ash</b></td> 
+<td><code>+MAX(0.3*J2*J11*B25/B26*(J5/J3-1),0.09*J2*J11*B25/B26)</code></td> 
+<td> <span class="err">Error in "Ash" on line [<a href="#0" data-text="663">663</a>]: Undefined variable or units: "Ash".</span>  cm2</td> 
+<td>2.1168 cm2</td> 
+<td> <span class="err">Error in "diff_Ash" on line [<a href="#0" data-text="665">665</a>]: Undefined variable or units: "diff_Ash".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "vinchas = Ash/0.00785/fi_est^2" on line [<a href="#0" data-text="667">667</a>]: Undefined variable or units: "Ash".</span></p>
+<span class="err">Error in "diff_vinchas = abs(vinchas - 2.6965605095541405)" on line [<a href="#0" data-text="669">669</a>]: Undefined variable or units: "vinchas".</span><tr><td><b>vinchas</b></td> 
+<td><code>+J13/0.00785/F13^2</code></td> 
+<td> <span class="err">Error in "vinchas" on line [<a href="#0" data-text="673">673</a>]: Undefined variable or units: "vinchas".</span>  u</td> 
+<td>2.6965605095541405 u</td> 
+<td> <span class="err">Error in "diff_vinchas" on line [<a href="#0" data-text="675">675</a>]: Undefined variable or units: "diff_vinchas".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Vn</var> = <span class="dvc"><i>a</i> · <var>fc</var><sup>0.5</sup> · <var>Ac</var><span class="dvl"></span>1000</span> = <span class="dvc"><i>a</i> · 210<sup>0.5</sup> · 2500<span class="dvl"></span>1000</span> = 36.228442 <i>a</i></span></p>
+<span class="err">Error in "diff_Vn = abs(Vn - 179.33078723409432)" on line [<a href="#0" data-text="679">679</a>]: Inconsistent units: "a - unitless".</span><tr><td><b>Vn</b></td> 
+<td><code>+Q12*B25^0.5*Q13/1000</code></td> 
+<td> <span class="eq"><var>Vn</var> = 36.228442 <i>a</i></span>  t</td> 
+<td>179.33078723409432 t</td> 
+<td> <span class="err">Error in "diff_Vn" on line [<a href="#0" data-text="685">685</a>]: Undefined variable or units: "diff_Vn".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>f</var><sub>Vn</sub> = <var>Vn</var> · 0.85 = 36.228442 <i>a</i> · 0.85 = 30.794176 <i>a</i></span></p>
+<span class="err">Error in "diff_f_Vn = abs(f_Vn - 152.43116914898016)" on line [<a href="#0" data-text="689">689</a>]: Inconsistent units: "a - unitless".</span><tr><td><b>f_Vn</b><br/><small>f Vn</small></td> 
+<td><code>+Q14*0.85</code></td> 
+<td> <span class="eq"><var>f</var><sub>Vn</sub> = 30.794176 <i>a</i></span>  t</td> 
+<td>152.43116914898016 t</td> 
+<td> <span class="err">Error in "diff_f_Vn" on line [<a href="#0" data-text="695">695</a>]: Undefined variable or units: "diff_f_Vn".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>F16</var> = <span class="dvc"><var>Pu</var><span class="dvl"></span>76</span> = <span class="dvc">240.189271<span class="dvl"></span>76</span> = 3.160385</span></p>
+<tr><td><b>F16</b></td> 
+<td><code>+F4/76</code></td> 
+<td> <span class="eq"><var>F16</var> = 3.160385</span> </td> 
+<td>2.8708467492260059</td> 
+<td> <span class="eq"><var>diff</var><sub>F16</sub> = 0.2895384</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>J18</var> = 60 · 60 = 3600</span></p>
+<tr><td><b>J18</b></td> 
+<td><code>60*60</code></td> 
+<td> <span class="eq"><var>J18</var> = 3600</span> </td> 
+<td>3600</td> 
+<td> <span class="eq"><var>diff</var><sub>J18</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Vc</var> = <var>Vj</var> = 416.145469</span></p>
+<tr><td><b>Vc</b></td> 
+<td><code>+Q8</code></td> 
+<td> <span class="eq"><var>Vc</var> = 416.145469</span> </td> 
+<td>85.332122823529403</td> 
+<td> <span class="eq"><var>diff</var><sub>Vc</sub> = 330.813346</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Q18</var> = <var>f</var><sub>Vn</sub> = 30.794176 <i>a</i></span></p>
+<span class="err">Error in "diff_Q18 = abs(Q18 - 152.43116914898016)" on line [<a href="#0" data-text="729">729</a>]: Inconsistent units: "a - unitless".</span><tr><td><b>Q18</b></td> 
+<td><code>+Q15</code></td> 
+<td> <span class="eq"><var>Q18</var> = 30.794176 <i>a</i></span>  OK</td> 
+<td>152.43116914898016 OK</td> 
+<td> <span class="err">Error in "diff_Q18" on line [<a href="#0" data-text="735">735</a>]: Undefined variable or units: "diff_Q18".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>R18</var> = 152.431169 &gt; <var>Vc</var> = 152.431169 &gt; 416.145469 = 0</span></p>
+<tr><td><b>R18</b></td> 
+<td><code>+IF(Q18&gt;P18,"OK","NO")</code></td> 
+<td> <span class="eq"><var>R18</var> = 0</span> </td> 
+<td>OK</td> 
+<td>-</td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>OK</var> = <span class="dvc"><var>Vc</var><span class="dvl"></span>152.431169</span> = <span class="dvc">416.145469<span class="dvl"></span>152.431169</span> = 2.730055</span></p>
+<tr><td><b>OK</b></td> 
+<td><code>+P18/Q18</code></td> 
+<td> <span class="eq"><var>OK</var> = 2.730055</span> </td> 
+<td>0.55980757282081317</td> 
+<td> <span class="eq"><var>diff</var><sub>OK</sub> = 2.170247</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Vh</var> = <var>h</var> = 45</span></p>
+<tr><td><b>Vh</b></td> 
+<td><code>+N3</code></td> 
+<td> <span class="eq"><var>Vh</var> = 45</span> </td> 
+<td>45</td> 
+<td> <span class="eq"><var>diff</var><sub>Vh</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Q19</var> = <var>prof</var> = 55</span></p>
+<tr><td><b>Q19</b></td> 
+<td><code>+F8</code></td> 
+<td> <span class="eq"><var>Q19</var> = 55</span>  OK</td> 
+<td>55 OK</td> 
+<td> <span class="eq"><var>diff</var><sub>Q19</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "R19 = (55&gt;=Vh)" on line [<a href="#0" data-text="774">774</a>]: Improper use of the assignment operator '='.</span></p>
+<tr><td><b>R19</b></td> 
+<td><code>+IF(Q19&gt;=P19,"OK","NO")</code></td> 
+<td> <span class="err">Error in "R19" on line [<a href="#0" data-text="777">777</a>]: Undefined variable or units: "R19".</span> </td> 
+<td>OK</td> 
+<td>-</td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>J20</var> = 30 · 30 = 900</span></p>
+<tr><td><b>J20</b></td> 
+<td><code>30*30</code></td> 
+<td> <span class="eq"><var>J20</var> = 900</span> </td> 
+<td>900</td> 
+<td> <span class="eq"><var>diff</var><sub>J20</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Ader</var> = <span class="dvc">20 · <var>fi</var><span class="dvl"></span>10</span> = <span class="dvc">20 · 16<span class="dvl"></span>10</span> = 32</span></p>
+<tr><td><b>Ader</b></td> 
+<td><code>20*N8/10</code></td> 
+<td> <span class="eq"><var>Ader</var> = 32</span> </td> 
+<td>32</td> 
+<td> <span class="eq"><var>diff</var><sub>Ader</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Q20</var> = <var>prof</var> = 55</span></p>
+<tr><td><b>Q20</b></td> 
+<td><code>+F8</code></td> 
+<td> <span class="eq"><var>Q20</var> = 55</span>  OK</td> 
+<td>55 OK</td> 
+<td> <span class="eq"><var>diff</var><sub>Q20</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>R20</var> = 55 &gt; <var>Ader</var> = 55 &gt; 32 = 1</span></p>
+<tr><td><b>R20</b></td> 
+<td><code>+IF(Q20&gt;P20,"OK","NO")</code></td> 
+<td> <span class="eq"><var>R20</var> = 1</span> </td> 
+<td>OK</td> 
+<td>-</td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>U20</var> = 0.18 · 2400 = 432</span></p>
+<tr><td><b>U20</b></td> 
+<td><code>0.18*2400</code></td> 
+<td> <span class="eq"><var>U20</var> = 432</span> </td> 
+<td>432</td> 
+<td> <span class="eq"><var>diff</var><sub>U20</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>F25</var> = <span class="dvc">133000<span class="dvl"></span>76</span> = 1750</span></p>
+<tr><td><b>F25</b></td> 
+<td><code>133000/76</code></td> 
+<td> <span class="eq"><var>F25</var> = 1750</span> </td> 
+<td>1750</td> 
+<td> <span class="eq"><var>diff</var><sub>F25</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>G25</var> = 45 · 45 = 2025</span></p>
+<tr><td><b>G25</b></td> 
+<td><code>45*45</code></td> 
+<td> <span class="eq"><var>G25</var> = 2025</span> </td> 
+<td>2025</td> 
+<td> <span class="eq"><var>diff</var><sub>G25</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>losa</var><sub>de_25_cm</sub> = 0.18 · 2400 + 40 + 40 + 108 = 620</span></p>
+<tr><td><b>losa_de_25_cm</b><br/><small>losa de 25 cm</small></td> 
+<td><code>(0.18*2400)+40+40+108</code></td> 
+<td> <span class="eq"><var>losa</var><sub>de_25_cm</sub> = 620</span> </td> 
+<td>620</td> 
+<td> <span class="eq"><var>diff</var><sub>losa_de_25_cm</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>U26</var> = <var>losa</var><sub>de_25_cm</sub> − 432 = 620 − 432 = 188</span></p>
+<tr><td><b>U26</b></td> 
+<td><code>+U25-U20</code></td> 
+<td> <span class="eq"><var>U26</var> = 188</span> </td> 
+<td>188</td> 
+<td> <span class="eq"><var>diff</var><sub>U26</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Z26</var> = 200 + 300 = 500</span></p>
+<tr><td><b>Z26</b></td> 
+<td><code>200+300</code></td> 
+<td> <span class="eq"><var>Z26</var> = 500</span> </td> 
+<td>500</td> 
+<td> <span class="eq"><var>diff</var><sub>Z26</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Carga</var><sub>que_baja_a_Plinto_</sub> = <var>Pu</var> = 240.189271</span></p>
+<tr><td><b>Carga_que_baja_a_Plinto_</b><br/><small>Carga que baja a Plinto.</small></td> 
+<td><code>+F4</code></td> 
+<td> <span class="eq"><var>Carga</var><sub>que_baja_a_Plinto_</sub> = 240.189271</span> </td> 
+<td>218.18435294117646</td> 
+<td> <span class="eq"><var>diff</var><sub>Carga_que_baja_a_Plinto_</sub> = 22.004918</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>N28</var> = 50 · 50 = 2500</span></p>
+<tr><td><b>N28</b></td> 
+<td><code>50*50</code></td> 
+<td> <span class="eq"><var>N28</var> = 2500</span> </td> 
+<td>2500</td> 
+<td> <span class="eq"><var>diff</var><sub>N28</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>U28</var> = 0.145 · 2400 = 348</span></p>
+<tr><td><b>U28</b></td> 
+<td><code>0.145*2400</code></td> 
+<td> <span class="eq"><var>U28</var> = 348</span> </td> 
+<td>348</td> 
+<td> <span class="eq"><var>diff</var><sub>U28</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>P29</var> = 40 · 40 = 1600</span></p>
+<tr><td><b>P29</b></td> 
+<td><code>40*40</code></td> 
+<td> <span class="eq"><var>P29</var> = 1600</span> </td> 
+<td>1600</td> 
+<td> <span class="eq"><var>diff</var><sub>P29</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>losa</var><sub>de_20</sub> = 0.145 · 2400 + 40 + 40 + 108 = 536</span></p>
+<tr><td><b>losa_de_20</b><br/><small>losa de 20</small></td> 
+<td><code>(0.145*2400)+40+40+108</code></td> 
+<td> <span class="eq"><var>losa</var><sub>de_20</sub> = 536</span> </td> 
+<td>536</td> 
+<td> <span class="eq"><var>diff</var><sub>losa_de_20</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Area</var><sub>de_Zapata_</sub> = <span class="dvc"><var>Carga</var><sub>que_baja_a_Plinto_</sub><span class="dvl"></span><var>Esfuerzo</var><sub>adm_suelo_</sub></span> = <span class="dvc">240.189271<span class="dvl"></span>21</span> = 11.437584</span></p>
+<tr><td><b>Area_de_Zapata_</b><br/><small>Area de Zapata.</small></td> 
+<td><code>+B28/B29</code></td> 
+<td> <span class="eq"><var>Area</var><sub>de_Zapata_</sub> = 11.437584</span>  m2</td> 
+<td>10.389731092436975 m2</td> 
+<td> <span class="eq"><var>diff</var><sub>Area_de_Zapata_</sub> = 1.047853</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>U30</var> = <var>losa</var><sub>de_20</sub> − 348 = 536 − 348 = 188</span></p>
+<tr><td><b>U30</b></td> 
+<td><code>+U29-U28</code></td> 
+<td> <span class="eq"><var>U30</var> = 188</span> </td> 
+<td>188</td> 
+<td> <span class="eq"><var>diff</var><sub>U30</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>P31</var> = <span class="dvc">3.1416 · 1.2 · 1.2<span class="dvl"></span>4</span> · 20 = 22.61952</span></p>
+<tr><td><b>P31</b></td> 
+<td><code>+((3.1416*1.2*1.2)/4)*20</code></td> 
+<td> <span class="eq"><var>P31</var> = 22.61952</span> </td> 
+<td>22.619520000000001</td> 
+<td> <span class="eq"><var>diff</var><sub>P31</sub> = 3.552714×10<sup>-15</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Area</var><sub>de_Zapata</sub> = <var>Dimensiones</var><sub>de_Zapata_</sub> · 1.5 = 1.5 · 1.5 = 2.25</span></p>
+<tr><td><b>Area_de_Zapata</b><br/><small>Area de Zapata</small></td> 
+<td><code>+B31*C31</code></td> 
+<td> <span class="eq"><var>Area</var><sub>de_Zapata</sub> = 2.25</span>  m2</td> 
+<td>2.25 m2</td> 
+<td> <span class="eq"><var>diff</var><sub>Area_de_Zapata</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>P33</var> = <span class="dvc">22.61952<span class="dvl"></span>1600</span> · 100 = 1.41372</span></p>
+<tr><td><b>P33</b></td> 
+<td><code>+(P31/P29)*100</code></td> 
+<td> <span class="eq"><var>P33</var> = 1.41372</span> </td> 
+<td>1.4137200000000001</td> 
+<td> <span class="eq"><var>diff</var><sub>P33</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Normativa</var><sub>para__Viga</sub> = <span class="dvc">4.12<span class="dvl"></span>10.98</span> = 0.3752277</span></p>
+<tr><td><b>Normativa_para__Viga</b><br/><small>Normativa para  Viga</small></td> 
+<td><code>(4.12/10.98)</code></td> 
+<td> <span class="eq"><var>Normativa</var><sub>para__Viga</sub> = 0.3752277</span> </td> 
+<td>0.37522768670309653</td> 
+<td> <span class="eq"><var>diff</var><sub>Normativa_para__Viga</sub> = 5.551115×10<sup>-17</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Cuantia</var><sub>de_acero_en_viga_para_</sub> = <span class="dvc">3.1416 · 1.6 · 1.6 · 3<span class="dvl"></span>4</span> + <span class="dvc">3.1416 · 1.6 · 1.6 · 2<span class="dvl"></span>4</span> = 10.05312</span></p>
+<tr><td><b>Cuantia_de_acero_en_viga_para_</b><br/><small>Cuantia de acero en viga para momento negativo y acero de refuerzo</small></td> 
+<td><code>+((3.1416*(1.6*1.6)*3)/4)+(3.1416*(1.6)*(1.6)*2)/4</code></td> 
+<td> <span class="eq"><var>Cuantia</var><sub>de_acero_en_viga_para_</sub> = 10.05312</span>  cm2</td> 
+<td>10.053120000000002 cm2</td> 
+<td> <span class="eq"><var>diff</var><sub>Cuantia_de_acero_en_viga_para_</sub> = 1.776357×10<sup>-15</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Cuantia</var><sub>para_columna</sub> = <span class="dvc">3.1416 · 1.6 · 1.6<span class="dvl"></span>4</span> · 8 = 16.084992</span></p>
+<tr><td><b>Cuantia_para_columna</b><br/><small>Cuantia para columna</small></td> 
+<td><code>+((3.1416*(1.6*1.6)/4))*8</code></td> 
+<td> <span class="eq"><var>Cuantia</var><sub>para_columna</sub> = 16.084992</span>  cm2</td> 
+<td>16.084992000000003 cm2</td> 
+<td> <span class="eq"><var>diff</var><sub>Cuantia_para_columna</sub> = 3.552714×10<sup>-15</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Area</var><sub>de_columna</sub> = 40 · 40 = 1600</span></p>
+<tr><td><b>Area_de_columna</b><br/><small>Area de columna</small></td> 
+<td><code>40*40</code></td> 
+<td> <span class="eq"><var>Area</var><sub>de_columna</sub> = 1600</span>  cm2</td> 
+<td>1600 cm2</td> 
+<td> <span class="eq"><var>diff</var><sub>Area_de_columna</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Cuantia</var><sub>de_acero</sub> = <span class="dvc"><var>Cuantia</var><sub>para_columna</sub><span class="dvl"></span><var>Area</var><sub>de_columna</sub></span> · 100 = <span class="dvc">16.084992<span class="dvl"></span>1600</span> · 100 = 1.005312</span></p>
+<tr><td><b>Cuantia_de_acero</b><br/><small>Cuantia de acero</small></td> 
+<td><code>+(B40/B41)*100</code></td> 
+<td> <span class="eq"><var>Cuantia</var><sub>de_acero</sub> = 1.005312</span> </td> 
+<td>1.0053120000000002</td> 
+<td> <span class="eq"><var>diff</var><sub>Cuantia_de_acero</sub> = 2.220446×10<sup>-16</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>L</var><sub>critica</sub> = <var>Longitud</var><sub>X1</sub> = 6.1</span></p>
+<tr><td><b>L_critica</b><br/><small>L critica</small></td> 
+<td><code>+B2</code></td> 
+<td> <span class="eq"><var>L</var><sub>critica</sub> = 6.1</span> </td> 
+<td>6.1</td> 
+<td> <span class="eq"><var>diff</var><sub>L_critica</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>h</var><sub>vida</sub> = <span class="dvc"><var>L</var><sub>critica</sub><span class="dvl"></span>11</span> = <span class="dvc">6.1<span class="dvl"></span>11</span> = 0.5545455</span></p>
+<tr><td><b>h_vida</b><br/><small>h vida</small></td> 
+<td><code>+F44/11</code></td> 
+<td> <span class="eq"><var>h</var><sub>vida</sub> = 0.5545455</span> </td> 
+<td>0.55454545454545456</td> 
+<td> <span class="eq"><var>diff</var><sub>h_vida</sub> = 1.110223×10<sup>-16</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Q45</var> = <span class="dvc up">0.85 · 0.85 · <span class="dvc">210<span class="dvl"></span>4200</span> · <span class="dvc">6100<span class="dvl"></span>6100 + 4200</span><span class="dvl"></span>2</span> = 0.01069721</span></p>
+<span class="err">Error in "diff_Q45 = abs(Q45 - 1.0697208737864077E-2)" on line [<a href="#0" data-text="1050">1050</a>]: Error parsing "E" as units.</span><tr><td><b>Q45</b></td> 
+<td><code>0.85*0.85*(210/4200)*((6100/(6100+4200)))/2</code></td> 
+<td> <span class="eq"><var>Q45</var> = 0.01069721</span> </td> 
+<td>1.0697208737864077E-2</td> 
+<td> <span class="err">Error in "diff_Q45" on line [<a href="#0" data-text="1056">1056</a>]: Undefined variable or units: "diff_Q45".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>B</var><sub>viga</sub> = <span class="dvc up"><span class="dvc"><var>Longitud</var><sub>X1</sub> + <var>Longitud</var><sub>X3</sub><span class="dvl"></span>2</span><span class="dvl"></span>20</span> = <span class="dvc up"><span class="dvc">6.1 + 6.55<span class="dvl"></span>2</span><span class="dvl"></span>20</span> = 0.31625</span></p>
+<tr><td><b>B_viga</b><br/><small>B viga</small></td> 
+<td><code>+((B2+B4)/2)/20</code></td> 
+<td> <span class="eq"><var>B</var><sub>viga</sub> = 0.31625</span> </td> 
+<td>0.31624999999999998</td> 
+<td> <span class="eq"><var>diff</var><sub>B_viga</sub> = 1.110223×10<sup>-16</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Q47</var> = 30 · 40 = 1200</span></p>
+<tr><td><b>Q47</b></td> 
+<td><code>30*40</code></td> 
+<td> <span class="eq"><var>Q47</var> = 1200</span> </td> 
+<td>1200</td> 
+<td> <span class="eq"><var>diff</var><sub>Q47</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Atrib</var> = <span class="dvc">5.41 + 5.41<span class="dvl"></span>2</span> · <span class="dvc">4.4 + 2.58<span class="dvl"></span>2</span> = 18.8809</span></p>
+<tr><td><b>Atrib</b></td> 
+<td><code>+((5.41+5.41)/2)*((4.4+2.58)/2)</code></td> 
+<td> <span class="eq"><var>Atrib</var> = 18.8809</span>  m2</td> 
+<td>18.8809 m2</td> 
+<td> <span class="eq"><var>diff</var><sub>Atrib</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Pu</var><sub>central</sub> = <var>N</var><sub>pisos</sub> · <var>Pu</var> · <var>Atrib</var> = 9 · 240.189271 · 18.8809 = 40814.90639</span></p>
+<tr><td><b>Pu_central</b><br/><small>Pu central</small></td> 
+<td><code>B46*B45*B48</code></td> 
+<td> <span class="eq"><var>Pu</var><sub>central</sub> = 40814.90639</span>  Kgf</td> 
+<td>203913.72 Kgf</td> 
+<td> <span class="eq"><var>diff</var><sub>Pu_central</sub> = 163098.8136</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Lado</var><sub>LargoL1</sub> = <var>Longitud</var><sub>X1</sub> = 6.1</span></p>
+<tr><td><b>Lado_LargoL1</b><br/><small>Lado Largo(L1)</small></td> 
+<td><code>+B2</code></td> 
+<td> <span class="eq"><var>Lado</var><sub>LargoL1</sub> = 6.1</span> </td> 
+<td>6.1</td> 
+<td> <span class="eq"><var>diff</var><sub>Lado_LargoL1</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "Q49 = 1200*1.0697208737864077E-2" on line [<a href="#0" data-text="1108">1108</a>]: Error parsing "E" as units.</span></p>
+<span class="err">Error in "diff_Q49 = abs(Q49 - 12.836650485436893)" on line [<a href="#0" data-text="1110">1110</a>]: Undefined variable or units: "Q49".</span><tr><td><b>Q49</b></td> 
+<td><code>+Q47*Q45</code></td> 
+<td> <span class="err">Error in "Q49" on line [<a href="#0" data-text="1114">1114</a>]: Undefined variable or units: "Q49".</span><p class="err">Error in "'&lt;td&gt;'Q49'&lt;/td&gt;" on line [<a href="#0" data-text="1114">1114</a>]: Too many errors. Further calculations are skipped.</p> </body></html>

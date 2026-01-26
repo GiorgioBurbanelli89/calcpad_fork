@@ -1,0 +1,37 @@
+#!/bin/bash
+# Calcpad Debug CLI - Carga archivos directamente desde línea de comandos
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEBUGGER_EXE="$SCRIPT_DIR/CalcpadDebugger/bin/Release/net10.0-windows/CalcpadDebugger.exe"
+FILE_PATH="$1"
+
+if [ -z "$FILE_PATH" ]; then
+    echo "===CALCPAD DEBUGGER CLI ==="
+    echo ""
+    echo "Uso: calcpad-debug <archivo.cpd>"
+    echo ""
+    echo "Ejemplo:"
+    echo "  calcpad-debug ejemplo-multiples-lenguajes.cpd"
+    echo ""
+    echo "El depurador se abrirá con el archivo cargado automáticamente"
+    exit 1
+fi
+
+# Verificar que el archivo existe
+if [ ! -f "$FILE_PATH" ]; then
+    echo "ERROR: Archivo no encontrado: $FILE_PATH"
+    exit 1
+fi
+
+# Convertir a ruta absoluta Windows-style
+ABS_PATH="$(cd "$(dirname "$FILE_PATH")" && pwd -W 2>/dev/null || pwd)/$(basename "$FILE_PATH")"
+ABS_PATH="${ABS_PATH//\//\}"
+
+echo "=== CALCPAD DEBUGGER CLI ==="
+echo ""
+echo "Archivo: $ABS_PATH"
+echo "Iniciando depurador..."
+echo ""
+
+# Ejecutar depurador con archivo como argumento
+"$DEBUGGER_EXE" "$ABS_PATH"

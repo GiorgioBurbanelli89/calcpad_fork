@@ -1,0 +1,27 @@
+"Test: 3 Columnas - Octave + Fortran + Rust
+#columns 3
+'Octave:
+@{octave}
+a = 5;
+fprintf('a = %d\n', a);
+@{end octave}
+#column
+'Fortran:
+@{fortran}
+program test
+    implicit none
+    integer :: a
+    a = 5
+    write(*,'(A,I0)') 'a = ', a
+end program test
+@{end fortran}
+#column
+'Rust:
+@{rust}
+fn main() {
+    let a = 5;
+    println!("a = {}", a);
+}
+@{end rust}
+#end columns
+'Fin

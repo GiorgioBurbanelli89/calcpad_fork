@@ -1,0 +1,108 @@
+"========================================================
+"GRAFICACIÓN DE MESH FEM CON OCTAVE + GNUPLOT
+"Versión pura de Octave (sin variables Calcpad)
+"========================================================
+
+@{octave}
+% Mesh FEM usando Gnuplot para generar PNG (funciona headless)
+% Todos los datos definidos en Octave
+
+% Datos del mesh
+a = 6;
+b = 4;
+n_a = 6;
+n_b = 4;
+
+% Generar coordenadas de nodos
+[X, Y] = meshgrid(linspace(0, a, n_a+1), linspace(0, b, n_b+1));
+x_nodes = X(:);
+y_nodes = Y(:);
+n_nodes = length(x_nodes);
+
+% Generar conectividad de elementos
+elements = [];
+for i = 1:n_a
+    for j = 1:n_b
+        n1 = (i-1)*(n_b+1) + j;
+        n2 = n1 + (n_b+1);
+        n3 = n2 + 1;
+        n4 = n1 + 1;
+        elements = [elements; n1 n2 n3 n4];
+    end
+end
+
+% Archivos de salida
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/fem_mesh_octave.png';
+gp_file = 'C:/Users/j-b-j/AppData/Local/Temp/fem_mesh.gp';
+
+% Escribir script gnuplot
+fid = fopen(gp_file, 'w');
+fprintf(fid, 'set terminal pngcairo size 800,600 enhanced font "Arial,11"\n');
+fprintf(fid, 'set output "%s"\n', output_file);
+fprintf(fid, 'set title "Mesh FEM - Losa Rectangular %dx%dm" font "Arial,14"\n', a, b);
+fprintf(fid, 'set xlabel "X (m)"\n');
+fprintf(fid, 'set ylabel "Y (m)"\n');
+fprintf(fid, 'set grid\n');
+fprintf(fid, 'set key outside right top\n');
+fprintf(fid, 'set xrange [-0.5:%f]\n', a+0.5);
+fprintf(fid, 'set yrange [-0.5:%f]\n', b+0.5);
+fprintf(fid, 'set size ratio -1\n');
+fprintf(fid, 'set style line 1 lc rgb "#008000" lw 1.5\n');
+
+% Elementos
+fprintf(fid, '$elements << EOD\n');
+for e = 1:size(elements, 1)
+    elem_nodes = elements(e, :);
+    for k = 1:4
+        n1_idx = elem_nodes(k);
+        n2_idx = elem_nodes(mod(k, 4) + 1);
+        fprintf(fid, '%f %f\n', x_nodes(n1_idx), y_nodes(n1_idx));
+        fprintf(fid, '%f %f\n', x_nodes(n2_idx), y_nodes(n2_idx));
+        fprintf(fid, '\n');
+    end
+end
+fprintf(fid, 'EOD\n\n');
+
+% Nodos del borde
+fprintf(fid, '$border_nodes << EOD\n');
+border = unique([find(x_nodes == 0); find(x_nodes == a); find(y_nodes == 0); find(y_nodes == b)]);
+for i = 1:length(border)
+    n = border(i);
+    fprintf(fid, '%f %f\n', x_nodes(n), y_nodes(n));
+end
+fprintf(fid, 'EOD\n\n');
+
+% Etiquetas de elementos
+fprintf(fid, '$labels << EOD\n');
+for e = 1:size(elements, 1)
+    elem_nodes = elements(e, :);
+    x_c = mean(x_nodes(elem_nodes));
+    y_c = mean(y_nodes(elem_nodes));
+    fprintf(fid, '%f %f %d\n', x_c, y_c, e);
+end
+fprintf(fid, 'EOD\n\n');
+
+% Plot
+fprintf(fid, 'plot $elements with lines ls 1 title "Elementos", ');
+fprintf(fid, '$border_nodes with points pt 7 ps 1.5 lc rgb "#ff0000" title "Apoyos", ');
+fprintf(fid, '$labels using 1:2:3 with labels tc rgb "#006400" font "Arial,9" notitle\n');
+
+fclose(fid);
+
+% Ejecutar gnuplot
+[status, output] = system(sprintf('gnuplot "%s"', gp_file));
+
+n_elements = size(elements, 1);
+if status == 0
+    fprintf('<img src="%s" width="800" style="border:2px solid #0790c0; border-radius:8px; margin:10px 0;">\n', output_file);
+    fprintf('<p><strong>Mesh FEM generado exitosamente</strong></p>\n');
+    fprintf('<ul>\n');
+    fprintf('<li>Dimensiones: %d x %d m</li>\n', a, b);
+    fprintf('<li>Elementos: %d (%d x %d)</li>\n', n_elements, n_a, n_b);
+    fprintf('<li>Nodos: %d</li>\n', n_nodes);
+    fprintf('</ul>\n');
+else
+    fprintf('Error generando imagen: %s\n', output);
+end
+@{end octave}
+

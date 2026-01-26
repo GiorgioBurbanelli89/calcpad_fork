@@ -1,0 +1,75 @@
+﻿'Test de WPF (XAML + C#)
+
+'Probando WPF con botÃ³n funcional:
+
+@{wpf}
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WpfTemp.MainWindow"
+        Title="Contador WPF" Height="250" Width="350">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Contador Interactivo"
+                   FontSize="20" FontWeight="Bold"
+                   Margin="0,0,0,20" HorizontalAlignment="Center"/>
+
+        <Border Grid.Row="1" Background="#e3f2fd"
+                BorderBrush="#2196F3" BorderThickness="2"
+                Padding="15" Margin="0,10">
+            <TextBlock x:Name="CounterText" Text="Contador: 0"
+                      FontSize="24" FontWeight="Bold"
+                      HorizontalAlignment="Center" Foreground="#1976D2"/>
+        </Border>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                   HorizontalAlignment="Center" Margin="0,20">
+            <Button x:Name="IncrementButton" Content="+ Incrementar"
+                    Width="120" Height="40" Margin="5"
+                    Background="#4CAF50" Foreground="White"
+                    FontSize="14" FontWeight="Bold"
+                    Click="IncrementButton_Click"/>
+
+            <Button x:Name="ResetButton" Content="Reiniciar"
+                    Width="120" Height="40" Margin="5"
+                    Background="#FF5722" Foreground="White"
+                    FontSize="14" FontWeight="Bold"
+                    Click="ResetButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
+
+// C#
+using System.Windows;
+
+namespace WpfTemp
+{
+    public partial class MainWindow : Window
+    {
+        private int counter = 0;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void IncrementButton_Click(object sender, RoutedEventArgs e)
+        {
+            counter++;
+            CounterText.Text = $"Contador: {counter}";
+        }
+
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            counter = 0;
+            CounterText.Text = "Contador: 0";
+        }
+    }
+}
+@{end wpf}
+
+'Fin del test de WPF

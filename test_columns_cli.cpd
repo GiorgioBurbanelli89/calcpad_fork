@@ -1,0 +1,46 @@
+"Test de Columnas en CLI
+
+"Ejemplo 1: Dos columnas simples
+#columns 2
+'Columna 1: Calculos
+a = 5
+b = 10
+c = a + b
+#column
+'Columna 2: Mas calculos
+x = 100
+y = 200
+z = x + y
+#end columns
+
+"Ejemplo 2: Dos columnas con Python
+#columns 2
+'Lado Calcpad:
+f(x) = x^2
+f(3)
+f(5)
+#column
+'Lado Python:
+@{python}
+def f(x):
+    return x**2
+
+print(f"f(3) = {f(3)}")
+print(f"f(5) = {f(5)}")
+@{end python}
+#end columns
+
+"Ejemplo 3: Tres columnas
+#columns 3
+'Col 1
+n1 = 1
+#column
+'Col 2
+n2 = 2
+#column
+'Col 3
+n3 = 3
+Total = n1 + n2 + n3
+#end columns
+
+'Fin del test

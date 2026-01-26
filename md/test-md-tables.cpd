@@ -1,0 +1,14 @@
+'Test de #md con tablas
+
+#md on
+'## Tabla de Comparación
+'
+'| Aspecto | Valor A | Valor B | Suma |
+'|---------|---------|---------|------|
+'| Números | 10 | 20 | 30 |
+'| **Tipo** | Entero | Entero | Entero |
+'| Estado | ✅ OK | ✅ OK | ✅ OK |
+#md off
+
+'Cálculo:
+a = 10 + 20

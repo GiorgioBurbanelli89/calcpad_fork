@@ -1,0 +1,170 @@
+"========================================
+"DEMO: Solver Simbólico con AngouriMath
+"Derivadas, Integrales, Simplificación, Ecuaciones
+"========================================
+
+'<h2>1. Derivadas Simbólicas</h2>
+
+'<p>Calcular derivadas de funciones:</p>
+
+@{symbolic}
+' Derivada de un polinomio
+f1 = x^3 + 2*x^2 - 5*x + 1
+df1 = d/dx(f1)
+
+' Derivada de función trigonométrica
+f2 = sin(x) * e^x
+df2 = derive(f2, x)
+
+' Derivada de logaritmo
+f3 = ln(x^2 + 1)
+df3 = d/dx(f3)
+@{end symbolic}
+
+'<p>Resultados:</p>
+'<ul>
+'<li>f₁(x) = x³ + 2x² - 5x + 1</li>
+'<li>f₁'(x) = $df1$</li>
+'<li>f₂(x) = sin(x) · eˣ</li>
+'<li>f₂'(x) = $df2$</li>
+'<li>f₃(x) = ln(x² + 1)</li>
+'<li>f₃'(x) = $df3$</li>
+'</ul>
+
+'<hr>
+
+'<h2>2. Integrales Simbólicas</h2>
+
+'<p>Calcular integrales indefinidas:</p>
+
+@{symbolic}
+' Integral de polinomio
+int1 = integrate(x^2, x)
+
+' Integral de función trigonométrica
+int2 = ∫(sin(x), x)
+
+' Integral de exponencial
+int3 = integrate(e^x, x)
+@{end symbolic}
+
+'<p>Resultados:</p>
+'<ul>
+'<li>∫ x² dx = $int1$</li>
+'<li>∫ sin(x) dx = $int2$</li>
+'<li>∫ eˣ dx = $int3$</li>
+'</ul>
+
+'<hr>
+
+'<h2>3. Simplificación Algebraica</h2>
+
+'<p>Simplificar expresiones complejas:</p>
+
+@{symbolic}
+' Identidad trigonométrica
+trig_id = simplify(sin(x)^2 + cos(x)^2)
+
+' Simplificar fracción algebraica
+frac_simp = simplify((x^2 - 4)/(x - 2))
+
+' Expandir expresión
+expanded = expand((x + 1)^2)
+@{end symbolic}
+
+'<p>Resultados:</p>
+'<ul>
+'<li>sin²(x) + cos²(x) = $trig_id$</li>
+'<li>(x² - 4)/(x - 2) = $frac_simp$</li>
+'<li>(x + 1)² = $expanded$</li>
+'</ul>
+
+'<hr>
+
+'<h2>4. Resolver Ecuaciones</h2>
+
+'<p>Encontrar soluciones de ecuaciones:</p>
+
+@{symbolic}
+' Ecuación cuadrática
+sol1 = solve(x^2 - 5*x + 6, x)
+
+' Ecuación cúbica
+sol2 = solve(x^3 - 6*x^2 + 11*x - 6, x)
+@{end symbolic}
+
+'<p>Resultados:</p>
+'<ul>
+'<li>x² - 5x + 6 = 0 → Soluciones: $sol1$</li>
+'<li>x³ - 6x² + 11x - 6 = 0 → Soluciones: $sol2$</li>
+'</ul>
+
+'<hr>
+
+'<h2>5. Límites</h2>
+
+'<p>Calcular límites de funciones:</p>
+
+@{symbolic}
+' Límite famoso
+lim1 = limit(sin(x)/x, x, 0)
+
+' Límite al infinito
+lim2 = limit((1 + 1/n)^n, n, +oo)
+@{end symbolic}
+
+'<p>Resultados:</p>
+'<ul>
+'<li>lim(x→0) sin(x)/x = $lim1$</li>
+'<li>lim(n→∞) (1 + 1/n)ⁿ = $lim2$</li>
+'</ul>
+
+'<hr>
+
+'<h2>6. Ejemplo de Ingeniería</h2>
+
+'<p>Análisis de flexión de viga:</p>
+
+' Variables Calcpad nativas
+L = 6'm
+E = 210000'MPa
+I = 5000'cm^4
+q = 10'kN/m
+
+@{symbolic}
+' Ecuación de momento flector simbólica (sin unidades para simplificar)
+M = q*L^2/8
+
+' Ecuación de deflexión
+delta_expr = 5*q*L^4/(384*E*I)
+
+' Derivada del momento (cortante)
+V = d/dx(M)
+@{end symbolic}
+
+'<p>Resultados simbólicos:</p>
+'<ul>
+'<li>Momento: M = $M$</li>
+'<li>Deflexión: δ = $delta_expr$</li>
+'<li>Cortante: V = $V$</li>
+'</ul>
+
+'<hr>
+
+'<h2>Conclusión</h2>
+
+'<p><b>El solver simbólico de Calcpad (AngouriMath) permite:</b></p>
+'<ul>
+'<li>✅ <b>Derivadas</b> simbólicas con d/dx() o derive()</li>
+'<li>✅ <b>Integrales</b> simbólicas con ∫() o integrate()</li>
+'<li>✅ <b>Simplificación</b> con simplify()</li>
+'<li>✅ <b>Expansión</b> con expand()</li>
+'<li>✅ <b>Resolver ecuaciones</b> con solve()</li>
+'<li>✅ <b>Límites</b> con limit()</li>
+'<li>✅ <b>Combinable</b> con solver numérico de Calcpad</li>
+'</ul>
+
+'<p class="ref">
+'<b>Nota:</b> El bloque @{symbolic} procesa las expresiones simbólicamente
+'y luego las traduce a sintaxis Calcpad para evaluación numérica.
+'</p>

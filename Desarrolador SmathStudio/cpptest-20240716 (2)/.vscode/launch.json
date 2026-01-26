@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach (gdb)",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${env:ProgramFiles(x86)}/SMath Studio/Solver.exe",
+            "processId": "${command:pickProcess}",
+            "targetArchitecture": "x64",
+            "MIMode": "gdb",
+            //"cwd":"${command:cmake.buildDirectory}",
+            "miDebuggerPath": "${env:USERPROFILE}/scoop/apps/mingw/current/bin/gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+    ]
+}

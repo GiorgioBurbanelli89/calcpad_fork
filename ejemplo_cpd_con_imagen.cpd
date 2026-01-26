@@ -1,0 +1,48 @@
+'================================================
+' EJEMPLO: Calcpad con Imágenes Embebidas
+' Sistema Base64 (estilo SMath Studio)
+'================================================
+
+'------------------------------------------------
+' Módulo de Elasticidad
+'------------------------------------------------
+E = 2.535
+ν = 0.20
+G = E/(2*(1 + ν))
+G = ? ' Resultado: 1.056
+
+'------------------------------------------------
+' IMAGEN 1: Diagrama de placa
+' (Imagen pequeña de ejemplo - solo primeros bytes)
+'------------------------------------------------
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==
+@{end image}
+
+'------------------------------------------------
+' Espesor de la placa
+'------------------------------------------------
+d = 250
+
+'------------------------------------------------
+' Matriz constitutiva a flexión
+'------------------------------------------------
+Df = E*d^3/(12*(1 - ν^2))*[1, ν, 0; ν, 1, 0; 0, 0, (1 - ν)/2]
+
+'------------------------------------------------
+' IMAGEN 2: Gráfico de resultados
+' (Otra imagen embebida)
+'------------------------------------------------
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8CQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==
+@{end image}
+
+'------------------------------------------------
+' Cálculo final
+'------------------------------------------------
+resultado = Df(1,1)
+resultado = ?
+
+'================================================
+' FIN DEL DOCUMENTO
+'================================================

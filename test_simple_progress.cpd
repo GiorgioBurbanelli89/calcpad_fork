@@ -1,0 +1,11 @@
+'Comentario 1
+
+@{python}
+print("Hello from Python")
+print("CALCPAD:x=42")
+@{end python}
+
+'Comentario 2
+
+y = 100
+z = y + 10

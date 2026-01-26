@@ -1,0 +1,7 @@
+"Test Simple Calcpad
+
+a = 10
+b = 20
+c = a + b
+
+'La suma es: 'c

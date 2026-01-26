@@ -1,0 +1,150 @@
+' ============================================
+' Importado de Mathcad Prime
+' Ejemplo 19: Solución de ecuación diferencial
+' VIBRACIÓN LIBRE NO AMORTIGUADA - CON GRÁFICA
+' ============================================
+
+'<h2 style="background:#FFFFF9CB; padding:10px;">6. Tópicos Adicionales</h2>
+
+'<h3 style="background:#FFEDCBCA; padding:8px;">Ejemplo 19: Solución de una ecuación diferencial</h3>
+
+'<p>Después de realizar la condensación estática del pórtico se obtuvo la rigidez lateral:</p>
+
+'<h4 style="background:#FFE2E3E4; padding:6px;">Rigidez lateral:</h4>
+K = 1766.568'tonnef/m
+
+'<h4 style="background:#FFE2E3E4; padding:6px;">Masa del sistema:</h4>
+M = 3.877'tonnef*s²/m
+
+'<h4 style="background:#FFE2E3E4; padding:6px;">Condiciones iniciales:</h4>
+t_0 = 0's      - Tiempo inicial
+x_0 = 5'cm     - Desplazamiento inicial
+v_0 = 0'm/s    - Velocidad inicial
+
+'<hr style="margin:20px 0;">
+
+'<h3 style="background:#D0E4F5; padding:10px;">VIBRACIÓN LIBRE NO AMORTIGUADA</h3>
+
+'<h4>Frecuencia natural del sistema:</h4>
+ω_n = sqr(K/M)'rad/s   - Frecuencia angular natural
+f_n = ω_n/(2*π)'Hz     - Frecuencia natural en Hz
+T_n = 1/f_n's          - Período natural
+
+'<h4>Solución analítica:</h4>
+A = x_0            - Amplitud relacionada con posición inicial
+B = v_0/ω_n        - Amplitud relacionada con velocidad inicial
+
+'<h3>Generación de la gráfica con Python/Matplotlib</h3>
+'<p>Replicando la visualización de Mathcad Prime con tres curvas:</p>
+
+#columns 1 python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Parámetros del sistema (de Calcpad)
+K = 1766.568e3  # tonnef/m -> N/m (1 tonnef = 1000 kgf ≈ 9810 N, pero usamos sistema métrico)
+M = 3.877       # tonnef·s²/m -> aproximadamente kg
+x_0 = 0.05      # 5 cm -> m
+v_0 = 0.0       # m/s
+omega_n = np.sqrt(K/M)  # rad/s
+
+# Vector de tiempo: 0 a 2 segundos, incrementos de 0.01s
+t = np.arange(0, 2.01, 0.01)
+
+# Solución analítica para vibración libre no amortiguada
+# u(t) = A·cos(ω_n·t) + B·sen(ω_n·t)
+A = x_0
+B = v_0 / omega_n
+
+# Desplazamiento, velocidad y aceleración
+u = A * np.cos(omega_n * t) + B * np.sin(omega_n * t)
+u_dot = -A * omega_n * np.sin(omega_n * t) + B * omega_n * np.cos(omega_n * t)
+u_ddot = -A * omega_n**2 * np.cos(omega_n * t) - B * omega_n**2 * np.sin(omega_n * t)
+
+# Conversión a unidades de visualización (como en Mathcad)
+u_mm = u * 1000          # m -> mm
+u_dot_cm_s = u_dot * 100  # m/s -> cm/s
+u_ddot_m_s2 = u_ddot      # m/s²
+
+# Crear la gráfica (estilo Mathcad Prime)
+plt.figure(figsize=(10, 6))
+
+# Graficar las tres curvas
+plt.plot(t, u_mm, 'b-', linewidth=2, label='u (mm)')
+plt.plot(t, u_dot_cm_s, 'g-', linewidth=2, label="u' (cm/s)")
+plt.plot(t, u_ddot_m_s2, 'r--', linewidth=2, label="u'' (m/s²)")
+
+# Configurar gráfica
+plt.axhline(y=0, color='k', linestyle='-', linewidth=0.5)
+plt.grid(True, alpha=0.3)
+plt.xlabel('Tiempo (s)', fontsize=11)
+plt.ylabel('Respuesta', fontsize=11)
+plt.title('Vibración Libre No Amortiguada\n' +
+          'Desplazamiento, Velocidad y Aceleración',
+          fontsize=13, fontweight='bold')
+plt.legend(loc='upper right', fontsize=10)
+plt.xlim(0, 2)
+plt.ylim(-120, 120)
+
+# Mostrar ecuación de la solución en la gráfica
+eq_text = r'$u(t) = A \cdot \cos(\omega_n t) + B \cdot \sin(\omega_n t)$'
+plt.text(1.6, 95, eq_text, fontsize=11,
+         bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+
+# Agregar info del sistema
+info_text = f'$\\omega_n = {omega_n:.2f}$ rad/s\n$T_n = {2*np.pi/omega_n:.3f}$ s'
+plt.text(1.6, -105, info_text, fontsize=9,
+         bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.5))
+
+plt.tight_layout()
+plt.savefig('vibracion_libre.png', dpi=150, bbox_inches='tight')
+plt.show()
+
+print(f"Parámetros del sistema:")
+print(f"  Frecuencia natural: ω_n = {omega_n:.4f} rad/s")
+print(f"  Frecuencia: f_n = {omega_n/(2*np.pi):.4f} Hz")
+print(f"  Período: T_n = {2*np.pi/omega_n:.4f} s")
+print(f"  Amplitud inicial: A = {A*1000:.2f} mm")
+print(f"  Amplitud velocidad: B = {B:.6f} m")
+print(f"\nGráfica guardada como: vibracion_libre.png")
+#end columns
+
+'<p class="ref">
+'<b>Nota:</b> La gráfica generada replica la visualización de Mathcad Prime mostrando:
+'<ul>
+'<li style="color:blue;"><b>u (mm)</b> - Desplazamiento en azul</li>
+'<li style="color:green;"><b>u' (cm/s)</b> - Velocidad en verde</li>
+'<li style="color:red;"><b>u'' (m/s²)</b> - Aceleración en rojo (línea discontinua)</li>
+'</ul>
+'</p>
+
+'<h4>Valores numéricos en puntos específicos:</h4>
+
+t_1 = 0.0's
+x_1 = A*cos(ω_n*t_1) + B*sin(ω_n*t_1)
+v_1 = -A*ω_n*sin(ω_n*t_1) + B*ω_n*cos(ω_n*t_1)
+a_1 = -A*ω_n^2*cos(ω_n*t_1) - B*ω_n^2*sin(ω_n*t_1)
+
+t_2 = 0.5's
+x_2 = A*cos(ω_n*t_2) + B*sin(ω_n*t_2)
+v_2 = -A*ω_n*sin(ω_n*t_2) + B*ω_n*cos(ω_n*t_2)
+a_2 = -A*ω_n^2*cos(ω_n*t_2) - B*ω_n^2*sin(ω_n*t_2)
+
+t_3 = 1.0's
+x_3 = A*cos(ω_n*t_3) + B*sin(ω_n*t_3)
+v_3 = -A*ω_n*sin(ω_n*t_3) + B*ω_n*cos(ω_n*t_3)
+a_3 = -A*ω_n^2*cos(ω_n*t_3) - B*ω_n^2*sin(ω_n*t_3)
+
+#show
+'<table border="1" style="border-collapse:collapse; margin:10px; width:80%;">
+'<tr style="background:#e0e0e0;">
+'<th>Tiempo (s)</th>
+'<th>u (mm)</th>
+'<th>u' (cm/s)</th>
+'<th>u'' (m/s²)</th>
+'</tr>
+'<tr><td>$t_1$</td><td>$(x_1/mm)$</td><td>$(v_1/(cm/s))$</td><td>$(a_1/(m/s²))$</td></tr>
+'<tr><td>$t_2$</td><td>$(x_2/mm)$</td><td>$(v_2/(cm/s))$</td><td>$(a_2/(m/s²))$</td></tr>
+'<tr><td>$t_3$</td><td>$(x_3/mm)$</td><td>$(v_3/(cm/s))$</td><td>$(a_3/(m/s²))$</td></tr>
+'</table>
+#hide

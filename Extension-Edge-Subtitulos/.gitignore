@@ -1,0 +1,25 @@
+# API Keys y configuración sensible
+.env
+config.js
+api-keys.txt
+*.key
+
+# Archivos temporales
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Carpetas de desarrollo
+node_modules/
+.vscode/
+.idea/
+
+# Archivos de construcción
+dist/
+build/
+*.zip
+
+# Archivos de sistema
+desktop.ini
+.directory

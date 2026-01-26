@@ -1,0 +1,252 @@
+"BARRIO CENTRAL - MODELO ESTRUCTURAL ETABS
+'<h1>Memoria de Modelo E2K - ETABS v22.4.0</h1>
+'Archivo fuente: <b>BARRIO CENTRAL E2K.e2k</b>
+'Fecha de exportación: 23/01/2026
+
+"<hr/>
+"1. DATOS GENERALES DEL PROYECTO
+'<h2>1.1 Información del Modelo</h2>
+'<p>Sistema de unidades:</p>
+'<ul>
+'<li>Fuerza: <b>TONF</b> (Toneladas fuerza)</li>
+'<li>Longitud: <b>M</b> (Metros)</li>
+'<li>Temperatura: <b>C</b> (Celsius)</li>
+'</ul>
+
+"<hr/>
+"2. CONFIGURACIÓN DE PISOS (STORIES)
+'<h2>2.1 Definición de Niveles</h2>
+'<p>El edificio consta de <b>4 pisos</b> más la base:</p>
+
+'<table class="bordered">
+'<tr><th>Nivel</th><th>Altura (m)</th><th>Elevación (m)</th><th>Tipo</th></tr>
+'<tr><td>Story4</td><td>3.60</td><td>14.40</td><td>Master Story</td></tr>
+'<tr><td>Story3</td><td>3.60</td><td>10.80</td><td>Similar a Story4</td></tr>
+'<tr><td>Story2</td><td>3.60</td><td>7.20</td><td>Similar a Story4</td></tr>
+'<tr><td>Story1</td><td>3.60</td><td>3.60</td><td>Similar a Story4</td></tr>
+'<tr><td>Base</td><td>-</td><td>0.00</td><td>Base fija</td></tr>
+'</table>
+
+"Cálculo de altura total:
+H_piso = 3.6|m
+n_pisos = 4
+H_total = H_piso*n_pisos|m
+'<p>Altura total del edificio: <b>'H_total'm</b></p>
+
+"<hr/>
+"3. SISTEMA DE GRILLAS
+'<h2>3.1 Ejes en Dirección X</h2>
+
+'<table class="bordered">
+'<tr><th>Eje</th><th>Coordenada X (m)</th><th>Distancia al anterior (m)</th></tr>
+'<tr><td>A</td><td>0.00</td><td>-</td></tr>
+'<tr><td>B</td><td>5.80</td><td>5.80</td></tr>
+'<tr><td>C</td><td>11.70</td><td>5.90</td></tr>
+'<tr><td>D</td><td>17.50</td><td>5.80</td></tr>
+'</table>
+
+"Dimensiones en X:
+X_A = 0|m
+X_B = 5.8|m
+X_C = 11.7|m
+X_D = 17.5|m
+L_total_X = X_D - X_A|m
+'<p>Longitud total en X: <b>'L_total_X'm</b></p>
+
+'<h2>3.2 Ejes en Dirección Y</h2>
+
+'<table class="bordered">
+'<tr><th>Eje</th><th>Coordenada Y (m)</th><th>Distancia al anterior (m)</th></tr>
+'<tr><td>1</td><td>0.00</td><td>-</td></tr>
+'<tr><td>2</td><td>6.40</td><td>6.40</td></tr>
+'<tr><td>3</td><td>12.80</td><td>6.40</td></tr>
+'<tr><td>4</td><td>19.20</td><td>6.40</td></tr>
+'<tr><td>5</td><td>25.60</td><td>6.40</td></tr>
+'</table>
+
+"Dimensiones en Y:
+Y_1 = 0|m
+Y_2 = 6.4|m
+Y_3 = 12.8|m
+Y_4 = 19.2|m
+Y_5 = 25.6|m
+L_total_Y = Y_5 - Y_1|m
+'<p>Longitud total en Y: <b>'L_total_Y'm</b></p>
+
+"Área en planta:
+A_planta = L_total_X*L_total_Y|m^2
+'<p>Área en planta: <b>'A_planta'm²</b></p>
+
+"<hr/>
+"4. PROPIEDADES DE MATERIALES
+'<h2>4.1 Concreto f'c = 210 kg/cm²</h2>
+
+fc = 210|kg/cm^2
+fc_MPa = fc/10.197|MPa
+'Resistencia a compresión: f'c = 'fc'kg/cm² = 'fc_MPa'MPa
+
+E_concreto = 1825914|Tonf/m^2
+E_c_MPa = E_concreto*9.80665/1000|MPa
+'Módulo de elasticidad: E = 'E_c_MPa'MPa
+
+nu_concreto = 0.2
+'Coeficiente de Poisson: ν = 'nu_concreto'
+
+gamma_concreto = 2.40277|Tonf/m^3
+'Peso específico: γ = 'gamma_concreto'Tonf/m³
+
+'<h2>4.2 Acero A36</h2>
+
+Fy_A36 = 25310.51|Tonf/m^2
+Fy_A36_MPa = Fy_A36*9.80665/1000|MPa
+'Esfuerzo de fluencia: Fy = 'Fy_A36_MPa'MPa (≈ 248 MPa nominal)
+
+Fu_A36 = 40778.04|Tonf/m^2
+Fu_A36_MPa = Fu_A36*9.80665/1000|MPa
+'Esfuerzo último: Fu = 'Fu_A36_MPa'MPa
+
+E_acero = 20389020|Tonf/m^2
+E_a_MPa = E_acero*9.80665/1000|MPa
+'Módulo de elasticidad: E = 'E_a_MPa'MPa (≈ 200,000 MPa)
+
+'<h2>4.3 Acero de Refuerzo A615 Gr60</h2>
+
+Fy_rebar = 42184.18|Tonf/m^2
+Fy_rebar_MPa = Fy_rebar*9.80665/1000|MPa
+'Esfuerzo de fluencia: Fy = 'Fy_rebar_MPa'MPa (≈ 420 MPa)
+
+"<hr/>
+"5. SECCIONES DE ELEMENTOS
+'<h2>5.1 Columnas - Tubo de Acero Relleno de Concreto</h2>
+
+'<h3>COL 45x45x12mm (Pisos 1-2)</h3>
+b_col = 45|cm
+t_col_12 = 12|mm
+'Sección: Tubo cuadrado 'b_col'x'b_col' con espesor t = 't_col_12'mm
+'Material: Acero A36 relleno de concreto f'c = 210 kg/cm²
+
+A_tubo = (b_col^2 - (b_col - 2*t_col_12/10)^2)|cm^2
+A_concreto = (b_col - 2*t_col_12/10)^2|cm^2
+'Área de acero: As = 'A_tubo'cm²
+'Área de concreto: Ac = 'A_concreto'cm²
+
+'<h3>COL 45x45x10mm (Pisos 3-4)</h3>
+t_col_10 = 10|mm
+A_tubo_10 = (b_col^2 - (b_col - 2*t_col_10/10)^2)|cm^2
+A_conc_10 = (b_col - 2*t_col_10/10)^2|cm^2
+'Área de acero: As = 'A_tubo_10'cm²
+'Área de concreto: Ac = 'A_conc_10'cm²
+
+'<h2>5.2 Vigas Principales - Perfiles I de Acero</h2>
+
+'<h3>VTP1-(B-C) - Vigas entre ejes B y C</h3>
+'<table class="bordered">
+'<tr><th>Propiedad</th><th>Valor</th></tr>
+'<tr><td>Peralte (D)</td><td>46 cm</td></tr>
+'<tr><td>Ancho ala (B)</td><td>20 cm</td></tr>
+'<tr><td>Espesor ala (TF)</td><td>12 mm</td></tr>
+'<tr><td>Espesor alma (TW)</td><td>10 mm</td></tr>
+'</table>
+
+D_VTP1_BC = 46|cm
+B_VTP1_BC = 20|cm
+TF_VTP1_BC = 12|mm
+TW_VTP1_BC = 10|mm
+
+'<h3>VTP1-(A-D) - Vigas en ejes A y D</h3>
+'<table class="bordered">
+'<tr><th>Propiedad</th><th>Valor</th></tr>
+'<tr><td>Peralte (D)</td><td>40 cm</td></tr>
+'<tr><td>Ancho ala (B)</td><td>12 cm</td></tr>
+'<tr><td>Espesor ala (TF)</td><td>12 mm</td></tr>
+'<tr><td>Espesor alma (TW)</td><td>8 mm</td></tr>
+'</table>
+
+'<h3>VTP1(1-2-3-4-5) - Vigas en ejes numéricos</h3>
+'<table class="bordered">
+'<tr><th>Propiedad</th><th>Valor</th></tr>
+'<tr><td>Peralte (D)</td><td>40 cm</td></tr>
+'<tr><td>Ancho ala (B)</td><td>16 cm</td></tr>
+'<tr><td>Espesor ala (TF)</td><td>10 mm</td></tr>
+'<tr><td>Espesor alma (TW)</td><td>8 mm</td></tr>
+'</table>
+
+'<h2>5.3 Vigas Secundarias</h2>
+
+'<h3>V-S-I - Viguetas interiores</h3>
+'<table class="bordered">
+'<tr><th>Propiedad</th><th>Valor</th></tr>
+'<tr><td>Peralte (D)</td><td>30 cm</td></tr>
+'<tr><td>Ancho ala (B)</td><td>14 cm</td></tr>
+'<tr><td>Espesor ala (TF)</td><td>8 mm</td></tr>
+'<tr><td>Espesor alma (TW)</td><td>4 mm</td></tr>
+'</table>
+
+'<h2>5.4 Losas</h2>
+
+'<h3>LOSA 10 CM - Losa de entrepiso</h3>
+t_losa = 10|cm
+'Espesor: t = 't_losa'cm
+'Tipo: Membrana (distribución unidireccional de cargas)
+'Material: Concreto f'c = 210 kg/cm²
+
+"<hr/>
+"6. DIAFRAGMAS RÍGIDOS
+'<h2>6.1 Asignación de Diafragmas</h2>
+'<p>Se han definido <b>4 diafragmas rígidos</b>, uno por cada piso:</p>
+'<ul>
+'<li>D1 - Story1 (Nivel +3.60 m)</li>
+'<li>D2 - Story2 (Nivel +7.20 m)</li>
+'<li>D3 - Story3 (Nivel +10.80 m)</li>
+'<li>D4 - Story4 (Nivel +14.40 m)</li>
+'</ul>
+
+"<hr/>
+"7. CONDICIONES DE APOYO
+'<h2>7.1 Restricciones en la Base</h2>
+'<p>Todos los nodos en el nivel Base tienen <b>empotramiento perfecto</b>:</p>
+'<ul>
+'<li>UX, UY, UZ = Restringido (traslaciones)</li>
+'<li>RX, RY, RZ = Restringido (rotaciones)</li>
+'</ul>
+
+n_columnas = 20
+'Número de columnas: 'n_columnas' (empotradas en base)
+
+"<hr/>
+"8. RESUMEN DE ELEMENTOS
+'<h2>8.1 Cantidad de Elementos</h2>
+
+'<table class="bordered">
+'<tr><th>Elemento</th><th>Cantidad</th><th>Descripción</th></tr>
+'<tr><td>Columnas</td><td>20 x 4 = 80</td><td>Tubos de acero rellenos 45x45</td></tr>
+'<tr><td>Vigas principales</td><td>~84 por piso</td><td>Perfiles I de acero</td></tr>
+'<tr><td>Losas</td><td>12 por piso</td><td>Losa de 10 cm</td></tr>
+'<tr><td>Puntos (nodos)</td><td>91</td><td>En planta típica</td></tr>
+'</table>
+
+"<hr/>
+"9. CARGAS DE DISEÑO (del análisis ASCE 7-10)
+'<h2>9.1 Reducción de Carga Viva (RLLF)</h2>
+'<p>Método: <b>ASCE7-10</b> con valores mínimos por defecto</p>
+
+"<hr/>
+"10. OBSERVACIONES DEL MODELO
+'<h2>10.1 Características Especiales</h2>
+'<ul>
+'<li>Columnas CFT (Concrete Filled Tubes) - Mayor capacidad y ductilidad</li>
+'<li>Vigas de acero con cardinal point 8 (top center) - Conexión superior</li>
+'<li>Zonas rígidas en conexiones (RigidZone = 1)</li>
+'<li>Malla automática en losas para análisis FEM</li>
+'</ul>
+
+'<h2>10.2 Luces Típicas</h2>
+L_X_typ = 5.85|m
+L_Y_typ = 6.40|m
+'Luz típica en X: 'L_X_typ'm
+'Luz típica en Y: 'L_Y_typ'm
+'Relación de aspecto: 'L_Y_typ/L_X_typ'
+
+"<hr/>
+'<p style="text-align:center;"><i>Documento generado desde archivo E2K de ETABS</i></p>
+'<p style="text-align:center;"><i>Calcpad - Software de Cálculo Estructural</i></p>

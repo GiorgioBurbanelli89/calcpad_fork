@@ -1,0 +1,47 @@
+"Test Simple de TypeScript en Calcpad
+'=====================================
+
+"Paso 1: Verificar que TypeScript esté instalado
+'================================================
+
+@{cmd}
+ts-node --version
+@{cmd}
+
+"Paso 2: Ejecutar código TypeScript simple
+'==========================================
+
+@{cmd}
+ts-node -e "const mensaje: string = 'Hola desde TypeScript!'; console.log(mensaje);"
+@{cmd}
+
+"Paso 3: Operaciones matemáticas con tipos
+'==========================================
+
+@{cmd}
+ts-node -e "function suma(a: number, b: number): number { return a + b; } console.log(suma(10, 20));"
+@{cmd}
+
+resultado = ?
+
+"Paso 4: Usar clases en TypeScript
+'==================================
+
+@{cmd}
+ts-node -e "class Calculadora { multiplicar(a: number, b: number): number { return a * b; } } const calc = new Calculadora(); console.log(calc.multiplicar(5, 6));"
+@{cmd}
+
+producto = ?
+
+"Paso 5: TypeScript con tipos complejos
+'=======================================
+
+@{cmd}
+ts-node -e "interface Vector { x: number; y: number; } function magnitud(v: Vector): number { return Math.sqrt(v.x**2 + v.y**2); } const vec: Vector = { x: 3, y: 4 }; console.log(magnitud(vec));"
+@{cmd}
+
+magnitud = ?
+
+"Si todos los pasos funcionan, ¡TypeScript está listo!
+'=====================================================
+'Ahora puedes usar TypeScript en cualquier archivo .cpd de Calcpad

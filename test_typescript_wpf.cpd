@@ -1,0 +1,38 @@
+"Test: TypeScript en WPF
+'Verificando que TypeScript funciona en Calcpad WPF
+
+"1. Suma simple
+@{ts}
+const a: number = 5;
+const b: number = 10;
+const suma: number = a + b;
+console.log(`suma = ${suma}`);
+@{end ts}
+
+"2. Con interface
+@{ts}
+interface Punto {
+    x: number;
+    y: number;
+}
+
+const p: Punto = { x: 3, y: 4 };
+const distancia: number = Math.sqrt(p.x ** 2 + p.y ** 2);
+console.log(`distancia = ${distancia.toFixed(2)}`);
+@{end ts}
+
+"3. Comparacion con Calcpad
+#columns 2
+'TypeScript:
+@{ts}
+const radio: number = 5;
+const area: number = Math.PI * radio ** 2;
+console.log(`area = ${area.toFixed(4)}`);
+@{end ts}
+#column
+'Calcpad:
+radio = 5
+area_calcpad = π*radio^2
+#end columns
+
+'Fin del test TypeScript WPF

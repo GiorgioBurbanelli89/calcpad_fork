@@ -1,0 +1,14 @@
+'Test de la función suma(x) = x + 1
+'Esta función está definida en Calcpad.Core
+
+x = 5
+"suma(5) = "suma(x)
+
+y = 10
+"suma(10) = "suma(y)
+
+z = -3
+"suma(-3) = "suma(z)
+
+"suma(0) = "suma(0)
+"suma(100) = "suma(100)

@@ -1,0 +1,139 @@
+'==============================================
+'DOCUMENTO MIXTO: MARKDOWN + CALCPAD
+'Indice con enlaces + Calculos integrados
+'==============================================
+
+@{markdown}
+# Manual de Cálculo Estructural
+
+## Tabla de Contenidos
+
+1. [Introducción](#introduccion)
+2. [Capítulo 1: Viga Simple](#capitulo-1-viga-simple)
+3. [Capítulo 2: Columna](#capitulo-2-columna)
+4. [Anexo A: Resultados](#anexo-a-resultados)
+
+---
+
+## Introducción
+
+Este manual combina **Markdown** para el formato del índice y **Calcpad** para los cálculos estructurales.
+
+**Ventajas:**
+- Índice navegable con enlaces internos
+- Cálculos precisos con Calcpad
+- Exportable a PDF con marcadores
+
+---
+
+## Capítulo 1: Viga Simple
+
+Se analizará una viga simplemente apoyada con las siguientes características:
+
+@{end markdown}
+
+'==============================================
+'CÁLCULOS DE CALCPAD - VIGA SIMPLE
+'==============================================
+
+'Datos de entrada:
+L = 6'm            'Longitud de la viga
+w = 10'kN/m        'Carga uniformemente distribuida
+E = 210'GPa        'Módulo de elasticidad del acero
+I = 8356'cm^4      'Momento de inercia (IPE 300)
+
+'Cálculos:
+M_max = w*L^2/8    'Momento máximo
+V_max = w*L/2      'Cortante máximo
+R_A = w*L/2        'Reacción en apoyo A
+R_B = w*L/2        'Reacción en apoyo B
+
+'Deflexión máxima:
+δ_max = 5*w*L^4/(384*E*I)
+
+'Verificación:
+'Esfuerzo máximo en la fibra extrema
+W = 2*I/(0.3'm)    'Módulo resistente
+σ_max = M_max/W    'Esfuerzo de flexión
+
+@{markdown}
+
+### Resultados de la Viga
+
+Los cálculos anteriores muestran que la viga IPE 300 es adecuada para soportar la carga aplicada.
+
+**Conclusiones del Capítulo 1:**
+- ✓ Momento máximo calculado
+- ✓ Deflexión dentro de límites aceptables
+- ✓ Esfuerzos verificados
+
+---
+
+## Capítulo 2: Columna
+
+Análisis de una columna de acero sometida a compresión axial.
+
+@{end markdown}
+
+'==============================================
+'CÁLCULOS DE CALCPAD - COLUMNA
+'==============================================
+
+'Datos de la columna:
+H = 4'm            'Altura de la columna
+A = 149.1'cm^2     'Área de la sección (HEB 300)
+I_y = 8563'cm^4    'Momento de inercia menor
+E_col = 210'GPa    'Módulo de elasticidad
+P = 500'kN         'Carga axial aplicada
+
+'Radio de giro:
+i = sqrt(I_y/A)
+
+'Esbeltez:
+λ = H/i
+
+'Carga crítica de Euler:
+P_cr = π^2*E_col*I_y/H^2
+
+'Factor de seguridad:
+FS = P_cr/P
+
+'Esfuerzo de compresión:
+σ_c = P/A
+
+@{markdown}
+
+### Resultados de la Columna
+
+La columna HEB 300 tiene un factor de seguridad adecuado contra pandeo.
+
+---
+
+## Anexo A: Resultados
+
+### Resumen de Resultados
+
+| Elemento | Parámetro | Valor Calculado | Estado |
+|----------|-----------|-----------------|--------|
+| Viga IPE 300 | Momento Máximo | Ver cálculos arriba | ✓ OK |
+| Viga IPE 300 | Deflexión | Ver cálculos arriba | ✓ OK |
+| Columna HEB 300 | Factor de Seguridad | Ver cálculos arriba | ✓ OK |
+| Columna HEB 300 | Esbeltez | Ver cálculos arriba | ✓ OK |
+
+### Conclusiones Finales
+
+1. **Viga:** La viga IPE 300 cumple con los requisitos de resistencia y deflexión
+2. **Columna:** La columna HEB 300 es adecuada con factor de seguridad suficiente
+3. **Recomendación:** Los elementos estructurales propuestos son satisfactorios
+
+---
+
+**Fin del Documento**
+
+[⬆ Volver al índice](#tabla-de-contenidos)
+
+@{end markdown}
+
+'==============================================
+'FIN DEL DOCUMENTO
+'==============================================

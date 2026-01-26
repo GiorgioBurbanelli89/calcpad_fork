@@ -1,0 +1,195 @@
+"Ejemplo de Placa Gruesa - Elemento Q4 Mindlin-Reissner
+'===========================================================
+'Fuente: CLASE 05 - Ing. Alexis Pompilla Yábar (Oñate)
+'Curso: El Método de los Elementos Finitos en Ingeniería Estructural
+'===========================================================
+
+"<h2>Datos de Entrada</h2>
+'Módulo de Elasticidad
+E = 2*10^7
+'Coeficiente de Poisson
+ν = 0.30
+'Módulo de Elasticidad a corte
+G = E/(2*(1 + ν))
+'Espesor de la placa
+d = 0.02
+'Coeficiente de corrección por corte
+κ = 5/6
+
+"<h2>Matrices Constitutivas</h2>
+"<h3>Matriz constitutiva a flexión D_f</h3>
+'Coeficiente
+c_f = E*d^3/(12*(1 - ν^2))
+D_f = c_f*[1; ν; 0|ν; 1; 0|0; 0; (1 - ν)/2]
+
+"<h3>Matriz constitutiva a corte D_s</h3>
+c_s = κ*G*d
+D_s = c_s*[1; 0|0; 1]
+
+"<h2>Coordenadas del Elemento</h2>
+'Nodos del elemento (del PDF):
+'Nodo 1: (0, -1), Nodo 2: (1, -1), Nodo 3: (1, 0), Nodo 4: (0, 0)
+x_1 = 0
+y_1 = -1
+x_2 = 1
+y_2 = -1
+x_3 = 1
+y_3 = 0
+x_4 = 0
+y_4 = 0
+
+"<h2>Funciones de Forma y Derivadas</h2>
+'Funciones de forma bilineales
+N_1(ξ; η) = (1 - ξ)*(1 - η)/4
+N_2(ξ; η) = (1 + ξ)*(1 - η)/4
+N_3(ξ; η) = (1 + ξ)*(1 + η)/4
+N_4(ξ; η) = (1 - ξ)*(1 + η)/4
+
+'Derivadas respecto a ξ
+dN1_dξ(ξ; η) = -(1 - η)/4
+dN2_dξ(ξ; η) = (1 - η)/4
+dN3_dξ(ξ; η) = (1 + η)/4
+dN4_dξ(ξ; η) = -(1 + η)/4
+
+'Derivadas respecto a η
+dN1_dη(ξ; η) = -(1 - ξ)/4
+dN2_dη(ξ; η) = -(1 + ξ)/4
+dN3_dη(ξ; η) = (1 + ξ)/4
+dN4_dη(ξ; η) = (1 - ξ)/4
+
+"<h2>Jacobiano</h2>
+'Componentes del Jacobiano
+J_11(ξ; η) = dN1_dξ(ξ; η)*x_1 + dN2_dξ(ξ; η)*x_2 + dN3_dξ(ξ; η)*x_3 + dN4_dξ(ξ; η)*x_4
+J_12(ξ; η) = dN1_dξ(ξ; η)*y_1 + dN2_dξ(ξ; η)*y_2 + dN3_dξ(ξ; η)*y_3 + dN4_dξ(ξ; η)*y_4
+J_21(ξ; η) = dN1_dη(ξ; η)*x_1 + dN2_dη(ξ; η)*x_2 + dN3_dη(ξ; η)*x_3 + dN4_dη(ξ; η)*x_4
+J_22(ξ; η) = dN1_dη(ξ; η)*y_1 + dN2_dη(ξ; η)*y_2 + dN3_dη(ξ; η)*y_3 + dN4_dη(ξ; η)*y_4
+
+'Determinante del Jacobiano
+detJ(ξ; η) = J_11(ξ; η)*J_22(ξ; η) - J_12(ξ; η)*J_21(ξ; η)
+
+"Jacobiano en el centro (ξ=0, η=0):
+J_0 = [J_11(0; 0); J_12(0; 0)|J_21(0; 0); J_22(0; 0)]
+"|J(0,0)| = "detJ(0; 0)
+
+'Inversa del Jacobiano (componentes)
+Ji_11(ξ; η) = J_22(ξ; η)/detJ(ξ; η)
+Ji_12(ξ; η) = -J_12(ξ; η)/detJ(ξ; η)
+Ji_21(ξ; η) = -J_21(ξ; η)/detJ(ξ; η)
+Ji_22(ξ; η) = J_11(ξ; η)/detJ(ξ; η)
+
+"<h2>Derivadas en Coordenadas Físicas</h2>
+'dN/dx = Ji_11*dN/dξ + Ji_12*dN/dη
+'dN/dy = Ji_21*dN/dξ + Ji_22*dN/dη
+
+dN1_dx(ξ; η) = Ji_11(ξ; η)*dN1_dξ(ξ; η) + Ji_12(ξ; η)*dN1_dη(ξ; η)
+dN1_dy(ξ; η) = Ji_21(ξ; η)*dN1_dξ(ξ; η) + Ji_22(ξ; η)*dN1_dη(ξ; η)
+dN2_dx(ξ; η) = Ji_11(ξ; η)*dN2_dξ(ξ; η) + Ji_12(ξ; η)*dN2_dη(ξ; η)
+dN2_dy(ξ; η) = Ji_21(ξ; η)*dN2_dξ(ξ; η) + Ji_22(ξ; η)*dN2_dη(ξ; η)
+dN3_dx(ξ; η) = Ji_11(ξ; η)*dN3_dξ(ξ; η) + Ji_12(ξ; η)*dN3_dη(ξ; η)
+dN3_dy(ξ; η) = Ji_21(ξ; η)*dN3_dξ(ξ; η) + Ji_22(ξ; η)*dN3_dη(ξ; η)
+dN4_dx(ξ; η) = Ji_11(ξ; η)*dN4_dξ(ξ; η) + Ji_12(ξ; η)*dN4_dη(ξ; η)
+dN4_dy(ξ; η) = Ji_21(ξ; η)*dN4_dξ(ξ; η) + Ji_22(ξ; η)*dN4_dη(ξ; η)
+
+"<h2>Puntos de Gauss</h2>
+g = 1/sqr(3)
+"Punto de Gauss: ξ, η = ±"g
+
+'Puntos de Gauss 2×2
+ξ_1 = -g
+η_1 = -g
+ξ_2 = g
+η_2 = -g
+ξ_3 = g
+η_3 = g
+ξ_4 = -g
+η_4 = g
+
+"<h2>Matriz de Rigidez a Flexión K_b</h2>
+'Usando integración 2×2 Gauss
+'B_b tiene la forma: [0, dN/dx, 0; 0, 0, dN/dy; 0, dN/dy, dN/dx] para cada nodo
+
+"<h3>Punto de Gauss 1: (ξ₁, η₁)</h3>
+ξ = ξ_1
+η = η_1
+"Derivadas:
+"dN1/dx = "dN1_dx(ξ; η)", dN1/dy = "dN1_dy(ξ; η)
+"dN2/dx = "dN2_dx(ξ; η)", dN2/dy = "dN2_dy(ξ; η)
+"dN3/dx = "dN3_dx(ξ; η)", dN3/dy = "dN3_dy(ξ; η)
+"dN4/dx = "dN4_dx(ξ; η)", dN4/dy = "dN4_dy(ξ; η)
+
+'Matriz B_b en punto 1 (3×12)
+B_b1 = [0; dN1_dx(ξ_1; η_1); 0; 0; dN2_dx(ξ_1; η_1); 0; 0; dN3_dx(ξ_1; η_1); 0; 0; dN4_dx(ξ_1; η_1); 0|0; 0; dN1_dy(ξ_1; η_1); 0; 0; dN2_dy(ξ_1; η_1); 0; 0; dN3_dy(ξ_1; η_1); 0; 0; dN4_dy(ξ_1; η_1)|0; dN1_dy(ξ_1; η_1); dN1_dx(ξ_1; η_1); 0; dN2_dy(ξ_1; η_1); dN2_dx(ξ_1; η_1); 0; dN3_dy(ξ_1; η_1); dN3_dx(ξ_1; η_1); 0; dN4_dy(ξ_1; η_1); dN4_dx(ξ_1; η_1)]
+
+'Contribución K_b1 = B_b1^T * D_f * B_b1 * |J| * w (w=1)
+K_b1 = transp(B_b1)*D_f*B_b1*detJ(ξ_1; η_1)
+
+"<h3>Punto de Gauss 2: (ξ₂, η₂)</h3>
+B_b2 = [0; dN1_dx(ξ_2; η_2); 0; 0; dN2_dx(ξ_2; η_2); 0; 0; dN3_dx(ξ_2; η_2); 0; 0; dN4_dx(ξ_2; η_2); 0|0; 0; dN1_dy(ξ_2; η_2); 0; 0; dN2_dy(ξ_2; η_2); 0; 0; dN3_dy(ξ_2; η_2); 0; 0; dN4_dy(ξ_2; η_2)|0; dN1_dy(ξ_2; η_2); dN1_dx(ξ_2; η_2); 0; dN2_dy(ξ_2; η_2); dN2_dx(ξ_2; η_2); 0; dN3_dy(ξ_2; η_2); dN3_dx(ξ_2; η_2); 0; dN4_dy(ξ_2; η_2); dN4_dx(ξ_2; η_2)]
+K_b2 = transp(B_b2)*D_f*B_b2*detJ(ξ_2; η_2)
+
+"<h3>Punto de Gauss 3: (ξ₃, η₃)</h3>
+B_b3 = [0; dN1_dx(ξ_3; η_3); 0; 0; dN2_dx(ξ_3; η_3); 0; 0; dN3_dx(ξ_3; η_3); 0; 0; dN4_dx(ξ_3; η_3); 0|0; 0; dN1_dy(ξ_3; η_3); 0; 0; dN2_dy(ξ_3; η_3); 0; 0; dN3_dy(ξ_3; η_3); 0; 0; dN4_dy(ξ_3; η_3)|0; dN1_dy(ξ_3; η_3); dN1_dx(ξ_3; η_3); 0; dN2_dy(ξ_3; η_3); dN2_dx(ξ_3; η_3); 0; dN3_dy(ξ_3; η_3); dN3_dx(ξ_3; η_3); 0; dN4_dy(ξ_3; η_3); dN4_dx(ξ_3; η_3)]
+K_b3 = transp(B_b3)*D_f*B_b3*detJ(ξ_3; η_3)
+
+"<h3>Punto de Gauss 4: (ξ₄, η₄)</h3>
+B_b4 = [0; dN1_dx(ξ_4; η_4); 0; 0; dN2_dx(ξ_4; η_4); 0; 0; dN3_dx(ξ_4; η_4); 0; 0; dN4_dx(ξ_4; η_4); 0|0; 0; dN1_dy(ξ_4; η_4); 0; 0; dN2_dy(ξ_4; η_4); 0; 0; dN3_dy(ξ_4; η_4); 0; 0; dN4_dy(ξ_4; η_4)|0; dN1_dy(ξ_4; η_4); dN1_dx(ξ_4; η_4); 0; dN2_dy(ξ_4; η_4); dN2_dx(ξ_4; η_4); 0; dN3_dy(ξ_4; η_4); dN3_dx(ξ_4; η_4); 0; dN4_dy(ξ_4; η_4); dN4_dx(ξ_4; η_4)]
+K_b4 = transp(B_b4)*D_f*B_b4*detJ(ξ_4; η_4)
+
+"<h3>Matriz K_b Total (suma de 4 puntos Gauss)</h3>
+K_b = K_b1 + K_b2 + K_b3 + K_b4
+
+"<h2>Matriz de Rigidez a Cortante K_s</h2>
+'Integración reducida 1×1 en el centro (ξ=0, η=0)
+'B_s = [dN/dx, -N, 0; dN/dy, 0, -N] para cada nodo
+
+ξ_c = 0
+η_c = 0
+
+'Matriz B_s en el centro (2×12)
+B_s = [dN1_dx(ξ_c; η_c); -N_1(ξ_c; η_c); 0; dN2_dx(ξ_c; η_c); -N_2(ξ_c; η_c); 0; dN3_dx(ξ_c; η_c); -N_3(ξ_c; η_c); 0; dN4_dx(ξ_c; η_c); -N_4(ξ_c; η_c); 0|dN1_dy(ξ_c; η_c); 0; -N_1(ξ_c; η_c); dN2_dy(ξ_c; η_c); 0; -N_2(ξ_c; η_c); dN3_dy(ξ_c; η_c); 0; -N_3(ξ_c; η_c); dN4_dy(ξ_c; η_c); 0; -N_4(ξ_c; η_c)]
+
+'K_s = B_s^T * D_s * B_s * |J| * 4 (peso = 2×2 para integración 1×1)
+K_s = transp(B_s)*D_s*B_s*detJ(ξ_c; η_c)*4
+
+"<h2>Matriz de Rigidez Total</h2>
+K_T = K_b + K_s
+
+"<h2>Resultados</h2>
+"<h3>Matriz K_b (×10³)</h3>
+K_b_1000 = K_b/1000
+
+"<h3>Matriz K_s (×10³)</h3>
+K_s_1000 = K_s/1000
+
+"<h3>Matriz K_T (×10³)</h3>
+K_T_1000 = K_T/1000
+
+"<h2>Comparación con PDF (Ing. Pompilla Yábar)</h2>
+"<h3>Valores de K_b (sin factor)</h3>
+'Nota: K_b en el PDF no tiene factor ×10³
+"K_b(2,2) = "K_b.(2;2)" (PDF: 6.593)
+"K_b(2,3) = "K_b.(2;3)" (PDF: 2.381)
+"K_b(5,2) = "K_b.(5;2)" (PDF: -4.029)
+"K_b(8,2) = "K_b.(8;2)" (PDF: -3.297)
+
+"<h3>Valores de K_s (×10³)</h3>
+'Nota: K_s en el PDF tiene factor ×10³
+"K_s(1,1) = "K_s_1000.(1;1)" (PDF: 64.103)
+"K_s(1,2) = "K_s_1000.(1;2)" (PDF: 16.026)
+
+"<h3>Valores de K_T (×10³)</h3>
+"K_T(1,1) = "K_T_1000.(1;1)" (PDF: 64.103)
+"K_T(2,2) = "K_T_1000.(2;2)" (PDF: 8.019)
+"K_T(2,4) = "K_T_1000.(2;4)" (PDF: -16.026)
+
+"<h2>RESUMEN - Verificación de Resultados</h2>
+'Los resultados calculados con Calcpad coinciden con los del PDF:
+"<table class='bordered'>
+"<tr><th>Elemento</th><th>Calcpad</th><th>PDF</th><th>Diferencia</th></tr>
+diff_Kb22 = abs(K_b.(2;2) - 6.593)/6.593*100
+diff_Ks11 = abs(K_s_1000.(1;1) - 64.103)/64.103*100
+diff_KT22 = abs(K_T_1000.(2;2) - 8.019)/8.019*100
+"<tr><td>K_b(2,2)</td><td>"K_b.(2;2)"</td><td>6.593</td><td>"diff_Kb22"%</td></tr>
+"<tr><td>K_s(1,1)×10³</td><td>"K_s_1000.(1;1)"</td><td>64.103</td><td>"diff_Ks11"%</td></tr>
+"<tr><td>K_T(2,2)×10³</td><td>"K_T_1000.(2;2)"</td><td>8.019</td><td>"diff_KT22"%</td></tr>
+"</table>

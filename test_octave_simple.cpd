@@ -1,0 +1,10 @@
+"Test Octave Simple
+@{octave}
+a = 5;
+b = 10;
+suma = a + b;
+fprintf('a = %d\n', a);
+fprintf('b = %d\n', b);
+fprintf('suma = %d\n', suma);
+@{end octave}
+'Fin

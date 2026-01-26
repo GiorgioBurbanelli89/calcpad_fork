@@ -1,0 +1,224 @@
+"========================================
+"DEMO: Sistema de Parsers Externos
+"Múltiples Sintaxis en un Solo Documento
+"========================================
+
+'<h2>Introducción</h2>
+'<p>Este documento demuestra el uso de múltiples sintaxis de expresiones matemáticas en Calcpad:</p>
+'<ul>
+'<li><b>LaTeX</b> - Sintaxis académica estándar</li>
+'<li><b>Mathcad</b> - Sintaxis Mathcad Prime</li>
+'<li><b>Python Math</b> - Sintaxis Python con módulo math</li>
+'<li><b>Calcpad nativo</b> - Sintaxis original de Calcpad</li>
+'</ul>
+
+'<hr>
+
+'<h2>1. Variables Calcpad Nativas</h2>
+
+' Geometría de la viga
+L = 6'm - Longitud de la viga
+b = 300'mm - Ancho de la sección
+h = 500'mm - Altura de la sección
+
+' Material
+E = 210000'MPa - Módulo de elasticidad del acero
+fy = 355'MPa - Límite elástico
+
+' Cargas
+q = 10'kN/m - Carga uniformemente distribuida
+P = 50'kN - Carga puntual
+
+'<hr>
+
+'<h2>2. Usando Sintaxis LaTeX</h2>
+
+'<p>LaTeX es ideal para documentos académicos y fórmulas complejas:</p>
+
+@{latex}
+' Propiedades geométricas (LaTeX)
+A = b \cdot h
+I = \frac{b \cdot h^{3}}{12}
+W = \frac{I}{h/2}
+@{end latex}
+
+'<p>Resultados:</p>
+Area = A
+Inercia = I
+Modulo_seccion = W
+
+'<hr>
+
+'<h2>3. Usando Sintaxis Mathcad</h2>
+
+'<p>Mathcad Prime utiliza := para asignación y · para multiplicación:</p>
+
+@{mathcad}
+' Cálculos de momento (Mathcad style)
+M_q := q · L^2 ÷ 8
+M_P := P · L ÷ 4
+M_total := M_q + M_P
+@{end mathcad}
+
+'<p>Resultados:</p>
+Momento_carga_uniforme = M_q
+Momento_carga_puntual = M_P
+Momento_total = M_total
+
+'<hr>
+
+'<h2>4. Usando Sintaxis Python Math</h2>
+
+'<p>Python math es familiar para programadores:</p>
+
+@{pymath}
+' Tensiones (Python style)
+sigma_max = M_total / W
+tau_max = 1.5 * (q * L / 2) / A
+sigma_vm = math.sqrt(sigma_max**2 + 3 * tau_max**2)
+@{end pymath}
+
+'<p>Resultados:</p>
+Tension_normal = sigma_max
+Tension_cortante = tau_max
+Tension_von_Mises = sigma_vm
+
+'<hr>
+
+'<h2>5. Verificación de Resistencia (Calcpad)</h2>
+
+' Factor de seguridad
+FS_tension = fy/sigma_max
+FS_cortante = (fy/sqr(3))/tau_max
+
+'<h3>Resultados Finales:</h3>
+#show
+'<table border="1" style="border-collapse:collapse; margin:10px; width:80%;">
+'<tr style="background:#e0e0e0;">
+'<th>Parámetro</th>
+'<th>Valor</th>
+'<th>Unidad</th>
+'<th>Estado</th>
+'</tr>
+'<tr>
+'<td>Área de la sección</td>
+'<td>$A$</td>
+'<td>mm²</td>
+'<td>-</td>
+'</tr>
+'<tr>
+'<td>Momento de inercia</td>
+'<td>$(I/cm^4)$</td>
+'<td>cm⁴</td>
+'<td>-</td>
+'</tr>
+'<tr>
+'<td>Módulo de sección</td>
+'<td>$(W/cm^3)$</td>
+'<td>cm³</td>
+'<td>-</td>
+'</tr>
+'<tr>
+'<td>Momento total</td>
+'<td>$M_total$</td>
+'<td>kN·m</td>
+'<td>-</td>
+'</tr>
+'<tr>
+'<td>Tensión máxima</td>
+'<td>$sigma_max$</td>
+'<td>MPa</td>
+'<td>$(if(sigma_max < fy; "✅ OK"; "❌ FALLA"))$</td>
+'</tr>
+'<tr>
+'<td>Factor de seguridad</td>
+'<td>$FS_tension$</td>
+'<td>-</td>
+'<td>$(if(FS_tension > 1.5; "✅ OK"; "⚠️ BAJO"))$</td>
+'</tr>
+'</table>
+#hide
+
+'<hr>
+
+'<h2>6. Ejemplo Avanzado: Fórmulas Mixtas</h2>
+
+'<p>Puedes mezclar sintaxis para diferentes partes del cálculo:</p>
+
+@{latex}
+' Deflexión con LaTeX (más legible para fórmulas largas)
+delta_q = \frac{5 \cdot q \cdot L^{4}}{384 \cdot E \cdot I}
+@{end latex}
+
+@{pymath}
+' Deflexión carga puntual con Python (más familiar)
+delta_P = (P * L**3) / (48 * E * I)
+@{end pymath}
+
+' Deflexión total en Calcpad nativo
+delta_total = delta_q + delta_P
+L_sobre_delta = L/delta_total
+
+'<p>Deflexión total: $delta_total$ (L/$L_sobre_delta$)</p>
+'<p class="ref">Límite recomendado: L/300 = $(L/300/mm)$ mm</p>
+
+' Verificación de deflexión
+resultado_deflexion = if(L_sobre_delta >= 300; 1; 0)
+#if resultado_deflexion > 0
+	'<p style="color:green; font-weight:bold;">✅ Deflexión aceptable (L/$L_sobre_delta$ ≥ L/300)</p>
+#else
+	'<p style="color:red; font-weight:bold;">❌ Deflexión excesiva (L/$L_sobre_delta$ < L/300)</p>
+#end if
+
+'<hr>
+
+'<h2>7. Comparación de Sintaxis</h2>
+
+'<p>La misma fórmula escrita en diferentes sintaxis:</p>
+
+#show
+'<table border="1" style="border-collapse:collapse; margin:10px; width:100%; font-family:monospace;">
+'<tr style="background:#e0e0e0;">
+'<th>Sintaxis</th>
+'<th>Código</th>
+'<th>Descripción</th>
+'</tr>
+'<tr>
+'<td><b>Calcpad</b></td>
+'<td>M = q*L^2/8</td>
+'<td>Sintaxis nativa, simple y directa</td>
+'</tr>
+'<tr>
+'<td><b>LaTeX</b></td>
+'<td>M = \frac{q \cdot L^{2}}{8}</td>
+'<td>Sintaxis académica, ideal para publicaciones</td>
+'</tr>
+'<tr>
+'<td><b>Mathcad</b></td>
+'<td>M := q · L^2 ÷ 8</td>
+'<td>Sintaxis Mathcad Prime, familiar para ingenieros</td>
+'</tr>
+'<tr>
+'<td><b>Python</b></td>
+'<td>M = q * L**2 / 8</td>
+'<td>Sintaxis Python, familiar para programadores</td>
+'</tr>
+'</table>
+#hide
+
+'<hr>
+
+'<h2>Conclusión</h2>
+
+'<p><b>Ventajas del sistema de parsers múltiples:</b></p>
+'<ul>
+'<li>✅ <b>Flexibilidad</b>: Usa la sintaxis que te resulte más natural</li>
+'<li>✅ <b>Interoperabilidad</b>: Importa fórmulas de otros programas</li>
+'<li>✅ <b>Legibilidad</b>: Elige la sintaxis más clara para cada fórmula</li>
+'<li>✅ <b>Compatibilidad</b>: Migra código de LaTeX, Mathcad o Python fácilmente</li>
+'</ul>
+
+'<p class="ref">
+'<b>Nota:</b> Todas las sintaxis se traducen internamente a Calcpad nativo,
+'por lo que obtienes el mismo resultado numérico con todas ellas.
+'</p>

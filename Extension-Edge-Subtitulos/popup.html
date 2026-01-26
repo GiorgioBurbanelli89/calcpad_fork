@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtítulos ES + Descargador HD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 400px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .section h2 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .video-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .video-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .video-item .url {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .video-item .meta {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .video-item .actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .button.primary {
+            background: #4CAF50;
+            color: white;
+            width: 100%;
+        }
+
+        .button.secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            flex: 1;
+            font-size: 11px;
+            padding: 6px 10px;
+        }
+
+        .button.download {
+            background: #FF9800;
+            color: white;
+            flex: 1;
+            font-size: 11px;
+            padding: 6px 10px;
+        }
+
+        .button.danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .status {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .empty {
+            text-align: center;
+            opacity: 0.7;
+            font-size: 13px;
+            padding: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(76, 175, 80, 0.3);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-right: 5px;
+        }
+
+        .badge.quality-badge {
+            background: rgba(255, 193, 7, 0.5);
+            font-weight: bold;
+        }
+
+        .button.download.hd {
+            background: linear-gradient(135deg, #FF9800 0%, #F44336 100%);
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        <span style="font-size: 24px;">🎬</span>
+        Subtítulos ES + Descargador HD
+    </h1>
+
+    <div class="status" id="status">
+        <span id="status-text">Cargando...</span>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('videos')">📹 Videos</button>
+        <button class="tab" onclick="switchTab('subtitles')">📝 Subtítulos</button>
+        <button class="tab" onclick="switchTab('settings')">⚙️ Config</button>
+    </div>
+
+    <!-- TAB: VIDEOS DETECTADOS -->
+    <div class="tab-content active" id="tab-videos">
+        <div class="section">
+            <h2>Videos Detectados (<span id="video-count">0</span>)</h2>
+
+            <div class="video-list" id="video-list">
+                <div class="empty">
+                    No se han detectado videos aún.<br>
+                    Navega a una página con videos.
+                </div>
+            </div>
+
+            <button class="button danger" onclick="clearVideos()" style="margin-top: 10px;">
+                🗑️ Limpiar lista
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB: SUBTÍTULOS -->
+    <div class="tab-content" id="tab-subtitles">
+        <div class="section">
+            <h2>🌐 Traducir Transcript a Español</h2>
+
+            <button class="button primary" onclick="translateTranscript()" style="background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);">
+                🇪🇸 Traducir Transcript a Español
+            </button>
+
+            <p style="font-size: 11px; opacity: 0.7; margin-top: 8px;">
+                Traduce automáticamente el transcript del video al español. El texto traducido aparecerá en verde.
+            </p>
+
+            <div id="translation-status" style="display: none; margin-top: 10px; background: rgba(76, 175, 80, 0.3); padding: 10px; border-radius: 6px; font-size: 12px;">
+            </div>
+        </div>
+
+        <div class="section" style="margin-top: 10px;">
+            <h2>📋 Extraer Transcript</h2>
+
+            <button class="button secondary" onclick="extractTranscript()" style="width: 100%;">
+                📋 Extraer y Copiar Transcript
+            </button>
+
+            <p style="font-size: 11px; opacity: 0.7; margin-top: 8px;">
+                Extrae el texto del transcript y lo copia al portapapeles.
+            </p>
+
+            <div id="transcript-result" style="display: none; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; max-height: 150px; overflow-y: auto;">
+                <pre id="transcript-text" style="font-size: 11px; white-space: pre-wrap; word-wrap: break-word;"></pre>
+            </div>
+        </div>
+
+        <div class="section" style="margin-top: 10px;">
+            <h2>🔊 Audio TTS Sincronizado</h2>
+
+            <button class="button primary" onclick="startSyncTTS()" style="background: linear-gradient(135deg, #FF9800 0%, #F44336 100%); width: 100%;">
+                🎧 Iniciar Audio Español Sincronizado
+            </button>
+
+            <p style="font-size: 11px; opacity: 0.7; margin-top: 8px;">
+                Reproduce audio en español sincronizado con el video. Puedes ajustar el volumen del audio original y del TTS.
+            </p>
+
+            <div id="tts-status" style="display: none; margin-top: 10px; background: rgba(255, 152, 0, 0.3); padding: 10px; border-radius: 6px; font-size: 12px;">
+            </div>
+
+            <button class="button danger" onclick="stopSyncTTS()" style="margin-top: 10px; width: 100%; display: none;" id="stop-tts-btn">
+                ⏹️ Detener TTS
+            </button>
+        </div>
+
+        <div class="section" style="margin-top: 10px;">
+            <h2>🎬 Crear Video con Audio Español</h2>
+
+            <button class="button primary" onclick="exportForPython()" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%); width: 100%;">
+                🐍 Exportar para Python
+            </button>
+
+            <p style="font-size: 11px; opacity: 0.7; margin-top: 8px;">
+                Exporta el transcript y genera comandos para crear un video con audio español de alta calidad usando Python + Edge TTS + FFmpeg.
+            </p>
+
+            <div id="python-export-result" style="display: none; margin-top: 10px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; font-size: 11px;">
+                <pre id="python-command" style="white-space: pre-wrap; word-wrap: break-word; margin: 0;"></pre>
+            </div>
+        </div>
+
+        <div class="section" style="margin-top: 10px;">
+            <h2>📝 Otras Opciones</h2>
+
+            <button class="button secondary" onclick="generateSubtitles()" style="width: 100%;">
+                📝 Generar Subtítulos SRT
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB: CONFIGURACIÓN -->
+    <div class="tab-content" id="tab-settings">
+        <div class="section">
+            <h2>Configuración</h2>
+
+            <label style="font-size: 12px; display: block; margin-bottom: 5px;">Voz TTS:</label>
+            <select id="voice-select">
+                <option value="edge-es-es">Edge: Español (España)</option>
+                <option value="edge-es-mx">Edge: Español (México)</option>
+                <option value="edge-es-ar">Edge: Español (Argentina)</option>
+                <option value="google">Google TTS</option>
+            </select>
+
+            <label style="font-size: 12px; display: block; margin-bottom: 5px;">Velocidad:</label>
+            <select id="speed-select">
+                <option value="0.75">0.75x (Más lento)</option>
+                <option value="1.0" selected>1.0x (Normal)</option>
+                <option value="1.25">1.25x (Rápido)</option>
+            </select>
+
+            <label style="font-size: 12px; display: block; margin-bottom: 5px;">Calidad de descarga:</label>
+            <select id="quality-select">
+                <option value="highest" selected>Máxima calidad</option>
+                <option value="1080p">1080p Full HD</option>
+                <option value="720p">720p HD</option>
+                <option value="480p">480p SD</option>
+            </select>
+
+            <div style="margin-top: 15px; font-size: 12px; opacity: 0.8;">
+                <input type="checkbox" id="auto-detect" checked>
+                <label for="auto-detect">Detectar videos automáticamente</label>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

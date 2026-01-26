@@ -1,0 +1,19 @@
+' ============================================
+' Importado de SMath Studio (.sm)
+' Versión SMath: 1.1.8763.0
+' Archivo: cpptest.sm
+' Fecha: 2026-01-22 15:50:45
+' ============================================
+
+cpptest("list")
+cpptest("author")
+cpptest("email")
+cpptest("logfile")
+cpptest("info")
+cppnow(0)
+cppinc(3)
+cppstrlen("string")
+cppdiv(1; 2)
+cppmul(2; 4)
+cppsum(i; 2)
+cppsub(1; i)

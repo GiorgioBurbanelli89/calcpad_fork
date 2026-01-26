@@ -1,0 +1,32 @@
+"Test de Aliases en Español"
+'Este archivo prueba que las funciones con nombres en español funcionan correctamente
+
+"Funciones trigonométricas (español)"
+x = 45°
+'Usando alias "sen" para "sin"
+y = sen(x)
+'Verificación con sin nativo
+y_check = sin(x)
+
+"Función raíz cuadrada (español)"
+a = 16
+'Usando alias "raiz" para "sqrt"
+b = raiz(a)
+'Verificación
+b_check = sqrt(a)
+
+"Función tangente (español)"
+'Usando alias "tg" para "tan"
+c = tg(30°)
+c_check = tan(30°)
+
+"Funciones de agregación (español)"
+datos = [1; 2; 3; 4; 5]
+'Usando alias "promedio" para "average"
+prom = promedio(datos)
+'Usando alias "maximo" y "minimo" para "max" y "min"
+maxi = maximo(datos)
+mini = minimo(datos)
+
+"Resumen"
+'Si los valores son iguales, los aliases funcionan correctamente

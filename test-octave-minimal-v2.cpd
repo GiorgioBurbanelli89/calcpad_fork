@@ -1,0 +1,17 @@
+"Test Octave Minimo v2"
+
+@{octave}
+x = [0 1 2 3];
+y = [0 1 4 9];
+
+h = figure();
+plot(x, y, '-o');
+title('Test Simple');
+
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/octave_test_v2.png';
+drawnow;
+print(h, output_file, '-dpng');
+close(h);
+
+fprintf('OK: %s\n', output_file);
+@{end octave}

@@ -1,0 +1,61 @@
+"Test: 3 Columnas con 3 Parsers Diferentes
+'Calcpad + Python + JavaScript en una sola linea de columnas
+
+"Ejemplo 1: Suma simple en 3 lenguajes
+#columns 3
+'Calcpad:
+a = 5
+b = 10
+suma = a + b
+#column
+'Python:
+@{python}
+a = 5
+b = 10
+suma = a + b
+print(f"a = {a}")
+print(f"b = {b}")
+print(f"suma = {suma}")
+@{end python}
+#column
+'JavaScript:
+@{js}
+const a = 5;
+const b = 10;
+const suma = a + b;
+console.log("a = " + a);
+console.log("b = " + b);
+console.log("suma = " + suma);
+@{end js}
+#end columns
+
+"Ejemplo 2: Funciones matematicas en 3 lenguajes
+#columns 3
+'Calcpad - Funcion cuadratica:
+f(x) = x^2 + 2*x + 1
+f(3)
+f(5)
+f(10)
+#column
+'Python - Misma funcion:
+@{python}
+def f(x):
+    return x**2 + 2*x + 1
+
+print(f"f(3) = {f(3)}")
+print(f"f(5) = {f(5)}")
+print(f"f(10) = {f(10)}")
+@{end python}
+#column
+'JavaScript - Misma funcion:
+@{js}
+function f(x) {
+    return x*x + 2*x + 1;
+}
+console.log("f(3) = " + f(3));
+console.log("f(5) = " + f(5));
+console.log("f(10) = " + f(10));
+@{end js}
+#end columns
+
+'Fin del test

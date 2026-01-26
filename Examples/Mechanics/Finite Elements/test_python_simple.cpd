@@ -1,0 +1,8 @@
+"Test Simple Python
+'Solo Python, sin Calcpad
+@{python}
+print("Hola desde Python!")
+a = 5
+b = 10
+print(f"a + b = {a + b}")
+@{end python}

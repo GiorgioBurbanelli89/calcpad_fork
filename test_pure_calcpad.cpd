@@ -1,0 +1,23 @@
+"Prueba de código Calcpad puro (sin código externo)
+
+'Este es código Calcpad matemático normal
+a = 10
+b = 20
+c = a + b
+
+'Resultado:
+c = ?
+
+'Cálculos con PI:
+radio = 5
+area = π·radio^2
+area = ?
+
+'Funciones trigonométricas:
+angulo = 45°
+seno = sin(angulo)
+coseno = cos(angulo)
+seno = ?
+coseno = ?
+
+"Fin del código Calcpad

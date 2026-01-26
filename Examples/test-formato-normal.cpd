@@ -1,0 +1,21 @@
+"Test de Formato Matemático Normal de Calcpad"
+
+'<h2>Expresiones Normales de Calcpad</h2>
+
+a = 5
+b = 10
+c = a + b
+
+'Variables con exponentes:
+x = 2
+y = x^3
+
+'Función exponencial:
+z = e^(2*x)
+
+'Fracciones:
+resultado = x^3/3 + C1
+
+'Funciones trigonométricas:
+sen = sin(2*x)
+cos_val = cos(2*x)

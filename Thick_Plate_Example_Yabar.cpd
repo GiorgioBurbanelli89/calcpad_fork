@@ -1,0 +1,213 @@
+"Ejemplo de Placa Gruesa - Elemento Q4 Mindlin
+'===========================================================
+'Fuente: CLASE 05 - Ing. Alexis Pompilla Yábar (Oñate)
+'Curso: El Método de los Elementos Finitos en Ingeniería Estructural
+'===========================================================
+
+"<h2>Datos de Entrada</h2>
+'Módulo de Elasticidad
+E = 2*10^7
+'Coeficiente de Poisson
+ν = 0.30
+'Módulo de Elasticidad a corte
+G = E/(2*(1 + ν))
+'Espesor de la placa
+d = 0.02
+'Coeficiente de corrección por corte
+κ = 5/6
+
+"<h2>Matrices Constitutivas</h2>
+"<h3>Matriz constitutiva a flexión D_f</h3>
+D_f = E*d^3/(12*(1 - ν^2))*[1; ν; 0|ν; 1; 0|0; 0; (1 - ν)/2]
+
+"<h3>Matriz constitutiva a corte D_s</h3>
+D_s = κ*G*d*[1; 0|0; 1]
+
+"<h2>Funciones de Forma (Interpolación Bilineal)</h2>
+#noc
+N_1(ξ; η) = (1 - ξ)*(1 - η)/4
+N_2(ξ; η) = (1 + ξ)*(1 - η)/4
+N_3(ξ; η) = (1 + ξ)*(1 + η)/4
+N_4(ξ; η) = (1 - ξ)*(1 + η)/4
+#eoc
+
+"<h2>Derivadas de las Funciones de Forma</h2>
+'Derivadas respecto a ξ
+#noc
+dN1dξ(η) = -(1 - η)/4
+dN2dξ(η) = (1 - η)/4
+dN3dξ(η) = (1 + η)/4
+dN4dξ(η) = -(1 + η)/4
+#eoc
+
+'Derivadas respecto a η
+#noc
+dN1dη(ξ) = -(1 - ξ)/4
+dN2dη(ξ) = -(1 + ξ)/4
+dN3dη(ξ) = (1 + ξ)/4
+dN4dη(ξ) = (1 - ξ)/4
+#eoc
+
+"<h2>Coordenadas del Elemento</h2>
+'Nodos del elemento (del PDF):
+'Nodo 1: (0, -1)
+'Nodo 2: (1, -1)
+'Nodo 3: (1, 0)
+'Nodo 4: (0, 0)
+X = [0|1|1|0]
+Y = [-1|-1|0|0]
+"Coordenadas X: "transp(X)
+"Coordenadas Y: "transp(Y)
+
+"<h2>Matriz Jacobiana</h2>
+'J = dN · XY
+#hide
+'Calcular Jacobiano en un punto (ξ, η)
+J_11(ξ; η) = dN1dξ(η)*X.1 + dN2dξ(η)*X.2 + dN3dξ(η)*X.3 + dN4dξ(η)*X.4
+J_12(ξ; η) = dN1dξ(η)*Y.1 + dN2dξ(η)*Y.2 + dN3dξ(η)*Y.3 + dN4dξ(η)*Y.4
+J_21(ξ; η) = dN1dη(ξ)*X.1 + dN2dη(ξ)*X.2 + dN3dη(ξ)*X.3 + dN4dη(ξ)*X.4
+J_22(ξ; η) = dN1dη(ξ)*Y.1 + dN2dη(ξ)*Y.2 + dN3dη(ξ)*Y.3 + dN4dη(ξ)*Y.4
+#show
+"Jacobiano en el centro (ξ=0, η=0):
+J_0 = [J_11(0; 0); J_12(0; 0)|J_21(0; 0); J_22(0; 0)]
+detJ_0 = det(J_0)
+"|J| = "detJ_0
+
+"<h2>Matriz de Rigidez del Elemento</h2>
+'Usando integración selectiva:
+'- Flexión: 2×2 puntos de Gauss
+'- Cortante: 1×1 punto (integración reducida)
+
+"<h3>Puntos de Gauss 2×2</h3>
+g = 1/sqrt(3)
+"ξ, η = ±"g
+
+#hide
+'Matriz de rigidez a flexión K_b
+'Integración 2×2 Gauss
+n = 12
+K_b = matrix(n; n)
+
+'Punto de Gauss 1: (-g, -g)
+ξ_1 = -g
+η_1 = -g
+'Punto de Gauss 2: (+g, -g)
+ξ_2 = g
+η_2 = -g
+'Punto de Gauss 3: (+g, +g)
+ξ_3 = g
+η_3 = g
+'Punto de Gauss 4: (-g, +g)
+ξ_4 = -g
+η_4 = g
+
+'Función para calcular derivadas respecto a coordenadas físicas
+'Necesitamos J^(-1) * dN/dξη para obtener dN/dxy
+
+#for gp = 1 : 4
+	ξ = take(gp; ξ_1; ξ_2; ξ_3; ξ_4)
+	η = take(gp; η_1; η_2; η_3; η_4)
+
+	'Jacobiano
+	J = [J_11(ξ; η); J_12(ξ; η)|J_21(ξ; η); J_22(ξ; η)]
+	detJ = det(J)
+	J_inv = inverse(J)
+
+	'Derivadas en coordenadas naturales
+	dNdξ = [dN1dξ(η); dN2dξ(η); dN3dξ(η); dN4dξ(η)]
+	dNdη = [dN1dη(ξ); dN2dη(ξ); dN3dη(ξ); dN4dη(ξ)]
+
+	'Derivadas en coordenadas físicas: [dN/dx; dN/dy] = J^(-1) * [dN/dξ; dN/dη]
+	'Para cada nodo i:
+	'dNi/dx = J_inv(1,1)*dNi/dξ + J_inv(1,2)*dNi/dη
+	'dNi/dy = J_inv(2,1)*dNi/dξ + J_inv(2,2)*dNi/dη
+
+	'Construir matriz B_b (3×12)
+	B_b = matrix(3; n)
+	#for i = 1 : 4
+		dNidξ = dNdξ.i
+		dNidη = dNdη.i
+		dNidx = J_inv.(1; 1)*dNidξ + J_inv.(1; 2)*dNidη
+		dNidy = J_inv.(2; 1)*dNidξ + J_inv.(2; 2)*dNidη
+
+		col = 3*(i - 1) + 1
+		'B_b = [0, dN/dx, 0; 0, 0, dN/dy; 0, dN/dy, dN/dx]
+		B_b.(1; col + 1) = dNidx
+		B_b.(2; col + 2) = dNidy
+		B_b.(3; col + 1) = dNidy
+		B_b.(3; col + 2) = dNidx
+	#loop
+
+	'K_b += B_b^T * D_f * B_b * |J| * w (w=1 para Gauss 2×2)
+	K_b = K_b + transp(B_b)*D_f*B_b*detJ
+#loop
+
+'Matriz de rigidez a cortante K_s
+'Integración 1×1 (reducida) en el centro
+ξ = 0
+η = 0
+
+'Jacobiano en el centro
+J = [J_11(ξ; η); J_12(ξ; η)|J_21(ξ; η); J_22(ξ; η)]
+detJ = det(J)
+J_inv = inverse(J)
+
+'Derivadas en coordenadas naturales
+dNdξ = [dN1dξ(η); dN2dξ(η); dN3dξ(η); dN4dξ(η)]
+dNdη = [dN1dη(ξ); dN2dη(ξ); dN3dη(ξ); dN4dη(ξ)]
+
+'Valores de N en el centro
+N_vec = [N_1(ξ; η); N_2(ξ; η); N_3(ξ; η); N_4(ξ; η)]
+
+'Construir matriz B_s (2×12)
+B_s = matrix(2; n)
+#for i = 1 : 4
+	dNidξ = dNdξ.i
+	dNidη = dNdη.i
+	dNidx = J_inv.(1; 1)*dNidξ + J_inv.(1; 2)*dNidη
+	dNidy = J_inv.(2; 1)*dNidξ + J_inv.(2; 2)*dNidη
+	Ni = N_vec.i
+
+	col = 3*(i - 1) + 1
+	'B_s = [dN/dx, -N, 0; dN/dy, 0, -N]
+	'Nota: El signo negativo en N viene de la convención γ = ∂w/∂x - θx
+	B_s.(1; col) = dNidx
+	B_s.(1; col + 1) = -Ni
+	B_s.(2; col) = dNidy
+	B_s.(2; col + 2) = -Ni
+#loop
+
+'K_s = B_s^T * D_s * B_s * |J| * w (w=2*2=4 para integración 1×1)
+K_s = transp(B_s)*D_s*B_s*detJ*4
+
+'Matriz de rigidez total
+K_T = K_b + K_s
+#show
+
+"<h3>Matriz de Rigidez a Flexión K_b (×10³)</h3>
+K_b/1000
+
+"<h3>Matriz de Rigidez a Cortante K_s (×10³)</h3>
+K_s/1000
+
+"<h3>Matriz de Rigidez Total K_T (×10³)</h3>
+K_T/1000
+
+"<h2>Comparación con Resultados del PDF</h2>
+'Del PDF (Ing. Pompilla Yábar):
+'K_b(2,2) = 6.593 ×10³
+'K_b(2,3) = 2.381 ×10³
+'K_s(1,1) = 64.103 ×10³
+'K_T(1,1) = 64.103 ×10³
+
+"Valores calculados:
+"K_b(2,2) = "K_b.(2; 2)/1000" ×10³  (PDF: 6.593)
+"K_b(2,3) = "K_b.(2; 3)/1000" ×10³  (PDF: 2.381)
+"K_s(1,1) = "K_s.(1; 1)/1000" ×10³  (PDF: 64.103)
+"K_T(1,1) = "K_T.(1; 1)/1000" ×10³  (PDF: 64.103)
+
+"<h2>Verificación de Algunos Elementos</h2>
+"K_b(5,2) = "K_b.(5; 2)/1000" ×10³  (PDF: -4.029)
+"K_b(8,2) = "K_b.(8; 2)/1000" ×10³  (PDF: -3.297)
+"K_s(1,2) = "K_s.(1; 2)/1000" ×10³  (PDF: 16.026)
+"K_T(2,4) = "K_T.(2; 4)/1000" ×10³  (PDF: -16.026)

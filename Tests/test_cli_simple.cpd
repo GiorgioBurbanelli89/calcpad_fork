@@ -1,0 +1,28 @@
+"Test CLI de Calcpad - Funciones FEM"
+'==================================='
+
+'Prueba 1: Matriz de rigidez de viga 2D'
+E = 200000'MPa
+A = 0.01'm^2
+I = 0.0001'm^4
+L = 5'm
+
+'Calculando matriz de rigidez local (simplificada)'
+k11 = E*A/L
+k22 = 12*E*I/L^3
+k33 = 4*E*I/L
+
+'Resultados:'
+k11'N/m
+k22'N/m
+k33'N·m/rad
+
+'======================================'
+'Prueba 2: Deflexión de viga en voladizo'
+P = 10000'N
+δ = P*L^3/(3*E*I)'m
+θ = P*L^2/(2*E*I)'rad
+
+'Resultados:'
+δ'm - Deflexión en el extremo
+θ'rad - Rotación en el extremo

@@ -1,0 +1,446 @@
+"BARRIO CENTRAL - CALCULOS ESTRUCTURALES
+'<h1>Memoria de Calculo - Diseño Estructural</h1>
+'Basado en: <b>HOJA DE CALCULO 23-01-2026.xlsx</b>
+
+"<hr/>
+"1. PROPIEDADES DE MATERIALES
+'<h2>1.1 Materiales de Diseño</h2>
+
+"Concreto:
+#noc
+f'c = 210|kg/cm^2
+#eoc
+'Resistencia a compresión del concreto
+
+"Acero de refuerzo:
+#noc
+fy = 4200|kg/cm^2
+#eoc
+'Esfuerzo de fluencia del acero de refuerzo
+
+"Acero estructural A36:
+#noc
+Fy_A36 = 36|ksi
+Fy_A36_kg = Fy_A36*70.307|kg/cm^2
+#eoc
+'Esfuerzo de fluencia: Fy = 'Fy_A36_kg'kg/cm² (≈ 2530 kg/cm²)
+
+"Módulo de elasticidad del acero:
+#noc
+E_acero = 2100000|kg/cm^2
+#eoc
+
+"<hr/>
+"2. DATOS ARQUITECTONICOS
+'<h2>2.1 Dimensiones del Edificio</h2>
+
+"Luces entre ejes:
+#noc
+L1 = 5.9|m
+L2 = 5.8|m
+L3 = 6.4|m
+L4 = 6.4|m
+#eoc
+
+"Número de pisos y altura:
+#noc
+n_pisos = 4
+He = 3.6|m
+H_total = n_pisos*He|m
+#eoc
+
+"Área tributaria típica:
+#noc
+At = 37.44|m^2
+#eoc
+
+"<hr/>
+"3. CARGAS DE DISEÑO
+'<h2>3.1 Cargas por Piso</h2>
+
+"Carga muerta (losa + acabados):
+#noc
+Cm = 0.62|Tonf/m^2
+#eoc
+
+"Carga viva:
+#noc
+Cv = 0.48|Tonf/m^2
+#eoc
+
+"Carga última (combinación 1.2D + 1.6L):
+#noc
+Cu = 1.2*Cm + 1.6*Cv|Tonf/m^2
+#eoc
+
+"<hr/>
+"4. DISEÑO DE LOSA
+'<h2>4.1 Predimensionamiento de Losa Nervada</h2>
+
+"Dimensiones de la losa:
+#noc
+Ht = 25|cm
+tc = 5|cm
+bn = 10|cm
+ba = 40|cm
+#eoc
+'Altura total: 'Ht'cm, Capa de compresión: 'tc'cm
+
+"Luz máxima:
+#noc
+Lmax = 6.55|m
+#eoc
+
+"Altura mínima por deflexión (L/20 para losa en dos direcciones):
+#noc
+h_min = Lmax*100/20|cm
+#eoc
+'h_min = 'h_min'cm < Ht = 'Ht'cm → OK
+
+"Momento de inercia del nervio:
+#noc
+I_losa = 63227.56|cm^4
+#eoc
+
+"<hr/>
+"5. DISEÑO DE COLUMNAS
+'<h2>5.1 Columna Tubular de Acero (CFT)</h2>
+
+"Dimensiones de la columna:
+#noc
+b_col = 45|cm
+h_col = 45|cm
+e_col = 1.2|cm
+#eoc
+'Sección: Tubo cuadrado 'b_col'x'h_col' cm, espesor 'e_col'cm
+
+"Área de acero del tubo:
+#noc
+As_col = b_col^2 - (b_col - 2*e_col)^2|cm^2
+#eoc
+'Área de acero: As = 'As_col'cm²
+
+"Área de concreto de relleno:
+#noc
+Ac_col = (b_col - 2*e_col)^2|cm^2
+#eoc
+'Área de concreto: Ac = 'Ac_col'cm²
+
+"Peso lineal de la columna:
+#noc
+gamma_acero = 7.85|kg/dm^3
+Peso_col = As_col*gamma_acero/100|kg/m
+#eoc
+'Peso: 'Peso_col'kg/m
+
+"Momento de inercia:
+#noc
+Ix_col = b_col^4/12 - (b_col - 2*e_col)^4/12|cm^4
+Iy_col = Ix_col|cm^4
+#eoc
+'Ix = Iy = 'Ix_col'cm⁴
+
+"Módulo plástico:
+#noc
+Zx_col = b_col^3/4 - (b_col - 2*e_col)^3/4|cm^3
+#eoc
+'Zx = 'Zx_col'cm³
+
+"Radio de giro:
+#noc
+rx_col = sqr(Ix_col/As_col)|cm
+ry_col = rx_col|cm
+#eoc
+'r = 'rx_col'cm
+
+'<h2>5.2 Verificación de Esbeltez</h2>
+
+"Factor de longitud efectiva:
+#noc
+K = 1.2
+#eoc
+
+"Longitud efectiva:
+#noc
+L_eff = K*He*100|cm
+#eoc
+'L_eff = 'L_eff'cm
+
+"Relación de esbeltez:
+#noc
+lambda_x = L_eff/rx_col
+#eoc
+'λ = KL/r = 'lambda_x'
+
+"Límite de esbeltez (4.71√(E/Fy)):
+#noc
+lambda_lim = 4.71*sqr(E_acero/Fy_A36_kg)
+#eoc
+'λ_lim = 'lambda_lim'
+
+#if lambda_x < lambda_lim
+'<p style="color:green"><b>λ = 'lambda_x' < λ_lim = 'lambda_lim' → Pandeo inelástico</b></p>
+#else
+'<p style="color:red"><b>λ = 'lambda_x' > λ_lim = 'lambda_lim' → Pandeo elástico</b></p>
+#end if
+
+'<h2>5.3 Resistencia a Compresión</h2>
+
+"Esfuerzo de Euler:
+#noc
+Fe = π^2*E_acero/lambda_x^2|kg/cm^2
+#eoc
+'Fe = 'Fe'kg/cm²
+
+"Esfuerzo crítico de pandeo:
+#noc
+Fcr = 0.658^(Fy_A36_kg/Fe)*Fy_A36_kg|kg/cm^2
+#eoc
+'Fcr = 'Fcr'kg/cm²
+
+"Resistencia nominal a compresión:
+#noc
+Pn = Fcr*As_col/1000|Tonf
+phi_c = 0.9
+Pr = phi_c*Pn|Tonf
+#eoc
+'Pn = 'Pn'Tonf
+'φPn = 'Pr'Tonf
+
+'<h2>5.4 Carga Última en Columna</h2>
+
+"Carga axial última:
+#noc
+Pu_col = Cu*At*n_pisos|Tonf
+#eoc
+'Pu = 'Pu_col'Tonf
+
+"Relación demanda/capacidad:
+#noc
+DC_col = Pu_col/Pr
+#eoc
+'D/C = 'DC_col'
+
+#if DC_col < 1
+'<p style="color:green"><b>D/C = 'DC_col' < 1.0 → COLUMNA SATISFACTORIA</b></p>
+#else
+'<p style="color:red"><b>D/C = 'DC_col' > 1.0 → COLUMNA NO CUMPLE</b></p>
+#end if
+
+"<hr/>
+"6. DISEÑO DE VIGAS PRINCIPALES
+'<h2>6.1 Viga Tipo VTP1-(B-C)</h2>
+
+"Dimensiones del perfil I:
+#noc
+D_viga = 46|cm
+B_viga = 20|cm
+tf_viga = 1.2|cm
+tw_viga = 1.0|cm
+#eoc
+'Peralte: 'D_viga'cm, Ancho ala: 'B_viga'cm
+'Espesor ala: 'tf_viga'cm, Espesor alma: 'tw_viga'cm
+
+"Área de la sección:
+#noc
+As_viga = 2*B_viga*tf_viga + (D_viga - 2*tf_viga)*tw_viga|cm^2
+#eoc
+'As = 'As_viga'cm²
+
+"Momento de inercia:
+#noc
+Ix_viga = B_viga*D_viga^3/12 - (B_viga - tw_viga)*(D_viga - 2*tf_viga)^3/12|cm^4
+#eoc
+'Ix = 'Ix_viga'cm⁴
+
+"Módulo plástico (aproximado):
+#noc
+Zx_viga = B_viga*tf_viga*(D_viga - tf_viga) + tw_viga*(D_viga - 2*tf_viga)^2/4|cm^3
+#eoc
+'Zx = 'Zx_viga'cm³
+
+'<h2>6.2 Verificación por Flexión</h2>
+
+"Luz de la viga:
+#noc
+Lv = L3|m
+#eoc
+
+"Carga distribuida última:
+#noc
+w_u = Cu*L1|Tonf/m
+#eoc
+'wu = 'w_u'Tonf/m
+
+"Momento último:
+#noc
+Mu_viga = w_u*Lv^2/8|Tonf*m
+Mu_viga_kg = Mu_viga*100000|kg*cm
+#eoc
+'Mu = 'Mu_viga'Tonf·m = 'Mu_viga_kg'kg·cm
+
+"Momento resistente nominal:
+#noc
+Mn_viga = Fy_A36_kg*Zx_viga/100000|Tonf*m
+phi_b = 0.9
+Mr_viga = phi_b*Mn_viga|Tonf*m
+#eoc
+'Mn = 'Mn_viga'Tonf·m
+'φMn = 'Mr_viga'Tonf·m
+
+"Relación demanda/capacidad:
+#noc
+DC_viga = Mu_viga/Mr_viga
+#eoc
+'D/C = 'DC_viga'
+
+#if DC_viga < 1
+'<p style="color:green"><b>D/C = 'DC_viga' < 1.0 → VIGA SATISFACTORIA</b></p>
+#else
+'<p style="color:red"><b>D/C = 'DC_viga' > 1.0 → VIGA NO CUMPLE</b></p>
+#end if
+
+"<hr/>
+"7. CONEXIONES VIGA-COLUMNA
+'<h2>7.1 Verificación de Nudo Fuerte</h2>
+
+"Momento plástico de la columna:
+#noc
+Mp_col = Fy_A36_kg*Zx_col/100000|Tonf*m
+Sum_Mp_col = 2*Mp_col|Tonf*m
+#eoc
+'ΣMp_col = 2 × 'Mp_col' = 'Sum_Mp_col'Tonf·m
+
+"Momento plástico de las vigas:
+#noc
+Mp_viga = Fy_A36_kg*Zx_viga/100000|Tonf*m
+Sum_Mp_viga = 2*Mp_viga|Tonf*m
+#eoc
+'ΣMp_viga = 2 × 'Mp_viga' = 'Sum_Mp_viga'Tonf·m
+
+"Relación columna fuerte - viga débil:
+#noc
+Ratio_CF = Sum_Mp_col/Sum_Mp_viga
+#eoc
+'ΣMp_col/ΣMp_viga = 'Ratio_CF'
+
+#if Ratio_CF > 1
+'<p style="color:green"><b>Ratio = 'Ratio_CF' > 1.0 → NUDO FUERTE CUMPLE</b></p>
+#else
+'<p style="color:red"><b>Ratio = 'Ratio_CF' < 1.0 → NUDO NO CUMPLE</b></p>
+#end if
+
+"<hr/>
+"8. PLACA BASE
+'<h2>8.1 Dimensionamiento de Placa Base</h2>
+
+"Carga última en base:
+#noc
+Pu_base = Pu_col|Tonf
+#eoc
+
+"Resistencia del concreto de cimentación:
+#noc
+f'c_cim = 180|kg/cm^2
+#eoc
+
+"Área requerida de placa:
+#noc
+phi_c_base = 0.65
+A_req = Pu_base*1000/(phi_c_base*0.85*f'c_cim)|cm^2
+#eoc
+'A_req = 'A_req'cm²
+
+"Dimensiones de placa (cuadrada):
+#noc
+B_placa = sqr(A_req)|cm
+B_placa_def = 65|cm
+H_placa = 65|cm
+A_placa = B_placa_def*H_placa|cm^2
+#eoc
+'B × H = 'B_placa_def' × 'H_placa' = 'A_placa'cm²
+
+"Presión de apoyo:
+#noc
+q_u = Pu_base*1000/A_placa|kg/cm^2
+q_adm = 0.85*f'c_cim|kg/cm^2
+#eoc
+'qu = 'q_u'kg/cm² < q_adm = 'q_adm'kg/cm²
+
+"Voladizo crítico:
+#noc
+m_placa = (B_placa_def - b_col)/2|cm
+n_placa = (H_placa - h_col)/2|cm
+#eoc
+'m = 'n_placa = (65 - 45)/2 = 'm_placa'cm
+
+"Momento en placa:
+#noc
+Mu_placa = q_u*m_placa^2/2|kg*cm/cm
+#eoc
+'Mu = 'Mu_placa'kg·cm/cm
+
+"Espesor requerido de placa:
+#noc
+Fy_placa = Fy_A36_kg|kg/cm^2
+t_req = sqr(4*Mu_placa/(0.9*Fy_placa))|cm
+t_placa = 3.5|cm
+#eoc
+'t_req = 'format(t_req,"F2")'cm → Usar t = 't_placa'cm (35 mm)
+
+"<hr/>
+"9. CIMENTACIONES
+'<h2>9.1 Diseño de Zapata</h2>
+
+"Carga que baja al plinto:
+#noc
+P_servicio = Pu_base/1.4|Tonf
+#eoc
+'P_servicio = 'P_servicio'Tonf (estimado)
+
+"Esfuerzo admisible del suelo:
+#noc
+q_adm_suelo = 21|Tonf/m^2
+#eoc
+
+"Área requerida de zapata:
+#noc
+A_zap_req = P_servicio/q_adm_suelo|m^2
+#eoc
+'A_req = 'A_zap_req'm²
+
+"Dimensiones de zapata (cuadrada):
+#noc
+B_zap = sqr(A_zap_req)|m
+B_zap_def = 1.5|m
+A_zap = B_zap_def^2|m^2
+#eoc
+'B = 'B_zap_def'm × 'B_zap_def'm = 'A_zap'm²
+
+"Presión de contacto:
+#noc
+q_contacto = P_servicio/A_zap|Tonf/m^2
+#eoc
+'q = 'q_contacto'Tonf/m²
+
+#if q_contacto < q_adm_suelo
+'<p style="color:green"><b>q = 'q_contacto'Tonf/m² < q_adm = 'q_adm_suelo'Tonf/m² → OK</b></p>
+#else
+'<p style="color:red"><b>q = 'q_contacto'Tonf/m² > q_adm = 'q_adm_suelo'Tonf/m² → AUMENTAR ZAPATA</b></p>
+#end if
+
+"<hr/>
+"10. RESUMEN DE DISEÑO
+'<h2>10.1 Elementos Principales</h2>
+
+'<table class="bordered">
+'<tr><th>Elemento</th><th>Sección</th><th>D/C</th><th>Estado</th></tr>
+'<tr><td>Columna CFT</td><td>45×45×12mm</td><td>'format(DC_col,"F3")'</td><td>OK</td></tr>
+'<tr><td>Viga Principal</td><td>I 46×20×12×10</td><td>'format(DC_viga,"F3")'</td><td>OK</td></tr>
+'<tr><td>Placa Base</td><td>65×65×35mm</td><td>-</td><td>OK</td></tr>
+'<tr><td>Zapata</td><td>1.50×1.50m</td><td>'format(q_contacto/q_adm_suelo,"F3")'</td><td>OK</td></tr>
+'</table>
+
+"<hr/>
+'<p style="text-align:center;"><i>Documento generado desde Excel de cálculos estructurales</i></p>
+'<p style="text-align:center;"><i>Calcpad - Software de Cálculo Estructural</i></p>

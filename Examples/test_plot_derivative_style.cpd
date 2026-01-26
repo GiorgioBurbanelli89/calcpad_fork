@@ -1,0 +1,88 @@
+"Gráfica de Derivada - Universo Formulas"
+
+'Replicando la gráfica de derivada exactamente como la imagen original
+@{plot}
+# Datos X para ambas curvas
+x: [0; 0.12; 0.24; 0.36; 0.48; 0.6; 0.72; 0.84; 0.96; 1.08; 1.2; 1.32; 1.44; 1.56; 1.68; 1.8; 1.92; 2.04; 2.16; 2.28; 2.4; 2.52; 2.64; 2.76; 2.88; 3.0]
+
+# f(x) = 0.6*x^2 + 0.15 - curva roja
+y: [0.15; 0.159; 0.185; 0.228; 0.288; 0.366; 0.461; 0.574; 0.703; 0.85; 1.014; 1.196; 1.394; 1.61; 1.843; 2.094; 2.362; 2.647; 2.95; 3.27; 3.607; 3.962; 4.334; 4.723; 5.13; 5.55]
+color: #CC0000
+smooth: true
+linewidth: 2.3
+symbol: none
+
+# Tangente en x=1.08: f'(x)=1.2x, f'(1.08)=1.296, f(1.08)=0.85
+# y = 1.296*(x - 1.08) + 0.85 = 1.296x - 0.55
+y2: [-0.55; -0.395; -0.239; -0.083; 0.072; 0.228; 0.384; 0.539; 0.695; 0.85; 1.006; 1.161; 1.317; 1.472; 1.628; 1.784; 1.939; 2.095; 2.25; 2.406; 2.562; 2.717; 2.873; 3.028; 3.184; 3.34]
+color2: #0000CC
+smooth2: false
+linewidth2: 1.5
+symbol2: none
+
+xlabel: "X"
+ylabel: "Y"
+title: ""
+xlim: -0.1, 3.1
+ylim: -0.6, 5.8
+width: 500
+height: 440
+background: white
+grid: false
+showlegend: false
+
+# Proyecciones punteadas desde A y B hacia los ejes
+proj: 1.08, 0.85, #777777
+proj: 1.92, 2.362, #777777
+
+# Puntos principales
+point: 1.08, 0.85, #000000, 5, filled
+point: 1.92, 2.362, #000000, 5, filled
+point: 1.92, 1.939, #CC0000, 4, filled
+point: 1.92, 0.85, #000000, 4, filled
+
+# Línea horizontal A-S (segmento de proyección)
+line: 1.08, 0.85, 1.92, 0.85, #777777
+
+# Etiquetas de puntos
+text: 0.9, 1.0, "A", #CC0000, 13, bold
+text: 2.02, 2.52, "B", #0000CC, 13, bold
+text: 2.02, 1.79, "R", #CC0000, 11, normal
+text: 2.02, 0.7, "S", #000000, 11, normal
+
+# f(x) etiqueta junto a la curva
+text: 2.55, 4.9, "f(x)", #CC0000, 14, italic
+
+# Etiquetas del eje Y usando ytick (posicionadas a la izquierda del eje)
+ytick: 0.85, "f(a)", #000000
+ytick: 2.362, "f(a+h)", #000000
+
+# Etiquetas del eje X usando xtick
+xtick: 1.08, "a", #000000
+xtick: 1.92, "a+h", #000000
+
+# Cero en el origen
+text: -0.06, -0.12, "0", #000000, 10, normal
+
+# Dimensión horizontal h = Δx = dx con flechas dobles
+dim: 1.08, -0.02, 1.92, -0.02, "h = Δx = dx", #000000
+
+# Texto Δf ~ df(a) arriba izquierda
+text: 0.05, 2.8, "Δf ~ df(a)", #000000, 12, italic
+
+# Dimensión vertical df(a) con flechas dobles
+dim: 2.25, 0.85, 2.25, 1.939, "df(a)", #000000
+
+# Flecha pequeña para Δf (de R a B)
+arrow: 2.45, 1.939, 2.45, 2.362, #000000
+
+# Texto Δf junto a la flecha
+text: 2.55, 2.15, "Δf", #000000, 10, italic
+
+# Ángulo α - un solo arco
+# Formato: angle: x, y, anguloInicio, anguloFin, radio, "etiqueta", color
+# La pendiente de la tangente es 1.296, arctan(1.296) ≈ 52°
+# El arco debe estar en el punto A (1.08, 0.85) donde la tangente toca la curva
+angle: 1.18, 0.85, 0, 52, 0.09, "α", #880000
+
+@{end plot}

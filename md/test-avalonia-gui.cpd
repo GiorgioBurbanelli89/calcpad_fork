@@ -1,0 +1,45 @@
+﻿'Test Avalonia GUI - Cross Platform
+
+"Este ejemplo usa Avalonia (C# + XAML) que funciona en Windows, Linux y macOS."
+
+'Nota: Avalonia requiere dotnet SDK instalado y el template de Avalonia.
+'Para instalar: dotnet new install Avalonia.Templates
+
+'Los ejemplos actuales de Qt y GTK solo imprimen texto porque:
+'- Qt requiere Qt SDK instalado (500+ MB)
+'- GTK requiere librerÃ­as GTK4 instaladas
+'- Ambos necesitan flags de compilaciÃ³n especiales
+
+'Avalonia es la mejor opciÃ³n para portar Calcpad a Linux porque:
+'1. Usa C# (mismo lenguaje que WPF)
+'2. Usa XAML (casi idÃ©ntico a WPF)
+'3. Solo requiere dotnet (ya instalado)
+'4. El cÃ³digo WPF se puede reutilizar casi 100%
+
+@{csharp}
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("=== Avalonia UI Framework ===");
+        Console.WriteLine("Para crear una GUI real de Avalonia:");
+        Console.WriteLine("");
+        Console.WriteLine("1. Instalar template:");
+        Console.WriteLine("   dotnet new install Avalonia.Templates");
+        Console.WriteLine("");
+        Console.WriteLine("2. Crear proyecto:");
+        Console.WriteLine("   dotnet new avalonia.app -n CalcpadAvalonia");
+        Console.WriteLine("");
+        Console.WriteLine("3. Ejecutar:");
+        Console.WriteLine("   cd CalcpadAvalonia");
+        Console.WriteLine("   dotnet run");
+        Console.WriteLine("");
+        Console.WriteLine("Esto creara una ventana GUI REAL que funciona en:");
+        Console.WriteLine("- Windows");
+        Console.WriteLine("- Linux");
+        Console.WriteLine("- macOS");
+    }
+}
+@{end csharp}

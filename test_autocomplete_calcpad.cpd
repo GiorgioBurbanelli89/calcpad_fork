@@ -1,0 +1,147 @@
+'==============================================
+'PRUEBA DE AUTOCOMPLETE @{calcpad:}
+'==============================================
+
+@{html}
+<h1>Manual de Cálculo Estructural con Índice</h1>
+
+<h2>Tabla de Contenidos</h2>
+<ul>
+  <li><a href="#cap1">Capítulo 1: Viga Simple</a></li>
+  <li><a href="#cap2">Capítulo 2: Columna</a></li>
+  <li><a href="#anexo-a">Anexo A: Resultados</a></li>
+</ul>
+
+<hr>
+
+<h2 id="cap1">Capítulo 1: Viga Simple</h2>
+
+<p>Datos de entrada:</p>
+
+@{calcpad:L = 6'm}
+@{calcpad:w = 10'kN/m}
+
+<p>Cálculos:</p>
+
+@{calcpad:M = w*L^2/8}
+@{calcpad:V = w*L/2}
+@{calcpad:R = w*L/2}
+
+<h3>Resultados del Capítulo 1</h3>
+<table border="1">
+  <tr>
+    <td><strong>Parámetro</strong></td>
+    <td><strong>Valor</strong></td>
+  </tr>
+  <tr>
+    <td>Longitud de viga</td>
+    <td>@{calcpad:#val
+L}</td>
+  </tr>
+  <tr>
+    <td>Carga distribuida</td>
+    <td>@{calcpad:#val
+w}</td>
+  </tr>
+  <tr>
+    <td>Momento máximo</td>
+    <td><strong>@{calcpad:#val
+M}</strong></td>
+  </tr>
+  <tr>
+    <td>Cortante máximo</td>
+    <td><strong>@{calcpad:#val
+V}</strong></td>
+  </tr>
+</table>
+
+<hr>
+
+<h2 id="cap2">Capítulo 2: Columna</h2>
+
+<p>Análisis de columna HEB 300:</p>
+
+@{calcpad:H = 4'm}
+@{calcpad:A = 149.1'cm^2}
+@{calcpad:I_y = 8563'cm^4}
+@{calcpad:E = 210'GPa}
+@{calcpad:P = 500'kN}
+
+<p>Radio de giro:</p>
+
+@{calcpad:i = sqrt(I_y/A)}
+
+<p>Esbeltez:</p>
+
+@{calcpad:lambda = H/i}
+
+<p>Carga crítica de Euler:</p>
+
+@{calcpad:P_cr = π^2*E*I_y/H^2}
+
+<p>Factor de seguridad:</p>
+
+@{calcpad:FS = P_cr/P}
+
+<h3>Resumen Columna</h3>
+<ul>
+  <li>Altura: @{calcpad:#val
+H}</li>
+  <li>Área: @{calcpad:#val
+A}</li>
+  <li>Radio de giro: @{calcpad:#val
+i}</li>
+  <li>Esbeltez: @{calcpad:#val
+lambda}</li>
+  <li>Factor de seguridad: <strong>@{calcpad:#val
+FS}</strong></li>
+</ul>
+
+<hr>
+
+<h2 id="anexo-a">Anexo A: Resultados Finales</h2>
+
+<table border="1" style="width:100%">
+  <tr>
+    <th>Elemento</th>
+    <th>Parámetro</th>
+    <th>Valor</th>
+    <th>Estado</th>
+  </tr>
+  <tr>
+    <td>Viga IPE 300</td>
+    <td>Momento Máximo</td>
+    <td>@{calcpad:#val
+M}</td>
+    <td>✓ OK</td>
+  </tr>
+  <tr>
+    <td>Viga IPE 300</td>
+    <td>Cortante</td>
+    <td>@{calcpad:#val
+V}</td>
+    <td>✓ OK</td>
+  </tr>
+  <tr>
+    <td>Columna HEB 300</td>
+    <td>Factor Seguridad</td>
+    <td>@{calcpad:#val
+FS}</td>
+    <td>✓ OK</td>
+  </tr>
+  <tr>
+    <td>Columna HEB 300</td>
+    <td>Esbeltez</td>
+    <td>@{calcpad:#val
+lambda}</td>
+    <td>✓ OK</td>
+  </tr>
+</table>
+
+<p><a href="#"><strong>⬆ Volver al índice</strong></a></p>
+
+@{end html}
+
+'==============================================
+'FIN DEL DOCUMENTO
+'==============================================

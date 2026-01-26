@@ -1,0 +1,24 @@
+"Prueba de código externo con sintaxis @{avalonia}
+
+@{avalonia}
+using System;
+
+// Este es código C# / Avalonia
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("¡Hola desde Avalonia con nueva sintaxis @{avalonia}!");
+        Console.WriteLine("La fecha actual es: " + DateTime.Now);
+
+        // Cálculos matemáticos
+        double resultado = Math.PI * 2;
+        Console.WriteLine("PI * 2 = " + resultado);
+
+        // Exportar variable a Calcpad (opcional)
+        Console.WriteLine("CALCPAD:resultado=" + resultado);
+    }
+}
+@{end avalonia}
+
+"Fin del código externo

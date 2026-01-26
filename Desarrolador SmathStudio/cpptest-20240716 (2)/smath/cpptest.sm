@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?application progid="SMath Studio настольная" version="1.1.8763.0"?>
+<worksheet xmlns="http://smath.info/schemas/worksheet/1.0">
+  <settings ppi="96">
+    <identity>
+      <id>c5bc424d-a742-45fb-b4e3-1ae85ec61600</id>
+      <revision>10</revision>
+    </identity>
+    <metadata lang="rus">
+      <author>Вячеслав Мезенцев</author>
+    </metadata>
+    <calculation>
+      <precision>4</precision>
+      <exponentialThreshold>5</exponentialThreshold>
+      <trailingZeros>false</trailingZeros>
+      <significantDigitsMode>false</significantDigitsMode>
+      <roundingMode>0</roundingMode>
+      <approximateEqualAccuracy>0</approximateEqualAccuracy>
+      <fractions>decimal</fractions>
+    </calculation>
+    <pageModel active="false" viewMode="2" printGrid="false" printAreas="true" simpleEqualsOnly="false" printBackgroundImages="true">
+      <paper id="9" orientation="Portrait" width="827" height="1169" />
+      <margins left="19" right="19" top="19" bottom="19" />
+      <header alignment="Center" color="#a9a9a9">&amp;[DATE] &amp;[TIME] - &amp;[FILENAME]</header>
+      <footer alignment="Center" color="#a9a9a9">&amp;[PAGENUM] / &amp;[COUNT]</footer>
+      <backgrounds />
+    </pageModel>
+    <dependencies>
+      <assembly name="SMath Studio настольная" version="1.1.8763.0" guid="a37cba83-b69c-4c71-9992-55ff666763bd" />
+      <assembly name="MathRegion" version="1.11.8763.0" guid="02f1ab51-215b-466e-a74d-5d8b1cf85e8d" />
+      <assembly name="Mathcad Custom Functions" version="1.1.8035.3236" guid="91a20d24-c30b-4774-9b1b-4d502a80420f" />
+    </dependencies>
+  </settings>
+  <regions type="content">
+    <region left="9" top="18" width="689" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand" style="string">list</e>
+          <e type="function" args="1">cpptest</e>
+        </input>
+        <result action="numeric">
+          <e type="operand" style="string">cpptest, cppsum, cppsub, cppstrlen, cppnow, cppmul, cppinc, cppdiv</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="45" width="361" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand" style="string">author</e>
+          <e type="function" args="1">cpptest</e>
+        </input>
+        <result action="numeric">
+          <e type="operand" style="string">Viacheslav N. Mezentsev</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="72" width="369" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand" style="string">email</e>
+          <e type="function" args="1">cpptest</e>
+        </input>
+        <result action="numeric">
+          <e type="operand" style="string">viacheslavmezentsev@ya.ru</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="99" width="1202" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand" style="string">logfile</e>
+          <e type="function" args="1">cpptest</e>
+        </input>
+        <result action="numeric">
+          <e type="operand" style="string">C:\Users\User\AppData\Roaming\SMath\extensions\plugins\91a20d24-c30b-4774-9b1b-4d502a80420f\1.1.8035.3236\userefi\cpptest64.log</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="126" width="521" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand" style="string">info</e>
+          <e type="function" args="1">cpptest</e>
+        </input>
+        <result action="numeric">
+          <e type="operand" style="string">cpptest: 0.1.8902.26900, May 16 2024 14:56:40</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="189" width="265" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">0</e>
+          <e type="function" args="1">cppnow</e>
+        </input>
+        <result action="numeric">
+          <e type="operand" style="string">16-05-2024 15:28:56</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="216" width="105" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">3</e>
+          <e type="function" args="1">cppinc</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">4</e>
+        </result>
+      </math>
+    </region>
+    <region left="216" top="216" width="185" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand" style="string">string</e>
+          <e type="function" args="1">cppstrlen</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">6</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="243" width="141" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">1</e>
+          <e type="operand">2</e>
+          <e type="function" args="2">cppdiv</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.5</e>
+        </result>
+      </math>
+    </region>
+    <region left="216" top="243" width="125" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">2</e>
+          <e type="operand">4</e>
+          <e type="function" args="2">cppmul</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">8</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="270" width="150" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">i</e>
+          <e type="operand">2</e>
+          <e type="function" args="2">cppsum</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">2</e>
+          <e type="operand">i</e>
+          <e type="operator" args="2">+</e>
+        </result>
+      </math>
+    </region>
+    <region left="216" top="270" width="148" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">1</e>
+          <e type="operand">i</e>
+          <e type="function" args="2">cppsub</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">1</e>
+          <e type="operand">i</e>
+          <e type="operator" args="2">-</e>
+        </result>
+      </math>
+    </region>
+  </regions>
+</worksheet>

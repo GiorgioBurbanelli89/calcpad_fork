@@ -1,0 +1,35 @@
+'Test: Calcpad comments with external languages
+
+'Definir variables
+a = 5
+b = 10
+
+'Calcular suma
+c = a + b
+
+'Mostrar resultado
+c
+
+'Ahora probar Python
+@{python}
+print("=== Python Test ===")
+x = 15
+y = 25
+print(f"Sum: {x} + {y} = {x + y}")
+@{end python}
+
+'Probar Qt
+@{qt}
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "=== Qt Test ===" << endl;
+    int num1 = 7;
+    int num2 = 8;
+    cout << "Sum: " << num1 << " + " << num2 << " = " << (num1 + num2) << endl;
+    return 0;
+}
+@{end qt}
+
+'Fin del test

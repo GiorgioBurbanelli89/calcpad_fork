@@ -1,0 +1,28 @@
+'Test de bloque #markdown con tablas
+
+'Primero, un cálculo de Calcpad:
+a = 10
+b = 20
+c = a + b
+
+#markdown
+## Tabla de Comparación
+
+| Aspecto | Valor A | Valor B | Suma |
+|---------|---------|---------|------|
+| Números | 10 | 20 | 30 |
+| **Tipo** | Entero | Entero | Entero |
+| Estado | ✅ OK | ✅ OK | ✅ OK |
+
+### Características
+
+- Primera característica
+- Segunda característica
+- Tercera característica
+
+**Conclusión**: Las tablas markdown ahora funcionan correctamente.
+#end markdown
+
+'Otro cálculo después del markdown:
+d = c * 2
+e = d + 100

@@ -1,0 +1,94 @@
+"========================================================
+"PRIMITIVAS SVG EN CALCPAD - Parser Nativo $svg
+"Usando el nuevo parser SVG integrado con sintaxis $svg...$end
+"========================================================
+
+'<h2>Prueba 1: Línea Simple</h2>
+
+$svg{width:400; height:100}
+line{x1:10; y1:50; x2:390; y2:50; stroke:blue; stroke-width:3}
+$end
+
+'<hr>
+
+'<h2>Prueba 2: Rectángulo</h2>
+
+$svg{width:400; height:150}
+rect{x:50; y:25; width:300; height:100; fill:lightgreen; stroke:darkgreen; stroke-width:2}
+$end
+
+'<hr>
+
+'<h2>Prueba 3: Círculo</h2>
+
+$svg{width:400; height:200}
+circle{cx:200; cy:100; r:80; fill:orange; stroke:darkorange; stroke-width:3}
+$end
+
+'<hr>
+
+'<h2>Prueba 4: Texto</h2>
+
+$svg{width:400; height:100}
+text{x:200; y:50; content:Hola Calcpad SVG; font-size:24; fill:red; font-weight:bold; text-anchor:middle}
+$end
+
+'<hr>
+
+'<h2>Prueba 5: Combinación con Variables</h2>
+
+'Parámetros
+width = 500
+height = 300
+cx1 = 100
+cy1 = 150
+r1 = 50
+
+$svg{width:width; height:height}
+rect{x:10; y:10; width:width-20; height:height-20; fill:#f0f0f0; stroke:#cccccc; stroke-width:1}
+circle{cx:cx1; cy:cy1; r:r1; fill:#ff6b6b; stroke:#c92a2a; stroke-width:2}
+circle{cx:cx1*3; cy:cy1; r:r1; fill:#51cf66; stroke:#2f9e44; stroke-width:2}
+line{x1:cx1+r1; y1:cy1; x2:cx1*3-r1; y2:cy1; stroke:#339af0; stroke-width:4}
+text{x:width/2; y:height-30; content:SVG Parser Nativo; font-size:20; fill:#495057; text-anchor:middle}
+$end
+
+'<hr>
+
+'<h2>Prueba 6: Polígonos y Paths</h2>
+
+$svg{width:600; height:250}
+polygon{points:100,50 150,150 50,150; fill:yellow; stroke:orange; stroke-width:2}
+polygon{points:250,50 350,80 320,150 180,150 150,80; fill:lightblue; stroke:blue; stroke-width:2}
+polyline{points:400,50 500,50 500,150 550,100; fill:none; stroke:red; stroke-width:3}
+path{d:M50,200 L100,180 L150,220 Z; fill:lime; stroke:green; stroke-width:2}
+$end
+
+'<hr>
+
+'<h2>Prueba 7: Elipses</h2>
+
+$svg{width:600; height:250}
+ellipse{cx:150; cy:125; rx:120; ry:80; fill:cyan; stroke:blue; stroke-width:2}
+ellipse{cx:400; cy:125; rx:100; ry:60; fill:magenta; stroke:purple; stroke-width:3}
+$end
+
+'<hr>
+
+'<div style="background:#d4edda;padding:15px;border-left:4px solid #28a745;margin:20px 0;">
+'<h3>✅ Parser SVG Nativo Funcional</h3>
+'<p>Sintaxis:</p>
+'<pre>
+'$svg{width:800; height:600}
+'  line{x1:10; y1:10; x2:100; y2:100; stroke:black}
+'  circle{cx:50; cy:50; r:20; fill:red}
+'$end
+'</pre>
+'<ul>
+'<li>✓ <strong>$svg{...}</strong> - Inicia bloque SVG con configuración</li>
+'<li>✓ <strong>line, rect, circle, ellipse</strong> - Primitivas básicas</li>
+'<li>✓ <strong>polygon, polyline, path</strong> - Formas complejas</li>
+'<li>✓ <strong>text</strong> - Texto con estilos</li>
+'<li>✓ <strong>Variables de Calcpad</strong> - Se evalúan automáticamente</li>
+'<li>✓ <strong>$end</strong> - Finaliza bloque SVG</li>
+'</ul>
+'</div>

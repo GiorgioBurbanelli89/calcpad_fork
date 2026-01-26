@@ -1,0 +1,265 @@
+
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="Originator" content="ImportDoc">
+<meta name="OriginalFile" content="GetOverwrite Concrete Eurocode 2-2004.doc">
+ <meta name="generator" content="Adobe RoboHelp 2019">
+<title>GetPreference {Concrete NTC-2008}</title>
+<link rel="StyleSheet" href="../../../../SAP2000.CSS" type="text/css">
+</head>
+
+<body lang="EN-US" xml:lang="EN-US">
+<script type="text/javascript" src="../../../../ehlpdhtm.js"></script>
+
+<h1>GetPreference</h1>
+<h2>Syntax</h2>
+<p class="Comment">SapObject.SapModel.DesignConcrete.ItalianNTC2008C.GetPreference</p>
+<h2>VB6 Procedure</h2>
+<p class="Comment">Function GetPreference(ByVal Item As Long, ByRef Value 
+ As Double) As Long</p>
+<h2>Parameters</h2>
+<p class="ParameterName">Item</p>
+<p class="Comment">This is an integer between 3 and 20, inclusive, indicating 
+ the preference item considered.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">3 = Second order method</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">4 = Number of interaction 
+ curves</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">5 = Number of interaction 
+ points</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;"><span lang="IT" xml:lang="IT">6 
+ = Consider minimum eccentricity</span></p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;"><span lang="IT" xml:lang="IT">7 
+ = Theta0</span></p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;"><span lang="IT" xml:lang="IT">8 
+ = Gamma steel</span></p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">9 = Gamma concrete</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">10 = AlphaCC</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">11 = AlphaCT</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">12 = AlphaLCC</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">13 = AlphaLCT</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">14 = Pattern live load 
+ factor</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">15 = Utilization factor 
+ limit</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-left: 88px; margin-bottom: 0pt;">16 = Multi-response case design</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-left: 88px; margin-bottom: 0pt;">17 = GammacE</p>
+<p class="ParameterNameDescription" style="margin-left: 88px; line-height: normal; 
+	 margin-bottom: 0pt;">18 = Alphae</p>
+<p class="ParameterNameDescription" style="margin-left: 88px; margin-bottom: 0pt; 
+	 line-height: normal;">20 = Consider torsion</p>
+<p class="ParameterNameDescription" style="margin-left: 88px; margin-bottom: 0pt;">&#160;</p>
+<p class="ParameterName">Value</p>
+<p class="Comment">The value of the considered preference item.</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">3 = Second order method</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">&#160;&#160;&#160;&#160;&#160;&#160;1 
+ = Nominal stiffness</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">&#160;&#160;&#160;&#160;&#160;&#160;2 
+ = Nominal curvature</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">&#160;&#160;&#160;&#160;&#160;&#160;3 
+ = None</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">4 = Number of interaction 
+ curves</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 4 and divisible 
+ by 4</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">5 = Number of interaction 
+ points</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt;= 5 and odd</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">6 = Consider minimum eccentricity</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">0 = No</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Any other value = Yes</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;"><span lang="IT" xml:lang="IT">7 
+ = Theta0</span></p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;"><span lang="IT" xml:lang="IT">Value 
+ &gt; 0</span></p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;"><span lang="IT" xml:lang="IT">8 
+ = Gamma steel</span></p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;"><span lang="IT" xml:lang="IT">Value 
+ &gt; 0</span></p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;"><span lang="IT" xml:lang="IT">9 
+ = Gamma concrete</span></p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">Value &gt; 0</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">10 = AlphaCC</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt; 
+ 0</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">11 = AlphaCT</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt; 
+ 0</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">12 = AlphaLCC</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt; 
+ 0</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">13 = AlphaLCT</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt; 
+ 0</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">14 = Pattern live load 
+ factor</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt;= 
+ 0</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">15 = Utilization factor 
+ limit</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;Value &gt; 
+ 0</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 88px;">16 = Multi-response case 
+ design</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;1 = Envelopes</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;2 = Step-by-step</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;3 = Last 
+ step</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;4 = Envelopes 
+ -- All</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 112px;">&#160;&#160;5 = Step-by-step 
+ -- All</p>
+<p class="ParameterDescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: .0001pt; margin-left: 108px;">&#160;</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-left: 67.5pt; 
+	 margin-bottom: .0001pt; text-indent: -67.5pt; line-height: normal;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;17 
+ = GammacE</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-left: 85.5pt; 
+	 margin-bottom: .0001pt; text-indent: -85.5pt; line-height: normal;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Value 
+ &gt; 0</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-left: 85.5pt; 
+	 margin-bottom: .0001pt; text-indent: -85.5pt; line-height: normal;">&#160;</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-left: 67.5pt; 
+	 margin-bottom: .0001pt; line-height: normal;">18 = Alphae</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-left: 85.5pt; 
+	 margin-bottom: .0001pt; text-indent: -85.5pt; line-height: normal;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Value 
+ &gt; 0</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-left: 85.5pt; 
+	 margin-bottom: .0001pt; text-indent: -85.5pt; line-height: normal;">&#160;</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 66.0pt; line-height: normal;">20 = Consider torsion</p>
+<p class="parameterdescription" style="margin-top: 0in; margin-right: 0in; 
+	 margin-bottom: 0in; margin-left: 1.25in;">0 = No</p>
+<p class="MsoNormal" style="margin-top: 0in; margin-right: 0in; margin-bottom: 0in; 
+	 margin-left: 1.25in; line-height: normal;">Any other value = Yes</p>
+<h2>Remarks</h2>
+<p class="Comment">This function retrieves the value of a concrete design 
+ preference item.</p>
+<p class="Comment">The function returns zero if the item is successfully 
+ retrieved; otherwise, it returns a nonzero value.</p>
+<h2>VBA Example</h2>
+<p class="Coding">Sub GetConcreteDesignPreferenceItemItalianNTC2008C()<br>
+&#160;&#160;&#160;'dimension variables<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim SapObject as cOAPI<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim SapModel As cSapModel<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim ret As Long<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim Value As Double<br>
+<br>
+&#160;&#160;&#160;'create Sap2000 object<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapObject = CreateObject(&quot;CSI.SAP2000.API.SapObject&quot;)<br>
+<br>
+&#160;&#160;&#160;'start Sap2000 application<br>
+&#160;&#160;&#160;&#160;&#160;&#160;SapObject.ApplicationStart<br>
+<br>
+&#160;&#160;&#160;'create SapModel object<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapModel = SapObject.SapModel<br>
+<br>
+&#160;&#160;&#160;'initialize model<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.InitializeNewModel<br>
+<br>
+&#160;&#160;&#160;'create new concrete frame section property<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.PropFrame.SetRectangle(&quot;R1&quot;, 
+ &quot;4000Psi&quot;, 20, 12)<br>
+<br>
+&#160;&#160;&#160;'create model from template<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.File.New2DFrame(PortalFrame, 
+ 2, 144, 2, 288, True, &quot;R1&quot;, &quot;R1&quot;)<br>
+<br>
+&#160;&#160;&#160;'set concrete design code<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.DesignConcrete.SetCode(&quot;Italian 
+ NTC 2008&quot;)<br>
+<br>
+&#160;&#160;&#160;'get preference item<br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.DesignConcrete.ItalianNTC2008C.GetPreference(5, 
+ Value)<br>
+<br>
+&#160;&#160;&#160;'close Sap2000<br>
+&#160;&#160;&#160;&#160;&#160;&#160;SapObject.ApplicationExit False<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapModel = Nothing<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapObject = Nothing<br>
+End Sub</p>
+<h2>Release Notes</h2>
+<p class="Comment">Initial release in version v23.4.0.</p>
+<h2>See Also</h2>
+<p class="Comment"><a href="SetPreference_{Concrete_NTC_2008}.htm">SetPreference</a></p>
+</body>
+</html>

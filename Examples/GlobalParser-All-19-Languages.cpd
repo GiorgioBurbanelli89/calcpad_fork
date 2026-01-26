@@ -1,0 +1,161 @@
+"================================================================
+"DEMO COMPLETO: 20 LENGUAJES DEL GLOBAL PARSER
+"================================================================
+"Lenguajes soportados:
+"INTERPRETADOS: Python, Octave, Julia, PowerShell, Bash, CMD, R
+"COMPILADOS: C++, C, Fortran, C#, Rust
+"ESPECIALIZADOS: OpenSees
+"GUI: WPF, XAML, Avalonia, Qt, GTK
+"DOCUMENTACION: Markdown, HTML
+"================================================================
+"1. CALCPAD - Calculos nativos con unidades
+"================================================================
+a = 6'm
+b = 4'm
+h = 0.5'm
+A = a*b
+V = A*h
+"================================================================
+"2. PYTHON
+"================================================================
+@{python}
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+print("<p><strong>Python</strong> - Ejecutado correctamente</p>")
+print(f"<p>Version: {sys.version_info.major}.{sys.version_info.minor}</p>")
+@{end python}
+"================================================================
+"3. OCTAVE
+"================================================================
+@{octave}
+fprintf('<p><strong>GNU Octave</strong> - Ejecutado correctamente</p>\n');
+fprintf('<p>Version: %s</p>\n', version());
+@{end octave}
+"================================================================
+"4. JULIA
+"================================================================
+@{julia}
+println("<p><strong>Julia</strong> - Ejecutado correctamente</p>")
+println("<p>Version: $(VERSION)</p>")
+@{end julia}
+"================================================================
+"5. POWERSHELL
+"================================================================
+@{powershell}
+Write-Output "<p><strong>PowerShell</strong> - Ejecutado correctamente</p>"
+Write-Output "<p>Version: $($PSVersionTable.PSVersion)</p>"
+@{end powershell}
+"================================================================
+"6. BASH
+"================================================================
+@{bash}
+echo "<p><strong>Bash</strong> - Ejecutado correctamente</p>"
+echo "<p>Version: $BASH_VERSION</p>"
+@{end bash}
+"================================================================
+"7. CMD
+"================================================================
+@{cmd}
+@echo off
+echo ^<p^>^<strong^>CMD^</strong^> - Ejecutado correctamente^</p^>
+@{end cmd}
+"================================================================
+"8. C++
+"================================================================
+@{cpp}
+#include <iostream>
+using namespace std;
+int main() {
+    cout << "<p><strong>C++</strong> - Ejecutado correctamente</p>" << endl;
+    cout << "<p>Standard: C++17</p>" << endl;
+    return 0;
+}
+@{end cpp}
+"================================================================
+"9. C
+"================================================================
+@{c}
+#include <stdio.h>
+int main() {
+    printf("<p><strong>C</strong> - Ejecutado correctamente</p>\n");
+    printf("<p>Standard: C11</p>\n");
+    return 0;
+}
+@{end c}
+"================================================================
+"10. FORTRAN
+"================================================================
+@{fortran}
+program test
+    implicit none
+    write(*,'(A)') '<p><strong>Fortran</strong> - Ejecutado correctamente</p>'
+    write(*,'(A)') '<p>Standard: Fortran 90</p>'
+end program test
+@{end fortran}
+"================================================================
+"11. CSHARP
+"================================================================
+@{csharp}
+using System;
+class Program {
+    static void Main() {
+        Console.WriteLine("<p><strong>C#</strong> - Ejecutado correctamente</p>");
+        Console.WriteLine($"<p>.NET: {Environment.Version}</p>");
+    }
+}
+@{end csharp}
+"================================================================
+"12. RUST
+"================================================================
+@{rust}
+fn main() {
+    println!("<p><strong>Rust</strong> - Ejecutado correctamente</p>");
+    println!("<p>Compilador: rustc 1.85.0</p>");
+    let n: u64 = 10;
+    let factorial: u64 = (1..=n).product();
+    println!("<p>Factorial de {} = {}</p>", n, factorial);
+}
+@{end rust}
+"================================================================
+"13. OPENSEES
+"================================================================
+@{opensees}
+wipe
+puts "<p><strong>OpenSees</strong> - Ejecutado correctamente</p>"
+puts "<p>Analisis estructural FEM</p>"
+@{end opensees}
+"================================================================
+"14. MARKDOWN
+"================================================================
+@{markdown}
+**Markdown** - Renderizado correctamente
+
+Este es un parrafo en *italica* y **negrita**.
+@{end markdown}
+"================================================================
+"15. HTML
+"================================================================
+@{html}
+<p><strong>HTML</strong> - Renderizado correctamente</p>
+<p style="color:blue;">Texto con estilo CSS inline</p>
+@{end html}
+"================================================================
+"LENGUAJES GUI (Requieren ventana interactiva)
+"================================================================
+"Los siguientes lenguajes NO se ejecutan en este demo porque
+"requieren una ventana GUI interactiva:
+"  - @{wpf}     - Windows Presentation Foundation
+"  - @{xaml}    - XAML (usado con WPF)
+"  - @{avalonia}- Avalonia UI (multiplataforma)
+"  - @{qt}      - Qt Framework (C++)
+"  - @{gtk}     - GTK (C/Linux)
+"LENGUAJES NO INSTALADOS:
+"  - @{r}       - R (estadistica) - No instalado en este sistema
+"================================================================
+"VERIFICACION FINAL EN CALCPAD
+"================================================================
+"Total de lenguajes soportados: 20
+"Lenguajes ejecutados en este demo: 15
+"  (Calcpad + 12 externos + Markdown + HTML)
+"Resultado del calculo de Calcpad:
+V

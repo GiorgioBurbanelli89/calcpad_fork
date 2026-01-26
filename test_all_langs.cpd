@@ -1,0 +1,67 @@
+"Test Completo: Todos los Lenguajes en Columnas
+
+"1. Python + JavaScript + Calcpad
+#columns 3
+@{python}
+print("Python: 5 + 10 =", 5 + 10)
+@{end python}
+#column
+@{js}
+console.log("JavaScript: 5 + 10 =", 5 + 10);
+@{end js}
+#column
+'Calcpad:
+resultado = 5 + 10
+#end columns
+
+"2. C# + C++ + C
+#columns 3
+@{csharp}
+using System;
+class P { static void Main() { Console.WriteLine("C#: 5 + 10 = " + (5+10)); }}
+@{end csharp}
+#column
+@{cpp}
+#include <iostream>
+int main() { std::cout << "C++: 5 + 10 = " << 5+10 << std::endl; return 0; }
+@{end cpp}
+#column
+@{c}
+#include <stdio.h>
+int main() { printf("C: 5 + 10 = %d\n", 5+10); return 0; }
+@{end c}
+#end columns
+
+"3. Octave + Fortran + Rust
+#columns 3
+@{octave}
+fprintf('Octave: 5 + 10 = %d\n', 5+10);
+@{end octave}
+#column
+@{fortran}
+program test
+    write(*,'(A,I0)') 'Fortran: 5 + 10 = ', 5+10
+end program test
+@{end fortran}
+#column
+@{rust}
+fn main() { println!("Rust: 5 + 10 = {}", 5+10); }
+@{end rust}
+#end columns
+
+"4. HTML + Markdown + CSS
+#columns 3
+@{html}
+<p style="color:blue;font-weight:bold;">HTML Output</p>
+@{end html}
+#column
+@{markdown}
+**Markdown** _Output_
+@{end markdown}
+#column
+@{css}
+.test { color: red; }
+@{end css}
+#end columns
+
+'Fin del test completo

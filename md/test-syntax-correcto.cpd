@@ -1,0 +1,43 @@
+﻿'Prueba de Sintaxis Correcta - Mensajes DinÃ¡micos
+
+'Este es texto explicativo normal usando comilla simple
+'Las comillas simples son para texto y comentarios
+'Las comillas dobles son para tÃ­tulos
+
+"SecciÃ³n 1: Python con salida de consola
+
+@{python}
+print("Hola desde Python!")
+resultado = 5 + 10
+print(f"5 + 10 = {resultado}")
+@{end python}
+
+"SecciÃ³n 2: C++ con salida de consola
+
+@{cpp}
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hola desde C++!" << endl;
+    cout << "10 * 5 = " << (10 * 5) << endl;
+    return 0;
+}
+@{end cpp}
+
+"SecciÃ³n 3: Qt GUI (sin salida de consola)
+
+'Qt es un framework GUI, por lo que no genera salida de consola
+'DeberÃ­a mostrar el mensaje: "ejecutado correctamente"
+
+@{qt}
+#include <QApplication>
+#include <QMessageBox>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMessageBox::information(nullptr, "Calcpad Qt", "Ventana Qt funcionando!");
+    return 0;
+}
+@{end qt}

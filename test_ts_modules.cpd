@@ -1,0 +1,93 @@
+"TypeScript Modules - Imports entre archivos
+'Usando @{ts:filename} para crear modulos que se pueden importar
+
+"1. Datos FEM
+nodos = 4
+elementos = 2
+
+"========================================
+"2. getColorMap.ts - Modulo exportable
+"========================================
+@{ts:getColorMap}
+// getColorMap.ts - Modulo con funcion para crear color map
+
+export interface ColorMapResult {
+    colors: string[];
+    min: number;
+    max: number;
+}
+
+export function getColorMap(values: number[]): ColorMapResult {
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    const colors = values.map(v => {
+        const t = (v - min) / (max - min || 1);
+        let r: number, g: number, b: number;
+
+        if (t < 0.25) { r = 0; g = t * 4; b = 1; }
+        else if (t < 0.5) { r = 0; g = 1; b = 1 - (t - 0.25) * 4; }
+        else if (t < 0.75) { r = (t - 0.5) * 4; g = 1; b = 0; }
+        else { r = 1; g = 1 - (t - 0.75) * 4; b = 0; }
+
+        return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+    });
+
+    return { colors, min, max };
+}
+@{end ts:getColorMap}
+
+"========================================
+"3. getLegend.ts - Modulo exportable
+"========================================
+@{ts:getLegend}
+// getLegend.ts - Modulo con funcion para crear leyenda
+
+export interface LegendMarker {
+    value: string;
+    position: number;
+}
+
+export function getLegend(min: number, max: number, steps: number = 5): LegendMarker[] {
+    const markers: LegendMarker[] = [];
+
+    for (let i = 0; i < steps; i++) {
+        const ratio = i / (steps - 1);
+        const value = (max - (max - min) * ratio).toFixed(2);
+        markers.push({ value, position: ratio * 100 });
+    }
+
+    return markers;
+}
+@{end ts:getLegend}
+
+"========================================
+"4. main.ts - Usa los modulos
+"========================================
+@{ts:main}
+// main.ts - Importa y usa los modulos
+
+import { getColorMap, ColorMapResult } from './getColorMap';
+import { getLegend, LegendMarker } from './getLegend';
+
+// Datos
+const values = [0, 2.5, 10, 5];
+
+// Usar getColorMap
+console.log("=== Usando getColorMap ===");
+const colorMap: ColorMapResult = getColorMap(values);
+console.log(`Min: ${colorMap.min}, Max: ${colorMap.max}`);
+colorMap.colors.forEach((c, i) => console.log(`  Nodo ${i}: ${c}`));
+
+// Usar getLegend
+console.log("\n=== Usando getLegend ===");
+const legend: LegendMarker[] = getLegend(colorMap.min, colorMap.max, 5);
+legend.forEach(m => console.log(`  ${m.value} at ${m.position.toFixed(0)}%`));
+
+console.log("\n>> Modulos TypeScript funcionando!");
+@{end ts:main}
+
+'========================================
+'Los modulos se guardan en temp_multilang/
+'y main.ts puede importarlos
+'========================================

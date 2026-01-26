@@ -1,0 +1,20 @@
+"TT Panel - Test Simple
+#deg
+'Dimensions:
+'Rib height -'h = ? {750}'mm
+'Rib top width -'b_2 = ? {200}'mm
+'Slab depth -'h_f = ? {100}'mm
+'Rib spacing c/c -'B_0 = ? {1500}'mm
+'Slab width -'B = ? {2500}'mm
+#post
+'Total height -'H = h + h_f'mm
+
+#post
+
+#hide
+$svg{width:500; height:400; viewbox:-1500,-150,3100,1250}
+polygon{points:1250,0 1250,100 890,100 850,130 750,850 650,850 610,130 570,100 -570,100 -610,130 -650,850 -750,850 -850,130 -890,100 -1250,100 -1250,0; fill:lightyellow; stroke:black; stroke-width:8}
+$end
+#show
+
+'Fin

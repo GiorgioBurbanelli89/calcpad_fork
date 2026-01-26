@@ -1,0 +1,150 @@
+"========================================================
+"TEST DE PRIMITIVAS SVG EN CALCPAD
+"Demostr ación de todas las formas gráficas SVG
+"========================================================
+
+'<h2>Configuración y Parámetros</h2>
+
+'Dimensiones del canvas
+width = 800
+height = 600
+
+'Parámetros geométricos
+x_center = width/2
+y_center = height/2
+radius = 50
+
+'<hr>
+
+'<h2>1. Líneas (line)</h2>
+
+$svg{width:800; height:200}
+line{x1:10; y1:10; x2:790; y2:10; stroke:black; stroke-width:2}
+line{x1:10; y1:50; x2:790; y2:50; stroke:red; stroke-width:4}
+line{x1:10; y1:100; x2:790; y2:100; stroke:blue; stroke-width:1; stroke-dasharray:5,5}
+line{x1:10; y1:150; x2:790; y2:150; stroke:green; stroke-width:3; stroke-dasharray:10,5}
+
+'<hr>
+
+'<h2>2. Rectángulos (rect)</h2>
+
+$svg{width:800; height:250}
+rect{x:10; y:10; width:150; height:100; fill:lightblue; stroke:darkblue; stroke-width:2}
+rect{x:180; y:10; width:150; height:100; fill:lightgreen; stroke:darkgreen; stroke-width:3; rx:10; ry:10}
+rect{x:350; y:10; width:150; height:100; fill:lightyellow; stroke:orange; stroke-width:2; opacity:0.7}
+rect{x:520; y:10; width:150; height:100; fill:pink; stroke:red; stroke-width:4; rx:20; ry:20}
+
+'<hr>
+
+'<h2>3. Círculos (circle)</h2>
+
+$svg{width:800; height:250}
+circle{cx:100; cy:125; r:80; fill:red; stroke:darkred; stroke-width:2}
+circle{cx:300; cy:125; r:80; fill:green; stroke:darkgreen; stroke-width:3}
+circle{cx:500; cy:125; r:80; fill:blue; stroke:darkblue; stroke-width:2}
+circle{cx:700; cy:125; r:80; fill:yellow; stroke:orange; stroke-width:4}
+
+'<hr>
+
+'<h2>4. Elipses (ellipse)</h2>
+
+$svg{width:800; height:250}
+ellipse{cx:150; cy:125; rx:120; ry:80; fill:cyan; stroke:blue; stroke-width:2}
+ellipse{cx:400; cy:125; rx:100; ry:60; fill:magenta; stroke:purple; stroke-width:3}
+ellipse{cx:650; cy:125; rx:130; ry:90; fill:lime; stroke:green; stroke-width:2}
+
+'<hr>
+
+'<h2>5. Polígonos (polygon)</h2>
+
+$svg{width:800; height:250}
+polygon{points:100,50 150,150 50,150; fill:orange; stroke:darkorange; stroke-width:2}
+polygon{points:250,50 350,80 320,150 180,150 150,80; fill:lightblue; stroke:blue; stroke-width:2}
+polygon{points:450,50 550,50 600,150 500,180 400,150; fill:pink; stroke:red; stroke-width:3}
+
+'<hr>
+
+'<h2>6. Polilíneas (polyline)</h2>
+
+$svg{width:800; height:250}
+polyline{points:10,50 100,50 100,150 200,150 200,50; fill:none; stroke:black; stroke-width:2}
+polyline{points:250,100 350,50 450,100 550,50 650,100; fill:none; stroke:red; stroke-width:3}
+polyline{points:680,50 750,80 720,150 780,180; fill:none; stroke:blue; stroke-width:2; stroke-dasharray:5,5}
+
+'<hr>
+
+'<h2>7. Rutas (path)</h2>
+
+$svg{width:800; height:250}
+path{d:M50,125 L100,50 L150,125 L100,200 Z; fill:yellow; stroke:black; stroke-width:2}
+path{d:M250,125 Q300,50 350,125 T450,125; fill:none; stroke:blue; stroke-width:3}
+path{d:M500,125 C500,50 600,50 600,125 S700,200 700,125; fill:none; stroke:red; stroke-width:2}
+
+'<hr>
+
+'<h2>8. Texto (text)</h2>
+
+$svg{width:800; height:200}
+text{x:50; y:50; content:Texto Simple; font-size:24; fill:black}
+text{x:50; y:100; content:Texto en Rojo; font-size:20; fill:red; font-weight:bold}
+text{x:50; y:150; content:Texto Centrado; font-size:18; fill:blue; text-anchor:middle; font-family:Arial}
+text{x:400; y:100; content:TEXTO GRANDE; font-size:36; fill:green; font-weight:bold}
+
+'<hr>
+
+'<h2>9. Combinación - Mesh FEM Simple con SVG</h2>
+
+'Parámetros del mesh
+a = 6
+b = 4
+n_x = 6
+n_y = 4
+scale = 80
+
+$svg{width:600; height:400; viewbox:0,0,600,400}
+
+'Dibujar elementos
+rect{x:50; y:50; width:a*scale; height:b*scale; fill:#f0f0f0; stroke:none}
+
+'Líneas verticales
+line{x1:50+0*scale; y1:50; x2:50+0*scale; y2:50+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50+1*scale; y1:50; x2:50+1*scale; y2:50+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50+2*scale; y1:50; x2:50+2*scale; y2:50+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50+3*scale; y1:50; x2:50+3*scale; y2:50+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50+4*scale; y1:50; x2:50+4*scale; y2:50+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50+5*scale; y1:50; x2:50+5*scale; y2:50+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50+6*scale; y1:50; x2:50+6*scale; y2:50+b*scale; stroke:#008000; stroke-width:1.5}
+
+'Líneas horizontales
+line{x1:50; y1:50+0*scale; x2:50+a*scale; y2:50+0*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50; y1:50+1*scale; x2:50+a*scale; y2:50+1*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50; y1:50+2*scale; x2:50+a*scale; y2:50+2*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50; y1:50+3*scale; x2:50+a*scale; y2:50+3*scale; stroke:#008000; stroke-width:1.5}
+line{x1:50; y1:50+4*scale; x2:50+a*scale; y2:50+4*scale; stroke:#008000; stroke-width:1.5}
+
+'Apoyos (círculos rojos en las esquinas)
+circle{cx:50; cy:50; r:8; fill:#ff0000; stroke:#8b0000; stroke-width:2}
+circle{cx:50+a*scale; cy:50; r:8; fill:#ff0000; stroke:#8b0000; stroke-width:2}
+circle{cx:50; cy:50+b*scale; r:8; fill:#ff0000; stroke:#8b0000; stroke-width:2}
+circle{cx:50+a*scale; cy:50+b*scale; r:8; fill:#ff0000; stroke:#8b0000; stroke-width:2}
+
+'Texto - título
+text{x:300; y:30; content:Mesh FEM con SVG; font-size:20; fill:#000000; font-weight:bold; text-anchor:middle}
+
+'<hr>
+
+'<div style="background:#d1fae5;padding:15px;border-left:4px solid #10b981;margin:20px 0;">
+'<h3>✅ Primitivas SVG Implementadas</h3>
+'<ul>
+'<li>✓ <strong>line</strong> - Líneas con estilos y trazos</li>
+'<li>✓ <strong>rect</strong> - Rectángulos con esquinas redondeadas</li>
+'<li>✓ <strong>circle</strong> - Círculos con relleno y borde</li>
+'<li>✓ <strong>ellipse</strong> - Elipses con radios independientes</li>
+'<li>✓ <strong>polygon</strong> - Polígonos cerrados</li>
+'<li>✓ <strong>polyline</strong> - Líneas poligonales abiertas</li>
+'<li>✓ <strong>path</strong> - Rutas complejas (líneas, curvas Bézier, arcos)</li>
+'<li>✓ <strong>text</strong> - Texto con fuentes y estilos</li>
+'</ul>
+'<p><strong>Total de primitivas:</strong> 8 tipos de elementos SVG</p>
+'<p><strong>Ventajas:</strong> Gráficas vectoriales escalables, integradas nativamente en Calcpad</p>
+'</div>

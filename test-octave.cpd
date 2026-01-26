@@ -1,0 +1,9 @@
+"Test Octave"
+
+@{octave}
+disp('Hello from Octave!')
+fprintf('Octave version: %s\n', version())
+x = 5;
+y = 10;
+fprintf('Sum: %d\n', x + y)
+@{end octave}

@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Created with Calcpad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <script src="https://calcpad.local/file:///C:/Users/j-b-j/Documents/Calcpad-7.5.7/Calcpad.Cli/bin/Release/net10.0/doc/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-size: 11pt;
+            font-family: 'Segoe UI', 'Arial Nova', Helvetica, sans-serif;
+            margin-left: 5mm;
+            max-width: 190mm;
+        }
+
+        h1, h2, h3, h4, h5, h6, .errorHeader, .roundBox {
+            font-family: 'Arial Nova', Helvetica, sans-serif;
+            margin: 0.5em 0 0.5em 0;
+            padding: 0;
+            line-height: 150%;
+        }
+
+        h1 {font-size: 2.1em;}
+        h2 {font-size: 1.7em;}
+        h3 {font-size: 1.4em;}
+        h4 {font-size: 1.2em;}
+        h5 {font-size: 1.1em;}
+        h6 {font-size: 1em;}
+
+        p, li {
+            margin: 0.3em 0 0.3em 0;
+            padding: 0;
+            line-height: 150%;
+        }
+
+        select, kbd {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        a:hover {
+            background-color: #e9f6ff;
+        }
+
+        .eq, input[type="text"], table.matrix {
+            font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+        }
+
+            .eq var {
+                color: #06d;
+                font-size: 105%;
+            }
+
+            .eq i {
+                color: #086;
+                font-style: normal;
+                font-size: 90%;
+            }
+
+            i.unit {
+                color: #043!important;
+                font-size: 90%!important;
+                vertical-align: -1pt;
+            }
+
+            sup.unit {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 70%!important;
+            }
+
+            .eq b {
+                font-weight: 600;
+            }
+
+            .eq sub {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 80%;
+                vertical-align: -18%;
+                margin-left: 1pt;
+            }
+
+            .eq sup {
+                display: inline-block;
+                margin-left: 1pt;
+                margin-top: -3pt;
+                font-size: 75%;
+            }
+
+            .eq small {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 70%;
+            }
+
+                .eq small var {
+                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-size: 8.5pt;
+                }
+
+                .eq small i {
+                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-size: 6pt;
+                }
+
+            .eq u, input, select {
+                background-color: LightYellow;
+            }
+
+                input[type="text"], select {
+                    font-size: 10pt;
+                    padding: 0.2em 0.4em;
+                    border: 0.5pt solid #CCC;
+                    border-radius: 0.35em;
+                    box-shadow: 0.06em 0.06em 0.5em #ddd;
+                    min-width: 3em;
+                }
+
+                input[type="text"] {
+                    text-align: right;
+                }
+
+                input[type="checkbox"],
+                input[type="radio"] {
+                    vertical-align: baseline;
+                    position: relative;
+                    bottom: -1pt;
+                    margin-right: 1pt;
+                }
+
+                    input[type="checkbox"].post:disabled:not(:checked),
+                    input[type="checkbox"].post:disabled:not(:checked) + label,
+                    input[type="radio"].post:disabled:not(:checked),
+                    input[type="radio"].post:disabled:not(:checked) + label {
+                        display: none;
+                    }
+
+                select:disabled {
+                    background: none;
+                    color: #444;
+                }
+
+                select.post:disabled {
+                    font-size: 12pt;
+                    border: none;
+                    box-shadow: none;
+                    color: red;
+                    background: none;
+                    appearance: none;
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                }
+
+                select.post:disabled::-ms-expand {
+                    display: none;
+                }
+
+                input[type="text"]:focus {
+                    box-shadow: 0.1em 0.1em 1em #ccc;
+                    color: black;
+                }
+
+        td, th {
+            padding: 2pt 4pt 2pt 4pt;
+            vertical-align: top;
+        }
+
+        small {
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+            table.bordered {
+                margin-top: 1em;
+            }
+
+                table.bordered th {
+                    background-color: #F0F0F0;
+                    border: solid 1pt #AAAAAA;
+                }
+
+                table.bordered td {
+                    border: solid 1pt #CCCCCC;
+                }
+
+            table.centered td, .matrix .td {
+                text-align: center;
+            }
+
+            table.data td {
+                text-align: right;
+            }
+
+                table.data td:first-child {
+                    text-align: left;
+                    padding-left: 0;
+                }
+
+        .matrix {
+            display: inline-table;
+        }
+
+            .matrix .tr {
+                display: table-row;
+            }
+
+            .matrix .td {
+                white-space: nowrap;
+                padding: 0 2pt 0 2pt;
+                min-width: 10pt;
+                display: table-cell;
+                font-size: 10pt;
+            }
+
+                .matrix .td:first-child,
+                .matrix .td:last-child {
+                    width: 0.75pt;
+                    min-width: 0.75pt;
+                    max-width: 0.75pt;
+                    padding: 0 1pt 0 1pt;
+                }
+
+                .matrix .td:first-child {
+                    border-left: solid 1pt black;
+                }
+
+                .matrix .td:last-child {
+                    border-right: solid 1pt black;
+                }
+
+            .matrix .tr:first-child .td:first-child,
+            .matrix .tr:first-child .td:last-child {
+                border-top: solid 1pt black;
+            }
+
+            .matrix .tr:last-child .td:first-child,
+            .matrix .tr:last-child .td:last-child {
+                border-bottom: solid 1pt black;
+            }
+
+        .block {
+            display: inline-block;
+            vertical-align: middle;
+            padding-left: 4pt;
+            margin-left: -1pt;
+            border-left: solid 1pt #80b0e8;
+            background: linear-gradient(to right, rgba(0, 192, 255, 0.06), rgba(0, 192, 255, 0.03));
+        }
+
+            .block .block {
+                background: linear-gradient(to right, rgba(0, 192, 255, 0.04), rgba(0, 192, 255, 0.02));
+            }
+
+        .dvcs:has(.block):not(.block *) {
+            display: inline-block;
+            border-left: solid 1pt #80b0e8;
+            padding-left: 0;
+            margin-left: 3pt;
+        }
+
+            .dvcs:has(.block):not(.block *)::before {
+                content: " 🞀";
+                font-size: 9pt;
+                color: #90c4f0;
+                margin-left: -4.5pt;
+            }
+
+        .arr {
+            color: #90c4f0;
+        }
+
+        .r0, .r1, .r2, .r3,
+        .o0, .o1, .o2, .o3,
+        .b1, .b2, .b3,
+        .c1, .c2, .c3, .c4,
+        .c5, .c6, .c7, .c8 {
+            display: inline-block;
+        }
+
+        .r0, .r1, .r2, .r3 {
+            margin-top: -1.5pt;
+            margin-right: 1.5pt;
+            vertical-align: top;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: right top;
+        }
+
+        .o0, .o1, .o2, .o3 {
+            border-top: solid 0.75pt;
+            line-height: 130%;
+            vertical-align: middle;
+            margin-top: 0.75pt;
+            padding-top: 1.25pt;
+            padding-left: 1pt;
+            padding-right: 1pt;
+        }
+
+        .r {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 150%;
+            display: inline-block;
+            vertical-align: top;
+            margin-left: -9.5pt;
+            position: relative;
+            top: 1pt;
+        }
+
+        .r0 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDEwIDIwIiBoZWlnaHQ9IjE1cHQiIHdpZHRoPSIxMHB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMCwxMyAyLDEyIDUsMTkgOSwwIiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MC42cHQ7IHN0cm9rZS1saW5lam9pbjpyb3VuZDsgc3Ryb2tlLWxpbmVjYXA6cm91bmQ7IGZpbGw6bm9uZSIgLz4NCiAgPGxpbmUgeDE9IjIuMiIgeTE9IjEyLjMiIHgyPSI0LjYiIHkyPSIxOC43IiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MC44cHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 8pt;
+            height: 16pt;
+            margin-left: -8pt;
+        }
+
+        .r1 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE1IDQwIiBoZWlnaHQ9IjMwcHQiIHdpZHRoPSIxNXB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMSwyNiAzLDI0IDgsMzggMTQsMCIgc3R5bGU9InN0cm9rZTpibGFjazsgc3Ryb2tlLXdpZHRoOjAuNnB0OyBzdHJva2UtbGluZWpvaW46cm91bmQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyBmaWxsOm5vbmUiIC8+DQogIDxsaW5lIHgxPSIzLjIiIHkxPSIyNC40IiB4Mj0iNy42IiB5Mj0iMzcuNiIgc3R5bGU9InN0cm9rZTpibGFjazsgc3Ryb2tlLXdpZHRoOjFwdDsgc3Ryb2tlLWxpbmVjYXA6cm91bmQ7IiAvPg0KPC9zdmc+");
+            width: 12pt;
+            height: 32pt;
+            margin-left: -12pt;
+        }
+
+        .r2 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDIwIDYwIiBoZWlnaHQ9IjQ1cHQiIHdpZHRoPSIyMHB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMiwzNyA1LDM0IDExLDU1IDE5LDAiIHN0eWxlPSJzdHJva2U6YmxhY2s7IHN0cm9rZS13aWR0aDowLjZwdDsgc3Ryb2tlLWxpbmVqb2luOnJvdW5kOyBzdHJva2UtbGluZWNhcDpyb3VuZDsgZmlsbDpub25lIiAvPg0KICA8bGluZSB4MT0iNS4xIiB5MT0iMzQuNiIgeDI9IjEwLjYiIHkyPSI1NC40IiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MS4ycHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 16pt;
+            height: 48pt;
+            margin-left: -16pt;
+        }
+
+        .r3 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDI1IDgwIiBoZWlnaHQ9IjYwcHQiIHdpZHRoPSIyNXB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMyw1MCA3LDQ2IDE1LDc0IDI0LDAiIHN0eWxlPSJzdHJva2U6YmxhY2s7IHN0cm9rZS13aWR0aDowLjZwdDsgc3Ryb2tlLWxpbmVqb2luOnJvdW5kOyBzdHJva2UtbGluZWNhcDpyb3VuZDsgZmlsbDpub25lIiAvPg0KICA8bGluZSB4MT0iNy4xIiB5MT0iNDYuOCIgeDI9IjE0LjUiIHkyPSI3My4yIiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MS4ycHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 19pt;
+            height: 62pt;
+            margin-left: -19pt;
+        }
+
+        .nth {
+            position: relative;
+            bottom: 1pt;
+        }
+
+        .eq small.nth {font-size: 70%;}
+        .dvr small {font-size: 65%;}
+        sup.raised {vertical-align: top;}
+
+        sup .r0, sup .r1, sup .r2, sup .r3 {
+            zoom: 0.7;
+            -moz-transform: scale(0.7);
+            -webkit-transform: scale(0.7);
+            transform: scale(0.7);
+            transform-origin: top right;
+            max-height: none;
+        }
+
+        sup .r0 { margin-left: -5pt; }
+        sup .r1 { margin-left: -11pt; }
+        sup .r2 { margin-left: -13pt; }
+        sup .r3 { margin-left: -16pt; }
+
+        .b1, .b2, .b3, .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+            vertical-align: middle;
+            font-weight: 100;
+            font-stretch: ultra-condensed;
+        }
+
+        .b2, .b3, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+            font-family: 'Jost* Hairline', sans-serif;
+        }
+
+        .b0, .b1, .c1 {
+            font-family: 'Jost* Thin', sans-serif;
+        }
+
+        .b0 {
+            font-size: 120%;
+            font-weight: 600;
+            padding: 0 1pt 0 1pt;
+        }
+
+        .b1 {
+            font-size: 240%;
+            margin-top: -3pt;
+            margin-left: -1pt;
+            margin-right: -1pt;
+        }
+
+        .b2 {
+            font-size: 370%;
+            margin-top: -5pt;
+            margin-left: -3pt;
+            margin-right: -3pt;
+        }
+
+        .b3 {
+            font-size: 520%;
+            margin-top: -8pt;
+            margin-left: -5pt;
+            margin-right: -5pt;
+        }
+
+        .c1 {
+            font-size: 240%;
+            margin-top: -4pt;
+        }
+
+        .c2 {
+            font-size: 360%;
+            margin-top: -6pt;
+            margin-left: -2.5pt;
+            margin-right: -0.5pt;
+        }
+
+        .c3 {
+            font-size: 480%;
+            margin-top: -8pt;
+            margin-left: -3pt;
+            margin-right: -1pt;
+        }
+
+        .c4 {
+            font-size: 600%;
+            margin-top: -10pt;
+            margin-left: -4pt;
+            margin-right: -2pt;
+            transform: scaleX(0.9);
+        }
+
+        .c5 {
+            font-size: 710%;
+            margin-top: -11.5pt;
+            margin-left: -6pt;
+            margin-right: -4pt;
+            transform: scaleX(0.8);
+        }
+
+        .c6 {
+            font-size: 820%;
+            margin-top: -13pt;
+            margin-left: -7pt;
+            margin-right: -5pt;
+            transform: scaleX(0.7);
+        }
+
+        .c7 {
+            font-size: 930%;
+            margin-top: -14.5pt;
+            margin-left: -8pt;
+            margin-right: -6pt;
+            transform: scaleX(0.6);
+        }
+
+        .c8 {
+            font-size: 1040%;
+            margin-top: -16pt;
+            margin-left: -9pt;
+            margin-right: -7pt;
+            transform: scaleX(0.5);
+        }
+
+        .dvc, .dvr, .dvs {
+            display: inline-block;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .dvc {
+            padding-left: 2pt;
+            padding-right: 2pt;
+            text-align: center;
+            line-height: 110%;
+        }
+
+        .dvr {
+            text-align: center;
+            line-height: 110%;
+            margin-bottom: 4pt;
+        }
+
+        .dvs {
+            text-align: left;
+            line-height: 110%;
+        }
+
+        .dvl {
+            display: block;
+            border-bottom: solid 1pt black;
+            margin-top: 1pt;
+            margin-bottom: 1pt;
+        }
+
+        .nary {
+            color: #C080F0;
+            font-size: 240%;
+            font-family: Georgia Pro Light, serif;
+            font-weight: 200;
+            line-height: 80%;
+            display: block;
+            margin: -1pt 1pt 3pt 1pt;
+        }
+
+            .nary em {
+                display: block;
+                transform: scaleX(0.7) rotate(7deg);
+            }
+
+        .dvc.down {
+            position: relative;
+            top: 0.5em;
+        }
+
+        .dvc.up {
+            position: relative;
+            bottom: 0.6em;
+        }
+
+        .low {
+            font-size: 70%;
+            display: inline-block;
+            position: relative;
+            top: 1.2em;
+        }
+
+        .cond {
+            color: #E000D0;
+        }
+
+        .err {
+            color: Crimson;
+            background-color: #FEE;
+        }
+
+        .ok {
+            color: Green;
+            background-color: #F0FFF0;
+        }
+
+        .ref {
+            float: right;
+            margin-left: 18pt;
+            color: Green;
+            background-color: #F8FFF0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .side {
+            float: right;
+            max-width: 50%;
+        }
+
+        .plot {
+            max-width: 100%
+        }
+
+        .indent {
+            border-left: 0.75pt solid #dddddd;
+            padding-left: 2em;
+        }
+
+        span.indent {
+            display: inline-block;
+        }
+
+        .fold {
+            height: 2.4em;
+            overflow: hidden;
+        }
+
+        .unfold {
+            height: auto;
+            overflow: auto;
+        }
+
+            .fold > :first-child, .unfold > :first-child {
+                cursor: pointer;
+            }
+
+                .fold > :first-child:hover, .unfold > :first-child:hover {
+                    color: #0066bb;
+                    text-decoration: underline;
+                }
+
+                .fold > :first-child::after {
+                    content: " ... ▼";
+                    font-size: 80%;
+                }
+
+                .unfold > :first-child::after {
+                    content: " ▲";
+                    font-size: 80%;
+                }
+
+        .vec {
+            font-family: 'Cambria Math', serif;
+            color: #8af;
+            font-style: normal;
+            display: inline-block;
+            vertical-align: 2pt;
+            margin-left: 3pt;
+            margin-right: -7pt;
+        }
+
+        small .vec, sup .vec {
+            margin-left: 2pt;
+            margin-right: -6pt;
+        }
+
+        #Units {
+            float: right;
+        }
+
+        @media screen {
+            .no-screen {
+                display: none;
+            }
+        }
+
+        @media print {
+            .side {
+                zoom: 0.8;
+                -moz-transform: scale(0.8);
+            }
+
+            body {
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        @page {
+            size: A4 portrait;
+            margin-left: 20mm;
+            margin-right: 10mm;
+            margin-top: 10mm;
+            margin-bottom: 10mm;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .value {
+            position: relative;
+            background-color: #f4fbff;
+            border-radius: 3pt;
+        }
+
+            .value:after {
+                content: "";
+                position: absolute;
+                left: 100%;
+                top: -100%;
+                transform: translateY(-50%);
+                margin-left: 2pt;
+                height: 16pt;
+                line-height: 16pt;
+                vertical-align: middle;
+                width: fit-content;
+                white-space: nowrap;
+                min-width: 10pt;
+                z-index: 1;
+                padding: 0 6pt 0 6pt;
+                border-radius: 6pt 6pt 6pt 0;
+                background: #000;
+                color: #fff;
+                font-family: 'Segoe UI', sans-serif;
+                font-style: normal;
+                font-size: 10pt;
+                text-align: center;
+                display: none;
+                opacity: 0;
+                transition: opacity 2s;
+                user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                -moz-user-select: none;
+            }
+
+            .value:hover:after {
+                content: attr(data-value);
+                display: block;
+                opacity: 1;
+            }
+
+        .errorHeader {
+            color: white;
+            background-color: crimson;
+            font-size: 10pt;
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 0;
+            width: 100vw;
+            max-width: 100%;
+            height: 1.8em;
+            line-height: 1.2em;
+            padding-left: 6pt;
+            overflow-x: hidden;
+        }
+
+        .roundBox {
+            background-color: #fee;
+            color: crimson;
+            font-size: 9pt;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            display: inline-block;
+            border-radius: 4pt;
+            min-width: 1.1em;
+            padding-left: 2pt;
+            padding-right: 2pt;
+            margin-top: 2pt;
+        }
+
+            .roundBox:hover {
+                background-color: white;
+            }
+
+        .lineLink {
+            background: none;
+            color: #b0e0ff;
+            font-family: Calibri, sans-serif;
+            font-size: 10pt;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: left;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            width: 2em;
+            height: 4em;
+            z-index: 1;
+        }
+
+            .lineLink:hover {
+                background: none;
+                color: #09e;
+            }
+    </style>
+</head>
+<body>
+    <script>
+        var contextMenu = false;
+        function getVerticalPosition(line) { return document.querySelector("[data-text='" + line + "']").getBoundingClientRect().top; }
+        function isNumeric(s) { return s.match(/^-?\d+(?:\.\d+)?$/); }
+        if (window.jQuery) {
+            function getHtmlWithInput() {
+                $("input[type=text]").each(function () {
+                    $(this).attr("value", $(this).val());
+                });
+                $("input[type=hidden]").each(function () {
+                    $(this).attr("value", $(this).val());
+                });
+                $("textarea").each(function () {
+                    $(this).html($(this).val());
+                });
+                $("input[type=radio]").each(function () {
+                    if (this.checked)
+                        $(this).attr("checked", "checked");
+                    else
+                        $(this).removeAttr("checked");
+                });
+                $("input[type=checkbox]").each(function () {
+                    if (this.checked)
+                        $(this).attr("checked", "checked");
+                    else
+                        $(this).removeAttr("checked");
+                });
+                $("select option").each(function () {
+                    if (this.selected) {
+                        $(this).attr("selected", "true");
+                    }
+                    else
+                        $(this).removeAttr("selected");
+                });
+                return document.body.outerHTML;
+            }
+
+            function getTargetId(element) {
+                var id = $(element).attr("name");
+                if (id != null && id.length > 0)
+                    return id;
+
+                return $(element).data("target");
+            }
+
+            function getValue(id, source) {
+                var value = "";
+                var target = $("#" + id + " input");
+                var domObj = target.get(0);
+                if (domObj == null || domObj.Length == 0) {
+                    target = $("#" + id + " .eq u");
+                    target.each(function () {
+                        value += $(this).text() + ";";
+                    });
+                    $(source).prop('disabled', true);
+                }
+                else {
+                    target.each(function () {
+                        value += $(this).val() + ";";
+                    });
+                }
+                if (value.length > 1) {
+                    value = value.slice(0, -1);
+                }
+                return value;
+            }
+
+            $(document).ready(function () {
+
+                $(".dvcs:has(.block) > :first-child").html("&hairsp;");
+
+                $("#Units").change(function () { $(".Units").text($(this).val()); });
+
+                $(".fold > :first-child").click(function () {
+                    if ($(this).parent().hasClass("fold")) {
+                        $(this).parent().removeClass("fold").addClass("unfold");
+                    }
+                    else {
+                        $(this).parent().removeClass("unfold").addClass("fold");
+                    }
+                });
+
+                $("select").each(function (index) {
+                    if ($(this).prop("id") != "Units") {
+                        var id = getTargetId(this);
+                        if (id != null && id.length > 0) {
+                            var value = getValue(id, this);
+                            $(this).val(value);
+                        }
+                    }
+
+                });
+
+                $("select").change(function () {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var target = $("#" + id + " input");
+                        if (target != null) {
+                            var values = $(this).val().split(";");
+                            target.each(function (index) {
+                                $(this).val(values[index]);
+                            });
+                        }
+                    }
+                });
+
+                $("input:radio, input:checkbox").each(function (index) {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var value = getValue(id, this);
+                        $(this).prop("checked", $(this).val() == value);
+                    }
+                });
+
+                $("input:radio, input:checkbox").change(function () {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var target = $("#" + id + " input");
+                        if (target != null) {
+                            if ($(this).prop("checked")) {
+                                var values = $(this).val().split(";");
+                                target.each(function (index) {
+                                    $(this).val(values[index]);
+                                });
+                            }
+                            else if ($(this).prop("type") == "checkbox") {
+                                target.each(function () {
+                                    $(this).val("0");
+                                });
+                            }
+                        }
+                    }
+                });
+
+                $(".line:not(style, script)").each(function () {
+                    var line = $(this).prop("id").split("-")[1];
+                    var $lineLink = $('<a class="lineLink" href="#0" data-text="' + line + '" title="Code line ' + line + '">&larr;</a>');
+                    $(this).append($lineLink);
+                    $lineLink.hide();
+                    $(this).hover(function () {
+                        $(".lineLink").hide();
+                        $lineLink.show();
+                    });
+                    $(window).scroll(function () {
+                        $lineLink.hide();
+                    });
+                });
+
+                $("body").mouseleave(function () {
+                    $(".lineLink").hide();
+                });
+
+                $(".roundBox").click(function () {
+                    var line = $(this).data("line");
+                    var e = document.getElementById("line-" + line);
+                    if (e) {
+                        window.scrollTo(0, e.offsetTop - $(this).outerHeight() - 20);
+                    }
+                });
+                $(".money").each(function () { $(this).text(Number(($(this).text())).toFixed(2)); });
+
+                $("input").change(function() {
+                    var e = $(this);
+                    var s = e.val();
+                    if (isNumeric(s)) {
+                        e.css("color", "black");
+                        e.removeAttr("title");
+                    } else {
+                        e.css("color", "red");
+                        e.attr("title", "Invalid number");
+                    }
+                });
+
+                $("a").click(function () {
+                    chrome.webview.postMessage('clicked');
+                });
+
+                window.addEventListener('click', () => {
+                    chrome.webview.postMessage('focused');
+                });
+            });
+        }
+        document.oncontextmenu = function () { contextMenu = true; };
+        document.onmousedown = function () { contextMenu = false; };
+    </script><p> ============================================ </p>
+<p> Importado de Excel (.xlsx) </p>
+<p> Versión: Microsoft Excel 16.0300 </p>
+<p> Archivo: hoja de calculo 23-01-2026.xlsx </p>
+<p> Fecha: 2026-01-24 07:20:36 </p>
+<p> Hojas: 24 </p>
+<p> ============================================ </p>
+<p>&nbsp;</p>
+<h3><hr/> </h3>
+<h3>LOSA </h3>
+<h2>LOSA</h2> 
+<p>&nbsp;</p>
+<h3>Datos de entrada</h3> 
+<table class="bordered"><tr><th>Variable</th><th>Valor</th><th>Descripción</th></tr>25<tr><td><b>Ht</b></td><td>25 cm</td><td>Ht</td></tr>5<tr><td><b>tc</b></td><td>5 cm</td><td>tc</td></tr>1<tr><td><b>E3</b></td><td>1</td><td>E3</td></tr>10<tr><td><b>bn</b></td><td>10 cm</td><td>bn</td></tr>2<tr><td><b>E4</b></td><td>2</td><td>E4</td></tr>40<tr><td><b>ba</b></td><td>40 cm</td><td>ba</td></tr>3<tr><td><b>E5</b></td><td>3</td><td>E5</td></tr>6.55<tr><td><b>Lmax</b></td><td>6.55 m</td><td>Lmax</td></tr>6<tr><td><b>F9</b></td><td>6</td><td>F9</td></tr>4.8<tr><td><b>F10</b></td><td>4.8</td><td>F10</td></tr>3.6<tr><td><b>F11</b></td><td>3.6</td><td>F11</td></tr></table><p>&nbsp;</p>
+<h3>Cálculos</h3> 
+<table class="bordered"> 
+<tr><th>Variable</th><th>Fórmula</th><th>Calcpad</th><th>Excel</th><th>Diferencia</th></tr> 
+<p><span class="eq"><var>F3</var> = <var>bn</var> ·  ( <var>Ht</var> − <var>tc</var> )  = 10 ·  ( 25 − 5 )  = 200</span></p>
+<tr><td><b>F3</b></td> 
+<td><code>+B4*(B2-B3)</code></td> 
+<td> <span class="eq"><var>F3</var> = 200</span> </td> 
+<td>200</td> 
+<td> <span class="eq"><var>diff</var><sub>F3</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>G3</var> = <span class="dvc"><var>Ht</var> − <var>tc</var><span class="dvl"></span>2</span> = <span class="dvc">25 − 5<span class="dvl"></span>2</span> = 10</span></p>
+<tr><td><b>G3</b></td> 
+<td><code>+(B2-B3)/2</code></td> 
+<td> <span class="eq"><var>G3</var> = 10</span> </td> 
+<td>10</td> 
+<td> <span class="eq"><var>diff</var><sub>G3</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>H3</var> = <var>F3</var> · <var>G3</var> = 200 · 10 = 2000</span></p>
+<tr><td><b>H3</b></td> 
+<td><code>+F3*G3</code></td> 
+<td> <span class="eq"><var>H3</var> = 2000</span> </td> 
+<td>2000</td> 
+<td> <span class="eq"><var>diff</var><sub>H3</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>I3</var> = <span class="dvc"><var>bn</var> ·  ( <var>Ht</var> − <var>tc</var> ) <sup>3</sup><span class="dvl"></span>12</span> = <span class="dvc">10 ·  ( 25 − 5 ) <sup>3</sup><span class="dvl"></span>12</span> = 6666.666667</span></p>
+<tr><td><b>I3</b></td> 
+<td><code>+B4*(B2-B3)^3 /12</code></td> 
+<td> <span class="eq"><var>I3</var> = 6666.666667</span> </td> 
+<td>6666.666666666667</td> 
+<td> <span class="eq"><var>diff</var><sub>I3</sub> = 7.275958×10<sup>-12</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>F5</var> = 100 · <var>tc</var> = 100 · 5 = 500</span></p>
+<tr><td><b>F5</b></td> 
+<td><code>100*B3</code></td> 
+<td> <span class="eq"><var>F5</var> = 500</span> </td> 
+<td>500</td> 
+<td> <span class="eq"><var>diff</var><sub>F5</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>G5</var> = <var>Ht</var> − <span class="dvc"><var>tc</var><span class="dvl"></span>2</span> = 25 − <span class="dvc">5<span class="dvl"></span>2</span> = 22.5</span></p>
+<tr><td><b>G5</b></td> 
+<td><code>+B2-B3/2</code></td> 
+<td> <span class="eq"><var>G5</var> = 22.5</span> </td> 
+<td>22.5</td> 
+<td> <span class="eq"><var>diff</var><sub>G5</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>H5</var> = <var>F5</var> · <var>G5</var> = 500 · 22.5 = 11250</span></p>
+<tr><td><b>H5</b></td> 
+<td><code>+F5*G5</code></td> 
+<td> <span class="eq"><var>H5</var> = 11250</span> </td> 
+<td>11250</td> 
+<td> <span class="eq"><var>diff</var><sub>H5</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "H6 = (H3+H4+H5)" on line [<a href="#0" data-text="115">115</a>]: Undefined variable or units: "H4".</span></p>
+<span class="err">Error in "diff_H6 = abs(H6 - 15250)" on line [<a href="#0" data-text="117">117</a>]: Undefined variable or units: "H6".</span><tr><td><b>H6</b></td> 
+<td><code>SUM(H3:H5)</code></td> 
+<td> <span class="err">Error in "H6" on line [<a href="#0" data-text="121">121</a>]: Undefined variable or units: "H6".</span> </td> 
+<td>15250</td> 
+<td> <span class="err">Error in "diff_H6" on line [<a href="#0" data-text="123">123</a>]: Undefined variable or units: "diff_H6".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "F6 = (F3+F4+F5)" on line [<a href="#0" data-text="125">125</a>]: Undefined variable or units: "F4".</span></p>
+<span class="err">Error in "diff_F6 = abs(F6 - 900)" on line [<a href="#0" data-text="127">127</a>]: Undefined variable or units: "F6".</span><tr><td><b>F6</b></td> 
+<td><code>SUM(F3:F5)</code></td> 
+<td> <span class="err">Error in "F6" on line [<a href="#0" data-text="131">131</a>]: Undefined variable or units: "F6".</span> </td> 
+<td>900</td> 
+<td> <span class="err">Error in "diff_F6" on line [<a href="#0" data-text="133">133</a>]: Undefined variable or units: "diff_F6".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "cg = H6/F6" on line [<a href="#0" data-text="135">135</a>]: Undefined variable or units: "H6".</span></p>
+<span class="err">Error in "diff_cg = abs(cg - 16.944444444444443)" on line [<a href="#0" data-text="137">137</a>]: Inconsistent units: "cg - unitless".</span><tr><td><b>cg</b></td> 
+<td><code>+H6/F6</code></td> 
+<td> <span class="eq"><i>cg</i> = 1 <i>cg</i></span>  cm</td> 
+<td>16.944444444444443 cm</td> 
+<td> <span class="err">Error in "diff_cg" on line [<a href="#0" data-text="143">143</a>]: Undefined variable or units: "diff_cg".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "J3 = (G3-cg)^2" on line [<a href="#0" data-text="145">145</a>]: Inconsistent units: "unitless - cg".</span></p>
+<span class="err">Error in "diff_J3 = abs(J3 - 48.225308641975289)" on line [<a href="#0" data-text="147">147</a>]: Undefined variable or units: "J3".</span><tr><td><b>J3</b></td> 
+<td><code>+(G3-$G$7)^2</code></td> 
+<td> <span class="err">Error in "J3" on line [<a href="#0" data-text="151">151</a>]: Undefined variable or units: "J3".</span> </td> 
+<td>48.225308641975289</td> 
+<td> <span class="err">Error in "diff_J3" on line [<a href="#0" data-text="153">153</a>]: Undefined variable or units: "diff_J3".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "K3 = I3+F3*J3" on line [<a href="#0" data-text="155">155</a>]: Undefined variable or units: "J3".</span></p>
+<span class="err">Error in "diff_K3 = abs(K3 - 16311.728395061724)" on line [<a href="#0" data-text="157">157</a>]: Undefined variable or units: "K3".</span><tr><td><b>K3</b></td> 
+<td><code>+I3+F3*J3</code></td> 
+<td> <span class="err">Error in "K3" on line [<a href="#0" data-text="161">161</a>]: Undefined variable or units: "K3".</span> </td> 
+<td>16311.728395061724</td> 
+<td> <span class="err">Error in "diff_K3" on line [<a href="#0" data-text="163">163</a>]: Undefined variable or units: "diff_K3".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>F4</var> = <var>F3</var> = 200</span></p>
+<tr><td><b>F4</b></td> 
+<td><code>+F3</code></td> 
+<td> <span class="eq"><var>F4</var> = 200</span> </td> 
+<td>200</td> 
+<td> <span class="eq"><var>diff</var><sub>F4</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>G4</var> = <var>G3</var> = 10</span></p>
+<tr><td><b>G4</b></td> 
+<td><code>+G3</code></td> 
+<td> <span class="eq"><var>G4</var> = 10</span> </td> 
+<td>10</td> 
+<td> <span class="eq"><var>diff</var><sub>G4</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>H4</var> = <var>F4</var> · <var>G4</var> = 200 · 10 = 2000</span></p>
+<tr><td><b>H4</b></td> 
+<td><code>+F4*G4</code></td> 
+<td> <span class="eq"><var>H4</var> = 2000</span> </td> 
+<td>2000</td> 
+<td> <span class="eq"><var>diff</var><sub>H4</sub> = 0</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>I4</var> = <var>I3</var> = 6666.666667</span></p>
+<tr><td><b>I4</b></td> 
+<td><code>+I3</code></td> 
+<td> <span class="eq"><var>I4</var> = 6666.666667</span> </td> 
+<td>6666.666666666667</td> 
+<td> <span class="eq"><var>diff</var><sub>I4</sub> = 7.275958×10<sup>-12</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "J4 = (G4-cg)^2" on line [<a href="#0" data-text="205">205</a>]: Inconsistent units: "unitless - cg".</span></p>
+<span class="err">Error in "diff_J4 = abs(J4 - 48.225308641975289)" on line [<a href="#0" data-text="207">207</a>]: Undefined variable or units: "J4".</span><tr><td><b>J4</b></td> 
+<td><code>+(G4-$G$7)^2</code></td> 
+<td> <span class="err">Error in "J4" on line [<a href="#0" data-text="211">211</a>]: Undefined variable or units: "J4".</span> </td> 
+<td>48.225308641975289</td> 
+<td> <span class="err">Error in "diff_J4" on line [<a href="#0" data-text="213">213</a>]: Undefined variable or units: "diff_J4".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "K4 = I4+F4*J4" on line [<a href="#0" data-text="215">215</a>]: Undefined variable or units: "J4".</span></p>
+<span class="err">Error in "diff_K4 = abs(K4 - 16311.728395061724)" on line [<a href="#0" data-text="217">217</a>]: Undefined variable or units: "K4".</span><tr><td><b>K4</b></td> 
+<td><code>+I4+F4*J4</code></td> 
+<td> <span class="err">Error in "K4" on line [<a href="#0" data-text="221">221</a>]: Undefined variable or units: "K4".</span> </td> 
+<td>16311.728395061724</td> 
+<td> <span class="err">Error in "diff_K4" on line [<a href="#0" data-text="223">223</a>]: Undefined variable or units: "diff_K4".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>I5</var> = <span class="dvc">100 · <var>tc</var><sup>3</sup><span class="dvl"></span>12</span> = <span class="dvc">100 · 5<sup>3</sup><span class="dvl"></span>12</span> = 1041.666667</span></p>
+<tr><td><b>I5</b></td> 
+<td><code>100*B3^3 /12</code></td> 
+<td> <span class="eq"><var>I5</var> = 1041.666667</span> </td> 
+<td>1041.6666666666667</td> 
+<td> <span class="eq"><var>diff</var><sub>I5</sub> = 6.82121×10<sup>-12</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "J5 = (G5-cg)^2" on line [<a href="#0" data-text="235">235</a>]: Inconsistent units: "unitless - cg".</span></p>
+<span class="err">Error in "diff_J5 = abs(J5 - 30.864197530864214)" on line [<a href="#0" data-text="237">237</a>]: Undefined variable or units: "J5".</span><tr><td><b>J5</b></td> 
+<td><code>+(G5-$G$7)^2</code></td> 
+<td> <span class="err">Error in "J5" on line [<a href="#0" data-text="241">241</a>]: Undefined variable or units: "J5".</span> </td> 
+<td>30.864197530864214</td> 
+<td> <span class="err">Error in "diff_J5" on line [<a href="#0" data-text="243">243</a>]: Undefined variable or units: "diff_J5".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "K5 = I5+F5*J5" on line [<a href="#0" data-text="245">245</a>]: Undefined variable or units: "J5".</span></p>
+<span class="err">Error in "diff_K5 = abs(K5 - 16473.765432098775)" on line [<a href="#0" data-text="247">247</a>]: Undefined variable or units: "K5".</span><tr><td><b>K5</b></td> 
+<td><code>+I5+F5*J5</code></td> 
+<td> <span class="err">Error in "K5" on line [<a href="#0" data-text="251">251</a>]: Undefined variable or units: "K5".</span> </td> 
+<td>16473.765432098775</td> 
+<td> <span class="err">Error in "diff_K5" on line [<a href="#0" data-text="253">253</a>]: Undefined variable or units: "diff_K5".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "K6 = (K3+K4+K5)" on line [<a href="#0" data-text="255">255</a>]: Undefined variable or units: "K3".</span></p>
+<span class="err">Error in "diff_K6 = abs(K6 - 49097.222222222219)" on line [<a href="#0" data-text="257">257</a>]: Undefined variable or units: "K6".</span><tr><td><b>K6</b></td> 
+<td><code>SUM(K3:K5)</code></td> 
+<td> <span class="err">Error in "K6" on line [<a href="#0" data-text="261">261</a>]: Undefined variable or units: "K6".</span> </td> 
+<td>49097.222222222219</td> 
+<td> <span class="err">Error in "diff_K6" on line [<a href="#0" data-text="263">263</a>]: Undefined variable or units: "diff_K6".</span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>hmin</var> = 0.03 · <var>Lmax</var> · 100 = 0.03 · 6.55 · 100 = 19.65</span></p>
+<tr><td><b>hmin</b></td> 
+<td><code>0.03*B7*100</code></td> 
+<td> <span class="eq"><var>hmin</var> = 19.65</span>  cm</td> 
+<td>19.649999999999999 cm</td> 
+<td> <span class="eq"><var>diff</var><sub>hmin</sub> = 9.947598×10<sup>-14</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="eq"><var>Imin</var> = <span class="dvc">100 · <var>hmin</var><sup>3</sup><span class="dvl"></span>12</span> = <span class="dvc">100 · 19.65<sup>3</sup><span class="dvl"></span>12</span> = 63227.55937</span></p>
+<tr><td><b>Imin</b></td> 
+<td><code>100*B8^3 /12</code></td> 
+<td> <span class="eq"><var>Imin</var> = 63227.55937</span> </td> 
+<td>63227.559374999983</td> 
+<td> <span class="eq"><var>diff</var><sub>Imin</sub> = 8.003553×10<sup>-11</sup></span> </td></tr> 
+<p>&nbsp;</p>
+<p><span class="err">Error in "K9 = (12*K6/100)^0.333" on line [<a href="#0" data-text="285">285</a>]: Undefined variable or units: "K6".</span><p class="err">Error in "K9 = (12*K6/100)^0.333" on line [<a href="#0" data-text="285">285</a>]: Too many errors. Further calculations are skipped.</p> </body></html>

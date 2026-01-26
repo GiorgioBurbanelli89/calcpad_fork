@@ -1,0 +1,95 @@
+"Ejemplo: Qt en Calcpad
+'Demostration de codigo Qt C++ dentro de Calcpad
+'Nota: Requiere tener Qt6 instalado (ej. via MSYS2)
+
+"1. Ventana Simple con Boton
+@{qt}
+#include <QApplication>
+#include <QWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QMessageBox>
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
+    // Crear ventana principal
+    QWidget window;
+    window.setWindowTitle("Calcpad + Qt Demo");
+    window.resize(350, 200);
+
+    // Layout vertical
+    QVBoxLayout *layout = new QVBoxLayout(&window);
+
+    // Etiqueta
+    QLabel *label = new QLabel("Hola desde Qt en Calcpad!");
+    label->setAlignment(Qt::AlignCenter);
+    label->setStyleSheet("font-size: 16px; font-weight: bold; color: #2196F3;");
+    layout->addWidget(label);
+
+    // Boton
+    QPushButton *button = new QPushButton("Click Me!");
+    button->setStyleSheet("padding: 10px; font-size: 14px;");
+    layout->addWidget(button);
+
+    // Conectar boton a mensaje
+    QObject::connect(button, &QPushButton::clicked, [&]() {
+        QMessageBox::information(&window, "Calcpad", "Boton presionado desde Qt!");
+    });
+
+    // Mostrar ventana
+    window.show();
+
+    return app.exec();
+}
+@{end qt}
+
+"2. Calculo con Qt + Calcpad
+'Calcpad nativo:
+a = 100
+b = 50
+area = a*b
+
+'Resultado en consola Qt:
+@{qt}
+#include <iostream>
+#include <cmath>
+
+int main() {
+    double a = 100.0;  // mm
+    double b = 50.0;   // mm
+    double area = (a * b) / 100.0;  // cm^2
+
+    std::cout << "Calculo en Qt/C++:" << std::endl;
+    std::cout << "  a = " << a << " mm" << std::endl;
+    std::cout << "  b = " << b << " mm" << std::endl;
+    std::cout << "  area = " << area << " cm^2" << std::endl;
+    return 0;
+}
+@{end qt}
+
+"3. Comparacion lado a lado
+#columns 2
+'C++ con Qt:
+@{qt}
+#include <iostream>
+#include <cmath>
+
+int main() {
+    double radio = 5.0;
+    double pi = 3.14159265;
+    double area = pi * radio * radio;
+    std::cout << "Circulo:" << std::endl;
+    std::cout << "  radio = " << radio << std::endl;
+    std::cout << "  area = " << area << std::endl;
+    return 0;
+}
+@{end qt}
+#column
+'Calcpad nativo:
+radio = 5
+area_circulo = π*radio^2
+#end columns
+
+'Fin del ejemplo Qt

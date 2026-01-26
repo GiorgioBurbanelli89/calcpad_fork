@@ -1,0 +1,17 @@
+"Test Octave Minimal Plot"
+
+@{octave}
+x = [0 1 2 3 4 5];
+y = [0 1 4 9 16 25];
+
+figure('visible', 'off');
+plot(x, y, '-o', 'LineWidth', 2);
+title('Test Plot');
+xlabel('X');
+ylabel('Y');
+grid on;
+
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/test_minimal_plot.png';
+print(output_file, '-dpng', '-r150');
+fprintf('Image saved to: %s\n', output_file);
+@{end octave}

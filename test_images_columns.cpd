@@ -1,0 +1,44 @@
+"Test: 4 Imagenes en Columnas
+
+"Ejemplo con 4 imagenes pequenas (1x1 pixel) en colores diferentes
+#columns 4
+'Rojo:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==
+@{end image}
+#column
+'Verde:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mNk+M/wHwADBwIApD5fRAAAAABJRU5ErkJggg==
+@{end image}
+#column
+'Azul:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mNkYPj/HwADBgIAMCbHYQAAAABJRU5ErkJggg==
+@{end image}
+#column
+'Amarillo:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mP8/5/hPwAIAgL/Hd1j8wAAAABJRU5ErkJggg==
+@{end image}
+#end columns
+
+"3 Imagenes en columnas (mas grandes 20x20)
+#columns 3
+'Imagen 1:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAKElEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==
+@{end image}
+#column
+'Imagen 2:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAKklEQVR42mNk+M/wHwAEBgIApD5fRAAAAABJRU5ErkJggg==
+@{end image}
+#column
+'Imagen 3:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAKklEQVR42mNkYPj/HwADBgIAMCbHYQAAAABJRU5ErkJggg==
+@{end image}
+#end columns
+
+'Fin del test de imagenes

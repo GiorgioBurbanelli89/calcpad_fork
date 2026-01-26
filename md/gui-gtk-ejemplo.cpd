@@ -1,0 +1,145 @@
+﻿'GUI con GTK (C/Python para Linux)
+
+"GTK es el framework nativo de GNOME (el desktop de Ubuntu/Fedora)."
+"Se usa en aplicaciones como Firefox, GIMP, LibreOffice."
+
+"Ventajas:"
+"- Nativo en Linux (GNOME)"
+"- Ligero y rÃ¡pido"
+"- Bindings para muchos lenguajes (C, Python, Rust, etc.)"
+"- IntegraciÃ³n perfecta con el escritorio Linux"
+
+"Ejemplo con GTK en C:"
+
+@{c}
+#include <gtk/gtk.h>
+
+static void on_button_clicked(GtkWidget *button, gpointer data)
+{
+    GtkWidget *label = GTK_WIDGET(data);
+    gtk_label_set_text(GTK_LABEL(label), "Â¡Hola desde GTK!");
+
+    g_print("Â¡BotÃ³n presionado!\n");
+}
+
+static void activate(GtkApplication *app, gpointer user_data)
+{
+    GtkWidget *window;
+    GtkWidget *box;
+    GtkWidget *label_title;
+    GtkWidget *button;
+    GtkWidget *label_result;
+
+    // Crear ventana
+    window = gtk_application_window_new(app);
+    gtk_window_set_title(GTK_WINDOW(window), "Mi AplicaciÃ³n GTK");
+    gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
+
+    // Crear contenedor vertical
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_widget_set_margin_start(box, 20);
+    gtk_widget_set_margin_end(box, 20);
+    gtk_widget_set_margin_top(box, 20);
+    gtk_widget_set_margin_bottom(box, 20);
+    gtk_window_set_child(GTK_WINDOW(window), box);
+
+    // Crear label tÃ­tulo
+    label_title = gtk_label_new("Ejemplo de GTK");
+    PangoAttrList *attrs = pango_attr_list_new();
+    pango_attr_list_insert(attrs, pango_attr_size_new(20 * PANGO_SCALE));
+    gtk_label_set_attributes(GTK_LABEL(label_title), attrs);
+    gtk_box_append(GTK_BOX(box), label_title);
+
+    // Crear botÃ³n
+    button = gtk_button_new_with_label("PresiÃ³name");
+    gtk_widget_set_size_request(button, 150, 40);
+    gtk_box_append(GTK_BOX(box), button);
+
+    // Crear label resultado
+    label_result = gtk_label_new("");
+    PangoAttrList *attrs2 = pango_attr_list_new();
+    pango_attr_list_insert(attrs2, pango_attr_size_new(16 * PANGO_SCALE));
+    pango_attr_list_insert(attrs2, pango_attr_foreground_new(0, 0, 65535));
+    gtk_label_set_attributes(GTK_LABEL(label_result), attrs2);
+    gtk_box_append(GTK_BOX(box), label_result);
+
+    // Conectar evento
+    g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), label_result);
+
+    gtk_window_present(GTK_WINDOW(window));
+}
+
+int main(int argc, char **argv)
+{
+    GtkApplication *app;
+    int status;
+
+    app = gtk_application_new("com.example.miapp", G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+    status = g_application_run(G_APPLICATION(app), argc, argv);
+    g_object_unref(app);
+
+    return status;
+}
+@{end c}
+
+Para compilar:
+$ sudo apt-get install libgtk-4-dev  # Linux
+$ gcc mi_app.c -o mi_app `pkg-config --cflags --libs gtk4`
+$ ./mi_app
+
+Ejemplo con GTK en Python (mÃ¡s fÃ¡cil):
+
+@{python}
+import gi
+gi.require_version('Gtk', '4.0')
+from gi.repository import Gtk
+
+class MainWindow(Gtk.ApplicationWindow):
+    def __init__(self, app):
+        super().__init__(application=app, title="Mi AplicaciÃ³n GTK Python")
+        self.set_default_size(400, 300)
+
+        # Crear contenedor vertical
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
+        box.set_margin_top(20)
+        box.set_margin_bottom(20)
+        self.set_child(box)
+
+        # Label tÃ­tulo
+        label_title = Gtk.Label(label="Ejemplo de GTK Python")
+        box.append(label_title)
+
+        # BotÃ³n
+        button = Gtk.Button(label="PresiÃ³name")
+        button.set_size_request(150, 40)
+        button.connect("clicked", self.on_button_clicked)
+        box.append(button)
+
+        # Label resultado
+        self.label_result = Gtk.Label()
+        box.append(self.label_result)
+
+    def on_button_clicked(self, button):
+        self.label_result.set_text("Â¡Hola desde GTK Python!")
+        print("Â¡BotÃ³n presionado!")
+
+def on_activate(app):
+    win = MainWindow(app)
+    win.present()
+
+app = Gtk.Application(application_id="com.example.miapp")
+app.connect("activate", on_activate)
+app.run(None)
+@{end python}
+
+Para ejecutar Python:
+$ sudo apt-get install python3-gi python3-gi-cairo gir1.2-gtk-4.0
+$ python3 mi_app.py
+
+Recursos:
+- https://www.gtk.org/
+- https://docs.gtk.org/
+- https://python-gtk-3-tutorial.readthedocs.io/

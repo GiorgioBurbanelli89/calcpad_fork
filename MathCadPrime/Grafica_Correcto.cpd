@@ -1,0 +1,28 @@
+' ============================================
+' Importado de Mathcad Prime: Grafica.mcdx
+' Conversión basada en PDF y estructura XML
+' ============================================
+
+'<h3>Datos de la gráfica</h3>
+
+' Vector de posiciones (metros) - Vector columna
+x = [2; 2; 6]'m
+
+' Vector de fuerzas (toneladas-fuerza) - Vector columna
+F = [2; 3; 5]'tonf
+
+' Conversión a Newtons para visualización
+F_N = F*1000*9.81'N
+
+'<p>Tabla de valores:</p>
+
+#show
+'<table border="1" style="border-collapse:collapse; margin:10px;">
+'<tr style="background:#e0e0e0;"><th>Punto</th><th>x (m)</th><th>F (tonf)</th><th>F (N)</th></tr>
+'<tr><td>1</td><td>$x_1$</td><td>$F_1$</td><td>$F_N_1$</td></tr>
+'<tr><td>2</td><td>$x_2$</td><td>$F_2$</td><td>$F_N_2$</td></tr>
+'<tr><td>3</td><td>$x_3$</td><td>$F_3$</td><td>$F_N_3$</td></tr>
+'</table>
+#hide
+
+'<p class="ref">Nota: Los valores corresponden a la relación lineal F vs x mostrada en el gráfico original de Mathcad Prime.</p>

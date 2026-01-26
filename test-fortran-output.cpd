@@ -1,0 +1,15 @@
+"Test Fortran Language
+
+@{fortran}
+program hello
+    implicit none
+    integer :: a, b, suma
+
+    a = 10
+    b = 20
+    suma = a + b
+
+    print *, 'Hola desde Fortran!'
+    print *, 'La suma de', a, '+', b, '=', suma
+end program hello
+@{end fortran}

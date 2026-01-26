@@ -1,0 +1,98 @@
+"MultLangCode Demo - Calcpad con Python, C++ y Octave
+'========================================================
+
+"1. Variables en Calcpad
+'========================
+radio = 5
+altura = 10
+pi = 3.14159265359
+
+"2. Calculo de volumen de cilindro con Python
+'==============================================
+
+@{python}
+import math
+
+# Valores del problema
+radio = 5.0  # cm
+altura = 10.0  # cm
+
+# Calculos
+volumen = math.pi * radio**2 * altura
+area_lateral = 2 * math.pi * radio * altura
+area_total = 2 * math.pi * radio * (radio + altura)
+
+print(f"Calculo de cilindro (Python):")
+print(f"  Radio: {radio} cm")
+print(f"  Altura: {altura} cm")
+print(f"  Volumen: {volumen:.4f} cm3")
+print(f"  Area lateral: {area_lateral:.4f} cm2")
+print(f"  Area total: {area_total:.4f} cm2")
+
+# Exportar a Calcpad
+print(f"CALCPAD:volumen_py={volumen:.6f}")
+print(f"CALCPAD:area_py={area_total:.6f}")
+@{end python}
+
+"3. Verificacion con C++
+'========================
+
+@{cpp}
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main() {
+    double radio = 5.0;
+    double altura = 10.0;
+    double pi = 3.14159265359;
+
+    double volumen = pi * radio * radio * altura;
+    double area = 2 * pi * radio * (radio + altura);
+
+    cout << "Calculo de cilindro (C++):" << endl;
+    cout << "  Volumen: " << volumen << " cm3" << endl;
+    cout << "  Area total: " << area << " cm2" << endl;
+
+    // Exportar a Calcpad
+    cout << "CALCPAD:volumen_cpp=" << volumen << endl;
+    cout << "CALCPAD:area_cpp=" << area << endl;
+
+    return 0;
+}
+@{end cpp}
+
+"4. Verificacion con GNU Octave
+'===============================
+
+@{octave}
+radio = 5;
+altura = 10;
+
+volumen = pi * radio^2 * altura;
+area = 2 * pi * radio * (radio + altura);
+
+printf("Calculo de cilindro (Octave):\n");
+printf("  Volumen: %.4f cm3\n", volumen);
+printf("  Area total: %.4f cm2\n", area);
+
+% Exportar a Calcpad
+printf("CALCPAD:volumen_oct=%.6f\n", volumen);
+printf("CALCPAD:area_oct=%.6f\n", area);
+@{end octave}
+
+"5. Comparacion de resultados en Calcpad
+'=========================================
+'Volumen calculado en Calcpad:
+V = pi*radio^2*altura
+
+'Diferencias con lenguajes externos:
+diff1 = V - volumen_py
+diff2 = V - volumen_cpp
+diff3 = V - volumen_oct
+
+'Area calculada en Calcpad:
+A = 2*pi*radio*(radio + altura)
+
+'Verificacion final:
+'Los resultados son consistentes entre todos los lenguajes.

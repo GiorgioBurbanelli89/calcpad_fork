@@ -1,0 +1,339 @@
+"Test de TypeScript con @{ts}
+'==============================
+
+"Ahora puedes usar @{ts} directamente!
+'======================================
+
+"Ejemplo 1: Código TypeScript Simple
+'====================================
+
+@{ts}
+const mensaje: string = "Hola desde TypeScript con @{ts}!";
+console.log(mensaje);
+@{end ts}
+
+"Ejemplo 2: Función con Tipos
+'=============================
+
+@{ts}
+function suma(a: number, b: number): number {
+  return a + b;
+}
+
+console.log(suma(10, 20));
+@{end ts}
+
+resultado = ?
+
+"Ejemplo 3: Interfaces
+'=====================
+
+@{ts}
+interface Punto {
+  x: number;
+  y: number;
+}
+
+function distancia(p1: Punto, p2: Punto): number {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+const puntoA: Punto = { x: 0, y: 0 };
+const puntoB: Punto = { x: 3, y: 4 };
+
+console.log(distancia(puntoA, puntoB));
+@{end ts}
+
+dist = ?
+
+"Ejemplo 4: Clases
+'=================
+
+@{ts}
+class Rectangulo {
+  constructor(
+    public ancho: number,
+    public alto: number
+  ) {}
+
+  area(): number {
+    return this.ancho * this.alto;
+  }
+
+  perimetro(): number {
+    return 2 * (this.ancho + this.alto);
+  }
+}
+
+const rect = new Rectangulo(10, 20);
+console.log("Área:", rect.area());
+console.log("Perímetro:", rect.perimetro());
+@{end ts}
+
+"Ejemplo 5: Genéricos
+'====================
+
+@{ts}
+class Pila<T> {
+  private items: T[] = [];
+
+  push(item: T): void {
+    this.items.push(item);
+  }
+
+  pop(): T | undefined {
+    return this.items.pop();
+  }
+
+  size(): number {
+    return this.items.length;
+  }
+
+  peek(): T | undefined {
+    return this.items[this.items.length - 1];
+  }
+}
+
+const pilaNumeros = new Pila<number>();
+pilaNumeros.push(10);
+pilaNumeros.push(20);
+pilaNumeros.push(30);
+
+console.log("Tamaño:", pilaNumeros.size());
+console.log("Top:", pilaNumeros.peek());
+console.log("Pop:", pilaNumeros.pop());
+console.log("Tamaño:", pilaNumeros.size());
+@{end ts}
+
+"Ejemplo 6: Async/Await
+'======================
+
+@{ts}
+async function esperarYSaludar(nombre: string): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(`Hola, ${nombre}!`);
+    }, 100);
+  });
+}
+
+async function main() {
+  const saludo = await esperarYSaludar("Usuario");
+  console.log(saludo);
+}
+
+main();
+@{end ts}
+
+"Ejemplo 7: Cálculo Estructural con TypeScript
+'==============================================
+
+@{ts}
+interface Viga {
+  longitud: number;
+  carga: number;
+  moduloElastico: number;
+  inercia: number;
+}
+
+class CalculadoraVigas {
+  static momentoMaximo(viga: Viga): number {
+    // Viga simplemente apoyada con carga uniformemente distribuida
+    return (viga.carga * viga.longitud ** 2) / 8;
+  }
+
+  static cortanteMaximo(viga: Viga): number {
+    return (viga.carga * viga.longitud) / 2;
+  }
+
+  static deflexionMaxima(viga: Viga): number {
+    const w = viga.carga;
+    const L = viga.longitud;
+    const E = viga.moduloElastico;
+    const I = viga.inercia;
+
+    return (5 * w * L ** 4) / (384 * E * I);
+  }
+
+  static imprimir(viga: Viga): void {
+    console.log("=".repeat(50));
+    console.log("ANÁLISIS DE VIGA");
+    console.log("=".repeat(50));
+    console.log(`Longitud: ${viga.longitud} m`);
+    console.log(`Carga distribuida: ${viga.carga} N/m`);
+    console.log("");
+    console.log("RESULTADOS:");
+    console.log(`Momento máximo: ${this.momentoMaximo(viga).toFixed(2)} N·m`);
+    console.log(`Cortante máximo: ${this.cortanteMaximo(viga).toFixed(2)} N`);
+    console.log(`Deflexión máxima: ${(this.deflexionMaxima(viga) * 1000).toFixed(2)} mm`);
+    console.log("=".repeat(50));
+  }
+}
+
+const miViga: Viga = {
+  longitud: 6,          // 6 metros
+  carga: 1000,          // 1000 N/m
+  moduloElastico: 200e9, // 200 GPa (acero)
+  inercia: 8e-6         // 8 cm^4
+};
+
+CalculadoraVigas.imprimir(miViga);
+@{end ts}
+
+"Ejemplo 8: Enums y Tipos Complejos
+'===================================
+
+@{ts}
+enum TipoApoyo {
+  SIMPLE,
+  EMPOTRADO,
+  VOLADIZO
+}
+
+type ResultadoAnalisis = {
+  momento: number;
+  cortante: number;
+  deflexion: number;
+  tipo: TipoApoyo;
+};
+
+function analizarViga(
+  L: number,
+  w: number,
+  tipo: TipoApoyo
+): ResultadoAnalisis {
+  let momento: number;
+  let cortante: number;
+
+  switch (tipo) {
+    case TipoApoyo.SIMPLE:
+      momento = (w * L ** 2) / 8;
+      cortante = (w * L) / 2;
+      break;
+    case TipoApoyo.EMPOTRADO:
+      momento = (w * L ** 2) / 12;
+      cortante = (w * L) / 2;
+      break;
+    case TipoApoyo.VOLADIZO:
+      momento = (w * L ** 2) / 2;
+      cortante = w * L;
+      break;
+    default:
+      momento = 0;
+      cortante = 0;
+  }
+
+  return {
+    momento,
+    cortante,
+    deflexion: 0, // Simplificado
+    tipo
+  };
+}
+
+const resultado = analizarViga(6, 1000, TipoApoyo.SIMPLE);
+console.log("Tipo de apoyo:", TipoApoyo[resultado.tipo]);
+console.log("Momento:", resultado.momento, "N·m");
+console.log("Cortante:", resultado.cortante, "N");
+@{end ts}
+
+"Ejemplo 9: Type Guards y Union Types
+'=====================================
+
+@{ts}
+type Forma =
+  | { tipo: "circulo"; radio: number }
+  | { tipo: "rectangulo"; ancho: number; alto: number }
+  | { tipo: "triangulo"; base: number; altura: number };
+
+function calcularArea(forma: Forma): number {
+  switch (forma.tipo) {
+    case "circulo":
+      return Math.PI * forma.radio ** 2;
+    case "rectangulo":
+      return forma.ancho * forma.alto;
+    case "triangulo":
+      return (forma.base * forma.altura) / 2;
+  }
+}
+
+const circulo: Forma = { tipo: "circulo", radio: 5 };
+const rectangulo: Forma = { tipo: "rectangulo", ancho: 10, alto: 20 };
+const triangulo: Forma = { tipo: "triangulo", base: 8, altura: 12 };
+
+console.log("Área círculo:", calcularArea(circulo).toFixed(2));
+console.log("Área rectángulo:", calcularArea(rectangulo));
+console.log("Área triángulo:", calcularArea(triangulo));
+@{end ts}
+
+"Ejemplo 10: Matriz con TypeScript
+'==================================
+
+@{ts}
+class Matriz {
+  private datos: number[][];
+
+  constructor(filas: number, columnas: number, valorInicial: number = 0) {
+    this.datos = Array(filas)
+      .fill(null)
+      .map(() => Array(columnas).fill(valorInicial));
+  }
+
+  set(i: number, j: number, valor: number): void {
+    this.datos[i][j] = valor;
+  }
+
+  get(i: number, j: number): number {
+    return this.datos[i][j];
+  }
+
+  imprimir(): void {
+    console.log("Matriz:");
+    this.datos.forEach(fila => {
+      console.log(fila.join("\t"));
+    });
+  }
+
+  transpuesta(): Matriz {
+    const filas = this.datos.length;
+    const cols = this.datos[0].length;
+    const resultado = new Matriz(cols, filas);
+
+    for (let i = 0; i < filas; i++) {
+      for (let j = 0; j < cols; j++) {
+        resultado.set(j, i, this.get(i, j));
+      }
+    }
+
+    return resultado;
+  }
+}
+
+const mat = new Matriz(3, 3);
+
+// Llenar matriz identidad
+for (let i = 0; i < 3; i++) {
+  mat.set(i, i, i + 1);
+}
+
+mat.imprimir();
+console.log("");
+console.log("Transpuesta:");
+mat.transpuesta().imprimir();
+@{end ts}
+
+"¡LISTO! Ahora puedes usar @{ts} en Calcpad!
+'===========================================
+
+'Ventajas de usar @{ts} en lugar de @{cmd} ts-node:
+'✓ Sintaxis más limpia
+'✓ Resaltado de sintaxis específico de TypeScript
+'✓ Autocompletado mejorado (en el futuro)
+'✓ Integración nativa con Calcpad
+
+'Para usar:
+'1. Asegúrate de tener ts-node instalado: npm install -g ts-node typescript
+'2. Escribe código TypeScript entre @{ts} y @{end ts}
+'3. Calcula (F5) y disfruta!

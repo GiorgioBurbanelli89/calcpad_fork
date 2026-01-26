@@ -728,8 +728,8 @@ namespace Calcpad.Common.ExpressionParsers
                     var formattedResult = FormatMathExpression(result);
                     var formattedVarName = $"<var>{varName}</var>";
 
-                    // Retornar como HTML literal con clase eq para aplicar estilos
-                    return $"'<p class=\"eq\">{formattedVarName} <b>=</b> {formattedResult}</p>";
+                    // Retornar como HTML literal con span class="eq" (formato de Calcpad)
+                    return $"'<p><span class=\"eq\">{formattedVarName} = {formattedResult}</span></p>";
                 }
                 catch (Exception ex)
                 {
@@ -1042,16 +1042,16 @@ namespace Calcpad.Common.ExpressionParsers
         }
 
         /// <summary>
-        /// Formatea una expresión matemática como HTML con etiquetas de Calcpad.
-        /// Convierte variables a <var>, números a <i>, operadores a <b>, y exponentes a <sup>
+        /// Formatea una expresión matemática como HTML siguiendo exactamente el formato de Calcpad.
+        /// Variables: <var>, Funciones: <b>, Exponentes: <sup>, Números y operadores: texto plano
         /// </summary>
         private string FormatMathExpression(string expr)
         {
             if (string.IsNullOrEmpty(expr))
                 return expr;
 
-            // Lista de funciones matemáticas comunes
-            var mathFunctions = new[] { "sin", "cos", "tan", "log", "ln", "exp", "sqrt", "abs" };
+            // Funciones matemáticas que usan <b> en Calcpad
+            var mathFunctions = new[] { "sin", "cos", "tan", "log", "ln", "exp", "sqrt", "abs", "csc", "sec", "cot" };
 
             var result = new StringBuilder();
             var i = 0;
@@ -1060,63 +1060,44 @@ namespace Calcpad.Common.ExpressionParsers
             {
                 var c = expr[i];
 
-                // Variables y funciones (letras)
+                // Letras: variables o funciones
                 if (char.IsLetter(c))
                 {
-                    var varName = new StringBuilder();
-                    varName.Append(c);
+                    var name = new StringBuilder();
+                    name.Append(c);
                     i++;
 
-                    // Capturar letras y números (C1, C2, sin, cos, etc.)
+                    // Capturar palabra completa
                     while (i < expr.Length && (char.IsLetterOrDigit(expr[i]) || expr[i] == '_'))
                     {
-                        varName.Append(expr[i]);
+                        name.Append(expr[i]);
                         i++;
                     }
 
-                    var name = varName.ToString();
+                    var identifier = name.ToString();
 
-                    // Verificar si es una función matemática conocida
-                    if (mathFunctions.Contains(name.ToLower()))
-                    {
-                        // Formatear como función (sin negrita)
-                        result.Append($"<var>{name}</var>");
-                    }
+                    // Funciones usan <b>, variables usan <var>
+                    if (mathFunctions.Contains(identifier.ToLower()))
+                        result.Append($"<b>{identifier}</b>");
                     else
-                    {
-                        // Formatear como variable normal
-                        result.Append($"<var>{name}</var>");
-                    }
+                        result.Append($"<var>{identifier}</var>");
+
                     continue;
                 }
 
-                // Números (enteros o decimales)
-                if (char.IsDigit(c) || (c == '.' && i + 1 < expr.Length && char.IsDigit(expr[i + 1])))
-                {
-                    var number = new StringBuilder();
-                    while (i < expr.Length && (char.IsDigit(expr[i]) || expr[i] == '.'))
-                    {
-                        number.Append(expr[i]);
-                        i++;
-                    }
-                    result.Append($"<i>{number}</i>");
-                    continue;
-                }
-
-                // Exponentes con ^
+                // Exponentes: ^ seguido del exponente
                 if (c == '^')
                 {
-                    result.Append("<b>^</b>");
                     i++;
 
-                    // Saltar espacios después del ^
+                    // Saltar espacios
                     while (i < expr.Length && char.IsWhiteSpace(expr[i]))
                         i++;
 
-                    // Si el exponente está entre paréntesis
+                    // Exponente entre paréntesis
                     if (i < expr.Length && expr[i] == '(')
                     {
-                        result.Append("<sup><b>(</b>");
+                        result.Append("<sup>");
                         i++;
                         var exponent = new StringBuilder();
                         int parenCount = 1;
@@ -1126,32 +1107,29 @@ namespace Calcpad.Common.ExpressionParsers
                             if (expr[i] == '(') parenCount++;
                             if (expr[i] == ')') parenCount--;
 
-                            if (parenCount == 0)
-                            {
-                                result.Append(FormatMathExpression(exponent.ToString()));
-                                result.Append("<b>)</b></sup>");
-                            }
-                            else
-                            {
+                            if (parenCount > 0)
                                 exponent.Append(expr[i]);
-                            }
+
                             i++;
                         }
+
+                        result.Append(FormatMathExpression(exponent.ToString()));
+                        result.Append("</sup>");
                     }
+                    // Exponente simple
                     else
                     {
-                        // Exponente simple (un número o variable)
                         result.Append("<sup>");
                         var exponent = new StringBuilder();
 
-                        // Capturar signo negativo si existe
+                        // Signo
                         if (i < expr.Length && (expr[i] == '-' || expr[i] == '+'))
                         {
                             exponent.Append(expr[i]);
                             i++;
                         }
 
-                        // Capturar el exponente
+                        // Capturar exponente
                         while (i < expr.Length && (char.IsLetterOrDigit(expr[i]) || expr[i] == '.'))
                         {
                             exponent.Append(expr[i]);
@@ -1164,31 +1142,7 @@ namespace Calcpad.Common.ExpressionParsers
                     continue;
                 }
 
-                // Operadores matemáticos
-                if ("+-*/=<>".Contains(c))
-                {
-                    result.Append($"<b>{c}</b>");
-                    i++;
-                    continue;
-                }
-
-                // Paréntesis
-                if (c == '(' || c == ')')
-                {
-                    result.Append($"<b>{c}</b>");
-                    i++;
-                    continue;
-                }
-
-                // Espacios - mantener
-                if (char.IsWhiteSpace(c))
-                {
-                    result.Append(' ');
-                    i++;
-                    continue;
-                }
-
-                // Cualquier otro carácter
+                // Todo lo demás (números, operadores, paréntesis, espacios) = texto plano
                 result.Append(c);
                 i++;
             }

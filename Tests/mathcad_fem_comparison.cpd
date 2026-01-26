@@ -1,0 +1,170 @@
+"========================================================================="
+"COMPARACIÓN: Funciones FEM de Mathcad vs Calcpad"
+"========================================================================="
+''
+"Este archivo compara los resultados de las DLLs de Mathcad con cálculos"
+"equivalentes en Calcpad para verificar la exactitud de las funciones."
+''
+'=========================================================================
+'1. MATRIZ DE RIGIDEZ DE VIGA 2D (fem_beam_K)
+'=========================================================================
+''
+"Parámetros de entrada:"
+E = 200000'MPa - Módulo de elasticidad
+A = 0.01'm^2 - Área de sección transversal
+I = 0.0001'm^4 - Momento de inercia
+L = 5'm - Longitud de la viga
+''
+"Cálculo de elementos de matriz de rigidez:"
+k_EA_L = E*A/L'N/m - Rigidez axial
+k_12EI_L3 = 12*E*I/L^3'N/m - Rigidez flexión (desplazamiento)
+k_6EI_L2 = 6*E*I/L^2'N - Rigidez flexión (rotación-desplazamiento)
+k_4EI_L = 4*E*I/L'N·m/rad - Rigidez flexión (rotación)
+k_2EI_L = 2*E*I/L'N·m/rad - Rigidez flexión (rotación cruzada)
+''
+"Matriz de rigidez local 6×6 (elementos principales):"
+"k[0,0] = "k_EA_L'N/m
+"k[1,1] = "k_12EI_L3'N/m
+"k[2,2] = "k_4EI_L'N·m/rad
+"k[3,3] = "k_EA_L'N/m
+"k[4,4] = "k_12EI_L3'N/m
+"k[5,5] = "k_4EI_L'N·m/rad
+''
+'=========================================================================
+'2. MATRIZ DE RIGIDEZ DE FRAME 3D (fem_frame3d_K)
+'=========================================================================
+''
+"Parámetros adicionales para frame 3D:"
+G = 80000'MPa - Módulo de corte
+I_y = 0.0001'm^4 - Momento de inercia eje Y
+I_z = 0.00008'm^4 - Momento de inercia eje Z
+J = 0.00015'm^4 - Momento polar de inercia
+''
+"Elementos de matriz de rigidez 3D:"
+k3d_EA_L = E*A/L'N/m - Rigidez axial
+k3d_GJ_L = G*J/L'N·m/rad - Rigidez torsional
+k3d_12EIy_L3 = 12*E*I_y/L^3'N/m - Rigidez flexión Y
+k3d_12EIz_L3 = 12*E*I_z/L^3'N/m - Rigidez flexión Z
+k3d_4EIy_L = 4*E*I_y/L'N·m/rad - Rigidez rotacional Y
+k3d_4EIz_L = 4*E*I_z/L'N·m/rad - Rigidez rotacional Z
+''
+"Matriz de rigidez 3D 12×12 (elementos principales):"
+"k3d[0,0] = "k3d_EA_L'N/m - Axial X
+"k3d[1,1] = "k3d_12EIz_L3'N/m - Flexión Y
+"k3d[2,2] = "k3d_12EIy_L3'N/m - Flexión Z
+"k3d[3,3] = "k3d_GJ_L'N·m/rad - Torsión
+"k3d[4,4] = "k3d_4EIy_L'N·m/rad - Rotación Y
+"k3d[5,5] = "k3d_4EIz_L'N·m/rad - Rotación Z
+''
+'=========================================================================
+'3. VIGA EN VOLADIZO (cantilever_defl, cantilever_rot)
+'=========================================================================
+''
+"Carga aplicada:"
+P = 10000'N
+''
+"Resultados analíticos:"
+δ_cant = P*L^3/(3*E*I)'m - Deflexión en extremo libre
+θ_cant = P*L^2/(2*E*I)'rad - Rotación en extremo libre
+''
+"Conversión a milímetros y grados:"
+δ_cant_mm = δ_cant*1000'mm
+θ_cant_deg = θ_cant*180/π'°
+''
+'=========================================================================
+'4. TRIÁNGULO - Geometría y Calidad (tri_area, tri_quality, tri_centroid)
+'=========================================================================
+''
+"Coordenadas del triángulo de prueba:"
+x1 = 0'm
+y1 = 0'm
+x2 = 4'm
+y2 = 0'm
+x3 = 2'm
+y3 = 3'm
+''
+"Área del triángulo (fórmula del determinante):"
+A_tri = abs((x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1))/2'm^2
+''
+"Longitudes de los lados:"
+a_tri = sqr((x2 - x1)^2 + (y2 - y1)^2)'m
+b_tri = sqr((x3 - x2)^2 + (y3 - y2)^2)'m
+c_tri = sqr((x1 - x3)^2 + (y1 - y3)^2)'m
+''
+"Semiperímetro:"
+s_tri = (a_tri + b_tri + c_tri)/2'm
+''
+"Radio del círculo inscrito:"
+r_in = A_tri/s_tri'm
+''
+"Radio del círculo circunscrito:"
+r_out = a_tri*b_tri*c_tri/(4*A_tri)'m
+''
+"Calidad del triángulo (aspect ratio):"
+quality = r_in/r_out - Calidad (0-1, 1 = equilátero)
+''
+"Centroide del triángulo:"
+x_c = (x1 + x2 + x3)/3'm
+y_c = (y1 + y2 + y3)/3'm
+''
+'=========================================================================
+'5. PLACA MINDLIN - Rigidez de Flexión (plate_Kb, plate_Ks, plate_K)
+'=========================================================================
+''
+"Parámetros de la placa:"
+E_plate = 30000'MPa - Módulo de elasticidad del concreto
+ν = 0.2 - Razón de Poisson
+t = 0.15'm - Espesor de la placa
+''
+"Rigidez a flexión D:"
+D = E_plate*t^3/(12*(1 - ν^2))'N·m - Rigidez de placa
+''
+"Factor de cortante (5/6 para placas):"
+κ = 5/6
+''
+"Rigidez a cortante (por unidad de ancho):"
+G_plate = E_plate/(2*(1 + ν))'MPa - Módulo de corte
+G_s = κ*G_plate*t'MPa·m - Rigidez cortante
+''
+"Para triángulo de 3 nodos (w, θx, θy por nodo = 9 DOF):"
+"La matriz de rigidez tiene dimensiones 9×9"
+''
+"Contribución de flexión (aproximada para elemento simple):"
+k_b_approx = D/A_tri'N/m - Orden de magnitud
+''
+"Contribución de cortante (aproximada):"
+k_s_approx = G_s/A_tri'MPa/m - Orden de magnitud
+''
+'=========================================================================
+'6. DEFLEXIÓN DE PLACA EMPOTRADA CUADRADA (plate_defl)
+'=========================================================================
+''
+"Placa cuadrada empotrada en todos los bordes:"
+q = 10'kN/m^2 - Carga distribuida
+a = 4'm - Lado de la placa cuadrada
+''
+"Deflexión máxima en el centro (fórmula Timoshenko):"
+α_defl = 0.0138 - Coeficiente para placa empotrada cuadrada
+w_max = α_defl*q*a^4/D'm - Deflexión máxima
+''
+"Conversión a milímetros:"
+w_max_mm = w_max*1000'mm
+''
+'=========================================================================
+'RESUMEN DE RESULTADOS
+'=========================================================================
+''
+"Los resultados calculados arriba deben coincidir con:"
+"1. fem_beam_K(200000, 0.01, 0.0001, 5) en Mathcad"
+"2. fem_frame3d_K(200000, 80000, 0.01, 0.0001, 0.00008, 0.00015, 5)"
+"3. cantilever_defl(10000, 5, 200000, 0.0001)"
+"4. cantilever_rot(10000, 5, 200000, 0.0001)"
+"5. tri_area(0, 0, 4, 0, 2, 3)"
+"6. tri_quality(0, 0, 4, 0, 2, 3)"
+"7. tri_centroid(0, 0, 4, 0, 2, 3)"
+"8. plate_K(0, 0, 4, 0, 2, 3, 30000, 0.2, 0.15)"
+"9. plate_defl(10, 4, 30000, 0.2, 0.15)"
+''
+"========================================================================="
+"FIN DEL DOCUMENTO"
+"========================================================================="

@@ -1,0 +1,144 @@
+'==============================================
+'PRUEBA DE ÍNDICE DE LIBRO CON MARKDOWN
+'==============================================
+
+@{markdown}
+# Manual Técnico de Estructuras
+
+## Tabla de Contenidos
+
+1. [Introducción](#introduccion)
+2. [Capítulo 1: Fundamentos](#capitulo-1-fundamentos)
+   - [1.1 Teoría de Vigas](#11-teoria-de-vigas)
+   - [1.2 Momentos Flectores](#12-momentos-flectores)
+3. [Capítulo 2: Aplicaciones](#capitulo-2-aplicaciones)
+   - [2.1 Ejemplos Prácticos](#21-ejemplos-practicos)
+   - [2.2 Casos de Estudio](#22-casos-de-estudio)
+4. [Anexo A: Tablas de Propiedades](#anexo-a-tablas-de-propiedades)
+5. [Anexo B: Referencias](#anexo-b-referencias)
+
+---
+
+## Introducción
+
+Este manual presenta los fundamentos del análisis estructural con aplicaciones prácticas en ingeniería civil.
+
+**Objetivos:**
+- Comprender los principios básicos
+- Aplicar métodos de cálculo
+- Resolver problemas reales
+
+---
+
+## Capítulo 1: Fundamentos
+
+### 1.1 Teoría de Vigas
+
+Las vigas son elementos estructurales que soportan cargas transversales. La ecuación fundamental es:
+
+$$M = \frac{wL^2}{8}$$
+
+Donde:
+- **M**: Momento máximo
+- **w**: Carga uniformemente distribuida
+- **L**: Longitud de la viga
+
+### 1.2 Momentos Flectores
+
+Los momentos flectores se calculan mediante:
+
+| Tipo de Carga | Fórmula | Aplicación |
+|---------------|---------|------------|
+| Puntual | M = P·L/4 | Vigas simplemente apoyadas |
+| Distribuida | M = wL²/8 | Cargas uniformes |
+| Triangular | M = wL²/6 | Cargas variables |
+
+---
+
+## Capítulo 2: Aplicaciones
+
+### 2.1 Ejemplos Prácticos
+
+**Ejemplo 1:** Viga de 6 metros con carga de 10 kN/m
+
+```
+Datos:
+L = 6 m
+w = 10 kN/m
+
+Solución:
+M = (10 × 6²) / 8 = 45 kN·m
+```
+
+### 2.2 Casos de Estudio
+
+> **Caso A:** Puente peatonal de 12 metros
+>
+> Análisis completo con cargas vivas y muertas considerando:
+> - Peso propio de la estructura
+> - Sobrecarga de uso
+> - Factores de seguridad
+
+---
+
+## Anexo A: Tablas de Propiedades
+
+### Propiedades de Secciones de Acero
+
+| Perfil | Área (cm²) | Ix (cm⁴) | Iy (cm⁴) | Peso (kg/m) |
+|--------|-----------|----------|----------|-------------|
+| IPE 200 | 28.5 | 1943 | 142 | 22.4 |
+| IPE 300 | 53.8 | 8356 | 604 | 42.2 |
+| IPE 400 | 84.5 | 23130 | 1318 | 66.3 |
+| HEB 200 | 78.1 | 5696 | 2003 | 61.3 |
+| HEB 300 | 149.1 | 25170 | 8563 | 117.0 |
+
+### Resistencias Características
+
+| Material | fy (MPa) | fu (MPa) | E (GPa) |
+|----------|----------|----------|---------|
+| S235 | 235 | 360 | 210 |
+| S275 | 275 | 430 | 210 |
+| S355 | 355 | 510 | 210 |
+
+---
+
+## Anexo B: Referencias
+
+### Bibliografía
+
+1. **Timoshenko, S.** (1972). *Resistencia de Materiales*. Editorial Espasa-Calpe.
+2. **Beer, F. & Johnston, E.** (2010). *Mecánica de Materiales*. McGraw-Hill.
+3. **Eurocode 3** (2005). *Design of steel structures*. CEN.
+
+### Normas Aplicables
+
+- **EC3**: Eurocódigo 3 - Estructuras de acero
+- **EC0**: Eurocódigo 0 - Bases de cálculo
+- **EC1**: Eurocódigo 1 - Acciones en estructuras
+
+---
+
+**Fin del Documento**
+
+[Volver al índice](#tabla-de-contenidos)
+
+@{end markdown}
+
+'==============================================
+'CÁLCULOS COMPLEMENTARIOS EN CALCPAD
+'==============================================
+
+'Ejemplo de viga con los datos del documento:
+
+L = 6'm
+w = 10'kN/m
+
+'Momento máximo:
+M = w*L^2/8
+
+'Cortante máximo:
+V = w*L/2
+
+'Reacción en apoyos:
+R = w*L/2

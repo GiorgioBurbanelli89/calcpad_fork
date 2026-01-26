@@ -1,0 +1,153 @@
+' ============================================
+' Importado de Mathcad Prime
+' Ejemplo 19: Solución de ecuación diferencial
+' VIBRACIÓN LIBRE NO AMORTIGUADA
+' ============================================
+
+'<h2 style="background:#FFFFF9CB; padding:10px;">6. Tópicos Adicionales</h2>
+
+'<h3 style="background:#FFEDCBCA; padding:8px;">Ejemplo 19: Solución de una ecuación diferencial</h3>
+
+'<p>Después de realizar la condensación estática del pórtico se obtuvo la rigidez lateral:</p>
+
+'<div style="margin:20px 0;">
+'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAYAAABS39xVAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEYEBYbmQk3OwAAAAd0RVh0QXV0aG9yAKmuzEgAAAAMdEVYdERlc2NyaXB0aW9uABMJISMAAAAKdEVYdENvcHlyaWdodACsD8w6AAAADnRFWHRDcmVhdGlvbiB0aW1lADX3DwkAAAAJdEVYdFNvZnR3YXJlAF1w/zoAAAALdEVYdERpc2NsYWltZXIAt8C0jwAAAAh0RVh0V2FybmluZwDAG+aHAAAAB3RFWHRTb3VyY2UA9f+D6wAAAAh0RVh0Q29tbWVudAD2zJa/AAAABnRFWHRUaXRsZQCo7tInAAAMQklEQVR4nO3df0xV9R8H8Pc5F36IXgRBLhcQ" alt="Pórtico" style="max-width:300px;"/>
+'</div>
+
+'<h4 style="background:#FFE2E3E4; padding:6px;">Rigidez lateral:</h4>
+K = 1766.568'tonnef/m
+
+'<h4 style="background:#FFE2E3E4; padding:6px;">Masa del sistema:</h4>
+M = 3.877'tonnef*s²/m
+
+'<h4 style="background:#FFE2E3E4; padding:6px;">Condiciones iniciales:</h4>
+t_0 = 0's      - Tiempo inicial
+x_0 = 5'cm     - Desplazamiento inicial
+v_0 = 0'm/s    - Velocidad inicial
+
+'<h4 style="background:#FFE2E3E4; padding:6px;">Contador de tiempo:</h4>
+' Rango: de 0s a 2s, con incrementos de 0.01s
+t_min = 0's
+t_max = 2's
+dt = 0.01's
+n_steps = (t_max - t_min)/dt + 1
+
+'<hr style="margin:20px 0;">
+
+'<h3 style="background:#D0E4F5; padding:10px;">VIBRACIÓN LIBRE NO AMORTIGUADA</h3>
+
+'<h4>Modelo Dinámico</h4>
+'<p>Sistema masa-resorte con:</p>
+'<ul>
+'<li>Masa: m (concentrada)</li>
+'<li>Rigidez: k (resorte)</li>
+'<li>Sin amortiguamiento</li>
+'</ul>
+
+'<h4>Ecuación de Movimiento:</h4>
+'<p style="font-size:18px; text-align:center; background:#f0f0f0; padding:15px; margin:20px;">
+'M · x<sub>a</sub>''(t) + K · x<sub>a</sub>(t) = 0
+'</p>
+
+'<h4>Restricciones (Condiciones Iniciales):</h4>
+'<p style="text-align:center; background:#f9f9f9; padding:10px;">
+'x<sub>a</sub>(t<sub>0</sub>) = x<sub>0</sub><br>
+'x<sub>a</sub>'(t<sub>0</sub>) = v<sub>0</sub>
+'</p>
+
+'<h4>Frecuencia natural del sistema:</h4>
+ω_n = sqr(K/M)'rad/s   - Frecuencia angular natural
+f_n = ω_n/(2*π)'Hz     - Frecuencia natural en Hz
+T_n = 1/f_n's          - Período natural
+
+'<h4>Solución analítica:</h4>
+'<p>Para vibración libre no amortiguada con condiciones iniciales x₀ y v₀:</p>
+'<p style="font-size:16px; text-align:center; background:#f0f0f0; padding:15px; margin:20px;">
+'u(t) = A · cos(ω<sub>n</sub>t) + B · sen(ω<sub>n</sub>t)
+'</p>
+'<p>Donde:</p>
+
+A = x_0            - Amplitud relacionada con posición inicial
+B = v_0/ω_n        - Amplitud relacionada con velocidad inicial
+
+'<p>Fórmula general:</p>
+'<p style="font-size:16px; text-align:center; background:#f0f0f0; padding:15px; margin:20px;">
+'u(t) = u₍₀₎ · cos(ω<sub>n</sub>t) + (u̇₍₀₎/ω<sub>n</sub>) · sen(ω<sub>n</sub>t)
+'</p>
+
+'<h4>Resultados para puntos de tiempo específicos:</h4>
+
+t_1 = 0.0's
+x_1 = A*cos(ω_n*t_1) + B*sin(ω_n*t_1)
+v_1 = -A*ω_n*sin(ω_n*t_1) + B*ω_n*cos(ω_n*t_1)
+a_1 = -A*ω_n^2*cos(ω_n*t_1) - B*ω_n^2*sin(ω_n*t_1)
+
+t_2 = 0.5's
+x_2 = A*cos(ω_n*t_2) + B*sin(ω_n*t_2)
+v_2 = -A*ω_n*sin(ω_n*t_2) + B*ω_n*cos(ω_n*t_2)
+a_2 = -A*ω_n^2*cos(ω_n*t_2) - B*ω_n^2*sin(ω_n*t_2)
+
+t_3 = 1.0's
+x_3 = A*cos(ω_n*t_3) + B*sin(ω_n*t_3)
+v_3 = -A*ω_n*sin(ω_n*t_3) + B*ω_n*cos(ω_n*t_3)
+a_3 = -A*ω_n^2*cos(ω_n*t_3) - B*ω_n^2*sin(ω_n*t_3)
+
+t_4 = 1.5's
+x_4 = A*cos(ω_n*t_4) + B*sin(ω_n*t_4)
+v_4 = -A*ω_n*sin(ω_n*t_4) + B*ω_n*cos(ω_n*t_4)
+a_4 = -A*ω_n^2*cos(ω_n*t_4) - B*ω_n^2*sin(ω_n*t_4)
+
+t_5 = 2.0's
+x_5 = A*cos(ω_n*t_5) + B*sin(ω_n*t_5)
+v_5 = -A*ω_n*sin(ω_n*t_5) + B*ω_n*cos(ω_n*t_5)
+a_5 = -A*ω_n^2*cos(ω_n*t_5) - B*ω_n^2*sin(ω_n*t_5)
+
+'<h4>Tabla de resultados:</h4>
+#show
+'<table border="1" style="border-collapse:collapse; margin:10px; width:100%;">
+'<tr style="background:#e0e0e0;">
+'<th>Tiempo (s)</th>
+'<th>Desplazamiento u (mm)</th>
+'<th>Velocidad u' (cm/s)</th>
+'<th>Aceleración u'' (m/s²)</th>
+'</tr>
+'<tr><td>$t_1$</td><td>$(x_1/mm)$</td><td>$(v_1/(cm/s))$</td><td>$(a_1/(m/s²))$</td></tr>
+'<tr><td>$t_2$</td><td>$(x_2/mm)$</td><td>$(v_2/(cm/s))$</td><td>$(a_2/(m/s²))$</td></tr>
+'<tr><td>$t_3$</td><td>$(x_3/mm)$</td><td>$(v_3/(cm/s))$</td><td>$(a_3/(m/s²))$</td></tr>
+'<tr><td>$t_4$</td><td>$(x_4/mm)$</td><td>$(v_4/(cm/s))$</td><td>$(a_4/(m/s²))$</td></tr>
+'<tr><td>$t_5$</td><td>$(x_5/mm)$</td><td>$(v_5/(cm/s))$</td><td>$(a_5/(m/s²))$</td></tr>
+'</table>
+#hide
+
+'<hr>
+
+'<h4>Resumen de parámetros del sistema:</h4>
+#show
+'<table border="1" style="border-collapse:collapse; margin:10px;">
+'<tr style="background:#e0e0e0;"><th>Parámetro</th><th>Valor</th><th>Unidad</th></tr>
+'<tr><td>Rigidez lateral K</td><td>$K$</td><td>tonnef/m</td></tr>
+'<tr><td>Masa M</td><td>$M$</td><td>tonnef·s²/m</td></tr>
+'<tr><td>Frecuencia natural ω<sub>n</sub></td><td>$ω_n$</td><td>rad/s</td></tr>
+'<tr><td>Frecuencia f<sub>n</sub></td><td>$f_n$</td><td>Hz</td></tr>
+'<tr><td>Período T<sub>n</sub></td><td>$T_n$</td><td>s</td></tr>
+'<tr><td>Desplazamiento inicial x₀</td><td>$x_0$</td><td>cm</td></tr>
+'<tr><td>Velocidad inicial v₀</td><td>$v_0$</td><td>m/s</td></tr>
+'</table>
+#hide
+
+'<p class="ref">
+'<b>Nota:</b> En Mathcad Prime este problema se resolvió usando <code>odesolve(x_a(t), 2s)</code>
+'para resolver la ecuación diferencial ordinaria. Calcpad no tiene solver ODE integrado,
+'por lo que se presenta la solución analítica. Para problemas más complejos, usar
+'<code>#columns</code> con Python/Octave que sí tienen solvers de EDOs.
+'</p>
+
+'<p>
+'La gráfica original muestra tres curvas:
+'<ul>
+'<li style="color:blue;">u (mm) - Desplazamiento en azul</li>
+'<li style="color:green;">u' (cm/s) - Velocidad en verde</li>
+'<li style="color:red;">u'' (m/s²) - Aceleración en rojo</li>
+'</ul>
+'Todas exhiben comportamiento sinusoidal característico de vibración libre no amortiguada.
+'</p>

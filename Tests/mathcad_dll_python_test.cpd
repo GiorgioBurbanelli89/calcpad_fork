@@ -1,0 +1,211 @@
+"========================================================================"
+"PRUEBA REAL: Comparar DLLs de Mathcad usando Python desde Calcpad"
+"========================================================================"
+''
+"Este archivo demuestra cómo Calcpad puede usar las DLLs de Mathcad"
+"mediante código Python con ctypes."
+''
+'========================================================================
+'1. PARAMETROS DE ENTRADA
+'========================================================================
+''
+"Parámetros para viga:"
+E = 200000'MPa
+A = 0.01'm^2
+I = 0.0001'm^4
+L = 5'm
+P = 10000'N
+''
+"Parámetros para triángulo:"
+x1 = 0'm
+y1 = 0'm
+x2 = 4'm
+y2 = 0'm
+x3 = 2'm
+y3 = 3'm
+''
+'========================================================================
+'2. RESULTADOS ANALITICOS (CALCPAD PURO)
+'========================================================================
+''
+"Voladizo (cálculos analíticos):"
+δ_calc = P*L^3/(3*E*I)'m
+θ_calc = P*L^2/(2*E*I)'rad
+''
+"Matriz de rigidez viga (valores esperados):"
+k_EA_L_calc = E*A/L'N/m
+k_12EI_L3_calc = 12*E*I/L^3'N/m
+k_4EI_L_calc = 4*E*I/L'N·m/rad
+''
+"Triángulo (cálculo analítico):"
+A_tri_calc = abs((x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1))/2'm^2
+x_c_calc = (x1 + x2 + x3)/3'm
+y_c_calc = (y1 + y2 + y3)/3'm
+''
+'========================================================================
+'3. LLAMAR A DLLs MEDIANTE PYTHON
+'========================================================================
+''
+"IMPORTANTE: Python usa ctypes para cargar las DLLs de Mathcad"
+"y comparar con los resultados analíticos de Calcpad mostrados arriba."
+''
+@{python}
+import ctypes
+import os
+import sys
+
+print("="*70)
+print("CARGANDO DLLs DE MATHCAD")
+print("="*70)
+
+# Cargar mathcad_fem.dll
+try:
+    fem_dll = ctypes.CDLL("mathcad_fem.dll")
+    print("✓ mathcad_fem.dll cargada exitosamente")
+except Exception as e:
+    print(f"✗ Error cargando mathcad_fem.dll: {e}")
+    sys.exit(1)
+
+# Cargar mathcad_triangle.dll
+try:
+    tri_path = os.path.join("mathcad_triangle", "mathcad_triangle.dll")
+    if not os.path.exists(tri_path):
+        tri_path = "mathcad_triangle.dll"
+    tri_dll = ctypes.CDLL(tri_path)
+    print(f"✓ mathcad_triangle.dll cargada exitosamente")
+except Exception as e:
+    print(f"✗ Error cargando mathcad_triangle.dll: {e}")
+    tri_dll = None
+
+print()
+
+# Configurar funciones de mathcad_fem.dll
+fem_dll.cantilever_defl_export.argtypes = [ctypes.c_double] * 4
+fem_dll.cantilever_defl_export.restype = ctypes.c_double
+
+fem_dll.cantilever_rot_export.argtypes = [ctypes.c_double] * 4
+fem_dll.cantilever_rot_export.restype = ctypes.c_double
+
+# Parámetros (tomados de Calcpad arriba)
+P = 10000.0   # N
+L = 5.0       # m
+E = 200000.0  # MPa (= 200000e6 Pa, pero usamos MPa)
+I = 0.0001    # m^4
+A = 0.01      # m^2
+
+print("="*70)
+print("COMPARACION: VOLADIZO")
+print("="*70)
+
+# Llamar DLLs
+delta_dll = fem_dll.cantilever_defl_export(P, L, E, I)
+theta_dll = fem_dll.cantilever_rot_export(P, L, E, I)
+
+# Calcular analíticamente (mismo cálculo que Calcpad arriba)
+delta_calc = P * L**3 / (3 * E * I)
+theta_calc = P * L**2 / (2 * E * I)
+
+# Comparar deflexión
+print(f"\nDEFLEXION:")
+print(f"  DLL (mathcad_fem):  {delta_dll:.10f} m")
+print(f"  Calcpad (analítico): {delta_calc:.10f} m")
+diff_delta = abs(delta_dll - delta_calc)
+print(f"  Diferencia:          {diff_delta:.12f} m")
+status_delta = "✓ PASS" if diff_delta < 0.001 else "✗ FAIL"
+print(f"  Estado:              {status_delta}")
+
+# Comparar rotación
+print(f"\nROTACION:")
+print(f"  DLL (mathcad_fem):  {theta_dll:.10f} rad")
+print(f"  Calcpad (analítico): {theta_calc:.10f} rad")
+diff_theta = abs(theta_dll - theta_calc)
+print(f"  Diferencia:          {diff_theta:.12f} rad")
+status_theta = "✓ PASS" if diff_theta < 0.001 else "✗ FAIL"
+print(f"  Estado:              {status_theta}")
+
+print()
+print("="*70)
+print("COMPARACION: MATRIZ DE RIGIDEZ")
+print("="*70)
+
+# Calcular elementos de matriz de rigidez analíticamente
+k_EA_L = E * A / L
+k_12EI_L3 = 12 * E * I / (L**3)
+k_4EI_L = 4 * E * I / L
+
+print(f"\nk[0,0] = EA/L:")
+print(f"  Calcpad (analítico): {k_EA_L:.6f} N/m")
+print(f"  Estado: (solo cálculo analítico, DLL retorna matriz completa)")
+
+print(f"\nk[1,1] = 12EI/L³:")
+print(f"  Calcpad (analítico): {k_12EI_L3:.6f} N/m")
+
+print(f"\nk[2,2] = 4EI/L:")
+print(f"  Calcpad (analítico): {k_4EI_L:.6f} N·m/rad")
+
+# Triángulo
+if tri_dll:
+    print()
+    print("="*70)
+    print("COMPARACION: TRIANGULO")
+    print("="*70)
+
+    try:
+        # Configurar funciones de triángulo
+        tri_dll.tri_area_export.argtypes = [ctypes.c_double] * 6
+        tri_dll.tri_area_export.restype = ctypes.c_double
+
+        x1, y1 = 0.0, 0.0
+        x2, y2 = 4.0, 0.0
+        x3, y3 = 2.0, 3.0
+
+        # Llamar DLL
+        area_dll = tri_dll.tri_area_export(x1, y1, x2, y2, x3, y3)
+
+        # Calcular analíticamente
+        area_calc = 0.5 * abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1))
+
+        print(f"\nAREA DEL TRIANGULO:")
+        print(f"  DLL (mathcad_triangle): {area_dll:.10f} m²")
+        print(f"  Calcpad (analítico):     {area_calc:.10f} m²")
+        diff_area = abs(area_dll - area_calc)
+        print(f"  Diferencia:              {diff_area:.12f} m²")
+        status_area = "✓ PASS" if diff_area < 0.001 else "✗ FAIL"
+        print(f"  Estado:                  {status_area}")
+
+    except Exception as e:
+        print(f"  Error usando funciones de triángulo: {e}")
+
+print()
+print("="*70)
+print("RESUMEN FINAL")
+print("="*70)
+print()
+print(f"Deflexión:  {status_delta}")
+print(f"Rotación:   {status_theta}")
+if tri_dll:
+    print(f"Área:       {status_area}")
+print()
+print("Si todos muestran '✓ PASS', las DLLs funcionan correctamente!")
+print("="*70)
+@{end python}
+''
+'========================================================================
+'4. INTERPRETACION
+'========================================================================
+''
+"IMPORTANTE:"
+"Python cargó las DLLs mediante ctypes y comparó con los cálculos"
+"analíticos de Calcpad mostrados en la sección 2."
+''
+"Si ves '✓ PASS' en todas las comparaciones:"
+"  → Las DLLs están correctamente implementadas"
+"  → Los cálculos coinciden con la teoría"
+''
+"Si ves '✗ FAIL':"
+"  → Revisa la implementación de las DLLs"
+"  → Verifica las fórmulas"
+''
+"========================================================================"
+"FIN DE LA PRUEBA"
+"========================================================================"

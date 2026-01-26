@@ -1,0 +1,113 @@
+
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta http-equiv="Content-Language" content="en-US">
+ <meta name="generator" content="Adobe RoboHelp 2019">
+<title>DeleteCut</title>
+<link rel="StyleSheet" href="../../../SAP2000.CSS" type="text/css">
+</head>
+
+<body>
+<script type="text/javascript" src="../../../ehlpdhtm.js" language="JavaScript1.2"></script>
+
+<h1>DeleteCut</h1>
+<h2>Syntax</h2>
+<p class="Comment">SapObject.SapModel.SectCut.Delete</p>
+<h2>VB6 Procedure</h2>
+<p class="Comment">Function Delete(ByVal Name As String) As Long</p>
+<h2>Parameters</h2>
+<p class="ParameterName">&#160;</p>
+<p class="ParameterName">Name</p>
+<p class="Comment">The name of the section cut to be deleted.</p>
+<h2>Remarks</h2>
+<p class="Comment">This function deletes an existing section cut.</p>
+<p class="Comment">The function returns zero if the section cut is successfully 
+ deleted, otherwise it returns a nonzero value.</p>
+<h2>VBA Example</h2>
+<p class="MsoNormal" style="mso-margin-top-alt: auto; mso-margin-bottom-alt: auto; 
+	 line-height: normal; margin-left: 60px;"><span class="Coding_Characters" 
+													 style="font-size: 12pt;">Sub 
+ DeleteSectionCut()</span><span class="Coding_Characters"><br>
+<br>
+</span><span class="Coding_Characters" style="font-size: 12pt;">'dimension 
+ variables</span><span class="Coding_Characters"><br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim SapObject as cOAPI<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim SapModel As cSapModel<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim ret As Long<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim X(3) As Double<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim Y(3) As Double<br>
+&#160;&#160;&#160;&#160;&#160;&#160;Dim Z(3) As Double<br>
+<br>
+</span><span class="Coding_Characters" style="font-size: 12pt;">'create 
+ Sap2000 object</span><span class="Coding_Characters"><br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapObject = CreateObject(&quot;CSI.SAP2000.API.SapObject&quot;)<br>
+<br>
+</span><span class="Coding_Characters" style="font-size: 12pt;">'start 
+ Sap2000 application</span><span class="Coding_Characters"><br>
+&#160;&#160;&#160;&#160;&#160;&#160;SapObject.ApplicationStart<br>
+<br>
+</span><span class="Coding_Characters" style="font-size: 12pt;">'create 
+ SapModel object</span><span class="Coding_Characters"><br>
+&#160;&#160;&#160;&#160;&#160;&#160;Set SapModel = SapObject.SapModel<br>
+<br>
+</span><span class="Coding_Characters" style="font-size: 12pt;">'initialize 
+ model<br>
+</span><span class="Coding_Characters">&#160;&#160;&#160;&#160;&#160;&#160;ret 
+ = SapModel.InitializeNewModel<br>
+<br>
+</span><span class="Coding_Characters" style="font-size: 12pt;">'create 
+ model from template</span><span class="Coding_Characters"><br>
+&#160;&#160;&#160;&#160;&#160;&#160;ret = SapModel.File.New2DFrame(PortalFrame, 
+ 2, 144, 2, 288)</span></p>
+<p class="comment" style="margin-top: 5.0pt; margin-right: 0in; margin-bottom: 9.5pt; 
+	 margin-left: 80px; text-indent: -20px;"><span class="Coding_Characters" 
+													 style="font-size: 12pt;">'define 
+ new group</span><span class="Coding_Characters"><br>
+&#160;ret = SapModel.GroupDef.SetGroup(&quot;Group1&quot;)</span></p>
+<p class="comment" style="margin-bottom: 9.5pt; margin-left: 80px; text-indent: -20px;"><span 
+	 class="Coding_Characters" style="font-size: 12pt;">'add objects to 
+ group<br>
+</span><span class="Coding_Characters">&#160;ret = SapModel.FrameObj.SetGroupAssign(&quot;1&quot;, 
+ &quot;Group1&quot;)<br>
+&#160;ret = SapModel.FrameObj.SetGroupAssign(&quot;2&quot;, &quot;Group1&quot;)<br>
+&#160;ret = SapModel.FrameObj.SetGroupAssign(&quot;3&quot;, &quot;Group1&quot;)</span></p>
+<p class="code" style="margin-bottom: 9.5pt; margin-left: 80px; text-indent: -20px;"><span 
+	 class="Coding_Characters" style="font-size: 12pt;">'define section 
+ cut</span><span class="Coding_Characters"><br>
+&#160;X(0) = -300<br>
+&#160;X(1) = -270<br>
+&#160;X(2) = -270<br>
+&#160;X(3) = -300<br>
+&#160;Y(0) = 10<br>
+&#160;Y(1) = 10<br>
+&#160;Y(2) = -10<br>
+&#160;Y(3) = -10<br>
+&#160;Z(0) = 10<br>
+&#160;Z(1) = 10<br>
+&#160;Z(2) = 10<br>
+&#160;Z(3) = 10<br>
+&#160;ret = SapModel.SectCut.SetByQuad(&quot;SCut1&quot;, &quot;Group1&quot;, 
+ 1, X, Y, Z)</span></p>
+<p class="MsoNormal" style="mso-margin-top-alt: auto; mso-margin-bottom-alt: auto; 
+	 line-height: normal; text-indent: -20px; margin-left: 80px;"><span 
+	 class="Coding_Characters" style="font-size: 12pt;">'delete section 
+ cut</span><span class="Coding_Characters"><br>
+&#160;ret = SapModel.SectCut.Delete(&quot;SCut1&quot;)</span></p>
+<p class="MsoNormal" style="mso-margin-top-alt: auto; mso-margin-bottom-alt: auto; 
+	 line-height: normal; text-indent: -20px; margin-left: 80px;"><span 
+	 class="Coding_Characters" style="font-size: 12pt;">'close Sap2000</span><span 
+	 class="Coding_Characters"><br>
+&#160;SapObject.ApplicationExit False<br>
+&#160;Set SapModel = Nothing<br>
+&#160;Set SapObject = Nothing</span></p>
+<p class="MsoNormal" style="mso-margin-top-alt: auto; mso-margin-bottom-alt: auto; 
+	 line-height: normal; text-indent: -20px; margin-left: 60px; font-size: 12pt;"><span 
+	 class="Coding_Characters" style="font-size: 12pt;">End Sub</span></p>
+<h2>Release Notes</h2>
+<p class="Comment">Initial release in version 23.4.0.</p>
+<h2>See Also</h2>
+<p class="Comment"><a href="SetByQuad.htm">SetByQuad</a></p>
+</body>
+</html>

@@ -1,0 +1,22 @@
+#columns 3
+@{octave}
+a = 5;
+fprintf('Octave: a = %d\n', a);
+@{end octave}
+#column
+@{fortran}
+program test
+    implicit none
+    integer :: a
+    a = 5
+    write(*,'(A,I0)') 'Fortran: a = ', a
+end program test
+@{end fortran}
+#column
+@{rust}
+fn main() {
+    let a = 5;
+    println!("Rust: a = {}", a);
+}
+@{end rust}
+#end columns

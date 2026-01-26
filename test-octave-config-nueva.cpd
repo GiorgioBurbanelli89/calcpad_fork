@@ -1,0 +1,19 @@
+"Test Octave Config Nueva"
+
+@{octave}
+set(0, 'DefaultFigureVisible', 'off');
+
+x = [0 1 2 3];
+y = [0 1 4 9];
+
+h = figure();
+plot(x, y, '-o');
+title('Test Config');
+
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/octave_config_test.png';
+drawnow;
+print(h, output_file, '-dpng');
+close(h);
+
+fprintf('Imagen guardada: %s\n', output_file);
+@{end octave}

@@ -1,0 +1,410 @@
+"========================================================
+"GRAFICACIÓN DE MESH FEM CON PYTHON
+"Rectangular Slab - Solo parte gráfica del mallado
+"========================================================
+
+'<h2>Datos de Entrada</h2>
+
+'Dimensiones de la losa
+a = 6'm
+b = 4'm
+
+'Elementos del mesh
+n_a = 6
+n_b = 4
+
+'Totales
+n_e = n_a*n_b
+n_j = (n_a + 1)*(n_b + 1)
+
+'<hr>
+
+'<h2>Método 1: Python con Matplotlib (Básico)</h2>
+
+@{python}
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.patches import Rectangle, Circle
+import os
+
+# Parámetros desde Calcpad
+a = 6.0  # m
+b = 4.0  # m
+n_a = 6
+n_b = 4
+
+# Generar coordenadas de nodos
+x = np.linspace(0, a, n_a + 1)
+y = np.linspace(0, b, n_b + 1)
+X, Y = np.meshgrid(x, y)
+x_nodes = X.flatten()
+y_nodes = Y.flatten()
+n_nodes = len(x_nodes)
+
+# Generar conectividad de elementos
+elements = []
+for i in range(n_a):
+    for j in range(n_b):
+        n1 = i * (n_b + 1) + j
+        n2 = n1 + (n_b + 1)
+        n3 = n2 + 1
+        n4 = n1 + 1
+        elements.append([n1, n2, n3, n4])
+elements = np.array(elements)
+
+# Crear figura
+fig, ax = plt.subplots(figsize=(10, 7))
+
+# Dibujar fondo
+ax.add_patch(Rectangle((0, 0), a, b,
+                       facecolor='lightyellow',
+                       alpha=0.2,
+                       zorder=0))
+
+# Dibujar elementos
+for e, elem_nodes in enumerate(elements):
+    x_elem = x_nodes[elem_nodes]
+    y_elem = y_nodes[elem_nodes]
+
+    x_min, x_max = x_elem.min(), x_elem.max()
+    y_min, y_max = y_elem.min(), y_elem.max()
+    width = x_max - x_min
+    height = y_max - y_min
+
+    # Rectángulo del elemento
+    rect = Rectangle((x_min, y_min), width, height,
+                     facecolor='lime',
+                     edgecolor='seagreen',
+                     alpha=0.1,
+                     linewidth=1.5)
+    ax.add_patch(rect)
+
+    # Etiqueta del elemento
+    x_center = x_elem.mean()
+    y_center = y_elem.mean()
+    ax.text(x_center, y_center, str(e+1),
+           ha='center', va='center',
+           fontsize=10, fontweight='bold',
+           color='darkgreen',
+           zorder=10)
+
+# Identificar nodos de borde (apoyos)
+border_mask = ((x_nodes == 0) | (x_nodes == a) |
+               (y_nodes == 0) | (y_nodes == b))
+border_indices = np.where(border_mask)[0]
+
+# Dibujar apoyos
+for idx in border_indices:
+    x_node = x_nodes[idx]
+    y_node = y_nodes[idx]
+
+    # Líneas de apoyo
+    line_length = 0.2
+    if y_node == 0 or y_node == b:
+        ax.plot([x_node - line_length, x_node + line_length],
+               [y_node, y_node],
+               'r-', linewidth=2, zorder=5)
+
+    if x_node == 0 or x_node == a:
+        ax.plot([x_node, x_node],
+               [y_node - line_length, y_node + line_length],
+               'r-', linewidth=2, zorder=5)
+
+    # Círculo de apoyo
+    circle = Circle((x_node, y_node), 0.1,
+                   facecolor='lightpink',
+                   edgecolor='red',
+                   linewidth=1.5,
+                   zorder=6)
+    ax.add_patch(circle)
+
+# Dibujar todos los nodos
+ax.plot(x_nodes, y_nodes, 'o',
+       markersize=8,
+       markerfacecolor='orangered',
+       markeredgecolor='orangered',
+       zorder=8)
+
+# Etiquetas de nodos
+for j in range(n_nodes):
+    ax.text(x_nodes[j] + 0.12, y_nodes[j] - 0.1,
+           str(j+1),
+           fontsize=8,
+           ha='left',
+           va='top',
+           color='darkred',
+           fontweight='bold',
+           zorder=9)
+
+# Configuración del gráfico
+ax.set_xlim(-0.5, a + 0.5)
+ax.set_ylim(-0.5, b + 0.5)
+ax.set_aspect('equal')
+ax.set_xlabel('X (m)', fontsize=12, fontweight='bold')
+ax.set_ylabel('Y (m)', fontsize=12, fontweight='bold')
+ax.set_title('Mesh de Elementos Finitos - Losa Rectangular\nGenerado con Python/Matplotlib',
+            fontsize=14, fontweight='bold', pad=20)
+ax.grid(True, alpha=0.3, linestyle='--')
+
+# Agregar leyenda
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
+legend_elements = [
+    Patch(facecolor='lime', edgecolor='seagreen', alpha=0.1, label='Elementos'),
+    Line2D([0], [0], marker='o', color='w', markerfacecolor='orangered',
+           markersize=8, label='Nodos'),
+    Patch(facecolor='lightpink', edgecolor='red', label='Apoyos')
+]
+ax.legend(handles=legend_elements, loc='upper right', fontsize=10)
+
+plt.tight_layout()
+
+# Guardar imagen
+output_dir = r'C:\Users\j-b-j\AppData\Local\Temp'
+output_file = os.path.join(output_dir, 'fem_mesh_python.png')
+plt.savefig(output_file, dpi=150, bbox_inches='tight')
+print(f"Imagen guardada en: {output_file}")
+
+plt.close()
+
+# Retornar HTML para embeber
+print(f'<img src="{output_file}" width="800" style="border:2px solid #ccc; border-radius:8px; margin:10px 0;">')
+@{end python}
+
+'<hr>
+
+'<h2>Método 2: Python Optimizado con PolyCollection</h2>
+
+@{python}
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.collections import PolyCollection
+from matplotlib.patches import Circle
+import os
+
+# Parámetros
+a, b = 6.0, 4.0
+n_a, n_b = 6, 4
+
+# Generar mesh
+x = np.linspace(0, a, n_a + 1)
+y = np.linspace(0, b, n_b + 1)
+X, Y = np.meshgrid(x, y)
+nodes = np.column_stack([X.flatten(), Y.flatten()])
+
+# Conectividad
+n_b1 = n_b + 1
+elements = []
+for i in range(n_a):
+    for j in range(n_b):
+        n1 = i * n_b1 + j
+        elements.append([n1, n1 + n_b1, n1 + n_b1 + 1, n1 + 1])
+elements = np.array(elements)
+
+# Coordenadas de elementos (para PolyCollection)
+element_coords = nodes[elements]
+
+# Figura
+fig, ax = plt.subplots(figsize=(10, 7))
+
+# Colección de polígonos (MÁS EFICIENTE)
+coll = PolyCollection(element_coords,
+                      facecolors='lime',
+                      edgecolors='seagreen',
+                      alpha=0.15,
+                      linewidths=1.5)
+ax.add_collection(coll)
+
+# Etiquetas de elementos
+for e, elem in enumerate(elements):
+    center = nodes[elem].mean(axis=0)
+    ax.text(center[0], center[1], str(e+1),
+           ha='center', va='center',
+           fontsize=10, fontweight='bold',
+           color='darkgreen')
+
+# Nodos interiores
+border = ((nodes[:, 0] == 0) | (nodes[:, 0] == a) |
+          (nodes[:, 1] == 0) | (nodes[:, 1] == b))
+interior = ~border
+
+ax.plot(nodes[interior, 0], nodes[interior, 1], 'o',
+       markersize=8,
+       markerfacecolor='orangered',
+       markeredgecolor='orangered',
+       label='Nodos interiores')
+
+# Nodos de borde (apoyos)
+ax.plot(nodes[border, 0], nodes[border, 1], 'o',
+       markersize=12,
+       markerfacecolor='lightpink',
+       markeredgecolor='red',
+       linewidth=2,
+       label='Apoyos')
+
+# Líneas de apoyo
+for idx in np.where(border)[0]:
+    x_node, y_node = nodes[idx]
+    if y_node == 0 or y_node == b:
+        ax.plot([x_node - 0.2, x_node + 0.2], [y_node, y_node],
+               'r-', linewidth=2, alpha=0.7)
+    if x_node == 0 or x_node == a:
+        ax.plot([x_node, x_node], [y_node - 0.2, y_node + 0.2],
+               'r-', linewidth=2, alpha=0.7)
+
+# Etiquetas de nodos
+for j in range(len(nodes)):
+    ax.text(nodes[j, 0] + 0.12, nodes[j, 1] - 0.1,
+           str(j+1),
+           fontsize=7,
+           ha='left',
+           va='top',
+           color='darkred',
+           alpha=0.8)
+
+# Configuración
+ax.set_aspect('equal')
+ax.set_xlim(-0.5, a + 0.5)
+ax.set_ylim(-0.5, b + 0.5)
+ax.set_xlabel('X (m)', fontsize=12, fontweight='bold')
+ax.set_ylabel('Y (m)', fontsize=12, fontweight='bold')
+ax.set_title('Mesh FEM Optimizado - Python PolyCollection\n(Más eficiente para meshes grandes)',
+            fontsize=14, fontweight='bold', pad=20)
+ax.grid(True, alpha=0.3, linestyle='--')
+ax.legend(loc='upper right', fontsize=10)
+
+plt.tight_layout()
+
+# Guardar
+output_dir = r'C:\Users\j-b-j\AppData\Local\Temp'
+output_file = os.path.join(output_dir, 'fem_mesh_python_optimized.png')
+plt.savefig(output_file, dpi=150, bbox_inches='tight')
+print(f"Imagen optimizada guardada en: {output_file}")
+
+plt.close()
+
+# Retornar HTML
+print(f'<img src="{output_file}" width="800" style="border:2px solid #ccc; border-radius:8px; margin:10px 0;">')
+@{end python}
+
+'<hr>
+
+'<h2>Método 3: Python - Estilo Blueprint</h2>
+
+@{python}
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.collections import PolyCollection
+import os
+
+# Parámetros
+a, b = 6.0, 4.0
+n_a, n_b = 6, 4
+
+# Generar mesh
+x = np.linspace(0, a, n_a + 1)
+y = np.linspace(0, b, n_b + 1)
+X, Y = np.meshgrid(x, y)
+nodes = np.column_stack([X.flatten(), Y.flatten()])
+
+n_b1 = n_b + 1
+elements = []
+for i in range(n_a):
+    for j in range(n_b):
+        n1 = i * n_b1 + j
+        elements.append([n1, n1 + n_b1, n1 + n_b1 + 1, n1 + 1])
+elements = np.array(elements)
+element_coords = nodes[elements]
+
+# Figura con fondo oscuro (estilo blueprint)
+fig, ax = plt.subplots(figsize=(10, 7), facecolor='#0D47A1')
+ax.set_facecolor('#0D47A1')
+
+# Elementos (azul claro)
+coll = PolyCollection(element_coords,
+                      facecolors='#64B5F6',
+                      edgecolors='#1976D2',
+                      alpha=0.3,
+                      linewidths=2)
+ax.add_collection(coll)
+
+# Etiquetas de elementos (blanco)
+for e, elem in enumerate(elements):
+    center = nodes[elem].mean(axis=0)
+    ax.text(center[0], center[1], str(e+1),
+           ha='center', va='center',
+           fontsize=10, fontweight='bold',
+           color='white')
+
+# Nodos (blanco brillante)
+ax.plot(nodes[:, 0], nodes[:, 1], 'o',
+       markersize=10,
+       markerfacecolor='white',
+       markeredgecolor='cyan',
+       linewidth=1.5)
+
+# Apoyos en bordes
+border = ((nodes[:, 0] == 0) | (nodes[:, 0] == a) |
+          (nodes[:, 1] == 0) | (nodes[:, 1] == b))
+for idx in np.where(border)[0]:
+    x_node, y_node = nodes[idx]
+    if y_node == 0 or y_node == b:
+        ax.plot([x_node - 0.2, x_node + 0.2], [y_node, y_node],
+               'w-', linewidth=3, alpha=0.8)
+    if x_node == 0 or x_node == a:
+        ax.plot([x_node, x_node], [y_node - 0.2, y_node + 0.2],
+               'w-', linewidth=3, alpha=0.8)
+
+# Etiquetas de nodos
+for j in range(len(nodes)):
+    ax.text(nodes[j, 0] + 0.12, nodes[j, 1] - 0.1,
+           str(j+1),
+           fontsize=7,
+           ha='left',
+           va='top',
+           color='cyan',
+           fontweight='bold')
+
+# Configuración
+ax.set_aspect('equal')
+ax.set_xlim(-0.5, a + 0.5)
+ax.set_ylim(-0.5, b + 0.5)
+ax.set_xlabel('X (m)', fontsize=12, fontweight='bold', color='white')
+ax.set_ylabel('Y (m)', fontsize=12, fontweight='bold', color='white')
+ax.set_title('Mesh FEM - Estilo Blueprint\nGenerado con Python',
+            fontsize=14, fontweight='bold', color='white', pad=20)
+ax.grid(True, alpha=0.3, linestyle='--', color='white')
+ax.tick_params(colors='white')
+
+# Borde blanco
+for spine in ax.spines.values():
+    spine.set_edgecolor('white')
+    spine.set_linewidth(2)
+
+plt.tight_layout()
+
+# Guardar
+output_dir = r'C:\Users\j-b-j\AppData\Local\Temp'
+output_file = os.path.join(output_dir, 'fem_mesh_python_blueprint.png')
+plt.savefig(output_file, dpi=150, bbox_inches='tight', facecolor='#0D47A1')
+print(f"Imagen blueprint guardada en: {output_file}")
+
+plt.close()
+
+print(f'<img src="{output_file}" width="800" style="border:2px solid #1976D2; border-radius:8px; margin:10px 0;">')
+@{end python}
+
+'<hr>
+
+'<div style="background:#e0f2fe;padding:15px;border-left:4px solid #0284c7;margin:20px 0;">
+'<h3>📊 Resumen</h3>
+'<p><strong>Total de elementos:</strong> 'n_e'</p>
+'<p><strong>Total de nodos:</strong> 'n_j'</p>
+'<p><strong>Métodos demostrados:</strong></p>
+'<ul>
+'<li>✓ Python básico con matplotlib (patches individuales)</li>
+'<li>✓ Python optimizado (PolyCollection - mejor performance)</li>
+'<li>✓ Python estilo Blueprint (tema oscuro profesional)</li>
+'</ul>
+'<p><strong>Imágenes guardadas en:</strong> <code>C:\Users\j-b-j\AppData\Local\Temp\</code></p>
+'</div>

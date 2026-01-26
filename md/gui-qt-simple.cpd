@@ -1,0 +1,97 @@
+﻿'Ejemplo GUI Qt - Ejecutable Simple en C++
+
+"Qt es el framework GUI mÃ¡s popular para C++ multiplataforma."
+
+@{qt}
+#include <iostream>
+using namespace std;
+
+// Calculadora simple con Qt (simulada para este ejemplo)
+int main() {
+    cout << "=== Qt GUI Framework - Calculadora Simple ===" << endl;
+    cout << "Qt es cross-platform (Windows/Linux/macOS/Android/iOS)" << endl;
+    cout << "Usado por: VLC, OBS Studio, Autodesk Maya, Telegram" << endl;
+    cout << endl;
+
+    // SimulaciÃ³n de GUI (sin ventana real, solo output)
+    cout << "Interfaz simulada:" << endl;
+    cout << "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”" << endl;
+    cout << "â”‚   Calculadora Qt 6             â”‚" << endl;
+    cout << "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤" << endl;
+    cout << "â”‚ NÃºmero 1: [  8  ]              â”‚" << endl;
+    cout << "â”‚ NÃºmero 2: [  3  ]              â”‚" << endl;
+    cout << "â”‚                                â”‚" << endl;
+    cout << "â”‚ [ + ] [ - ] [ Ã— ] [ Ã· ]        â”‚" << endl;
+    cout << "â”‚                                â”‚" << endl;
+    cout << "â”‚ Resultado: 11                  â”‚" << endl;
+    cout << "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜" << endl;
+    cout << endl;
+
+    // LÃ³gica de ejemplo
+    int num1 = 8;
+    int num2 = 3;
+    int suma = num1 + num2;
+
+    cout << "CÃ¡lculo: " << num1 << " + " << num2 << " = " << suma << endl;
+    cout << endl;
+    cout << "Para instalar Qt en Linux:" << endl;
+    cout << "$ sudo apt install qt6-base-dev qt6-tools-dev" << endl;
+    cout << "$ qmake --version" << endl;
+    cout << endl;
+    cout << "Compilar app Qt:" << endl;
+    cout << "$ g++ main.cpp -o app $(pkg-config --cflags --libs Qt6Widgets)" << endl;
+    cout << "$ ./app" << endl;
+    cout << endl;
+    cout << "Ventajas de Qt:" << endl;
+    cout << "âœ“ Muy maduro y estable" << endl;
+    cout << "âœ“ Excelente documentaciÃ³n" << endl;
+    cout << "âœ“ Gran ecosistema de herramientas" << endl;
+    cout << "âœ“ Usado en producciÃ³n por millones" << endl;
+
+    return 0;
+}
+@{end qt}
+
+'CÃ³digo Qt real (requiere Qt instalado):
+
+"Para crear una ventana Qt real necesitas:"
+
+"1. Instalar Qt:"
+"   $ sudo apt install qt6-base-dev"
+
+"2. CÃ³digo mÃ­nimo (main.cpp):"
+
+@{qt}
+#include <QApplication>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
+    QMainWindow window;
+    window.setWindowTitle("Calcpad Qt");
+    window.resize(400, 300);
+
+    QWidget *central = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout();
+
+    QLabel *label = new QLabel("Hola desde Qt!");
+    QPushButton *button = new QPushButton("Calcular");
+
+    layout->addWidget(label);
+    layout->addWidget(button);
+    central->setLayout(layout);
+
+    window.setCentralWidget(central);
+    window.show();
+
+    return app.exec();
+}
+@{end qt}
+
+3. Compilar:
+   $ g++ main.cpp -o calcpad-qt $(pkg-config --cflags --libs Qt6Widgets)
+   $ ./calcpad-qt

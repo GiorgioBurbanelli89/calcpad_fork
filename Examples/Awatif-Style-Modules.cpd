@@ -1,0 +1,202 @@
+"Awatif-UI Style - Módulos TypeScript con Three.js
+'Estructura modular como awatif-ui/color-map
+'Los módulos se compilan a JS y se cargan en el navegador
+
+"1. Datos FEM
+nodos = 4
+elementos = 2
+
+"========================================
+"2. getColorMap.ts - Módulo de Color Map
+"========================================
+@{ts:getColorMap}
+// getColorMap.ts - Crea mesh con vertex colors basado en valores
+import * as THREE from 'three';
+
+export interface ColorMapResult {
+    mesh: THREE.Mesh;
+    min: number;
+    max: number;
+}
+
+export function getColorMap(
+    nodes: number[][],
+    elements: number[][],
+    values: number[]
+): ColorMapResult {
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    // Create geometry
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(nodes.flat(), 3));
+    geometry.setIndex(new THREE.Uint16BufferAttribute(elements.flat(), 1));
+
+    // Calculate vertex colors using rainbow LUT
+    const colors = new Float32Array(nodes.length * 3);
+    for (let i = 0; i < values.length; i++) {
+        const t = (values[i] - min) / (max - min || 1);
+        let r: number, g: number, b: number;
+
+        if (t < 0.25) { r = 0; g = t * 4; b = 1; }
+        else if (t < 0.5) { r = 0; g = 1; b = 1 - (t - 0.25) * 4; }
+        else if (t < 0.75) { r = (t - 0.5) * 4; g = 1; b = 0; }
+        else { r = 1; g = 1 - (t - 0.75) * 4; b = 0; }
+
+        colors[i * 3] = r;
+        colors[i * 3 + 1] = g;
+        colors[i * 3 + 2] = b;
+    }
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+    const material = new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        side: THREE.DoubleSide
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+
+    return { mesh, min, max };
+}
+@{end ts:getColorMap}
+
+"========================================
+"3. getLegend.ts - Módulo de Leyenda
+"========================================
+@{ts:getLegend}
+// getLegend.ts - Crea elemento HTML de leyenda
+
+export interface LegendMarker {
+    value: string;
+    position: number;
+}
+
+export function getLegend(min: number, max: number, steps: number = 5): HTMLDivElement {
+    const legend = document.createElement('div');
+    legend.id = 'legend';
+    legend.style.cssText = `
+        width: 20px;
+        height: 200px;
+        background: linear-gradient(#ff0000, #ffff00 25%, #00ff00 50%, #00ffff 75%, #0000ff);
+        position: absolute;
+        right: 50px;
+        top: 90px;
+        z-index: 2;
+    `;
+
+    for (let i = 0; i < steps; i++) {
+        const ratio = i / (steps - 1);
+        const value = (max - (max - min) * ratio).toFixed(2);
+
+        const marker = document.createElement('div');
+        marker.style.cssText = `
+            width: 10px;
+            height: 1px;
+            margin-left: 20px;
+            background: white;
+            position: relative;
+            margin-top: ${i === 0 ? 0 : (200 / (steps - 1)) - 1}px;
+        `;
+
+        const label = document.createElement('span');
+        label.style.cssText = `
+            position: absolute;
+            color: white;
+            font-size: 11px;
+            top: -6px;
+            left: 12px;
+            font-family: monospace;
+        `;
+        label.textContent = value;
+
+        marker.appendChild(label);
+        legend.appendChild(marker);
+    }
+
+    return legend;
+}
+@{end ts:getLegend}
+
+"========================================
+"4. main.ts - Punto de Entrada
+"========================================
+@{ts:main}
+// main.ts - Importa módulos y crea visualización 3D
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { getColorMap } from './getColorMap';
+import { getLegend } from './getLegend';
+
+// Datos FEM
+const nodes: number[][] = [[0, 0, 0], [5, 0, 0], [5, 0, 5], [0, 0, 5]];
+const elements: number[][] = [[0, 1, 2], [0, 2, 3]];
+const values: number[] = [0, 2.5, 10, 5];
+
+// Setup Three.js
+const container = document.getElementById('container')!;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1a2e);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(10, -12, 8);
+camera.up.set(0, 0, 1);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+container.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(2.5, 0, 2.5);
+controls.update();
+
+// Usar módulo getColorMap
+const colorMap = getColorMap(nodes, elements, values);
+scene.add(colorMap.mesh);
+
+// Agregar wireframe
+const wireGeom = new THREE.BufferGeometry();
+wireGeom.setAttribute('position', new THREE.Float32BufferAttribute(nodes.flat(), 3));
+wireGeom.setIndex(new THREE.Uint16BufferAttribute(elements.flat(), 1));
+scene.add(new THREE.LineSegments(
+    new THREE.WireframeGeometry(wireGeom),
+    new THREE.LineBasicMaterial({ color: 0xffffff })
+));
+
+// Grid y ejes
+const grid = new THREE.GridHelper(10, 10, 0x444444, 0x333333);
+grid.rotation.x = Math.PI / 2;
+scene.add(grid);
+scene.add(new THREE.AxesHelper(2));
+
+// Usar módulo getLegend
+const legend = getLegend(colorMap.min, colorMap.max, 5);
+document.body.appendChild(legend);
+
+// Info panel
+const info = document.createElement('div');
+info.style.cssText = 'position:absolute;top:10px;left:10px;color:white;font-size:12px;background:rgba(0,0,0,0.6);padding:8px 12px;border-radius:4px;font-family:Arial';
+info.innerHTML = `<b>Color Map FEM</b><br>Nodos: ${nodes.length} | Elementos: ${elements.length}<br>Min: ${colorMap.min.toFixed(1)} | Max: ${colorMap.max.toFixed(1)} mm`;
+document.body.appendChild(info);
+
+// Render loop
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();
+
+// Resize handler
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+console.log('>> Awatif-Style modules loaded successfully!');
+console.log(`   ColorMap: min=${colorMap.min}, max=${colorMap.max}`);
+@{end ts:main}
+
+'========================================
+'Módulos compilados y listos para WebView2
+'El HTML generado está en temp_multilang/index.html
+'========================================

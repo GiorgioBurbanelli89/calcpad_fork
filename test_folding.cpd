@@ -1,0 +1,84 @@
+'Prueba de Code Folding en AvalonEdit
+'======================================
+
+'INSTRUCCIONES:
+'1. Presiona el botón "Code" para cambiar a AvalonEdit (NO usar MathEditor)
+'2. Busca en el margen izquierdo los símbolos ▼ (triángulo hacia abajo)
+'3. Click en ▼ para colapsar el bloque
+'4. Click en ▶ (triángulo hacia derecha) para expandir
+
+'Bloque HTML con código adentro
+@{html}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+</head>
+<body>
+    <h1>Hello World</h1>
+</body>
+</html>
+@{end html}
+
+'Bloque CSS con estilos
+@{css}
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #333;
+}
+@{end css}
+
+'Bloque TypeScript con código
+@{ts}
+function calculateSum(a: number, b: number): number {
+    return a + b;
+}
+
+const result = calculateSum(5, 3);
+console.log(`Result: ${result}`);
+@{end ts}
+
+'Bloque C con código
+@{c}
+#include <stdio.h>
+
+int main() {
+    printf("Hello from C!\n");
+    return 0;
+}
+@{end c}
+
+'Bloque Fortran
+@{fortran}
+program hello
+    implicit none
+    print *, "Hello from Fortran!"
+end program hello
+@{end fortran}
+
+'Bloques Calcpad también tienen folding
+#if x > 0
+    y = x^2 + 2*x + 1
+#else
+    y = -x
+#end if
+
+#def factorial(n)
+    result = 1
+    #for i = 1 : n
+        result = result*i
+    #loop
+    factorial = result
+#end def
+
+'Bloques SVG
+$svg
+    <circle cx="50" cy="50" r="40" fill="blue"/>
+$end
+
+'Resultado: Deberías ver triángulos ▼ al lado de cada bloque
+'Click en ellos para colapsar/expandir

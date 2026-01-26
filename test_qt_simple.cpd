@@ -1,0 +1,29 @@
+"Test: Qt Simple
+@{qt}
+#include <QApplication>
+#include <QWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QLabel>
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
+    QWidget window;
+    window.setWindowTitle("Calcpad + Qt");
+    window.resize(300, 150);
+
+    QVBoxLayout *layout = new QVBoxLayout(&window);
+
+    QLabel *label = new QLabel("Hola desde Qt!");
+    label->setAlignment(Qt::AlignCenter);
+    layout->addWidget(label);
+
+    QPushButton *button = new QPushButton("Cerrar");
+    QObject::connect(button, &QPushButton::clicked, &app, &QApplication::quit);
+    layout->addWidget(button);
+
+    window.show();
+    return app.exec();
+}
+@{end qt}

@@ -1,0 +1,18 @@
+#!/bin/bash
+# Calcpad Debugger CLI
+# Ejecuta el depurador WPF para código Calcpad
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEBUGGER_EXE="$SCRIPT_DIR/CalcpadDebugger/bin/Release/net10.0-windows/CalcpadDebugger.exe"
+
+if [ ! -f "$DEBUGGER_EXE" ]; then
+    echo "Error: CalcpadDebugger no está compilado"
+    echo "Ejecuta: cd CalcpadDebugger && dotnet build -c Release"
+    exit 1
+fi
+
+echo "🐛 Iniciando Calcpad Debugger..."
+echo ""
+
+# Ejecutar el depurador
+"$DEBUGGER_EXE" "$@"

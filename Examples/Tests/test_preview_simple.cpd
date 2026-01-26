@@ -1,0 +1,11 @@
+"Test de Preview TextBox
+'Este es un archivo simple para probar la barra de preview
+
+@{c}
+// Codigo C para probar
+int x = 5;
+int y = 10;
+int suma = x + y;
+@{end}
+
+'Resultado esperado: suma = 15

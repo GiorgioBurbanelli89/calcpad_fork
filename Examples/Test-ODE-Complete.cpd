@@ -1,0 +1,87 @@
+"Ecuaciones Diferenciales Ordinarias (ODEs)"
+
+'<h2>Resolver Ecuaciones Diferenciales con Calcpad</h2>
+
+@{symbolic}
+
+'<h3>1. ODEs de Primer Orden Separables</h3>
+' Forma: y' = f(x)
+' Solución: y = ∫f(x)dx + C
+
+sol1 = solve_ode(y' = 2*x, y, x)
+' Esperado: y = x² + C
+
+sol2 = solve_ode(y' = e^x, y, x)
+' Esperado: y = e^x + C
+
+sol3 = solve_ode(y' = sin(x), y, x)
+' Esperado: y = -cos(x) + C
+
+'<h3>2. ODEs Lineales de Primer Orden Homogéneas</h3>
+' Forma: y' + a*y = 0
+' Solución: y = C*e^(-a*x)
+
+sol4 = solve_ode(y' + 2*y = 0, y, x)
+' Esperado: y = C*e^(-2x)
+
+sol5 = solve_ode(y' + 5*y = 0, y, x)
+' Esperado: y = C*e^(-5x)
+
+'<h3>3. ODEs de Segundo Orden - Raíces Reales Distintas</h3>
+' Forma: y'' + a*y' + b*y = 0
+' Ecuación característica: r² + a*r + b = 0
+' Si Δ > 0: y = C1*e^(r1*x) + C2*e^(r2*x)
+
+sol6 = solve_ode(y'' - 3*y' + 2*y = 0, y, x)
+' Ecuación característica: r² - 3r + 2 = 0
+' Raíces: r1 = 2, r2 = 1
+' Esperado: y = C1*e^(2x) + C2*e^x
+
+sol7 = solve_ode(y'' - 5*y' + 6*y = 0, y, x)
+' Ecuación característica: r² - 5r + 6 = 0
+' Raíces: r1 = 3, r2 = 2
+' Esperado: y = C1*e^(3x) + C2*e^(2x)
+
+'<h3>4. ODEs de Segundo Orden - Raíz Doble</h3>
+' Si Δ = 0: y = (C1 + C2*x)*e^(r*x)
+
+sol8 = solve_ode(y'' - 4*y' + 4*y = 0, y, x)
+' Ecuación característica: r² - 4r + 4 = 0
+' Raíz doble: r = 2
+' Esperado: y = (C1 + C2*x)*e^(2x)
+
+sol9 = solve_ode(y'' + 6*y' + 9*y = 0, y, x)
+' Ecuación característica: r² + 6r + 9 = 0
+' Raíz doble: r = -3
+' Esperado: y = (C1 + C2*x)*e^(-3x)
+
+'<h3>5. ODEs de Segundo Orden - Raíces Complejas</h3>
+' Si Δ < 0: y = e^(αx)*(C1*cos(βx) + C2*sin(βx))
+' donde α = -a/2, β = √(-Δ)/2
+
+sol10 = solve_ode(y'' + 4*y = 0, y, x)
+' Ecuación característica: r² + 4 = 0
+' Raíces complejas: r = ±2i
+' Esperado: y = C1*cos(2x) + C2*sin(2x)
+
+sol11 = solve_ode(y'' + y' + y = 0, y, x)
+' Ecuación característica: r² + r + 1 = 0
+' Raíces complejas: r = -1/2 ± i√3/2
+' Esperado: y = e^(-x/2)*(C1*cos(√3/2*x) + C2*sin(√3/2*x))
+
+sol12 = solve_ode(y'' + 2*y' + 5*y = 0, y, x)
+' Ecuación característica: r² + 2r + 5 = 0
+' Raíces: r = -1 ± 2i
+' Esperado: y = e^(-x)*(C1*cos(2x) + C2*sin(2x))
+
+'<h3>6. Verificación de Soluciones</h3>
+
+check1 = verify_ode(y = C1*e^(2*x) + C2*e^x, y'' - 3*y' + 2*y = 0, y, x)
+
+check2 = verify_ode(y = (C1 + C2*x)*e^(2*x), y'' - 4*y' + 4*y = 0, y, x)
+
+@{end symbolic}
+
+'<hr>
+'<p><b>Nota:</b> Las ODEs se resuelven usando el método de la ecuación característica para ODEs lineales con coeficientes constantes.</p>
+'<p>Para ODEs más complejas, considera integrar Maxima (CAS opensource).</p>

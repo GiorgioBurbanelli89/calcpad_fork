@@ -1,0 +1,49 @@
+' Archivo convertido de Mathcad Prime (.mcdx) a Calcpad (.cpd)
+' Archivo original: Matriz de rigidez vigas.mcdx
+' Fecha de conversion: 2026-01-22
+' CONVERSION MANUAL del XML extraido
+
+' ==============================================
+' EJEMPLO: Matriz de Rigidez de Vigas
+' ==============================================
+
+' Propiedades del material y seccion
+E = 210*GPa                 'Modulo de elasticidad
+I = 833.3*cm^4              'Momento de inercia
+A = 100*cm^2                'Area de la seccion
+L = 3*m                     'Longitud de la viga
+
+' Carga
+P = 1000*N                  'Carga puntual
+
+' ==============================================
+' NOTA: La funcion fem_beam_K() es una Custom Function de Mathcad
+' En Calcpad, la implementamos directamente:
+' ==============================================
+
+' Coeficientes de la matriz de rigidez 6x6 (Euler-Bernoulli)
+' K = [EA/L, 12EI/L^3, 4EI/L, ...]
+
+' Rigidez axial
+k_axial = E*A/L
+k_axial
+
+' Rigidez de flexion
+k_flex = 12*E*I/L^3
+k_flex
+
+' Rigidez de rotacion
+k_rot = 4*E*I/L
+k_rot
+
+' ==============================================
+' Deflexion en voladizo (cantilever)
+' Formula: delta = P*L^3 / (3*E*I)
+' ==============================================
+
+delta = P*L^3/(3*E*I)
+delta
+
+' Convertir a mm
+delta_mm = delta*1000/m*mm
+delta_mm

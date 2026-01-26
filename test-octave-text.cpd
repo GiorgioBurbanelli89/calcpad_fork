@@ -1,0 +1,23 @@
+"Test Octave text function"
+
+@{octave}
+x = 3;
+y = 2;
+
+figure('visible', 'off');
+plot([0 6], [0 4]);
+
+% Test text function
+text(x, y, 'Test Label', ...
+     'FontSize', 10, ...
+     'FontWeight', 'bold', ...
+     'Color', [0 0.4 0]);
+
+% Also test with number
+text(x + 1, y + 1, num2str(5), ...
+     'HorizontalAlignment', 'center', ...
+     'VerticalAlignment', 'middle', ...
+     'FontSize', 10);
+
+fprintf('Text test completed\n');
+@{end octave}

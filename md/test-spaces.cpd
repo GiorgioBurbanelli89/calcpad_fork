@@ -1,0 +1,27 @@
+﻿'Test de espacios en diferentes lenguajes
+
+@{csharp}
+using System;
+class Program
+{
+    static void Main()
+    {
+        int a = 10;
+        Console.WriteLine("Hello World");
+    }
+}
+@{end csharp}
+
+@{python}
+import math
+x = 5
+print("Hello World")
+@{end python}
+
+@{fortran}
+program hello
+    implicit none
+    integer :: a
+    a = 10
+end program hello
+@{end fortran}

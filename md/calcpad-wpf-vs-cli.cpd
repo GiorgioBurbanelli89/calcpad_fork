@@ -1,0 +1,201 @@
+#md on
+'Calcpad WPF vs CLI - Comparación Técnica
+'---
+'
+'## 📋 Introducción
+'
+'Este documento compara las arquitecturas, flujos de procesamiento y diferencias clave entre **Calcpad WPF** (aplicación de escritorio) y **Calcpad CLI** (interfaz de línea de comandos).
+'
+'---
+'
+'## 🏗️ Arquitectura General
+'
+'### Calcpad WPF
+'- **Interfaz gráfica** usando Windows Presentation Foundation (WPF)
+'- **Editor interactivo** con RichTextBox y syntax highlighting en tiempo real
+'- **Visualización HTML** integrada usando WebView2
+'- **Ejecución asíncrona** con UI responsiva
+'- **Target Framework**: .NET 10.0-windows
+'
+'### Calcpad CLI
+'- **Interfaz de consola** sin UI gráfica
+'- **Procesamiento batch** de archivos .cpd
+'- **Salida a archivos** HTML, PDF, DOCX
+'- **Ejecución síncrona** simple y directa
+'- **Target Framework**: .NET 10.0 (multiplataforma)
+'
+'---
+'
+'## 📊 Tabla Comparativa Detallada
+'
+'| Aspecto | Calcpad WPF | Calcpad CLI | ¿Son Iguales? |
+'|---------|-------------|-------------|---------------|
+'| **Motor de Cálculo** | Calcpad.Core | Calcpad.Core | ✅ IDÉNTICO |
+'| **Parser de Macros** | MacroParser | MacroParser | ✅ IDÉNTICO |
+'| **Soporte Multi-lenguaje** | MultLangProcessor | MultLangProcessor | ✅ IDÉNTICO |
+'| **Generación HTML** | HtmlWriter | HtmlWriter | ✅ IDÉNTICO |
+'| **Syntax Highlighting** | HighLighter.cs (WPF) | No aplica | ❌ Solo WPF |
+'| **Transformación Operadores** | Sí (de << a ∠) | No | ❌ DIFERENTE |
+'| **Reversión Operadores** | Sí (RevertCalcpadOperators) | No necesita | ❌ Solo WPF |
+'| **Entrada Usuario** | RichTextBox interactivo | Archivo .cpd | ❌ DIFERENTE |
+'| **Salida** | WebView2 (HTML en pantalla) | Archivos (HTML/PDF/DOCX) | ❌ DIFERENTE |
+'| **Ejecución Asíncrona** | Sí (Dispatcher.InvokeAsync) | No | ❌ Solo WPF |
+'| **AutoRun** | Sí (configurable) | No aplica | ❌ Solo WPF |
+'| **Undo/Redo** | Sí | No aplica | ❌ Solo WPF |
+'| **Recent Files** | Sí | No aplica | ❌ Solo WPF |
+'| **Settings Persistence** | Sí (Settings.settings) | No | ❌ Solo WPF |
+'
+'---
+'
+'## 🔄 Flujo de Procesamiento WPF
+'
+'1. Usuario escribe código
+'2. HighLighter transforma operadores en tiempo real
+'   - De menor-que menor-que  a símbolo ángulo
+'   - De igual-igual a símbolo equivalente
+'   - De exclamación-igual a símbolo no-igual
+'   - De ampersand-ampersand a símbolo AND lógico
+'   - De pipe-pipe a símbolo OR lógico
+'3. Usuario guarda o ejecuta (AutoRun o Manual)
+'4. GetInputText() extrae texto del RichTextBox
+'5. Si hay bloques multi-lenguaje (como cpp, python, etc):
+'   - RevertCalcpadOperators() revierte transformaciones
+'6. MultLangProcessor ejecuta código externo
+'7. MacroParser procesa macros
+'8. Calculator evalúa expresiones
+'9. HtmlWriter genera salida
+'10. WebView2 muestra resultado
+'
+'---
+'
+'## 🔄 Flujo de Procesamiento CLI
+'
+'1. Usuario ejecuta: calcpad input.cpd output.html
+'2. CLI lee archivo input.cpd
+'3. MultLangProcessor (si hay bloques externos)
+'4. MacroParser procesa macros
+'5. Calculator evalúa expresiones
+'6. HtmlWriter genera salida
+'7. CLI guarda resultado en output.html
+'
+'---
+'
+'## ⚠️ Diferencias Críticas
+'
+'### 1. Transformación de Operadores
+'
+'**WPF**: Transforma para visualización Unicode
+'- Problema: Causaba errores al compilar C++
+'- Solución: RevertCalcpadOperators() antes de compilar
+'
+'**CLI**: No transforma
+'- Lee archivo original
+'- Envía código sin modificar al compilador
+'
+'### 2. Rendimiento
+'
+'**WPF Antes**: 3700ms para mostrar código
+'**WPF Ahora**: 100ms (37x más rápido)
+'- Solución: Dispatcher.InvokeAsync() con prioridad Background
+'
+'**CLI**: No aplica (sin UI)
+'
+'---
+'
+'## 🔧 Componentes Compartidos
+'
+'Ambas versiones comparten (100% sincronizados):
+'
+'### Calcpad.Core
+'- **Calculator.cs**: Motor de cálculo
+'- **ExpressionParser.cs**: Parser
+'- **MacroParser.cs**: Macros
+'- **HtmlWriter.cs**: Generador HTML
+'
+'### Calcpad.Common
+'- **MultLangManager.cs**: Gestor lenguajes
+'- **MultLangProcessor.cs**: Procesador multi-lenguaje
+'- **LanguageExecutor.cs**: Ejecutor Python/C++/Octave
+'- **MultLangConfig.json**: Configuración compartida
+'
+'---
+'
+'## 🎯 Ejemplo Práctico de Uso CLI
+'
+'Sintaxis básica:
+'
+'    calcpad input.cpd output.html
+'
+'Con opciones:
+'
+'    calcpad input.cpd output.html -d 3 -u si -a deg
+'
+'Ejemplo real:
+'
+'    calcpad test_all_langs.cpd output.html
+'
+'---
+'
+'## 📐 Demo con Cálculos
+'
+'Ahora un ejemplo con cálculos reales de Calcpad:
+#md off
+
+'Área de un círculo:
+r = 5'm
+A = π*r^2
+
+'Volumen de una esfera:
+V = 4/3*π*r^3
+
+'Teorema de Pitágoras:
+a = 3'm
+b = 4'm
+c = sqrt(a^2 + b^2)
+
+#md on
+'
+'---
+'
+'## ✅ Conclusiones
+'
+'### Ventajas de WPF
+'- ✨ Edición interactiva en tiempo real
+'- 🎨 Syntax highlighting visual
+'- 👁️ Visualización inmediata
+'- ↩️ Undo/Redo, búsqueda, reemplazo
+'
+'### Ventajas de CLI
+'- 🤖 Automatización y scripting
+'- 📦 Procesamiento batch
+'- 🌐 Multiplataforma
+'- 🔄 Integración CI/CD
+'
+'### ⚡ Ambos Comparten
+'- Mismo motor de cálculo (resultados idénticos)
+'- Mismo soporte multi-lenguaje
+'- Misma configuración sincronizada
+'- Misma salida HTML
+'
+'---
+'
+'## 🐛 Problemas Resueltos (WPF)
+'
+'1. **Error C++ Compilación**
+'   - ❌ Antes: cout con símbolo ángulo (transformación incorrecta)
+'   - ✅ Ahora: cout con operador correcto (revertido correctamente)
+'
+'2. **Lentitud al Abrir**
+'   - ❌ Antes: 3700ms
+'   - ✅ Ahora: 100ms (37x más rápido)
+'
+'3. **Config No Se Guarda**
+'   - ❌ Settings.Default.Save() falla en .NET 10
+'   - ⏳ Pendiente de solución
+'
+'---
+'
+'**Fecha**: 2026-01-15
+'**Versión**: Calcpad 7.5.8
+'**Autor**: Análisis técnico de arquitectura
+#md off

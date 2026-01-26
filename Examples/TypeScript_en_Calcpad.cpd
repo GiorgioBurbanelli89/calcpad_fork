@@ -1,0 +1,496 @@
+"Uso de TypeScript en Calcpad
+'=================================
+
+"Introducción
+'============
+'TypeScript es JavaScript con tipos. Puedes ejecutarlo en Calcpad usando external parsers.
+
+"Método 1: Usando ts-node (Directo)
+'===================================
+
+'Primero instala ts-node globalmente:
+'npm install -g ts-node typescript
+
+'Luego en Calcpad puedes usar:
+
+@{cmd}
+ts-node -e "
+interface Punto {
+  x: number;
+  y: number;
+}
+
+function distancia(p1: Punto, p2: Punto): number {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+const puntoA: Punto = { x: 0, y: 0 };
+const puntoB: Punto = { x: 3, y: 4 };
+
+console.log(distancia(puntoA, puntoB));
+"
+@{cmd}
+
+'Resultado: 5
+
+"Método 2: Compilar y ejecutar
+'==============================
+
+'Crea un archivo TypeScript y ejecútalo:
+
+@{cmd}
+echo interface Calculadora { > calc.ts
+echo   sumar(a: number, b: number): number; >> calc.ts
+echo } >> calc.ts
+echo. >> calc.ts
+echo class MiCalculadora implements Calculadora { >> calc.ts
+echo   sumar(a: number, b: number): number { >> calc.ts
+echo     return a + b; >> calc.ts
+echo   } >> calc.ts
+echo } >> calc.ts
+echo. >> calc.ts
+echo const calc = new MiCalculadora(); >> calc.ts
+echo console.log(calc.sumar(10, 20)); >> calc.ts
+
+ts-node calc.ts
+@{cmd}
+
+'Resultado: 30
+
+"Método 3: Usando Deno (TypeScript Nativo)
+'==========================================
+
+'Deno soporta TypeScript sin configuración:
+
+@{cmd}
+deno eval "
+interface Vector {
+  x: number;
+  y: number;
+  z: number;
+}
+
+function magnitud(v: Vector): number {
+  return Math.sqrt(v.x**2 + v.y**2 + v.z**2);
+}
+
+const vector: Vector = { x: 3, y: 4, z: 5 };
+console.log(magnitud(vector).toFixed(2));
+"
+@{cmd}
+
+'Resultado: 7.07
+
+"Ejemplo Práctico: Cálculo Estructural en TypeScript
+'====================================================
+
+'Calcular momentos flectores con TypeScript:
+
+@{cmd}
+ts-node -e "
+interface Viga {
+  longitud: number;
+  carga: number;
+  moduloElastico: number;
+  inercia: number;
+}
+
+class CalculadoraVigas {
+  static momentoMaximo(viga: Viga): number {
+    // Viga simplemente apoyada con carga uniformemente distribuida
+    return (viga.carga * viga.longitud ** 2) / 8;
+  }
+
+  static deflexionMaxima(viga: Viga): number {
+    const w = viga.carga;
+    const L = viga.longitud;
+    const E = viga.moduloElastico;
+    const I = viga.inercia;
+
+    return (5 * w * L ** 4) / (384 * E * I);
+  }
+}
+
+const vigas: Viga = {
+  longitud: 6,          // 6 metros
+  carga: 1000,          // 1000 N/m
+  moduloElastico: 200e9, // 200 GPa (acero)
+  inercia: 8e-6         // 8 cm^4
+};
+
+const M = CalculadoraVigas.momentoMaximo(vigas);
+const d = CalculadoraVigas.deflexionMaxima(vigas);
+
+console.log('Momento máximo:', M.toFixed(2), 'N·m');
+console.log('Deflexión máxima:', (d * 1000).toFixed(2), 'mm');
+"
+@{cmd}
+
+"Ejemplo: TypeScript con Clases y Genéricos
+'===========================================
+
+@{cmd}
+ts-node -e "
+// Genéricos en TypeScript
+class Matriz<T> {
+  private datos: T[][];
+
+  constructor(filas: number, columnas: number, valorInicial: T) {
+    this.datos = Array(filas).fill(null).map(() =>
+      Array(columnas).fill(valorInicial)
+    );
+  }
+
+  set(i: number, j: number, valor: T): void {
+    this.datos[i][j] = valor;
+  }
+
+  get(i: number, j: number): T {
+    return this.datos[i][j];
+  }
+
+  imprimir(): void {
+    this.datos.forEach(fila => {
+      console.log(fila.join('\\t'));
+    });
+  }
+}
+
+// Crear matriz de números
+const mat = new Matriz<number>(3, 3, 0);
+
+// Llenar diagonal
+for (let i = 0; i < 3; i++) {
+  mat.set(i, i, i + 1);
+}
+
+console.log('Matriz diagonal:');
+mat.imprimir();
+"
+@{cmd}
+
+"Ejemplo: TypeScript con Async/Await
+'====================================
+
+@{cmd}
+ts-node -e "
+interface DatosAPI {
+  temperatura: number;
+  presion: number;
+  humedad: number;
+}
+
+async function obtenerDatos(): Promise<DatosAPI> {
+  // Simular llamada API
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        temperatura: 25.5,
+        presion: 1013.25,
+        humedad: 65
+      });
+    }, 100);
+  });
+}
+
+async function procesarDatos(): Promise<void> {
+  const datos = await obtenerDatos();
+
+  console.log('Temperatura:', datos.temperatura, '°C');
+  console.log('Presión:', datos.presion, 'hPa');
+  console.log('Humedad:', datos.humedad, '%');
+
+  // Calcular punto de rocío
+  const a = 17.27;
+  const b = 237.7;
+  const alpha = ((a * datos.temperatura) / (b + datos.temperatura)) +
+                Math.log(datos.humedad / 100);
+  const puntoRocio = (b * alpha) / (a - alpha);
+
+  console.log('Punto de rocío:', puntoRocio.toFixed(1), '°C');
+}
+
+procesarDatos();
+"
+@{cmd}
+
+"Configuración Avanzada: Crear Parser TypeScript Personalizado
+'==============================================================
+
+'Puedes crear un script wrapper para TypeScript:
+
+@{cmd}
+echo @echo off > ts-calc.bat
+echo ts-node %%* >> ts-calc.bat
+@{cmd}
+
+'Luego usarlo en Calcpad:
+
+@{cmd}
+ts-calc -e "console.log(Math.PI * 2)"
+@{cmd}
+
+"Integración con Calcpad: Pasar Variables
+'=========================================
+
+'Puedes pasar valores de Calcpad a TypeScript:
+
+a = 10
+b = 20
+
+@{cmd}
+ts-node -e "
+const a: number = $a;
+const b: number = $b;
+const suma: number = a + b;
+console.log(suma);
+"
+@{cmd}
+
+c = ?
+
+"Ejemplo Completo: FEM en TypeScript
+'====================================
+
+@{cmd}
+ts-node -e "
+interface Nodo {
+  x: number;
+  y: number;
+  restriccion: boolean;
+}
+
+interface Elemento {
+  nodo1: number;
+  nodo2: number;
+  E: number;  // Módulo de Young
+  A: number;  // Área
+}
+
+class SistemaFEM {
+  private nodos: Nodo[];
+  private elementos: Elemento[];
+
+  constructor(nodos: Nodo[], elementos: Elemento[]) {
+    this.nodos = nodos;
+    this.elementos = elementos;
+  }
+
+  calcularLongitud(elem: Elemento): number {
+    const n1 = this.nodos[elem.nodo1];
+    const n2 = this.nodos[elem.nodo2];
+
+    return Math.sqrt(
+      (n2.x - n1.x) ** 2 +
+      (n2.y - n1.y) ** 2
+    );
+  }
+
+  calcularRigidez(elem: Elemento): number {
+    const L = this.calcularLongitud(elem);
+    return (elem.E * elem.A) / L;
+  }
+
+  resolver(): void {
+    console.log('Sistema FEM:');
+    console.log('Nodos:', this.nodos.length);
+    console.log('Elementos:', this.elementos.length);
+
+    this.elementos.forEach((elem, i) => {
+      const k = this.calcularRigidez(elem);
+      console.log(\`Elemento \${i}: k = \${k.toFixed(2)} N/m\`);
+    });
+  }
+}
+
+// Definir sistema
+const nodos: Nodo[] = [
+  { x: 0, y: 0, restriccion: true },
+  { x: 1, y: 0, restriccion: false },
+  { x: 2, y: 0, restriccion: true }
+];
+
+const elementos: Elemento[] = [
+  { nodo1: 0, nodo2: 1, E: 200e9, A: 0.01 },
+  { nodo1: 1, nodo2: 2, E: 200e9, A: 0.01 }
+];
+
+const sistema = new SistemaFEM(nodos, elementos);
+sistema.resolver();
+"
+@{cmd}
+
+"Ventajas de TypeScript en Calcpad
+'==================================
+
+'1. Tipado estático
+'   - Detecta errores en tiempo de compilación
+'   - Mejor autocompletado (si usas un editor)
+
+'2. OOP avanzado
+'   - Interfaces
+'   - Clases abstractas
+'   - Genéricos
+
+'3. Async/Await
+'   - Código asíncrono legible
+'   - Ideal para APIs
+
+'4. Mejor mantenibilidad
+'   - Código más estructurado
+'   - Documentación con tipos
+
+"Instalación de Dependencias
+'=============================
+
+'Para usar TypeScript en Calcpad necesitas:
+
+@{cmd}
+echo Instalando TypeScript y ts-node...
+npm install -g typescript ts-node
+
+echo.
+echo Verificando instalación:
+tsc --version
+ts-node --version
+
+echo.
+echo ¡Listo! Ahora puedes usar TypeScript en Calcpad
+@{cmd}
+
+"Alternativa: Deno (Sin Node.js)
+'================================
+
+'Si prefieres Deno (más moderno):
+
+@{cmd}
+REM Descargar Deno
+powershell -c "irm https://deno.land/install.ps1 | iex"
+
+REM Usar TypeScript directamente
+deno eval "console.log('Hola desde Deno + TypeScript')"
+@{cmd}
+
+"Ejemplo Final: Sistema Completo
+'================================
+
+@{cmd}
+ts-node -e "
+// Sistema de cálculo de vigas con TypeScript
+
+enum TipoApoyo {
+  SIMPLE,
+  EMPOTRADO,
+  VOLADIZO
+}
+
+interface Carga {
+  posicion: number;
+  magnitud: number;
+}
+
+interface ResultadoViga {
+  momentoMaximo: number;
+  cortanteMaximo: number;
+  deflexionMaxima: number;
+}
+
+class AnalizadorVigas {
+  private longitud: number;
+  private EI: number;
+  private tipo: TipoApoyo;
+  private cargas: Carga[];
+
+  constructor(
+    longitud: number,
+    EI: number,
+    tipo: TipoApoyo = TipoApoyo.SIMPLE
+  ) {
+    this.longitud = longitud;
+    this.EI = EI;
+    this.tipo = tipo;
+    this.cargas = [];
+  }
+
+  agregarCarga(posicion: number, magnitud: number): void {
+    this.cargas.push({ posicion, magnitud });
+  }
+
+  analizar(): ResultadoViga {
+    // Cálculo simplificado para carga puntual central
+    const P = this.cargas.reduce((sum, c) => sum + c.magnitud, 0);
+    const L = this.longitud;
+
+    let momentoMaximo: number;
+    let cortanteMaximo: number;
+    let deflexionMaxima: number;
+
+    switch (this.tipo) {
+      case TipoApoyo.SIMPLE:
+        momentoMaximo = (P * L) / 4;
+        cortanteMaximo = P / 2;
+        deflexionMaxima = (P * L ** 3) / (48 * this.EI);
+        break;
+      case TipoApoyo.EMPOTRADO:
+        momentoMaximo = (P * L) / 8;
+        cortanteMaximo = P / 2;
+        deflexionMaxima = (P * L ** 3) / (192 * this.EI);
+        break;
+      default:
+        momentoMaximo = 0;
+        cortanteMaximo = 0;
+        deflexionMaxima = 0;
+    }
+
+    return { momentoMaximo, cortanteMaximo, deflexionMaxima };
+  }
+
+  imprimir(resultado: ResultadoViga): void {
+    console.log('='.repeat(50));
+    console.log('ANÁLISIS DE VIGA');
+    console.log('='.repeat(50));
+    console.log(\`Longitud: \${this.longitud} m\`);
+    console.log(\`Tipo: \${TipoApoyo[this.tipo]}\`);
+    console.log(\`Cargas: \${this.cargas.length}\`);
+    console.log('');
+    console.log('RESULTADOS:');
+    console.log(\`Momento máximo: \${resultado.momentoMaximo.toFixed(2)} N·m\`);
+    console.log(\`Cortante máximo: \${resultado.cortanteMaximo.toFixed(2)} N\`);
+    console.log(\`Deflexión máxima: \${(resultado.deflexionMaxima * 1000).toFixed(2)} mm\`);
+    console.log('='.repeat(50));
+  }
+}
+
+// Crear viga
+const viga = new AnalizadorVigas(
+  6.0,                    // 6 metros
+  200e9 * 8.4e-6,        // E * I (acero)
+  TipoApoyo.SIMPLE
+);
+
+// Agregar cargas
+viga.agregarCarga(3.0, 5000); // 5 kN en el centro
+
+// Analizar
+const resultado = viga.analizar();
+viga.imprimir(resultado);
+"
+@{cmd}
+
+"Conclusión
+'==========
+
+'TypeScript en Calcpad te permite:
+'✓ Código más robusto con tipado estático
+'✓ Mejor estructura con clases e interfaces
+'✓ Código asíncrono con async/await
+'✓ Integración con ecosistema JavaScript/Node.js
+
+'Para usar TypeScript en Calcpad:
+'1. Instala ts-node: npm install -g ts-node typescript
+'2. Usa @{cmd} con ts-node -e "código"
+'3. O crea archivos .ts y ejecútalos con ts-node archivo.ts
+
+'¡Ahora tienes el poder de TypeScript dentro de Calcpad!

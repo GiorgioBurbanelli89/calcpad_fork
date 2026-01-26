@@ -1,0 +1,33 @@
+'Prueba de Snippets HTML/CSS/TypeScript
+'=========================================
+
+'Instrucciones:
+'1. Abre este archivo en Calcpad
+'2. Dentro de cada bloque, escribe el trigger y presiona Tab/Enter
+'3. Observa cómo se expande el snippet con preview
+
+'Bloque HTML - Prueba: html, div, p, table, form, button, input
+@{html}
+
+@{end html}
+
+'Bloque CSS - Prueba: flex, grid, center
+@{css}
+
+@{end css}
+
+'Bloque TypeScript - Prueba: function, arrow, class, interface, log
+@{ts}
+
+@{end ts}
+
+'Bloque JavaScript - Prueba: function, arrow, log
+@{js}
+
+@{end js}
+
+'Snippets disponibles:
+'======================
+'HTML: html, html:5, div, p, h1, h2, h3, a, link, script, style, button, input, form, table, ul, ol
+'CSS: flex, grid, center
+'TS/JS: function, arrow, class, interface, log

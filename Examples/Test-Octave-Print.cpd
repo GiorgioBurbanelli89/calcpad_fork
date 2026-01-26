@@ -1,0 +1,37 @@
+"Test de Octave con gnuplot directo (funciona en headless)
+
+@{octave}
+% Metodo que funciona con octave-cli sin display
+% Genera un script gnuplot y lo ejecuta directamente
+
+% Crear datos
+x = linspace(0, 2*pi, 100);
+y = sin(x);
+
+% Archivo de salida
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/octave_test_print.png';
+gp_file = 'C:/Users/j-b-j/AppData/Local/Temp/plot.gp';
+
+% Escribir script gnuplot
+fid = fopen(gp_file, 'w');
+fprintf(fid, 'set terminal pngcairo size 600,400 enhanced font "Arial,12"\n');
+fprintf(fid, 'set output "%s"\n', strrep(output_file, '\', '/'));
+fprintf(fid, 'set title "Test con Octave CLI + Gnuplot"\n');
+fprintf(fid, 'set xlabel "X"\n');
+fprintf(fid, 'set ylabel "Y"\n');
+fprintf(fid, 'set grid\n');
+fprintf(fid, 'plot "-" with lines lw 2 lc rgb "blue" title "sin(x)"\n');
+for i = 1:length(x)
+  fprintf(fid, '%f %f\n', x(i), y(i));
+endfor
+fprintf(fid, 'e\n');
+fclose(fid);
+
+% Ejecutar gnuplot
+system(sprintf('gnuplot "%s"', gp_file));
+
+% Emitir HTML con la imagen
+fprintf('<img src="%s" width="600" style="border:2px solid #0790c0; border-radius:8px; margin:10px 0;">\n', output_file);
+fprintf('Imagen generada exitosamente con gnuplot\n');
+@{end octave}
+

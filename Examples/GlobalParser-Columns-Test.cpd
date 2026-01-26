@@ -1,0 +1,157 @@
+"Test: Columnas con Diferentes Parsers de GlobalParser
+'Este archivo prueba la funcionalidad de columnas con múltiples lenguajes
+
+"Ejemplo 1: DOS Columnas - Calcpad + Python
+#columns 2
+'Lado Calcpad:
+a = 5
+b = 10
+c = a + b
+Area = a*b
+#column
+'Lado Python:
+@{python}
+a = 5
+b = 10
+c = a + b
+area = a * b
+print(f"a = {a}")
+print(f"b = {b}")
+print(f"c = {c}")
+print(f"Area = {area}")
+@{end python}
+#end columns
+
+"Ejemplo 2: DOS Columnas - Calcpad + JavaScript
+#columns 2
+'Calcpad - Funciones:
+f(x) = x^2 + 2*x + 1
+f(3)
+f(5)
+#column
+'JavaScript - Funciones:
+@{js}
+function f(x) {
+    return x*x + 2*x + 1;
+}
+console.log("f(3) = " + f(3));
+console.log("f(5) = " + f(5));
+@{end js}
+#end columns
+
+"Ejemplo 3: TRES Columnas - Calcpad + Python + JavaScript
+#columns 3
+'Col 1: Calcpad
+r = 5
+Perimetro = 2*π*r
+AreaCirculo = π*r^2
+#column
+'Col 2: Python
+@{python}
+import math
+r = 5
+perimetro = 2 * math.pi * r
+area = math.pi * r**2
+print(f"r = {r}")
+print(f"Perimetro = {perimetro:.4f}")
+print(f"Area = {area:.4f}")
+@{end python}
+#column
+'Col 3: JavaScript
+@{js}
+const r = 5;
+const perimetro = 2 * Math.PI * r;
+const area = Math.PI * r * r;
+console.log("r = " + r);
+console.log("Perimetro = " + perimetro.toFixed(4));
+console.log("Area = " + area.toFixed(4));
+@{end js}
+#end columns
+
+"Ejemplo 4: CUATRO Columnas - Calcpad + Python + JavaScript + Markdown
+#columns 4
+'Col 1: Calcpad
+x = 10
+y = 20
+z = x + y
+#column
+'Col 2: Python
+@{python}
+x, y = 10, 20
+z = x + y
+print(f"Suma: {z}")
+@{end python}
+#column
+'Col 3: JavaScript
+@{js}
+let x = 10, y = 20;
+let z = x + y;
+console.log("Suma: " + z);
+@{end js}
+#column
+'Col 4: Markdown
+@{markdown}
+**Resumen:**
+- Calcpad: z = 30
+- Python: z = 30
+- JavaScript: z = 30
+@{end markdown}
+#end columns
+
+"Ejemplo 5: DOS Columnas - Calcpad + HTML
+#columns 2
+'Calcpad - Tabla de Valores:
+n = 5
+'Valores: 1, 2, 3, 4, 5
+Suma = 1 + 2 + 3 + 4 + 5
+#column
+'HTML - Tabla Visual:
+@{html}
+<table border="1" style="border-collapse: collapse;">
+  <tr><th>n</th><th>Valor</th></tr>
+  <tr><td>1</td><td>1</td></tr>
+  <tr><td>2</td><td>2</td></tr>
+  <tr><td>3</td><td>3</td></tr>
+  <tr><td>4</td><td>4</td></tr>
+  <tr><td>5</td><td>5</td></tr>
+  <tr><td colspan="2"><b>Suma = 15</b></td></tr>
+</table>
+@{end html}
+#end columns
+
+"Ejemplo 6: TRES Columnas - Python + Octave + JavaScript (solo codigo)
+#columns 3
+'Python:
+@{python}
+import numpy as np
+A = np.array([[1,2],[3,4]])
+B = np.array([[5,6],[7,8]])
+C = A @ B
+print("A @ B =")
+print(C)
+@{end python}
+#column
+'Octave/MATLAB:
+@{octave}
+A = [1,2; 3,4];
+B = [5,6; 7,8];
+C = A * B;
+disp("A * B =");
+disp(C);
+@{end octave}
+#column
+'JavaScript:
+@{js}
+// Matrix multiplication
+const A = [[1,2],[3,4]];
+const B = [[5,6],[7,8]];
+const C = [
+  [A[0][0]*B[0][0]+A[0][1]*B[1][0], A[0][0]*B[0][1]+A[0][1]*B[1][1]],
+  [A[1][0]*B[0][0]+A[1][1]*B[1][0], A[1][0]*B[0][1]+A[1][1]*B[1][1]]
+];
+console.log("A * B =");
+console.log(C);
+@{end js}
+#end columns
+
+'Fin del test de columnas con GlobalParser

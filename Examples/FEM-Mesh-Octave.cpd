@@ -1,0 +1,240 @@
+"========================================================
+"GRAFICACIÓN DE MESH FEM CON OCTAVE
+"Rectangular Slab - Solo parte gráfica del mallado
+"========================================================
+
+'<h2>Datos de Entrada</h2>
+
+'Dimensiones de la losa
+a = 6'm
+b = 4'm
+
+'Elementos del mesh
+n_a = 6
+n_b = 4
+
+'Totales
+n_e = n_a*n_b
+n_j = (n_a + 1)*(n_b + 1)
+
+'<hr>
+
+'<h2>Método 1: Mesh 2D Básico con Gnuplot</h2>
+
+@{octave}
+% Datos del mesh
+a = 6; b = 4; n_a = 6; n_b = 4;
+
+% Generar coordenadas
+[X, Y] = meshgrid(linspace(0, a, n_a+1), linspace(0, b, n_b+1));
+x_nodes = X(:); y_nodes = Y(:);
+
+% Conectividad
+elements = [];
+for i = 1:n_a
+    for j = 1:n_b
+        n1 = (i-1)*(n_b+1) + j;
+        elements = [elements; n1 n1+(n_b+1) n1+(n_b+1)+1 n1+1];
+    end
+end
+
+% Archivo de salida
+out_file = 'C:/Users/j-b-j/AppData/Local/Temp/fem_octave_method1.png';
+gp_file = 'C:/Users/j-b-j/AppData/Local/Temp/fem_m1.gp';
+
+% Script gnuplot
+fid = fopen(gp_file, 'w');
+fprintf(fid, 'set terminal pngcairo size 800,600 enhanced font "Arial,11"\n');
+fprintf(fid, 'set output "%s"\n', out_file);
+fprintf(fid, 'set title "Mesh FEM - Método 1: Visualización 2D Básica"\n');
+fprintf(fid, 'set xlabel "X (m)"\nset ylabel "Y (m)"\nset grid\n');
+fprintf(fid, 'set xrange [-0.5:%f]\nset yrange [-0.5:%f]\n', a+0.5, b+0.5);
+fprintf(fid, 'set size ratio -1\n');
+fprintf(fid, 'set style line 1 lc rgb "#008000" lw 1.5\n');
+
+% Elementos
+fprintf(fid, '$elem << EOD\n');
+for e = 1:size(elements, 1)
+    en = elements(e, :);
+    for k = 1:4
+        fprintf(fid, '%f %f\n', x_nodes(en(k)), y_nodes(en(k)));
+        fprintf(fid, '%f %f\n', x_nodes(en(mod(k,4)+1)), y_nodes(en(mod(k,4)+1)));
+        fprintf(fid, '\n');
+    end
+end
+fprintf(fid, 'EOD\n');
+
+% Apoyos
+fprintf(fid, '$apoyos << EOD\n');
+border = unique([find(x_nodes==0);find(x_nodes==a);find(y_nodes==0);find(y_nodes==b)]);
+for i = 1:length(border)
+    fprintf(fid, '%f %f\n', x_nodes(border(i)), y_nodes(border(i)));
+end
+fprintf(fid, 'EOD\n');
+
+% Etiquetas
+fprintf(fid, '$labels << EOD\n');
+for e = 1:size(elements, 1)
+    fprintf(fid, '%f %f %d\n', mean(x_nodes(elements(e,:))), mean(y_nodes(elements(e,:))), e);
+end
+fprintf(fid, 'EOD\n');
+
+fprintf(fid, 'plot $elem w l ls 1 t "Elementos", $apoyos w p pt 7 ps 1.5 lc rgb "#ff0000" t "Apoyos", $labels u 1:2:3 w labels tc rgb "#006400" notitle\n');
+fclose(fid);
+
+[st, ~] = system(sprintf('gnuplot "%s"', gp_file));
+if st == 0
+    fprintf('<img src="%s" width="800" style="border:2px solid #0790c0; border-radius:8px; margin:10px 0;">\n', out_file);
+    fprintf('Método 1 completado: %d elementos, %d nodos\n', size(elements,1), length(x_nodes));
+end
+@{end octave}
+
+'<hr>
+
+'<h2>Método 2: Mesh con Numeración de Nodos</h2>
+
+@{octave}
+% Datos
+a = 6; b = 4; n_a = 6; n_b = 4;
+[X, Y] = meshgrid(linspace(0, a, n_a+1), linspace(0, b, n_b+1));
+x_nodes = X(:); y_nodes = Y(:);
+
+elements = [];
+for i = 1:n_a
+    for j = 1:n_b
+        n1 = (i-1)*(n_b+1) + j;
+        elements = [elements; n1 n1+(n_b+1) n1+(n_b+1)+1 n1+1];
+    end
+end
+
+out_file = 'C:/Users/j-b-j/AppData/Local/Temp/fem_octave_method2.png';
+gp_file = 'C:/Users/j-b-j/AppData/Local/Temp/fem_m2.gp';
+
+fid = fopen(gp_file, 'w');
+fprintf(fid, 'set terminal pngcairo size 800,600 enhanced font "Arial,11"\n');
+fprintf(fid, 'set output "%s"\n', out_file);
+fprintf(fid, 'set title "Mesh FEM - Método 2: Con Numeración de Nodos"\n');
+fprintf(fid, 'set xlabel "X (m)"\nset ylabel "Y (m)"\nset grid\n');
+fprintf(fid, 'set xrange [-0.5:%f]\nset yrange [-0.5:%f]\n', a+0.5, b+0.5);
+fprintf(fid, 'set size ratio -1\n');
+
+% Elementos
+fprintf(fid, '$elem << EOD\n');
+for e = 1:size(elements, 1)
+    en = elements(e, :);
+    for k = 1:4
+        fprintf(fid, '%f %f\n', x_nodes(en(k)), y_nodes(en(k)));
+        fprintf(fid, '%f %f\n', x_nodes(en(mod(k,4)+1)), y_nodes(en(mod(k,4)+1)));
+        fprintf(fid, '\n');
+    end
+end
+fprintf(fid, 'EOD\n');
+
+% Nodos
+fprintf(fid, '$nodos << EOD\n');
+for i = 1:length(x_nodes)
+    fprintf(fid, '%f %f\n', x_nodes(i), y_nodes(i));
+end
+fprintf(fid, 'EOD\n');
+
+% Números de nodos
+fprintf(fid, '$numeros << EOD\n');
+for i = 1:length(x_nodes)
+    fprintf(fid, '%f %f %d\n', x_nodes(i)+0.12, y_nodes(i)-0.08, i);
+end
+fprintf(fid, 'EOD\n');
+
+fprintf(fid, 'plot $elem w l lw 1.5 lc rgb "#008000" t "Elementos", $nodos w p pt 7 ps 0.8 lc rgb "#ff4500" t "Nodos", $numeros u 1:2:3 w labels font "Arial,8" tc rgb "#8b0000" notitle\n');
+fclose(fid);
+
+[st, ~] = system(sprintf('gnuplot "%s"', gp_file));
+if st == 0
+    fprintf('<img src="%s" width="800" style="border:2px solid #0790c0; border-radius:8px; margin:10px 0;">\n', out_file);
+    fprintf('Método 2 completado con numeración de nodos\n');
+end
+@{end octave}
+
+'<hr>
+
+'<h2>Método 3: Mesh con Colores por Elemento</h2>
+
+@{octave}
+% Datos
+a = 6; b = 4; n_a = 6; n_b = 4;
+[X, Y] = meshgrid(linspace(0, a, n_a+1), linspace(0, b, n_b+1));
+x_nodes = X(:); y_nodes = Y(:);
+
+elements = [];
+for i = 1:n_a
+    for j = 1:n_b
+        n1 = (i-1)*(n_b+1) + j;
+        elements = [elements; n1 n1+(n_b+1) n1+(n_b+1)+1 n1+1];
+    end
+end
+
+out_file = 'C:/Users/j-b-j/AppData/Local/Temp/fem_octave_method3.png';
+gp_file = 'C:/Users/j-b-j/AppData/Local/Temp/fem_m3.gp';
+
+fid = fopen(gp_file, 'w');
+fprintf(fid, 'set terminal pngcairo size 800,600 enhanced font "Arial,11"\n');
+fprintf(fid, 'set output "%s"\n', out_file);
+fprintf(fid, 'set title "Mesh FEM - Método 3: Elementos Coloreados"\n');
+fprintf(fid, 'set xlabel "X (m)"\nset ylabel "Y (m)"\nset grid\n');
+fprintf(fid, 'set xrange [-0.5:%f]\nset yrange [-0.5:%f]\n', a+0.5, b+0.5);
+fprintf(fid, 'set size ratio -1\n');
+fprintf(fid, 'set palette defined (0 "#0000ff", 12 "#00ff00", 24 "#ff0000")\n');
+
+% Elementos con color
+n_elem = size(elements, 1);
+for e = 1:n_elem
+    en = elements(e, :);
+    fprintf(fid, '$elem%d << EOD\n', e);
+    for k = 1:4
+        fprintf(fid, '%f %f\n', x_nodes(en(k)), y_nodes(en(k)));
+    end
+    fprintf(fid, '%f %f\n', x_nodes(en(1)), y_nodes(en(1)));
+    fprintf(fid, 'EOD\n');
+end
+
+% Etiquetas
+fprintf(fid, '$labels << EOD\n');
+for e = 1:n_elem
+    fprintf(fid, '%f %f %d\n', mean(x_nodes(elements(e,:))), mean(y_nodes(elements(e,:))), e);
+end
+fprintf(fid, 'EOD\n');
+
+% Plot con colores
+fprintf(fid, 'plot ');
+for e = 1:n_elem
+    color_val = (e-1)/(n_elem-1);
+    fprintf(fid, '$elem%d w filledcurves lc palette frac %.3f notitle', e, color_val);
+    if e < n_elem
+        fprintf(fid, ', ');
+    end
+end
+fprintf(fid, ', $labels u 1:2:3 w labels tc rgb "#ffffff" font "Arial,9,bold" notitle\n');
+
+fclose(fid);
+
+[st, ~] = system(sprintf('gnuplot "%s"', gp_file));
+if st == 0
+    fprintf('<img src="%s" width="800" style="border:2px solid #0790c0; border-radius:8px; margin:10px 0;">\n', out_file);
+    fprintf('Método 3 completado con %d elementos coloreados\n', n_elem);
+end
+@{end octave}
+
+'<hr>
+
+'<div style="background:#fef3c7;padding:15px;border-left:4px solid #f59e0b;margin:20px 0;">
+'<h3>📊 Resumen Octave</h3>
+'<p><strong>Total de elementos:</strong> 'n_e'</p>
+'<p><strong>Total de nodos:</strong> 'n_j'</p>
+'<p><strong>Métodos demostrados:</strong></p>
+'<ul>
+'<li>✓ Método 1: Mesh 2D básico con apoyos</li>
+'<li>✓ Método 2: Mesh con numeración de nodos</li>
+'<li>✓ Método 3: Mesh con elementos coloreados (gradiente)</li>
+'</ul>
+'<p><strong>Técnica:</strong> Octave CLI + Gnuplot (funciona headless)</p>
+'<p><strong>Imágenes guardadas en:</strong> <code>C:\Users\j-b-j\AppData\Local\Temp\</code></p>
+'</div>

@@ -1,0 +1,150 @@
+"========================================================
+"MESH FEM CON PARSER SVG NATIVO
+"Visualización de malla FEM usando $svg...$end
+"========================================================
+
+'<h2>Parámetros del Mesh</h2>
+
+'Dimensiones de la losa
+a = 6'm
+b = 4'm
+
+'Elementos del mesh
+n_a = 6
+n_b = 4
+
+'Totales
+n_e = n_a*n_b
+n_j = (n_a + 1)*(n_b + 1)
+
+'<p><strong>Elementos:</strong> 'n_e' | <strong>Nodos:</strong> 'n_j'</p>
+
+'<hr>
+
+'<h2>Visualización del Mesh con SVG Parser</h2>
+
+'Escala de visualización
+scale = 80'px/m
+margin = 50'px
+width_svg = a*scale + 2*margin
+height_svg = b*scale + 2*margin
+
+'Dimensiones de elementos
+a_e = a/n_a'm
+b_e = b/n_b'm
+
+$svg{width:width_svg; height:height_svg}
+
+'Fondo
+rect{x:margin; y:margin; width:a*scale; height:b*scale; fill:#ffffcc; stroke:none; opacity:0.3}
+
+'Líneas verticales del grid
+line{x1:margin+0*a_e*scale; y1:margin; x2:margin+0*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+1*a_e*scale; y1:margin; x2:margin+1*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+2*a_e*scale; y1:margin; x2:margin+2*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+3*a_e*scale; y1:margin; x2:margin+3*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+4*a_e*scale; y1:margin; x2:margin+4*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+5*a_e*scale; y1:margin; x2:margin+5*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+6*a_e*scale; y1:margin; x2:margin+6*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+
+'Líneas horizontales del grid
+line{x1:margin; y1:margin+0*b_e*scale; x2:margin+a*scale; y2:margin+0*b_e*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin; y1:margin+1*b_e*scale; x2:margin+a*scale; y2:margin+1*b_e*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin; y1:margin+2*b_e*scale; x2:margin+a*scale; y2:margin+2*b_e*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin; y1:margin+3*b_e*scale; x2:margin+a*scale; y2:margin+3*b_e*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin; y1:margin+4*b_e*scale; x2:margin+a*scale; y2:margin+4*b_e*scale; stroke:#008000; stroke-width:1.5}
+
+'Nodos en todas las intersecciones
+circle{cx:margin+0*a_e*scale; cy:margin+0*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+0*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+0*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+0*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+0*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+0*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+0*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+circle{cx:margin+0*a_e*scale; cy:margin+1*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+1*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+1*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+1*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+1*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+1*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+1*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+circle{cx:margin+0*a_e*scale; cy:margin+2*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+2*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+2*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+2*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+2*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+2*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+2*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+circle{cx:margin+0*a_e*scale; cy:margin+3*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+3*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+3*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+3*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+3*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+3*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+3*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+circle{cx:margin+0*a_e*scale; cy:margin+4*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+4*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+4*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+4*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+4*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+4*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+4*b_e*scale; r:5; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+'Apoyos en las esquinas (círculos más grandes)
+circle{cx:margin; cy:margin; r:12; fill:#ffcccc; stroke:#ff0000; stroke-width:3}
+circle{cx:margin+a*scale; cy:margin; r:12; fill:#ffcccc; stroke:#ff0000; stroke-width:3}
+circle{cx:margin; cy:margin+b*scale; r:12; fill:#ffcccc; stroke:#ff0000; stroke-width:3}
+circle{cx:margin+a*scale; cy:margin+b*scale; r:12; fill:#ffcccc; stroke:#ff0000; stroke-width:3}
+
+'Numeración de elementos (centrados)
+text{x:margin+0.5*a_e*scale; y:margin+0.5*b_e*scale; content:1; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+1.5*a_e*scale; y:margin+0.5*b_e*scale; content:2; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+2.5*a_e*scale; y:margin+0.5*b_e*scale; content:3; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+3.5*a_e*scale; y:margin+0.5*b_e*scale; content:4; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+4.5*a_e*scale; y:margin+0.5*b_e*scale; content:5; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+5.5*a_e*scale; y:margin+0.5*b_e*scale; content:6; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+
+text{x:margin+0.5*a_e*scale; y:margin+1.5*b_e*scale; content:7; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+1.5*a_e*scale; y:margin+1.5*b_e*scale; content:8; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+2.5*a_e*scale; y:margin+1.5*b_e*scale; content:9; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+3.5*a_e*scale; y:margin+1.5*b_e*scale; content:10; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+4.5*a_e*scale; y:margin+1.5*b_e*scale; content:11; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+5.5*a_e*scale; y:margin+1.5*b_e*scale; content:12; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+
+text{x:margin+0.5*a_e*scale; y:margin+2.5*b_e*scale; content:13; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+1.5*a_e*scale; y:margin+2.5*b_e*scale; content:14; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+2.5*a_e*scale; y:margin+2.5*b_e*scale; content:15; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+3.5*a_e*scale; y:margin+2.5*b_e*scale; content:16; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+4.5*a_e*scale; y:margin+2.5*b_e*scale; content:17; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+5.5*a_e*scale; y:margin+2.5*b_e*scale; content:18; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+
+text{x:margin+0.5*a_e*scale; y:margin+3.5*b_e*scale; content:19; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+1.5*a_e*scale; y:margin+3.5*b_e*scale; content:20; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+2.5*a_e*scale; y:margin+3.5*b_e*scale; content:21; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+3.5*a_e*scale; y:margin+3.5*b_e*scale; content:22; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+4.5*a_e*scale; y:margin+3.5*b_e*scale; content:23; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+5.5*a_e*scale; y:margin+3.5*b_e*scale; content:24; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+
+'Título principal
+text{x:width_svg/2; y:25; content:Mesh FEM 6x4; font-size:18; fill:#000000; font-weight:bold; text-anchor:middle}
+
+$end
+
+'<hr>
+
+'<div style="background:#e3f2fd;padding:15px;border-left:4px solid #2196f3;margin:20px 0;">
+'<h3>🎨 Parser SVG Nativo en Calcpad</h3>
+'<ul>
+'<li>✓ <strong>Sintaxis limpia:</strong> $svg{...} ... $end</li>
+'<li>✓ <strong>Variables calculadas:</strong> Usa expresiones de Calcpad</li>
+'<li>✓ <strong>Integrado:</strong> No requiere código externo</li>
+'<li>✓ <strong>Escalable:</strong> Gráficos vectoriales sin pérdida de calidad</li>
+'</ul>
+'<p><strong>Mesh generado:</strong> 'n_a' × 'n_b' = 'n_e' elementos con 'n_j' nodos</p>
+'<p><strong>Dimensiones:</strong> 'a' × 'b'</p>
+'</div>

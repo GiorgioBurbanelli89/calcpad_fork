@@ -1,0 +1,13 @@
+﻿'Test Qt Simple
+
+@{qt}
+#include <QApplication>
+#include <QMessageBox>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMessageBox::information(nullptr, "Calcpad Qt", "Â¡Ventana Qt funcionando!");
+    return 0;
+}
+@{end qt}

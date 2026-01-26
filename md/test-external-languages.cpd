@@ -1,0 +1,76 @@
+﻿'Test External Languages with Include Directives
+
+"This file demonstrates that external language blocks work correctly."
+
+@{qt}
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    cout << "=== Qt GUI Framework ===" << endl;
+    cout << "Cross-platform: Windows, Linux, macOS, Android, iOS" << endl;
+    cout << "Used by: VLC, OBS Studio, Telegram, Autodesk Maya" << endl;
+    cout << endl;
+
+    int a = 10;
+    int b = 20;
+    cout << "Calculation: " << a << " + " << b << " = " << (a + b) << endl;
+
+    return 0;
+}
+@{end qt}
+
+@{gtk}
+#include <stdio.h>
+#define MAX_SIZE 100
+
+int main()
+{
+    printf("=== GTK GUI Framework ===\n");
+    printf("Native on Linux/GNOME\n");
+    printf("Lightweight and efficient\n");
+    printf("Used by: GIMP, Inkscape, Blender, GNOME\n");
+    printf("\n");
+
+    int x = 15;
+    int y = 25;
+    printf("Calculation: %d + %d = %d\n", x, y, x + y);
+    printf("MAX_SIZE defined as: %d\n", MAX_SIZE);
+
+    return 0;
+}
+@{end gtk}
+
+@{c}
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    printf("=== C Language Test ===\n");
+    printf("Testing include directives and math functions\n\n");
+
+    double angle = 45.0;
+    double radians = angle * 3.14159 / 180.0;
+
+    printf("sin(45Â°) = %.4f\n", sin(radians));
+    printf("cos(45Â°) = %.4f\n", cos(radians));
+    printf("sqrt(100) = %.2f\n", sqrt(100.0));
+
+    return 0;
+}
+@{end c}
+
+@{python}
+import math
+
+print("=== Python Test ===")
+print("Testing import statements and math module\n")
+
+angle = 45
+radians = math.radians(angle)
+
+print(f"sin(45Â°) = {math.sin(radians):.4f}")
+print(f"cos(45Â°) = {math.cos(radians):.4f}")
+print(f"sqrt(100) = {math.sqrt(100):.2f}")
+@{end python}

@@ -1,0 +1,9 @@
+"SVG Minimal Test
+'Width -'w = ? {200}'px
+'Height -'h = ? {200}'px
+#show
+#hide
+$svg{width:200; height:200; viewbox:0,0,200,200}
+circle{cx:100; cy:100; r:50; fill:blue}
+$end
+'Done

@@ -1,0 +1,13 @@
+-:Thumbs.db
+-:desktop.ini
+-:~*
+-:.*
+-:*~.*
+-:*.crdownload
+-:*.sb-????????-??????
+-:*.tmp
+-p:*awatif-2.0.0/node_modules/awatif-ui
+-p:awatif-2.0.0/node_modules/awatif-fem
+-p:awatif-2.0.0/node_modules/awatif-mesh
+-p:awatif-2.0.0/node_modules/examples
+-p:*awatif-2.0.0/node_modules/website

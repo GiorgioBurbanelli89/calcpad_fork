@@ -1,0 +1,22 @@
+'================================================
+' PRUEBA: Imagen pequeña Base64 (1x1 pixel rojo)
+'================================================
+
+'Módulo de Elasticidad
+E = 2.535
+ν = 0.20
+G = E/(2*(1 + ν))
+G = ?
+
+'================================================
+' IMAGEN PEQUEÑA (1x1 pixel rojo - PNG)
+'================================================
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==
+@{end image}
+
+'================================================
+' Cálculo final
+'================================================
+resultado = G
+resultado = ?

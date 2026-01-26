@@ -1,0 +1,109 @@
+"Demo de @{plot} con Símbolos y Estilos"
+
+'1. Círculos vacíos (estilo Mathcad)
+@{plot}
+x: [1; 2; 3; 4; 5; 6]
+y: [2; 2.9; 3.2; 3.8; 4.5; 5]
+xlabel: "x (m)"
+ylabel: "F (tonnef)"
+color: #003399
+symbol: circle
+symbolsize: 8
+linewidth: 2
+grid: true
+legend: "Datos"
+@{end plot}
+
+'2. Solo puntos (sin línea)
+@{plot}
+x: [0; 1; 2; 3; 4; 5]
+y: [1; 4; 9; 16; 25; 36]
+xlabel: "t"
+ylabel: "y"
+color: #CC0000
+symbol: dot
+symbolsize: 6
+style: none
+legend: "Puntos"
+@{end plot}
+
+'3. Cuadrados con línea punteada
+@{plot}
+x: [1; 2; 3; 4; 5]
+y: [5; 8; 12; 15; 20]
+xlabel: "x"
+ylabel: "P (kN)"
+color: #006600
+symbol: square
+symbolsize: 7
+style: dash
+linewidth: 1.5
+legend: "Carga"
+@{end plot}
+
+'4. Diamantes (rombos)
+@{plot}
+x: [0; 2; 4; 6; 8]
+y: [0; 3; 8; 12; 18]
+xlabel: "L"
+ylabel: "M"
+color: #9900CC
+symbol: diamond
+symbolsize: 8
+style: solid
+legend: "Momento"
+@{end plot}
+
+'5. Triángulos
+@{plot}
+x: [1; 2; 3; 4; 5; 6]
+y: [10; 15; 12; 18; 22; 25]
+xlabel: "Tiempo (s)"
+ylabel: "Velocidad (m/s)"
+color: #FF6600
+symbol: triangle
+symbolsize: 8
+linewidth: 2
+legend: "v(t)"
+@{end plot}
+
+'6. Estrellas
+@{plot}
+x: [1; 2; 3; 4; 5]
+y: [2; 5; 3; 7; 4]
+xlabel: "n"
+ylabel: "Valor"
+color: #CC0066
+symbol: star
+symbolsize: 10
+style: dot
+linewidth: 1
+legend: "Puntos clave"
+@{end plot}
+
+'7. Marcador X
+@{plot}
+x: [0; 1; 2; 3; 4]
+y: [0; 2; 6; 12; 20]
+xlabel: "i"
+ylabel: "f(i)"
+color: #0066CC
+symbol: x
+symbolsize: 8
+style: solid
+linewidth: 2
+legend: "f = i²+i"
+@{end plot}
+
+'8. Marcador + (plus)
+@{plot}
+x: [1; 2; 3; 4; 5; 6; 7]
+y: [1; 1; 2; 3; 5; 8; 13]
+xlabel: "n"
+ylabel: "Fibonacci"
+color: #339933
+symbol: plus
+symbolsize: 8
+linewidth: 1.5
+legend: "Fib(n)"
+@{end plot}

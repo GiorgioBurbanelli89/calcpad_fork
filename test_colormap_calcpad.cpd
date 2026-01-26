@@ -1,0 +1,194 @@
+"Test: Color Map FEM en Calcpad
+'Visualizacion de resultados FEM con Three.js y Color Map
+
+"1. Datos de la malla
+'Nodos (x, y, z):
+n1 = (0; 0; 0)
+n2 = (5; 0; 0)
+n3 = (5; 0; 5)
+n4 = (0; 0; 5)
+
+'Elementos triangulares:
+e1 = (0; 1; 2)
+e2 = (0; 2; 3)
+
+'Valores nodales (desplazamientos):
+v1 = 0
+v2 = 2.5
+v3 = 10
+v4 = 5
+
+"2. Visualizacion 3D con Color Map
+@{html}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #container { width: 100%; height: 400px; }
+        #legend {
+            width: 20px;
+            height: 200px;
+            background: linear-gradient(#ff0000, #ffff00 20%, #00ff00 50%, #00ffff 80%, #0000ff);
+            position: absolute;
+            right: 50px;
+            top: 100px;
+            z-index: 2;
+        }
+        #legend .marker {
+            width: 10px;
+            height: 1px;
+            margin-left: 20px;
+            background: white;
+            position: relative;
+        }
+        #legend .marker p {
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            top: -7px;
+            left: 15px;
+            margin: 0;
+            font-family: monospace;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial;
+            font-size: 14px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div id="legend">
+        <div class="marker" style="margin-top:0"><p>10.0</p></div>
+        <div class="marker" style="margin-top:48px"><p>7.5</p></div>
+        <div class="marker" style="margin-top:48px"><p>5.0</p></div>
+        <div class="marker" style="margin-top:48px"><p>2.5</p></div>
+        <div class="marker" style="margin-top:48px"><p>0.0</p></div>
+    </div>
+    <div id="info">
+        <b>Color Map FEM</b><br>
+        Nodos: 4<br>
+        Elementos: 2<br>
+        Min: 0.0 | Max: 10.0
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { Lut } from 'three/addons/math/Lut.js';
+
+        // Datos de la malla
+        const nodes = [
+            [0, 0, 0],
+            [5, 0, 0],
+            [5, 0, 5],
+            [0, 0, 5]
+        ];
+        const elements = [
+            [0, 1, 2],
+            [0, 2, 3]
+        ];
+        const values = [0, 2.5, 10, 5];
+
+        // Setup
+        const container = document.getElementById('container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a2e);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(10, -15, 10);
+        camera.up.set(0, 0, 1);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(2.5, 0, 2.5);
+        controls.update();
+
+        // Color Map usando LUT
+        const lut = new Lut('rainbow', 512);
+        lut.setMin(Math.min(...values));
+        lut.setMax(Math.max(...values));
+
+        // Crear geometria
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(nodes.flat());
+        const indices = new Uint16Array(elements.flat());
+        const colors = new Float32Array(nodes.length * 3);
+
+        // Asignar colores basados en valores
+        for (let i = 0; i < values.length; i++) {
+            const color = lut.getColor(values[i]);
+            colors[i * 3] = color.r * 0.8;
+            colors[i * 3 + 1] = color.g * 0.8;
+            colors[i * 3 + 2] = color.b * 0.8;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+        geometry.computeVertexNormals();
+
+        const material = new THREE.MeshBasicMaterial({
+            vertexColors: true,
+            side: THREE.DoubleSide
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // Wireframe
+        const wireframe = new THREE.LineSegments(
+            new THREE.WireframeGeometry(geometry),
+            new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 })
+        );
+        scene.add(wireframe);
+
+        // Grid
+        const gridHelper = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
+        gridHelper.rotation.x = Math.PI / 2;
+        scene.add(gridHelper);
+
+        // Axes
+        const axesHelper = new THREE.AxesHelper(3);
+        scene.add(axesHelper);
+
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
+</body>
+</html>
+@{end html}
+
+'Fin del ejemplo

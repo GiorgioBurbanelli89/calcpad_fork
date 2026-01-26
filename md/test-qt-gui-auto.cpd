@@ -1,0 +1,39 @@
+"Test Qt GUI con auto-cierre"
+
+"Este test muestra una ventana Qt y se cierra automáticamente después de 2 segundos."
+
+@{qt}
+#include <QApplication>
+#include <QMainWindow>
+#include <QLabel>
+#include <QTimer>
+#include <iostream>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    QMainWindow window;
+    window.setWindowTitle("Calcpad - Qt Test");
+    window.resize(400, 200);
+
+    QLabel *label = new QLabel("Qt GUI funcionando correctamente!");
+    label->setStyleSheet("font-size: 16px; color: green; padding: 20px;");
+    label->setAlignment(Qt::AlignCenter);
+
+    window.setCentralWidget(label);
+    window.show();
+
+    std::cout << "Ventana Qt mostrada exitosamente!" << std::endl;
+    std::cout << "Cerrando en 2 segundos..." << std::endl;
+
+    // Auto-cerrar después de 2 segundos
+    QTimer::singleShot(2000, &app, &QApplication::quit);
+
+    int result = app.exec();
+    std::cout << "Qt GUI test completado!" << std::endl;
+    return result;
+}
+@{end qt}
+
+"Fin del test"

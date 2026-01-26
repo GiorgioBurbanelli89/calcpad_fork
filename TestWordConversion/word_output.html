@@ -1,0 +1,718 @@
+<p class="Title">MEMORIA DE C&#193;LCULO ESTRUCTURAL</p>
+<p style="text-align:center;"><strong><span style="color:#2E75B6;font-size:18pt">ESCALERA MET&#193;LICA TIPO I</span></strong></p>
+<p style="text-align:center;"><span style="color:#666666;font-size:14pt">ESTRUCTURA INDEPENDIENTE</span></p>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">PROYECTO:</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Escalera Met&#225;lica Independiente</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">UBICACI&#211;N:</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">&#193;rea de Garaje</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">TIPO:</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Tipo I - Recta con descanso intermedio</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">NIVELES:</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">N+0.00 a N+4.00 (Altura total: 4.00 m)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">COLUMNAS:</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">4 unidades HSS 100&#215;100&#215;4 mm ASTM A36</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">ZANCAS:</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">HSS 100&#215;100&#215;4 mm ASTM A36</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">NORMATIVA:</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">NEC-SE-AC, NEC-SE-CG, AISC 360-16 (ASD)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">FECHA:</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">30/11/2025</span></strong></td>
+</tr>
+</table>
+
+<p><br/></p>
+<h1 class="Heading1">1. CONFIGURACI&#211;N ESTRUCTURAL</h1>
+<h2 class="Heading2">1.1 Descripci&#243;n General</h2>
+<p>La escalera met&#225;lica tipo I es una estructura independiente que conecta el nivel N+0.00 con el nivel N+4.00, con un descanso intermedio ubicado en el nivel N+2.00. La estructura est&#225; compuesta por:</p>
+<p class="ListParagraph" style="margin-left:20px;">2 apoyos simples en el arranque (nivel N+0.00) - placas ancladas al piso</p>
+<p class="ListParagraph" style="margin-left:20px;">4 columnas HSS 100&#215;100&#215;4 mm que soportan el descanso y la llegada</p>
+<p class="ListParagraph" style="margin-left:20px;">4 zancas HSS 100&#215;100&#215;4 mm (2 por tramo)</p>
+<p class="ListParagraph" style="margin-left:20px;">22 pelda&#241;os con losa de concreto armado sobre &#225;ngulos de soporte</p>
+<h2 class="Heading2">1.2 Distribuci&#243;n de Apoyos y Columnas</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">ELEMENTO</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">X (m)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">Y (m)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">NIVEL SUP.</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">H (m)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">EJE</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">APOYO A</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">0.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">0.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">N+0.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">-</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">1-A</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">APOYO B</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">0.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">1.10</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">N+0.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">-</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFF2CC;"><strong><span style="color:#000000;font-size:10pt">1-B</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">C1</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">3.15</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">N+2.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">2.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">2-A</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">C2</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">3.15</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">1.10</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">N+2.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">2.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">2-B</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">C3</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">6.30</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#C00000;font-size:10pt">N+4.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#C00000;font-size:10pt">4.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">3-A</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">C4</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">6.30</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">1.10</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#C00000;font-size:10pt">N+4.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#C00000;font-size:10pt">4.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">3-B</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">1.3 Par&#225;metros Geom&#233;tricos</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">PAR&#193;METRO</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">VALOR</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Altura total</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4.00 m</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Altura por tramo</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">2.00 m</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">N&#250;mero de contrahuellas</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">22 unidades (11 por tramo)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Contrahuella (CH)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">4.00/22 = 18.18 cm</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Huella (H)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">30 cm</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">N&#250;mero de huellas</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">21 unidades</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Longitud horizontal por tramo</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">3.15 m</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Longitud horizontal total</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">6.30 m</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Ancho de escalera</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">1.10 m (entre ejes A y B)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Luz libre de pelda&#241;o</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">1.00 m</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Longitud inclinada por tramo</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">√(3.15&#178; + 2.00&#178;) = 3.73 m</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">&#193;ngulo de inclinaci&#243;n</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">arctan(2.00/3.15) = 32.4&#176;</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">1.4 Verificaci&#243;n de Confort (F&#243;rmula de Blondel)</h2>
+<p>2CH + H = 2(18.18) + 30 = 66.36 cm</p>
+<p>Rango recomendado: 62 - 64 cm</p>
+<p><em>Valor ligeramente superior al rango &#243;ptimo pero aceptable para uso comercial.</em></p>
+<p><br/></p>
+<h1 class="Heading1">2. ESPECIFICACI&#211;N DE MATERIALES</h1>
+<h2 class="Heading2">2.1 Acero Estructural</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">PROPIEDAD</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">VALOR</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Norma</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">ASTM A36 / ASTM A500 Gr. B</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Esfuerzo de fluencia (Fy)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">2,530 kg/cm&#178; (250 MPa)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Esfuerzo &#250;ltimo (Fu)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4,080 kg/cm&#178; (400 MPa)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">M&#243;dulo de elasticidad (E)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">2,040,000 kg/cm&#178;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">M&#243;dulo de corte (G)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">785,000 kg/cm&#178;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Peso espec&#237;fico</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">7,850 kg/m&#179;</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">2.2 Soldadura</h2>
+<p>Electrodo: E70XX (AWS D1.1)</p>
+<p>FEXX = 70 ksi = 4,900 kg/cm&#178;</p>
+<p>Proceso: SMAW o GMAW</p>
+<h2 class="Heading2">2.3 Concreto y Acero de Refuerzo</h2>
+<p>Concreto: f&#39;c = 210 kg/cm&#178;</p>
+<p>Acero de refuerzo: fy = 4,200 kg/cm&#178; (ASTM A615 Gr. 60)</p>
+<p>Malla electrosoldada: &#216;5.5 mm @ 100 mm</p>
+<p><br/></p>
+<h1 class="Heading1">3. AN&#193;LISIS DE CARGAS</h1>
+<h2 class="Heading2">3.1 Cargas Muertas (D)</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">COMPONENTE</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">PESO (kg/m&#178;)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Losa de concreto pelda&#241;os (e=40mm)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">96</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Zancas HSS 100&#215;100&#215;4 (distribuido)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">25</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">&#193;ngulos de soporte L65&#215;65&#215;5</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">18</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Barandas y pasamanos</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">20</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Instalaciones y acabados</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">10</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"><strong><span style="color:#000000;font-size:10pt">TOTAL CARGA MUERTA (D)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"><strong><span style="color:#000000;font-size:10pt">169 kg/m&#178;</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">3.2 Cargas Vivas (L)</h2>
+<p>Seg&#250;n NEC-SE-CG, Tabla 9:</p>
+<p>Escaleras de uso p&#250;blico/comercial: <strong>L = 480 kg/m&#178;</strong></p>
+<h2 class="Heading2">3.3 Combinaciones de Carga (ASD - AISC 360-16)</h2>
+<p>Combinaci&#243;n b&#225;sica: D + L</p>
+<p><strong><span style="font-size:12pt">w = 169 + 480 = 649 kg/m&#178;</span></strong></p>
+<h2 class="Heading2">3.4 Cargas sobre Elementos Estructurales</h2>
+<h3 class="Heading3">3.4.1 Carga lineal sobre cada zanca:</h3>
+<p>Ancho tributario por zanca = 1.10/2 = 0.55 m</p>
+<p><strong>w_zanca = 649 &#215; 0.55 = 357 kg/m</strong></p>
+<h3 class="Heading3">3.4.2 Carga por pelda&#241;o:</h3>
+<p>&#193;rea tributaria = 0.30 &#215; 1.00 = 0.30 m&#178;</p>
+<p><strong>P_pelda&#241;o = 649 &#215; 0.30 = 195 kg/pelda&#241;o</strong></p>
+<p><br/></p>
+<h1 class="Heading1">4. DISE&#209;O DE ZANCAS - HSS 100&#215;100&#215;4 mm</h1>
+<h2 class="Heading2">4.1 Propiedades del Perfil HSS 100&#215;100&#215;4 mm</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">PROPIEDAD</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">VALOR</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Dimensiones exteriores</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">100 &#215; 100 mm</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Espesor de pared (t)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">4 mm</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">&#193;rea (A)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">14.4 cm&#178;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Momento de inercia (Ix = Iy)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">222 cm⁴</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">M&#243;dulo de secci&#243;n (Sx = Sy)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">44.4 cm&#179;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Radio de giro (rx = ry)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">3.93 cm</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">M&#243;dulo pl&#225;stico (Zx = Zy)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">52.8 cm&#179;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Peso lineal</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">11.3 kg/m</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">4.2 Clasificaci&#243;n de la Secci&#243;n (AISC 360-16, Tabla B4.1a)</h2>
+<p>Relaci&#243;n ancho-espesor:</p>
+<p>b/t = (100 - 2&#215;4)/4 = 92/4 = 23</p>
+<p>L&#237;mite para secci&#243;n compacta (flexi&#243;n):</p>
+<p>λp = 1.12√(E/Fy) = 1.12√(2,040,000/2,530) = 31.8</p>
+<p><strong><span style="color:#008000">b/t = 23 &lt; λp = 31.8 → SECCI&#211;N COMPACTA ✓</span></strong></p>
+<h2 class="Heading2">4.3 An&#225;lisis Estructural de la Zanca</h2>
+<h3 class="Heading3">Modelo: Viga simplemente apoyada</h3>
+<p>Luz inclinada: L = 3.73 m = 373 cm</p>
+<p>Carga distribuida: w = 357 kg/m = 3.57 kg/cm</p>
+<h3 class="Heading3">4.3.1 Momento m&#225;ximo:</h3>
+<p>Mu = wL&#178;/8 = (3.57 &#215; 373&#178;)/8 = 62,090 kg&#183;cm</p>
+<p><strong>Mu = 620.9 kg&#183;m</strong></p>
+<h3 class="Heading3">4.3.2 Cortante m&#225;ximo:</h3>
+<p>Vu = wL/2 = (3.57 &#215; 373)/2 = 666 kg</p>
+<h3 class="Heading3">4.3.3 Reacciones en apoyos:</h3>
+<p>R = wL/2 = 666 kg por zanca</p>
+<p><strong>Reacci&#243;n total por eje = 2 &#215; 666 = 1,332 kg</strong></p>
+<h2 class="Heading2">4.4 Verificaci&#243;n a Flexi&#243;n (AISC 360-16, Cap. F)</h2>
+<h3 class="Heading3">Resistencia nominal a flexi&#243;n:</h3>
+<p>Para secci&#243;n compacta HSS: Mn = Mp = Fy &#215; Zx</p>
+<p>Mn = 2,530 &#215; 52.8 = 133,584 kg&#183;cm</p>
+<h3 class="Heading3">Capacidad admisible (ASD, Ωb = 1.67):</h3>
+<p>Mn/Ωb = 133,584/1.67 = 79,990 kg&#183;cm</p>
+<h3 class="Heading3">Relaci&#243;n demanda/capacidad:</h3>
+<p>Mu/(Mn/Ωb) = 62,090/79,990 = 0.78</p>
+<p><strong><span style="color:#008000">0.78 &lt; 1.0 → CUMPLE ✓</span></strong></p>
+<h2 class="Heading2">4.5 Verificaci&#243;n a Cortante (AISC 360-16, Cap. G)</h2>
+<p>&#193;rea de corte: Aw = 2 &#215; (100 &#215; 4) = 800 mm&#178; = 8.0 cm&#178;</p>
+<p>Vn = 0.6 &#215; Fy &#215; Aw = 0.6 &#215; 2,530 &#215; 8.0 = 12,144 kg</p>
+<p>Vn/Ωv = 12,144/1.67 = 7,272 kg</p>
+<p>Vu/(Vn/Ωv) = 666/7,272 = 0.09</p>
+<p><strong><span style="color:#008000">0.09 &lt; 1.0 → CUMPLE ✓</span></strong></p>
+<h2 class="Heading2">4.6 Verificaci&#243;n de Deflexi&#243;n</h2>
+<p>Deflexi&#243;n m&#225;xima:</p>
+<p>δ = 5wL⁴/(384EI) = 5 &#215; 3.57 &#215; 373⁴/(384 &#215; 2,040,000 &#215; 222)</p>
+<p>δ = 0.48 cm = 4.8 mm</p>
+<p>L&#237;mite admisible: L/360 = 373/360 = 1.04 cm = 10.4 mm</p>
+<p>δ/δadm = 4.8/10.4 = 0.46</p>
+<p><strong><span style="color:#008000">0.46 &lt; 1.0 → CUMPLE ✓</span></strong></p>
+<p><br/></p>
+<h1 class="Heading1">5. DISE&#209;O DE PELDA&#209;OS</h1>
+<h2 class="Heading2">5.1 Configuraci&#243;n del Pelda&#241;o</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">COMPONENTE</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">ESPECIFICACI&#211;N</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Losa de concreto</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">300 &#215; 1000 &#215; 40 mm</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Concreto</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">f&#39;c = 210 kg/cm&#178;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Refuerzo</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Malla &#216;5.5 mm @ 100 mm</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">&#193;ngulos de soporte</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">L 65&#215;65&#215;5 mm (2 por pelda&#241;o)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Luz libre entre zancas</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">1.00 m</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Posici&#243;n del &#225;ngulo</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Ala vertical hacia arriba</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">5.2 Propiedades del &#193;ngulo L 65&#215;65&#215;5 mm</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">PROPIEDAD</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">VALOR</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">&#193;rea (A)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">6.21 cm&#178;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Momento de inercia (Ix = Iy)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">19.4 cm⁴</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">M&#243;dulo de secci&#243;n (Sx = Sy)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4.08 cm&#179;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Radio de giro (rx = ry)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">1.97 cm</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Peso lineal</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4.88 kg/m</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">5.3 An&#225;lisis del &#193;ngulo como M&#233;nsula</h2>
+<h3 class="Heading3">Cargas sobre el pelda&#241;o:</h3>
+<p>Peso losa concreto: 0.30 &#215; 1.00 &#215; 0.04 &#215; 2,400 = 28.8 kg</p>
+<p>Peso &#225;ngulos (2): 2 &#215; 4.88 &#215; 0.30 = 2.9 kg</p>
+<p>Carga muerta total: D = 31.7 kg</p>
+<p>Carga viva: L = 480 &#215; 0.30 = 144 kg</p>
+<p><strong>Carga total: P = 31.7 + 144 = 175.7 kg/pelda&#241;o</strong></p>
+<h3 class="Heading3">An&#225;lisis del &#225;ngulo (voladizo):</h3>
+<p>Carga por &#225;ngulo: P/2 = 175.7/2 = 87.9 kg</p>
+<p>Longitud de voladizo: L = 500 mm = 50 cm</p>
+<p>Momento en empotramiento: M = P &#215; L = 87.9 &#215; 50 = 4,395 kg&#183;cm</p>
+<h3 class="Heading3">Verificaci&#243;n a flexi&#243;n:</h3>
+<p>fb = M/Sx = 4,395/4.08 = 1,077 kg/cm&#178;</p>
+<p>Fb = 0.66 &#215; Fy = 0.66 &#215; 2,530 = 1,670 kg/cm&#178;</p>
+<p>fb/Fb = 1,077/1,670 = 0.64</p>
+<p><strong><span style="color:#008000">0.64 &lt; 1.0 → CUMPLE ✓</span></strong></p>
+<h3 class="Heading3">Verificaci&#243;n de deflexi&#243;n:</h3>
+<p>δ = PL&#179;/(3EI) = 87.9 &#215; 50&#179;/(3 &#215; 2,040,000 &#215; 19.4)</p>
+<p>δ = 0.093 cm = 0.93 mm</p>
+<p>L&#237;mite: L/180 = 500/180 = 2.78 mm</p>
+<p><strong><span style="color:#008000">0.93 mm &lt; 2.78 mm → CUMPLE ✓</span></strong></p>
+<p><br/></p>
+<h1 class="Heading1">6. DISE&#209;O DE COLUMNAS HSS 100&#215;100&#215;4 mm</h1>
+<h2 class="Heading2">6.1 Cargas en Columnas</h2>
+<h3 class="Heading3">6.1.1 Columnas C1 y C2 (Descanso - H = 2.00 m)</h3>
+<p>Reacci&#243;n de zanca Tramo 1: R1 = 666 kg</p>
+<p>Reacci&#243;n de zanca Tramo 2: R2 = 666 kg</p>
+<p>Peso propio columna: 11.3 &#215; 2.00 = 22.6 kg</p>
+<p>Carga de descanso (&#225;rea 1.10&#215;1.00/2): 649 &#215; 0.55 = 357 kg</p>
+<p><strong>P_C1,C2 = 666 + 666 + 22.6 + 357 = 1,712 kg</strong></p>
+<h3 class="Heading3">6.1.2 Columnas C3 y C4 (Llegada - H = 4.00 m)</h3>
+<p>Reacci&#243;n de zanca Tramo 2: R2 = 666 kg</p>
+<p>Peso propio columna: 11.3 &#215; 4.00 = 45.2 kg</p>
+<p><strong>P_C3,C4 = 666 + 45.2 = 711 kg</strong></p>
+<h2 class="Heading2">6.2 Verificaci&#243;n de Columna Cr&#237;tica C1/C2 (Mayor carga)</h2>
+<h3 class="Heading3">Par&#225;metros de esbeltez:</h3>
+<p>Longitud no arriostrada: L = 200 cm</p>
+<p>Factor de longitud efectiva: K = 1.0 (conservador)</p>
+<p>Radio de giro: r = 3.93 cm</p>
+<p>Esbeltez: KL/r = (1.0 &#215; 200)/3.93 = 50.9</p>
+<h3 class="Heading3">Esfuerzo cr&#237;tico de pandeo (AISC 360-16, Cap. E):</h3>
+<p>L&#237;mite el&#225;stico: 4.71√(E/Fy) = 4.71√(2,040,000/2,530) = 133.8</p>
+<p>Como KL/r = 50.9 &lt; 133.8 → Pandeo inel&#225;stico</p>
+<p>Fe = π&#178;E/(KL/r)&#178; = π&#178; &#215; 2,040,000/50.9&#178; = 7,772 kg/cm&#178;</p>
+<p>Fcr = [0.658^(Fy/Fe)] &#215; Fy = [0.658^(2530/7772)] &#215; 2,530 = 2,143 kg/cm&#178;</p>
+<h3 class="Heading3">Capacidad a compresi&#243;n (ASD, Ωc = 1.67):</h3>
+<p>Pn = Fcr &#215; A = 2,143 &#215; 14.4 = 30,859 kg</p>
+<p>Pn/Ωc = 30,859/1.67 = 18,478 kg</p>
+<h3 class="Heading3">Relaci&#243;n demanda/capacidad:</h3>
+<p>P/(Pn/Ωc) = 1,712/18,478 = 0.093</p>
+<p><strong><span style="color:#008000">0.093 &lt; 1.0 → CUMPLE ✓</span></strong></p>
+<h2 class="Heading2">6.3 Verificaci&#243;n de Columna C3/C4 (Mayor altura)</h2>
+<h3 class="Heading3">Par&#225;metros de esbeltez:</h3>
+<p>Longitud no arriostrada: L = 400 cm</p>
+<p>Esbeltez: KL/r = (1.0 &#215; 400)/3.93 = 101.8</p>
+<h3 class="Heading3">Esfuerzo cr&#237;tico:</h3>
+<p>Como KL/r = 101.8 &lt; 133.8 → Pandeo inel&#225;stico</p>
+<p>Fe = π&#178; &#215; 2,040,000/101.8&#178; = 1,943 kg/cm&#178;</p>
+<p>Fcr = [0.658^(2530/1943)] &#215; 2,530 = 1,458 kg/cm&#178;</p>
+<h3 class="Heading3">Capacidad a compresi&#243;n:</h3>
+<p>Pn = 1,458 &#215; 14.4 = 20,995 kg</p>
+<p>Pn/Ωc = 20,995/1.67 = 12,571 kg</p>
+<h3 class="Heading3">Relaci&#243;n demanda/capacidad:</h3>
+<p>P/(Pn/Ωc) = 711/12,571 = 0.057</p>
+<p><strong><span style="color:#008000">0.057 &lt; 1.0 → CUMPLE ✓</span></strong></p>
+<p><br/></p>
+<h1 class="Heading1">7. DISE&#209;O DE CONEXIONES</h1>
+<h2 class="Heading2">7.1 Conexi&#243;n &#193;ngulo - Zanca</h2>
+<p>Tipo: Soldadura de filete en ambas caras del ala vertical</p>
+<p>Electrodo: E70XX</p>
+<p>Tama&#241;o de filete: a = 5 mm</p>
+<p>Longitud disponible: 65 mm &#215; 2 = 130 mm</p>
+<h3 class="Heading3">Capacidad de soldadura (ASD):</h3>
+<p>Fw = 0.30 &#215; FEXX = 0.30 &#215; 4,900 = 1,470 kg/cm&#178;</p>
+<p>&#193;rea efectiva: Aw = 0.707 &#215; 0.5 &#215; 13 = 4.60 cm&#178;</p>
+<p>Capacidad: Rn = 1,470 &#215; 4.60 = 6,762 kg</p>
+<p>Demanda: V = 87.9 kg</p>
+<p><strong><span style="color:#008000">87.9 kg &lt;&lt; 6,762 kg → CUMPLE ✓</span></strong></p>
+<h2 class="Heading2">7.2 Conexi&#243;n Zanca - Columna</h2>
+<p>Tipo: Placa de conexi&#243;n soldada</p>
+<p>Placa: 150 &#215; 100 &#215; 8 mm (ASTM A36)</p>
+<p>Soldadura a columna: Filete 6 mm perimetral</p>
+<p>Soldadura a zanca: Filete 6 mm en ambos lados</p>
+<h3 class="Heading3">Verificaci&#243;n de soldadura:</h3>
+<p>Longitud total de soldadura: 2 &#215; (15 + 10) = 50 cm</p>
+<p>&#193;rea efectiva: 0.707 &#215; 0.6 &#215; 50 = 21.2 cm&#178;</p>
+<p>Capacidad: 1,470 &#215; 21.2 = 31,164 kg</p>
+<p>Demanda: R = 666 kg</p>
+<p><strong><span style="color:#008000">666 kg &lt;&lt; 31,164 kg → CUMPLE ✓</span></strong></p>
+<h2 class="Heading2">7.3 Placa Base de Columnas</h2>
+<p>Dimensiones: 200 &#215; 200 &#215; 12 mm</p>
+<p>Material: ASTM A36</p>
+<p>&#193;rea de contacto: A = 400 cm&#178;</p>
+<h3 class="Heading3">Verificaci&#243;n de aplastamiento:</h3>
+<p>Presi&#243;n actuante: fp = P/A = 1,712/400 = 4.28 kg/cm&#178;</p>
+<p>Presi&#243;n admisible: Fp = 0.35 &#215; f&#39;c = 0.35 &#215; 210 = 73.5 kg/cm&#178;</p>
+<p><strong><span style="color:#008000">4.28 kg/cm&#178; &lt;&lt; 73.5 kg/cm&#178; → CUMPLE ✓</span></strong></p>
+<h3 class="Heading3">Anclaje:</h3>
+<p>Pernos de anclaje: 4 &#216; 1/2&quot; &#215; 250 mm (ASTM A307)</p>
+<p>Capacidad por perno (cortante): 1,200 kg</p>
+<p>Capacidad total: 4 &#215; 1,200 = 4,800 kg &gt; 1,712 kg ✓</p>
+<h2 class="Heading2">7.4 Apoyo en Piso (Arranque)</h2>
+<p>Tipo: Placa de apoyo soldada a zanca</p>
+<p>Dimensiones: 150 &#215; 100 &#215; 10 mm</p>
+<p>Anclaje: 4 pernos &#216; 3/8&quot; &#215; 150 mm expansivos</p>
+<p>Carga: R = 666 kg por zanca</p>
+<p><br/></p>
+<h1 class="Heading1">8. DISE&#209;O DE CIMENTACI&#211;N</h1>
+<h2 class="Heading2">8.1 Zapatas Aisladas</h2>
+<p>N&#250;mero de zapatas: 4 (una por cada columna)</p>
+<p>Capacidad portante del suelo asumida: qa = 1.5 kg/cm&#178;</p>
+<h3 class="Heading3">Dimensionamiento (columna m&#225;s cargada C1/C2):</h3>
+<p>Carga de servicio: P = 1,712 kg</p>
+<p>&#193;rea requerida: A = P/qa = 1,712/1.5 = 1,141 cm&#178;</p>
+<p>Lado m&#237;nimo: √1,141 = 33.8 cm</p>
+<p><strong>Adoptar: Zapata 60 &#215; 60 &#215; 25 cm</strong></p>
+<h3 class="Heading3">Verificaci&#243;n:</h3>
+<p>&#193;rea proporcionada: 60 &#215; 60 = 3,600 cm&#178;</p>
+<p>Presi&#243;n actuante: q = 1,712/3,600 = 0.48 kg/cm&#178;</p>
+<p><strong><span style="color:#008000">0.48 kg/cm&#178; &lt; 1.5 kg/cm&#178; → CUMPLE ✓</span></strong></p>
+<h3 class="Heading3">Refuerzo de zapata:</h3>
+<p>Refuerzo inferior: Malla &#216;10 mm @ 15 cm en ambas direcciones</p>
+<p>Recubrimiento: 7.5 cm</p>
+<h2 class="Heading2">8.2 Vigas de Amarre</h2>
+<p>Conectar zapatas del mismo eje con vigas de amarre:</p>
+<p>Secci&#243;n: 20 &#215; 25 cm</p>
+<p>Concreto: f&#39;c = 210 kg/cm&#178;</p>
+<p>Refuerzo longitudinal: 4 &#216; 12 mm</p>
+<p>Estribos: &#216; 8 mm @ 20 cm</p>
+<p><br/></p>
+<h1 class="Heading1">9. RESUMEN DE MATERIALES</h1>
+<h2 class="Heading2">9.1 Acero Estructural</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">ELEMENTO</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">PERFIL</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">CANT.</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">LONG. (m)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">PESO (kg)</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Columnas C1, C2</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">HSS 100&#215;100&#215;4</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">2</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">45</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Columnas C3, C4</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">HSS 100&#215;100&#215;4</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">2</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">8.00</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">90</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Zancas</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">HSS 100&#215;100&#215;4</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">14.92</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">169</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">&#193;ngulos pelda&#241;os</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">L 65&#215;65&#215;5</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">44</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">13.20</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">64</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Placas base</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">PL 200&#215;200&#215;12</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">-</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">15</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Placas apoyo</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">PL 150&#215;100&#215;10</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">2</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">-</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">2</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Placas conexi&#243;n</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">PL 150&#215;100&#215;8</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">8</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">-</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">8</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"><strong><span style="color:#000000;font-size:10pt">TOTAL ACERO ESTRUCTURAL</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"><strong><span style="color:#000000;font-size:10pt">393 kg</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">9.2 Concreto y Acero de Refuerzo</h2>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">ELEMENTO</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">CANTIDAD</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Zapatas (4 unidades 60&#215;60&#215;25)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.36 m&#179;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Vigas de amarre (20&#215;25)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">0.45 m&#179;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Pelda&#241;os (22 unidades)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.26 m&#179;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"><strong><span style="color:#000000;font-size:10pt">TOTAL CONCRETO f&#39;c=210 kg/cm&#178;</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#FFC000;"><strong><span style="color:#000000;font-size:10pt">1.07 m&#179;</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Acero de refuerzo (zapatas y vigas)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">≈ 65 kg</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Malla electrosoldada &#216;5.5@100</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">6.6 m&#178;</span></strong></td>
+</tr>
+</table>
+
+<h2 class="Heading2">9.3 Otros Materiales</h2>
+<p class="ListParagraph" style="margin-left:20px;">Pernos de anclaje &#216;1/2&quot;&#215;250mm: 16 unidades</p>
+<p class="ListParagraph" style="margin-left:20px;">Pernos expansivos &#216;3/8&quot;&#215;150mm: 8 unidades</p>
+<p class="ListParagraph" style="margin-left:20px;">Soldadura E70XX: ≈ 8 kg</p>
+<p class="ListParagraph" style="margin-left:20px;">Pintura anticorrosiva: 15 m&#178;</p>
+<p class="ListParagraph" style="margin-left:20px;">Pintura de acabado: 15 m&#178;</p>
+<p><br/></p>
+<h1 class="Heading1">10. RESUMEN DE VERIFICACIONES</h1>
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">VERIFICACI&#211;N</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">DEMANDA</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">D/C</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#1F4E79;"><strong><span style="color:#FFFFFF;font-size:10pt">ESTADO</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Flexi&#243;n zanca HSS 100&#215;100&#215;4</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">62,090 kg&#183;cm</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.78</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Cortante zanca</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">666 kg</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">0.09</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Deflexi&#243;n zanca</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4.8 mm</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.46</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Flexi&#243;n &#225;ngulo L65&#215;65&#215;5</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">4,395 kg&#183;cm</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">0.64</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Deflexi&#243;n &#225;ngulo</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.93 mm</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.33</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Compresi&#243;n columna C1/C2 (H=2m)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">1,712 kg</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">0.09</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Compresi&#243;n columna C3/C4 (H=4m)</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">711 kg</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.06</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Soldadura &#225;ngulo-zanca</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">87.9 kg</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">0.01</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">Placa base</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">4.28 kg/cm&#178;</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;"><strong><span style="color:#000000;font-size:10pt">0.06</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+<tr>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">Cimentaci&#243;n</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">0.48 kg/cm&#178;</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#D6DCE4;"><strong><span style="color:#000000;font-size:10pt">0.32</span></strong></td>
+<td style="border:1px solid #ccc;padding:4px;background-color:#C6EFCE;"><strong><span style="color:#000000;font-size:10pt">CUMPLE ✓</span></strong></td>
+</tr>
+</table>
+
+<h1 class="Heading1">11. RECOMENDACIONES CONSTRUCTIVAS</h1>
+<p class="ListParagraph" style="margin-left:20px;">Mantener junta s&#237;smica de 50 mm m&#237;nimo entre la escalera y estructuras adyacentes.</p>
+<p class="ListParagraph" style="margin-left:20px;">Aplicar dos manos de pintura anticorrosiva y una de acabado en todos los elementos met&#225;licos.</p>
+<p class="ListParagraph" style="margin-left:20px;">Verificar nivelaci&#243;n de zapatas antes del montaje de columnas.</p>
+<p class="ListParagraph" style="margin-left:20px;">Todas las soldaduras ser&#225;n ejecutadas por soldador calificado AWS.</p>
+<p class="ListParagraph" style="margin-left:20px;">Curar adecuadamente los pelda&#241;os de concreto (m&#237;nimo 7 d&#237;as).</p>
+<p class="ListParagraph" style="margin-left:20px;">Instalar barandas de seguridad con altura m&#237;nima de 90 cm seg&#250;n NEC.</p>
+<p class="ListParagraph" style="margin-left:20px;">Colocar cintas antideslizantes en bordes de pelda&#241;os.</p>
+<p>&nbsp;</p>
+<p style="text-align:center;"><span style="font-size:10pt">─────────────────────────────────────────</span></p>
+<p style="text-align:center;"><strong><span style="font-size:12pt">INGENIERO ESTRUCTURAL</span></strong></p>
+<p style="text-align:center;"><em><span style="font-size:10pt">Registro Profesional SENESCYT</span></em></p>

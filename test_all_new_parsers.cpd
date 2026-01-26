@@ -1,0 +1,79 @@
+"Test: ALL New Parsers Added
+'Probando: rust, go, lua, perl, ruby, php, haskell, d, ts
+
+"1. Rust + Go + Lua
+#columns 3
+'Rust:
+@{rust}
+fn main() {
+    let suma = 5 + 10;
+    println!("suma = {}", suma);
+}
+@{end rust}
+#column
+'Go:
+@{go}
+package main
+import "fmt"
+func main() {
+    suma := 5 + 10
+    fmt.Println("suma =", suma)
+}
+@{end go}
+#column
+'Lua:
+@{lua}
+local suma = 5 + 10
+print("suma = " .. suma)
+@{end lua}
+#end columns
+
+"2. Perl + Ruby + PHP
+#columns 3
+'Perl:
+@{perl}
+my $suma = 5 + 10;
+print "suma = $suma\n";
+@{end perl}
+#column
+'Ruby:
+@{ruby}
+suma = 5 + 10
+puts "suma = #{suma}"
+@{end ruby}
+#column
+'PHP:
+@{php}
+<?php
+$suma = 5 + 10;
+echo "suma = $suma\n";
+?>
+@{end php}
+#end columns
+
+"3. Haskell + D + TypeScript
+#columns 3
+'Haskell:
+@{haskell}
+main = do
+    let suma = 5 + 10
+    putStrLn $ "suma = " ++ show suma
+@{end haskell}
+#column
+'D:
+@{d}
+import std.stdio;
+void main() {
+    int suma = 5 + 10;
+    writeln("suma = ", suma);
+}
+@{end d}
+#column
+'TypeScript:
+@{ts}
+const suma: number = 5 + 10;
+console.log(`suma = ${suma}`);
+@{end ts}
+#end columns
+
+'Fin del test

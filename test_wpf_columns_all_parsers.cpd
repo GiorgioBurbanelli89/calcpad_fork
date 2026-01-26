@@ -1,0 +1,171 @@
+"Test: WPF Columns - All Parsers
+'Test of multi-column layout with all parsers in Calcpad WPF
+
+"1. Calcpad + Python + JavaScript
+#columns 3
+'Calcpad:
+a = 5
+b = 10
+suma = a + b
+#column
+'Python:
+@{python}
+a = 5
+b = 10
+suma = a + b
+print(f"suma = {suma}")
+@{end python}
+#column
+'JavaScript:
+@{js}
+let a = 5;
+let b = 10;
+let suma = a + b;
+console.log(`suma = ${suma}`);
+@{end js}
+#end columns
+
+"2. C# + C++ + C
+#columns 3
+'C#:
+@{csharp}
+using System;
+class Test {
+    static void Main() {
+        int a = 5, b = 10;
+        Console.WriteLine($"suma = {a + b}");
+    }
+}
+@{end csharp}
+#column
+'C++:
+@{cpp}
+#include <iostream>
+int main() {
+    int a = 5, b = 10;
+    std::cout << "suma = " << a + b << std::endl;
+}
+@{end cpp}
+#column
+'C:
+@{c}
+#include <stdio.h>
+int main() {
+    int a = 5, b = 10;
+    printf("suma = %d\n", a + b);
+    return 0;
+}
+@{end c}
+#end columns
+
+"3. Octave + Fortran + Rust
+#columns 3
+'Octave:
+@{octave}
+a = 5;
+b = 10;
+fprintf('suma = %d\n', a + b);
+@{end octave}
+#column
+'Fortran:
+@{fortran}
+program test
+    implicit none
+    integer :: a, b
+    a = 5
+    b = 10
+    write(*,'(A,I0)') 'suma = ', a + b
+end program test
+@{end fortran}
+#column
+'Rust:
+@{rust}
+fn main() {
+    let a = 5;
+    let b = 10;
+    println!("suma = {}", a + b);
+}
+@{end rust}
+#end columns
+
+"4. Julia + Go + Bash
+#columns 3
+'Julia:
+@{julia}
+a = 5
+b = 10
+println("suma = $(a + b)")
+@{end julia}
+#column
+'Go:
+@{go}
+package main
+import "fmt"
+func main() {
+    a, b := 5, 10
+    fmt.Printf("suma = %d\n", a + b)
+}
+@{end go}
+#column
+'Bash:
+@{bash}
+a=5
+b=10
+echo "suma = $((a + b))"
+@{end bash}
+#end columns
+
+"5. Lua + Perl + Ruby
+#columns 3
+'Lua:
+@{lua}
+local a = 5
+local b = 10
+print("suma = " .. (a + b))
+@{end lua}
+#column
+'Perl:
+@{perl}
+my $a = 5;
+my $b = 10;
+print "suma = " . ($a + $b) . "\n";
+@{end perl}
+#column
+'Ruby:
+@{ruby}
+a = 5
+b = 10
+puts "suma = #{a + b}"
+@{end ruby}
+#end columns
+
+"6. PHP + Haskell + D
+#columns 3
+'PHP:
+@{php}
+<?php
+$a = 5;
+$b = 10;
+echo "suma = " . ($a + $b) . "\n";
+?>
+@{end php}
+#column
+'Haskell:
+@{haskell}
+main = do
+    let a = 5
+    let b = 10
+    putStrLn $ "suma = " ++ show (a + b)
+@{end haskell}
+#column
+'D:
+@{d}
+import std.stdio;
+void main() {
+    int a = 5, b = 10;
+    writeln("suma = ", a + b);
+}
+@{end d}
+#end columns
+
+'Fin del test - 18 parsers probados

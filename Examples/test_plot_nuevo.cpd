@@ -1,0 +1,37 @@
+"Test del nuevo comando @{plot}"
+'Ejemplo 1: Datos inline
+@{plot}
+x: [1; 2; 3; 4; 5]
+y: [1; 4; 9; 16; 25]
+title: "Función cuadrática"
+xlabel: "x"
+ylabel: "y = x²"
+color: #4169E1
+legend: "y = x²"
+@{end plot}
+
+'Ejemplo 2: Con límites personalizados
+@{plot}
+x: [0; 1; 2; 3; 4; 5; 6]
+y: [0; 1; 4; 9; 16; 25; 36]
+title: "Parábola con límites"
+xlabel: "Eje X"
+ylabel: "Eje Y"
+xlim: -1, 7
+ylim: -5, 40
+color: #FF4500
+style: dash
+legend: "f(x)"
+@{end plot}
+
+'Ejemplo 3: Línea punteada sin leyenda
+@{plot}
+x: [1; 2; 3; 4]
+y: [10; 20; 15; 25]
+title: "Datos de prueba"
+xlabel: "Tiempo"
+ylabel: "Valor"
+style: dot
+color: #228B22
+grid: true
+@{end plot}

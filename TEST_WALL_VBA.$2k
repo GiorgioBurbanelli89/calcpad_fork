@@ -1,0 +1,352 @@
+File C:\Users\j-b-j\Documents\Calcpad-7.5.7\TEST_WALL_VBA.$2k was saved on m/d/yy at h:mm:ss
+ 
+TABLE:  "ACTIVE DEGREES OF FREEDOM"
+   UX=Yes   UY=Yes   UZ=Yes   RX=Yes   RY=Yes   RZ=Yes
+ 
+TABLE:  "ANALYSIS OPTIONS"
+   Solver=Advanced   SolverProc=Auto   Force32Bit=No   StiffCase=None   GeomMod=None   HingeOpt="In Elements"   NumAThreads=0   MaxFileSize=0   NumDThreads=0   NumRThreads=0   UseMMFiles="Program Determined"   AllowDiff=No
+ 
+TABLE:  "AREA SECTION ASSIGNMENTS"
+   Area=1   Section=ASEC1   MatProp=Default
+   Area=2   Section=ASEC1   MatProp=Default
+   Area=3   Section=ASEC1   MatProp=Default
+   Area=4   Section=ASEC1   MatProp=Default
+   Area=5   Section=ASEC1   MatProp=Default
+   Area=6   Section=ASEC1   MatProp=Default
+   Area=7   Section=ASEC1   MatProp=Default
+   Area=8   Section=ASEC1   MatProp=Default
+   Area=9   Section=ASEC1   MatProp=Default
+   Area=10   Section=ASEC1   MatProp=Default
+   Area=11   Section=ASEC1   MatProp=Default
+   Area=12   Section=ASEC1   MatProp=Default
+   Area=13   Section=ASEC1   MatProp=Default
+   Area=14   Section=ASEC1   MatProp=Default
+   Area=15   Section=ASEC1   MatProp=Default
+   Area=16   Section=ASEC1   MatProp=Default
+   Area=17   Section=ASEC1   MatProp=Default
+   Area=18   Section=ASEC1   MatProp=Default
+   Area=19   Section=ASEC1   MatProp=Default
+   Area=20   Section=ASEC1   MatProp=Default
+   Area=21   Section=ASEC1   MatProp=Default
+   Area=22   Section=ASEC1   MatProp=Default
+   Area=23   Section=ASEC1   MatProp=Default
+   Area=24   Section=ASEC1   MatProp=Default
+   Area=25   Section=ASEC1   MatProp=Default
+   Area=26   Section=ASEC1   MatProp=Default
+   Area=27   Section=ASEC1   MatProp=Default
+   Area=28   Section=ASEC1   MatProp=Default
+   Area=29   Section=ASEC1   MatProp=Default
+   Area=30   Section=ASEC1   MatProp=Default
+   Area=31   Section=ASEC1   MatProp=Default
+   Area=32   Section=ASEC1   MatProp=Default
+   Area=33   Section=ASEC1   MatProp=Default
+   Area=34   Section=ASEC1   MatProp=Default
+   Area=35   Section=ASEC1   MatProp=Default
+   Area=36   Section=ASEC1   MatProp=Default
+ 
+TABLE:  "AREA SECTION PROPERTIES"
+   Section=ASEC1   Material=4000Psi   MatAngle=0   AreaType=Shell   Type=Shell-Thin   DrillDOF=Yes   Thickness=12   BendThick=12   Color=Cyan   F11Mod=1   F22Mod=1   F12Mod=1   M11Mod=1   M22Mod=1   M12Mod=1   V13Mod=1   V23Mod=1   MMod=1 _
+        WMod=1   Notes="Added 1/17/2026 7:29:16 PM"
+ 
+TABLE:  "AREA SECTION PROPERTY DESIGN PARAMETERS"
+   Section=ASEC1   RebarMat=None   RebarOpt=Default
+ 
+TABLE:  "AREA SECTION PROPERTY - TIME DEPENDENT"
+   Section=ASEC1   TypeSize=Auto   AutoSFSize=1
+ 
+TABLE:  "AUTO WAVE 3 - WAVE CHARACTERISTICS - GENERAL"
+   WaveChar=Default   WaveType="From Theory"   KinFactor=1   SWaterDepth=1800   WaveHeight=720   WavePeriod=12   WaveTheory=Linear
+ 
+TABLE:  "CASE - MODAL 1 - GENERAL"
+   Case=MODAL   ModeType=Eigen   MaxNumModes=12   MinNumModes=1   EigenShift=0   EigenCutoff=0   EigenTol=1E-09   AutoShift=Yes
+ 
+TABLE:  "CASE - STATIC 1 - LOAD ASSIGNMENTS"
+   Case=DEAD   LoadType="Load pattern"   LoadName=DEAD   LoadSF=1
+ 
+TABLE:  "CONNECTIVITY - AREA"
+   Area=1   Joint1=1   Joint2=2   Joint3=3   Joint4=4   GUID=2967908e-bc9a-427c-8714-605de5a35008
+   Area=2   Joint1=4   Joint2=3   Joint3=5   Joint4=6   GUID=de6dad1b-4a62-4a0a-b25d-f640fbd46f89
+   Area=3   Joint1=6   Joint2=5   Joint3=7   Joint4=8   GUID=9a8a38ba-484c-4adc-a0c1-29d8fbb478b2
+   Area=4   Joint1=8   Joint2=7   Joint3=9   Joint4=10   GUID=23127a8f-db84-42ac-b747-324ac63f9eac
+   Area=5   Joint1=10   Joint2=9   Joint3=11   Joint4=12   GUID=3bff6ab6-b8d5-4cf7-92ed-1043477c215b
+   Area=6   Joint1=12   Joint2=11   Joint3=13   Joint4=14   GUID=e17ac084-3d2c-4a2a-9a0a-e22964d9e55c
+   Area=7   Joint1=2   Joint2=15   Joint3=16   Joint4=3   GUID=d4adeafe-c6f6-4c6a-ac43-4f0a43d039d0
+   Area=8   Joint1=3   Joint2=16   Joint3=17   Joint4=5   GUID=3deacf03-8775-4a47-9d95-3a8e8e832b34
+   Area=9   Joint1=5   Joint2=17   Joint3=18   Joint4=7   GUID=deeb7a8b-d8fd-46a1-afbc-462175cd950d
+   Area=10   Joint1=7   Joint2=18   Joint3=19   Joint4=9   GUID=e11b96e8-7d2b-4f52-ae2b-0ba1bf399d6a
+   Area=11   Joint1=9   Joint2=19   Joint3=20   Joint4=11   GUID=8d65e0a6-a4f1-4790-a579-5645d1c2f839
+   Area=12   Joint1=11   Joint2=20   Joint3=21   Joint4=13   GUID=722590cd-c741-4f1c-ab7e-da75735e1c00
+   Area=13   Joint1=15   Joint2=22   Joint3=23   Joint4=16   GUID=06db287b-a451-4409-b60b-bacc40be55a4
+   Area=14   Joint1=16   Joint2=23   Joint3=24   Joint4=17   GUID=5dca2e2a-2dd0-46a0-95a6-41867cfb1357
+   Area=15   Joint1=17   Joint2=24   Joint3=25   Joint4=18   GUID=85c745ef-d6a5-46ba-9a69-adf099c63831
+   Area=16   Joint1=18   Joint2=25   Joint3=26   Joint4=19   GUID=42304ade-219b-452b-8b14-7bd55eeaf642
+   Area=17   Joint1=19   Joint2=26   Joint3=27   Joint4=20   GUID=b9ae317f-c900-4d53-8593-bd194002b25f
+   Area=18   Joint1=20   Joint2=27   Joint3=28   Joint4=21   GUID=27ddae60-9818-48a4-a1e1-cb17ccde2efe
+   Area=19   Joint1=22   Joint2=29   Joint3=30   Joint4=23   GUID=7a6f9543-9213-43fa-8d4c-0d89aeb31bc5
+   Area=20   Joint1=23   Joint2=30   Joint3=31   Joint4=24   GUID=d1f4e3fb-3156-47ae-b862-39e41c5caf18
+   Area=21   Joint1=24   Joint2=31   Joint3=32   Joint4=25   GUID=d02a25e0-00c1-44c7-a923-644ff4b8487a
+   Area=22   Joint1=25   Joint2=32   Joint3=33   Joint4=26   GUID=e39a927a-c486-4f8d-8d47-2f26ed31f517
+   Area=23   Joint1=26   Joint2=33   Joint3=34   Joint4=27   GUID=1c726238-307f-4f18-9679-355e83a917a7
+   Area=24   Joint1=27   Joint2=34   Joint3=35   Joint4=28   GUID=f4c21792-ee74-4a01-b1c0-c50d0b5d0a7f
+   Area=25   Joint1=29   Joint2=36   Joint3=37   Joint4=30   GUID=d469cf06-4ca7-4c84-bd77-24bedc84456c
+   Area=26   Joint1=30   Joint2=37   Joint3=38   Joint4=31   GUID=0abe83af-261d-4f11-887b-0136033b24c5
+   Area=27   Joint1=31   Joint2=38   Joint3=39   Joint4=32   GUID=1be3fc9b-3187-43da-b333-4f6ef58d51a7
+   Area=28   Joint1=32   Joint2=39   Joint3=40   Joint4=33   GUID=9c7284ea-326a-400c-8627-4db3729de780
+   Area=29   Joint1=33   Joint2=40   Joint3=41   Joint4=34   GUID=8009bf44-f8ff-4fd8-a296-9712b8333b9e
+   Area=30   Joint1=34   Joint2=41   Joint3=42   Joint4=35   GUID=0863ab00-da69-4c91-beef-4f19373c32d2
+   Area=31   Joint1=36   Joint2=43   Joint3=44   Joint4=37   GUID=09c39470-96ab-43af-a803-16e976f940c9
+   Area=32   Joint1=37   Joint2=44   Joint3=45   Joint4=38   GUID=b95f5e4a-1669-4cc0-bac1-9beb96650d05
+   Area=33   Joint1=38   Joint2=45   Joint3=46   Joint4=39   GUID=bad52786-03c4-4ffd-b87c-9476c86bc8fa
+   Area=34   Joint1=39   Joint2=46   Joint3=47   Joint4=40   GUID=013da1b1-4f9e-4f03-b2fe-5b6c7d4e0353
+   Area=35   Joint1=40   Joint2=47   Joint3=48   Joint4=41   GUID=7523ebed-0ccc-402a-a338-893c10b3bc26
+   Area=36   Joint1=41   Joint2=48   Joint3=49   Joint4=42   GUID=e76c55f9-bfce-4546-9331-79049dbff00e
+ 
+TABLE:  "COORDINATE SYSTEMS"
+   Name=GLOBAL   Type=Cartesian   X=0   Y=0   Z=0   AboutZ=0   AboutY=0   AboutX=0
+ 
+TABLE:  "DATABASE DOCUMENTATION"
+ 
+TABLE:  "DATABASE FORMAT TYPES"
+   UnitsCurr=Yes   OverrideE=No
+ 
+TABLE:  "FUNCTION - PLOT FUNCTIONS"
+   PlotFunc="Input Energy"   Type=Energy   Component=Input   Mode=All
+ 
+TABLE:  "FUNCTION - POWER SPECTRAL DENSITY - USER"
+   Name=UNIFPSD   Frequency=0   Value=1
+   Name=UNIFPSD   Frequency=1   Value=1
+ 
+TABLE:  "FUNCTION - RESPONSE SPECTRUM - USER"
+   Name=UNIFRS   Period=0   Accel=1   FuncDamp=0.05
+   Name=UNIFRS   Period=1   Accel=1
+ 
+TABLE:  "FUNCTION - STEADY STATE - USER"
+   Name=UNIFSS   Frequency=0   Value=1
+   Name=UNIFSS   Frequency=1   Value=1
+ 
+TABLE:  "FUNCTION - TIME HISTORY - USER"
+   Name=RAMPTH   Time=0   Value=0
+   Name=RAMPTH   Time=1   Value=1
+   Name=RAMPTH   Time=4   Value=1
+   Name=UNIFTH   Time=0   Value=1
+   Name=UNIFTH   Time=1   Value=1
+ 
+TABLE:  "GRID LINES"
+   CoordSys=GLOBAL   AxisDir=X   GridID=A   XRYZCoord=-144   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End   AllVisible=Yes   BubbleSize=12
+   CoordSys=GLOBAL   AxisDir=X   GridID=B   XRYZCoord=-96   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=X   GridID=C   XRYZCoord=-48   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=X   GridID=D   XRYZCoord=0   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=X   GridID=E   XRYZCoord=48   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=X   GridID=F   XRYZCoord=96   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=X   GridID=G   XRYZCoord=144   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=Y   GridID=1   XRYZCoord=0   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=Start
+   CoordSys=GLOBAL   AxisDir=Z   GridID=Z1   XRYZCoord=0   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=Z   GridID=Z2   XRYZCoord=48   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=Z   GridID=Z3   XRYZCoord=96   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=Z   GridID=Z4   XRYZCoord=144   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=Z   GridID=Z5   XRYZCoord=192   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=Z   GridID=Z6   XRYZCoord=240   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+   CoordSys=GLOBAL   AxisDir=Z   GridID=Z7   XRYZCoord=288   LineType=Primary   LineColor=Gray8Dark   Visible=No   BubbleLoc=End
+ 
+TABLE:  "GROUPS 1 - DEFINITIONS"
+   GroupName=ALL   Selection=Yes   SectionCut=Yes   Steel=Yes   Concrete=Yes   Aluminum=Yes   ColdFormed=Yes   Stage=Yes   Bridge=Yes   AutoSeismic=No   AutoWind=No   SelDesSteel=No   SelDesAlum=No   SelDesCold=No   MassWeight=Yes   Color=Red
+ 
+TABLE:  "JOINT COORDINATES"
+   Joint=1   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-144   Y=0   Z=0   SpecialJt=No   GUID=fdbcadf1-b441-4bdb-8a09-596bae3a440e
+   Joint=2   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-96   Y=0   Z=0   SpecialJt=No   GUID=44e8bc83-59ab-44d6-9bf7-6e68dc6b5d31
+   Joint=3   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-96   Y=0   Z=48   SpecialJt=No   GUID=d176d013-92af-4cdf-81aa-5be87b3f57e1
+   Joint=4   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-144   Y=0   Z=48   SpecialJt=No   GUID=1fe65fbb-3c7a-4132-a82c-69d3712d12e6
+   Joint=5   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-96   Y=0   Z=96   SpecialJt=No   GUID=8b43c472-3ceb-43b8-92ad-61df39b0cd43
+   Joint=6   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-144   Y=0   Z=96   SpecialJt=No   GUID=d12b839d-b0a3-4565-8752-9720c08e0c77
+   Joint=7   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-96   Y=0   Z=144   SpecialJt=No   GUID=265da744-9ce0-4946-9aca-ffafecbffe01
+   Joint=8   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-144   Y=0   Z=144   SpecialJt=No   GUID=a95b093c-b9cd-44d9-832e-1076275df795
+   Joint=9   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-96   Y=0   Z=192   SpecialJt=No   GUID=2801a4a3-d7b9-4c59-a649-30a5dd470480
+   Joint=10   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-144   Y=0   Z=192   SpecialJt=No   GUID=5373f081-182e-4d7d-aa3b-d505b3c844b7
+   Joint=11   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-96   Y=0   Z=240   SpecialJt=No   GUID=7b3986d1-72bc-42ef-a93a-c5cd145d3d4e
+   Joint=12   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-144   Y=0   Z=240   SpecialJt=No   GUID=23296905-63d7-4fe9-a150-119efd31982a
+   Joint=13   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-96   Y=0   Z=288   SpecialJt=No   GUID=52ac400e-ccfb-41c1-b20f-59059c8dbf1d
+   Joint=14   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-144   Y=0   Z=288   SpecialJt=No   GUID=95177057-86bb-4a89-9ae8-8cc030bde786
+   Joint=15   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-48   Y=0   Z=0   SpecialJt=No   GUID=2bd1c9e8-7004-4fb1-acb6-d2ece7164637
+   Joint=16   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-48   Y=0   Z=48   SpecialJt=No   GUID=69209b37-2364-4aa9-a65b-01e6f918a033
+   Joint=17   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-48   Y=0   Z=96   SpecialJt=No   GUID=68569d2d-6bc9-4488-b544-b9eebd247936
+   Joint=18   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-48   Y=0   Z=144   SpecialJt=No   GUID=cc0485a9-722c-465b-b729-66f636b90f9e
+   Joint=19   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-48   Y=0   Z=192   SpecialJt=No   GUID=7c91c8fb-8b22-4870-bfa3-f540a5cd0ddd
+   Joint=20   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-48   Y=0   Z=240   SpecialJt=No   GUID=894f552d-f922-4ace-ba29-fdefd7f74ad2
+   Joint=21   CoordSys=GLOBAL   CoordType=Cartesian   XorR=-48   Y=0   Z=288   SpecialJt=No   GUID=a85ae295-b9b1-48af-b14a-8ca818ede9fc
+   Joint=22   CoordSys=GLOBAL   CoordType=Cartesian   XorR=0   Y=0   Z=0   SpecialJt=No   GUID=26d2cbc2-eb73-4624-951d-cb0d7428629c
+   Joint=23   CoordSys=GLOBAL   CoordType=Cartesian   XorR=0   Y=0   Z=48   SpecialJt=No   GUID=44835432-b632-4cbc-9acd-50bdb5eb39b2
+   Joint=24   CoordSys=GLOBAL   CoordType=Cartesian   XorR=0   Y=0   Z=96   SpecialJt=No   GUID=6d34bfa2-4158-45cd-a228-83fa5ca52ba3
+   Joint=25   CoordSys=GLOBAL   CoordType=Cartesian   XorR=0   Y=0   Z=144   SpecialJt=No   GUID=d89da216-731a-4f3f-abb0-d265af859510
+   Joint=26   CoordSys=GLOBAL   CoordType=Cartesian   XorR=0   Y=0   Z=192   SpecialJt=No   GUID=0a27942f-8db6-4338-a1f8-6f337e1919d5
+   Joint=27   CoordSys=GLOBAL   CoordType=Cartesian   XorR=0   Y=0   Z=240   SpecialJt=No   GUID=0a25e4a9-ea97-4530-a3b4-43365a9cc749
+   Joint=28   CoordSys=GLOBAL   CoordType=Cartesian   XorR=0   Y=0   Z=288   SpecialJt=No   GUID=2fbe555b-424d-4e6e-8b5c-cb3caa916a9e
+   Joint=29   CoordSys=GLOBAL   CoordType=Cartesian   XorR=48   Y=0   Z=0   SpecialJt=No   GUID=797bd89e-7686-4e9b-a21d-5228ba96ddb5
+   Joint=30   CoordSys=GLOBAL   CoordType=Cartesian   XorR=48   Y=0   Z=48   SpecialJt=No   GUID=00adb0bf-f6d0-4437-b420-2cffa9d3bc4b
+   Joint=31   CoordSys=GLOBAL   CoordType=Cartesian   XorR=48   Y=0   Z=96   SpecialJt=No   GUID=3859061c-7902-432c-9eba-c9fd5a5a848b
+   Joint=32   CoordSys=GLOBAL   CoordType=Cartesian   XorR=48   Y=0   Z=144   SpecialJt=No   GUID=98078d8f-64e0-43da-901c-39781a1091c5
+   Joint=33   CoordSys=GLOBAL   CoordType=Cartesian   XorR=48   Y=0   Z=192   SpecialJt=No   GUID=3f85d1f4-8e23-487d-bf9c-8fc8b8fc0e88
+   Joint=34   CoordSys=GLOBAL   CoordType=Cartesian   XorR=48   Y=0   Z=240   SpecialJt=No   GUID=57cdca61-0623-4bfe-845f-065fef55aaa7
+   Joint=35   CoordSys=GLOBAL   CoordType=Cartesian   XorR=48   Y=0   Z=288   SpecialJt=No   GUID=d9a38a7a-dffa-4e44-8478-81fd03543085
+   Joint=36   CoordSys=GLOBAL   CoordType=Cartesian   XorR=96   Y=0   Z=0   SpecialJt=No   GUID=f4e1d6b6-3b23-40d9-8062-0d9f2c553c89
+   Joint=37   CoordSys=GLOBAL   CoordType=Cartesian   XorR=96   Y=0   Z=48   SpecialJt=No   GUID=df6bda48-ec1f-4feb-945f-a609b22e4011
+   Joint=38   CoordSys=GLOBAL   CoordType=Cartesian   XorR=96   Y=0   Z=96   SpecialJt=No   GUID=c8c1b890-1f70-48ae-abc4-182e31726c94
+   Joint=39   CoordSys=GLOBAL   CoordType=Cartesian   XorR=96   Y=0   Z=144   SpecialJt=No   GUID=a48ceb33-6564-4ef2-9277-7b8182212343
+   Joint=40   CoordSys=GLOBAL   CoordType=Cartesian   XorR=96   Y=0   Z=192   SpecialJt=No   GUID=66e01f88-68d2-4171-8413-9830e61671c9
+   Joint=41   CoordSys=GLOBAL   CoordType=Cartesian   XorR=96   Y=0   Z=240   SpecialJt=No   GUID=3f662020-1b3c-464f-bee3-8b7bdb1ed63c
+   Joint=42   CoordSys=GLOBAL   CoordType=Cartesian   XorR=96   Y=0   Z=288   SpecialJt=No   GUID=938e6cf9-3126-419d-a330-b4a9d14127a3
+   Joint=43   CoordSys=GLOBAL   CoordType=Cartesian   XorR=144   Y=0   Z=0   SpecialJt=No   GUID=de1576a6-a60c-484f-94f4-9902e9c00c8c
+   Joint=44   CoordSys=GLOBAL   CoordType=Cartesian   XorR=144   Y=0   Z=48   SpecialJt=No   GUID=c7d7fa30-ee59-45f3-b0c0-4ea512016f44
+   Joint=45   CoordSys=GLOBAL   CoordType=Cartesian   XorR=144   Y=0   Z=96   SpecialJt=No   GUID=1adbe136-e196-4d74-a36e-80b188568090
+   Joint=46   CoordSys=GLOBAL   CoordType=Cartesian   XorR=144   Y=0   Z=144   SpecialJt=No   GUID=146cb589-0813-44ac-8486-6ed4fcf4b6a3
+   Joint=47   CoordSys=GLOBAL   CoordType=Cartesian   XorR=144   Y=0   Z=192   SpecialJt=No   GUID=965a5957-c0ff-4cdf-bafa-3660fde3a8f4
+   Joint=48   CoordSys=GLOBAL   CoordType=Cartesian   XorR=144   Y=0   Z=240   SpecialJt=No   GUID=33c5cd19-0f06-4e85-ae62-aa5685b6d062
+   Joint=49   CoordSys=GLOBAL   CoordType=Cartesian   XorR=144   Y=0   Z=288   SpecialJt=No   GUID=9dd92a6b-d106-45fc-87de-afbd1e997cad
+ 
+TABLE:  "JOINT PATTERN DEFINITIONS"
+   Pattern=Default
+ 
+TABLE:  "JOINT RESTRAINT ASSIGNMENTS"
+   Joint=1   U1=Yes   U2=Yes   U3=Yes   R1=Yes   R2=Yes   R3=Yes
+   Joint=2   U1=Yes   U2=Yes   U3=Yes   R1=Yes   R2=Yes   R3=Yes
+   Joint=15   U1=Yes   U2=Yes   U3=Yes   R1=Yes   R2=Yes   R3=Yes
+   Joint=22   U1=Yes   U2=Yes   U3=Yes   R1=Yes   R2=Yes   R3=Yes
+   Joint=29   U1=Yes   U2=Yes   U3=Yes   R1=Yes   R2=Yes   R3=Yes
+   Joint=36   U1=Yes   U2=Yes   U3=Yes   R1=Yes   R2=Yes   R3=Yes
+   Joint=43   U1=Yes   U2=Yes   U3=Yes   R1=Yes   R2=Yes   R3=Yes
+ 
+TABLE:  "LOAD CASE DEFINITIONS"
+   Case=DEAD   Type=LinStatic   InitialCond=Zero   DesTypeOpt="Prog Det"   DesignType=Dead   DesActOpt="Prog Det"   DesignAct=Non-Composite   AutoType=None   RunCase=Yes   GUID=99f2ec5b-9808-45eb-ba02-e6b6be25ae90
+   Case=MODAL   Type=LinModal   InitialCond=Zero   DesTypeOpt="Prog Det"   DesignType=Other   DesActOpt="Prog Det"   DesignAct=Other   AutoType=None   RunCase=Yes   GUID=534cffaf-9550-44ea-9281-881d896d8cea
+ 
+TABLE:  "LOAD PATTERN DEFINITIONS"
+   LoadPat=DEAD   DesignType=Dead   SelfWtMult=1   GUID=638bc5e7-ea2f-47f2-bf71-5d41cad04a61
+ 
+TABLE:  "MASS SOURCE"
+   MassSource=MSSSRC1   Elements=Yes   Masses=Yes   Loads=No   IsDefault=Yes
+ 
+TABLE:  "MATERIAL PROPERTIES 01 - GENERAL"
+   Material=4000Psi   Type=Concrete   Grade="f'c 4000 psi"   SymType=Isotropic   TempDepend=No   Color=Red   GUID=d92f138e-16bf-424e-985d-887c6833a03c   Notes="Customary f'c 4000 psi 1/17/2026 7:29:16 PM"
+   Material=A992Fy50   Type=Steel   Grade="Grade 50"   SymType=Isotropic   TempDepend=No   Color=Cyan   Notes="ASTM A992 Grade 50 1/17/2026 7:29:16 PM"
+ 
+TABLE:  "MATERIAL PROPERTIES 02 - BASIC MECHANICAL PROPERTIES"
+   Material=4000Psi   UnitWeight=8.680555556E-05   UnitMass=2.248332521E-07   E1=3604.9965   G12=1502.081875   U12=0.2   A1=5.5E-06
+   Material=A992Fy50   UnitWeight=0.000283564814814815   UnitMass=7.34455290352564E-07   E1=29000   G12=11153.8461538462   U12=0.3   A1=6.5E-06
+ 
+TABLE:  "MATERIAL PROPERTIES 03A - STEEL DATA"
+   Material=A992Fy50   Fy=50   Fu=65   EffFy=55   EffFu=71.5   SSCurveOpt=Simple   SSHysType=Kinematic   SHard=0.015   SMax=0.11   SRup=0.17   FinalSlope=-0.1   CoupModType="Von Mises"
+ 
+TABLE:  "MATERIAL PROPERTIES 03B - CONCRETE DATA"
+   Material=4000Psi   Fc=4   eFc=4   LtWtConc=No   SSCurveOpt=Mander   SSHysType=Takeda   SFc=0.00221914   SCap=0.005   FinalSlope=-0.1   FAngle=0   DAngle=0   CoupModType="Modified Darwin-Pecknold"
+ 
+TABLE:  "MATERIAL PROPERTIES 03J - COUPLED NONLINEAR VON MISES DATA"
+   Material=A992Fy50   YieldStress=55   LinIsoHard=No   LinKinHard=No   NLIsoSaHard=No
+ 
+TABLE:  "MATERIAL PROPERTIES 06 - DAMPING PARAMETERS"
+   Material=4000Psi   ModalRatio=0   VisMass=0   VisStiff=0   HysMass=0   HysStiff=0
+   Material=A992Fy50   ModalRatio=0   VisMass=0   VisStiff=0   HysMass=0   HysStiff=0
+ 
+TABLE:  "MATERIAL PROPERTIES 09 - ACCEPTANCE CRITERIA"
+   Material=4000Psi   IOTens=0.01   LSTens=0.02   CPTens=0.05   IOComp=-0.003   LSComp=-0.006   CPComp=-0.015   IgnoreTens=Yes
+   Material=A992Fy50   IOTens=0.01   LSTens=0.02   CPTens=0.05   IOComp=-0.005   LSComp=-0.01   CPComp=-0.02
+ 
+TABLE:  "OPTIONS - COLORS - DISPLAY"
+   DeviceType=Screen   Points=Blue   LinesFrame=Blue   LinesFrmDL=Blue   LinesCable=Green   LinesTendon=Green   SpringLinks=Green   Restraints=Green   Releases=Green   Axes=Cyan   Text=Black   ShadowLines=Gray8Dark   GuideLines=Gray8Dark _
+        Highlight=Red   Selection=10504778   AreaFillBot=Red   AreaFillTop=16744703   AreaFillSd=Red   AreaEdge=DarkRed   SolidF1=Red   SolidF2=Blue   SolidF3=Green   SolidF4=Yellow   SolidF5=White   SolidF6=Cyan   SolidEdge=DarkRed _
+        Floor=Gray4   Background=White   BGLowLeft=White   BGLowRight=White   BGUpRight=White   Darkness=0.5
+   DeviceType=Printer   Points=Gray8Dark   LinesFrame=Black   LinesFrmDL=Gray4   LinesCable=Black   LinesTendon=Black   SpringLinks=Gray8Dark   Restraints=Gray8Dark   Releases=Gray4   Axes=Black   Text=Black   ShadowLines=Gray4 _
+        GuideLines=Gray4   Highlight=Black   Selection=Black   AreaFillBot=Gray4   AreaFillTop=Gray8Dark   AreaFillSd=Gray4   AreaEdge=Black   SolidF1=Gray1Light   SolidF2=Gray2   SolidF3=Gray3   SolidF4=Gray4   SolidF5=Gray5 _
+        SolidF6=Gray6   SolidEdge=Black   Floor=Gray4   Background=White   BGLowLeft=White   BGLowRight=White   BGUpRight=White   Darkness=0.5
+   DeviceType="Color Printer"   Points=Blue   LinesFrame=Blue   LinesFrmDL=Blue   LinesCable=Green   LinesTendon=Green   SpringLinks=Green   Restraints=Green   Releases=Green   Axes=Cyan   Text=Black   ShadowLines=Gray8Dark _
+        GuideLines=Gray8Dark   Highlight=Red   Selection=10504778   AreaFillBot=Red   AreaFillTop=16744703   AreaFillSd=Red   AreaEdge=DarkRed   SolidF1=Red   SolidF2=Blue   SolidF3=Green   SolidF4=Yellow   SolidF5=White   SolidF6=Cyan _
+        SolidEdge=DarkRed   Floor=Gray4   Background=White   BGLowLeft=White   BGLowRight=White   BGUpRight=White   Darkness=0.5
+ 
+TABLE:  "OPTIONS - COLORS - OUTPUT"
+   DeviceType=Screen   Contour1=13107400   Contour2=6553828   Contour3=Red   Contour4=16639   Contour5=Orange   Contour6=43775   Contour7=54527   Contour8=Yellow   Contour9=65408   Contour10=Green   Contour11=8453888   Contour12=Cyan _
+        Contour13=16755200   Contour14=16733440   Contour15=Blue   Transpare=0   Ratio1=Cyan   Ratio2=Green   Ratio3=Yellow   Ratio4=Orange   Ratio5=Red   RatioNotD=Gray4   RatioNotC=Red   RatioVal1=0.5   RatioVal2=0.7   RatioVal3=0.9 _
+        RatioVal4=1   DFillPos=Blue   DFillNeg=Red   DFillRPos=Green   DFillRNeg=Green
+   DeviceType=Printer   Contour1=Black   Contour2=3158064   Contour3=4210752   Contour4=5263440   Contour5=6316128   Contour6=7368816   Contour7=Gray8Dark   Contour8=Gray7   Contour9=Gray6   Contour10=Gray5   Contour11=Gray4 _
+        Contour12=Gray3   Contour13=Gray2   Contour14=Gray1Light   Contour15=White   Transpare=0   Ratio1=Gray2   Ratio2=Gray4   Ratio3=Gray8Dark   Ratio4=4210752   Ratio5=Black   RatioNotD=Gray4   RatioNotC=Black   RatioVal1=0.5 _
+        RatioVal2=0.7   RatioVal3=0.9   RatioVal4=1   DFillPos=Gray8Dark   DFillNeg=Gray8Dark   DFillRPos=4210752   DFillRNeg=4210752
+   DeviceType="Color Printer"   Contour1=13107400   Contour2=6553828   Contour3=Red   Contour4=16639   Contour5=Orange   Contour6=43775   Contour7=54527   Contour8=Yellow   Contour9=65408   Contour10=Green   Contour11=8453888 _
+        Contour12=Cyan   Contour13=16755200   Contour14=16733440   Contour15=Blue   Transpare=0   Ratio1=Cyan   Ratio2=Green   Ratio3=Yellow   Ratio4=Orange   Ratio5=Red   RatioNotD=Gray4   RatioNotC=Red   RatioVal1=0.5   RatioVal2=0.7 _
+        RatioVal3=0.9   RatioVal4=1   DFillPos=Blue   DFillNeg=Red   DFillRPos=Green   DFillRNeg=Green
+ 
+TABLE:  "PREFERENCES - ALUMINUM DESIGN - AA 2015"
+   THDesign=Envelopes   SRatioLimit=1   Provision=LRFD   LatFact=1.33333333333333   UseLatFact=No   Bridge=No   PhiTy=0.9   PhiTr=0.75   PhiC=0.9   PhiBo=0.9   PhiBr=0.75   PhiVo=0.9   PhiVr=0.75
+ 
+TABLE:  "PREFERENCES - COLD FORMED DESIGN - AISI-16"
+   THDesign=Envelopes   FrameType="Braced Frame"   SRatioLimit=1   SOMethod="General 2nd Order"   Provision=LRFD   LatFact=1.33333333333333   UseLatFact=No   PhiTy=0.9   PhiTr=0.75   PhiC=0.85   PhiB=0.9   PhiBPipe=0.95   PhiV=0.95
+ 
+TABLE:  "PREFERENCES - CONCRETE DESIGN - ACI 318-19"
+   THDesign=Envelopes   NumCurves=24   NumPoints=11   MinEccen=Yes   BCCDesign=Yes   IgnoreBPu=Yes   CTorsion=Yes   PatLLF=0.75   UFLimit=0.95   SeisCat=D   Rho=1   Sds=0.5   PhiT=0.9   PhiCTied=0.65   PhiCSpiral=0.75   PhiV=0.75 _
+        PhiVSeismic=0.6   PhiVJoint=0.85   TanTheta=1
+ 
+TABLE:  "PREFERENCES - CONCRETE SHELL DESIGN - EUROCODE 2-2004"
+   Country="CEN Default"   GammaS=1.15   GammaC=1.5   AlphaCC=1   AlphaCT=1   CrackCond="Program Determined"   ShrDesMet="Method 1"   CotTheta=1
+ 
+TABLE:  "PREFERENCES - DIMENSIONAL"
+   MergeTol=0.1   FineGrid=12   Nudge=12   SelectTol=3   SnapTol=12   SLineThick=1   PLineThick=4   MaxFont=8   MinFont=3   AutoZoom=10   ShrinkFact=70   TextFileLen=240
+ 
+TABLE:  "PREFERENCES - STEEL DESIGN - AISC 360-16"
+   THDesign=Envelopes   FrameType=SMF   PatLLF=0.75   SRatioLimit=0.95   MaxIter=1   SDC=D   SeisCode=No   SeisLoad=No   ImpFactor=1   SystemRho=1   SystemSds=0.5   SystemR=8   SystemCd=5.5   Omega0=3   Provision=LRFD _
+        AMethod="Direct Analysis"   SOMethod="General 2nd Order"   SRMethod="Tau-b Fixed"   NLCoeff=0.002   PhiB=0.9   PhiC=0.9   PhiTY=0.9   PhiTF=0.75   PhiV=0.9   PhiVRolledI=1   PhiVT=0.9   PlugWeld=Yes   HSSWelding=ERW   HSSReduceT=No _
+        CheckDefl=No   DLRat=120   SDLAndLLRat=120   LLRat=360   TotalRat=240   NetRat=240
+ 
+TABLE:  "PROGRAM CONTROL"
+   ProgramName=SAP2000   Version=24.1.0   CurrUnits="Kip, in, F"   SteelCode="AISC 360-16"   ConcCode="ACI 318-19"   AlumCode="AA 2015"   ColdCode=AISI-16   RegenHinge=Yes
+ 
+TABLE:  "PROJECT INFORMATION"
+   Item="Company Name"
+   Item="Client Name"
+   Item="Project Name"
+   Item="Project Number"
+   Item="Model Name"
+   Item="Model Description"
+   Item="Revision Number"
+   Item="Frame Type"
+   Item=Engineer
+   Item=Checker
+   Item=Supervisor
+   Item="Issue Code"
+   Item="Design Code"
+ 
+TABLE:  "REBAR SIZES"
+   RebarID=#2   Area=0.05   Diameter=0.25
+   RebarID=#3   Area=0.109999999403954   Diameter=0.375
+   RebarID=#4   Area=0.200000002980232   Diameter=0.5
+   RebarID=#5   Area=0.310000002384186   Diameter=0.625
+   RebarID=#6   Area=0.439999997615814   Diameter=0.75
+   RebarID=#7   Area=0.600000023841858   Diameter=0.875
+   RebarID=#8   Area=0.790000021457672   Diameter=1
+   RebarID=#9   Area=1   Diameter=1.12800002098083
+   RebarID=#10   Area=1.26999998092651   Diameter=1.26999998092651
+   RebarID=#11   Area=1.55999994277954   Diameter=1.4099999666214
+   RebarID=#14   Area=2.25   Diameter=1.692999958992
+   RebarID=#18   Area=4   Diameter=2.25699996948242
+   RebarID=10M   Area=0.155000314116478   Diameter=0.444881916046143
+   RebarID=15M   Area=0.310000628232956   Diameter=0.62992125749588
+   RebarID=20M   Area=0.465000957250595   Diameter=0.767716526985168
+   RebarID=25M   Area=0.775001585483551   Diameter=0.992126047611237
+   RebarID=30M   Area=1.08500218391418   Diameter=1.17716538906097
+   RebarID=35M   Area=1.5500031709671   Diameter=1.4055118560791
+   RebarID=45M   Area=2.3250048160553   Diameter=1.72047245502472
+   RebarID=55M   Area=3.87500786781311   Diameter=2.22047257423401
+   RebarID=6d   Area=0.0438650883734226   Diameter=0.236220479011536
+   RebarID=8d   Area=0.0779651552438736   Diameter=0.31496062874794
+   RebarID=10d   Area=0.121675245463848   Diameter=0.393700778484344
+   RebarID=12d   Area=0.175150364637375   Diameter=0.472440958023071
+   RebarID=14d   Area=0.238700494170189   Diameter=0.551181137561798
+   RebarID=16d   Area=0.31155064702034   Diameter=0.62992125749588
+   RebarID=20d   Area=0.486700981855392   Diameter=0.787401556968689
+   RebarID=25d   Area=0.761051535606384   Diameter=0.984251976013184
+   RebarID=26d   Area=0.823051691055298   Diameter=1.02362203598022
+   RebarID=28d   Area=0.954801976680756   Diameter=1.1023622751236
+   RebarID=N12   Area=0.175150364637375   Diameter=0.472440958023071
+   RebarID=N16   Area=0.31155064702034   Diameter=0.62992125749588
+   RebarID=N20   Area=0.486700981855392   Diameter=0.787401556968689
+   RebarID=N24   Area=0.7006014585495   Diameter=0.944881916046143
+   RebarID=N28   Area=0.954801976680756   Diameter=1.1023622751236
+   RebarID=N32   Area=1.24620258808136   Diameter=1.25984251499176
+   RebarID=N36   Area=1.58100318908691   Diameter=1.41732287406921
+ 
+END TABLE DATA

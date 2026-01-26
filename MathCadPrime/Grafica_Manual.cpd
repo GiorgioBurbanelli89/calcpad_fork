@@ -1,0 +1,28 @@
+' ============================================
+' Importado de Mathcad Prime: Grafica.mcdx
+' Conversión manual basada en PDF y XML
+' ============================================
+
+' Definición de variables con vectores y unidades
+
+' Vector de posiciones (metros)
+x = [2; 2; 6]'m
+
+' Vector de fuerzas (toneladas-fuerza)
+F = [2; 3; 5]'tonf
+
+' Conversión a Newtons para visualización
+F_N = F*1000*9.81
+
+' Resultados en tabla
+#show
+'<table>
+'<tr><th>x (m)</th><th>F (tonf)</th><th>F (N)</th></tr>
+'<tr><td>$x_1$</td><td>$F_1$</td><td>$F_N_1$</td></tr>
+'<tr><td>$x_2$</td><td>$F_2$</td><td>$F_N_2$</td></tr>
+'<tr><td>$x_3$</td><td>$F_3$</td><td>$F_N_3$</td></tr>
+'</table>
+#hide
+
+' Nota: Para graficar estos datos, usar software externo
+' o exportar a Python/Octave con #columns

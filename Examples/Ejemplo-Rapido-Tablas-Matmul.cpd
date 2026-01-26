@@ -1,0 +1,118 @@
+"=========================================
+"EJEMPLO RÁPIDO: Tablas Markdown + matmul()
+"=========================================
+
+'<h2>🎯 Demostración de Nuevas Funcionalidades</h2>
+
+'<h3 style="color:#2563eb;">1. Tablas Markdown (UsePipeTables)</h3>
+
+#md on
+## Tabla de Propiedades de Aceros Estructurales
+
+| Designación | f_y (MPa) | f_u (MPa) | Elongación (%) | Uso Típico |
+|-------------|-----------|-----------|----------------|------------|
+| A36         | 250       | 400       | 20             | Estructuras generales |
+| A572 Gr.50  | 345       | 450       | 21             | Puentes y edificios |
+| A992        | 345       | 450       | 21             | Perfiles laminados |
+| A514        | 690       | 760       | 18             | Alta resistencia |
+
+---
+
+## Secciones de Acero Disponibles
+
+| Perfil | Peso (kg/m) | A (cm²) | I_x (cm⁴) | W_x (cm³) | Precio ($/m) |
+|--------|-------------|---------|-----------|-----------|--------------|
+| W14x90 | 133.8       | 170.3   | 62900     | 2890      | 185.50       |
+| W18x97 | 144.3       | 183.9   | 100200    | 3540      | 212.30       |
+| W21x93 | 138.3       | 176.1   | 128400    | 4010      | 203.80       |
+| W24x84 | 124.9       | 159.0   | 144600    | 4440      | 184.20       |
+
+#md off
+
+'<div style="background:#f0f9ff;padding:15px;margin:10px 0;border-left:4px solid #2563eb;">
+'✨ <strong>Nota:</strong> Las tablas arriba fueron renderizadas usando Markdown con el nuevo soporte <code>UsePipeTables()</code>
+'</div>
+
+'<h3 style="color:#7c3aed;">2. Multiplicación Rápida de Matrices (matmul)</h3>
+
+"Definir matriz de rigidez K (4x4)
+K = [100; -50; 0; 0 | -50; 150; -75; 0 | 0; -75; 175; -100 | 0; 0; -100; 100]
+
+"Definir matriz de desplazamientos unitarios D (4x4)
+D = [1; 0; 0; 0 | 0; 1; 0; 0 | 0; 0; 1; 0 | 0; 0; 0; 1]
+
+'<p><strong>Multiplicación tradicional (K × D):</strong></p>
+"Resultado usando operador estándar
+R_standard = K*D
+
+'<p><strong>Multiplicación optimizada con matmul():</strong></p>
+"Usando algoritmo Winograd paralelo + SIMD
+R_optimized = matmul(K; D)
+
+'<div style="background:#faf5ff;padding:15px;margin:10px 0;border-left:4px solid #7c3aed;">
+'⚡ <strong>Ventaja de matmul():</strong> Para matrices grandes (especialmente >64x64),
+'la función <code>matmul()</code> usa un kernel SIMD optimizado con loops desenrollados que
+'ofrece significativamente mejor performance que la multiplicación estándar.
+'</div>
+
+'<h3 style="color:#16a34a;">3. Aplicación Práctica: Análisis de Armadura</h3>
+
+"Parámetros de diseño
+E = 200000'MPa      'Módulo de elasticidad del acero
+A_section = 25'cm²   'Área de sección transversal
+L = 4'm              'Longitud de miembro
+
+"Matriz de rigidez elemental simplificada (2x2)
+k_elem = E*A_section*10/L
+K_2x2 = [k_elem; -k_elem | -k_elem; k_elem]
+
+"Vector de cargas nodales
+F = [0; 50]'kN
+
+"Resolver sistema K × u = F (invertir K)
+K_inv = [1/k_elem; 1/k_elem | 1/k_elem; 2/k_elem]
+u = matmul(K_inv; F)
+
+"Desplazamientos
+u_1 = u_1
+u_2 = u_2
+
+'<h3 style="color:#dc2626;">4. Comparación de Métodos en Tabla</h3>
+
+#md on
+
+| Método | Complejidad | Performance | Mejor para |
+|--------|-------------|-------------|------------|
+| Operador * | O(n³) | Estándar | Matrices pequeñas (<32x32) |
+| matmul() | O(n^2.807) | Optimizado | Matrices medianas y grandes |
+| matmul() + SIMD | O(n^2.807) | Muy rápido | Matrices muy grandes (>64x64) |
+
+**Tabla:** Comparación de métodos de multiplicación de matrices
+
+---
+
+### 💡 Casos de Uso Recomendados para matmul()
+
+1. **Análisis matricial de estructuras** - Matrices de rigidez grandes
+2. **Elementos finitos** - Ensamblaje y solución de sistemas
+3. **Dinámica estructural** - Matrices de masa y amortiguamiento
+4. **Optimización** - Múltiples iteraciones matriciales
+5. **Análisis modal** - Problemas de eigenvalores
+
+#md off
+
+'<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:20px;border-radius:8px;margin-top:20px;">
+'<h3 style="color:white;margin:0;">✅ Resumen de Mejoras Demostradas</h3>
+'<ul style="margin:10px 0;">
+'<li>✓ Tablas Markdown profesionales con <code>UsePipeTables()</code></li>
+'<li>✓ Multiplicación optimizada con <code>matmul(A; B)</code></li>
+'<li>✓ Algoritmo Winograd paralelo con SIMD</li>
+'<li>✓ Mejor presentación de datos tabulares</li>
+'<li>✓ Performance mejorado para operaciones matriciales</li>
+'</ul>
+'</div>
+
+'<hr>
+'<p style="text-align:center;color:#666;font-size:0.9em;">
+'Ejemplo creado con Calcpad 2026 - Actualización del 18 Enero
+'</p>

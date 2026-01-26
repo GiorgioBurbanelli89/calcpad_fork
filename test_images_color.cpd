@@ -1,0 +1,25 @@
+"Test: 4 Imagenes de Colores en Columnas (50x50 px)
+
+#columns 4
+'Rojo:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAAOUlEQVR42u3OAQkAAAjAsPcvrTUUBguwpg5KS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tL61drAXsrusQtES25AAAAAElFTkSuQmCC
+@{end image}
+#column
+'Verde:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAAOElEQVR42u3OAQkAAAjAsPcvrTUUBguwmi7S0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS+tVawFm6xFkGzagAAAAASUVORK5CYII=
+@{end image}
+#column
+'Azul:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAAOElEQVR42u3OAQkAAAjAsPcvrTUUBguwak7S0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSetVaBZa6xHKg1wAAAAAASUVORK5CYII=
+@{end image}
+#column
+'Amarillo:
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAAOUlEQVR42u3OAQkAAAwDoPUvvdfYQTCAaTMoWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWr9aBx4VdZYjPdTXAAAAAElFTkSuQmCC
+@{end image}
+#end columns
+
+'Fin

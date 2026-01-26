@@ -1,0 +1,20 @@
+"Test Octave Invisible"
+
+@{octave}
+% Configurar para NO mostrar ventanas
+set(0, 'DefaultFigureVisible', 'off');
+
+x = [0 1 2 3];
+y = [0 1 4 9];
+
+h = figure();
+plot(x, y, '-o');
+title('Test Invisible');
+
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/octave_invisible.png';
+drawnow;
+print(h, output_file, '-dpng');
+close(h);
+
+fprintf('Imagen guardada: %s\n', output_file);
+@{end octave}

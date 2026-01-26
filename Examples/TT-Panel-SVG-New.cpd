@@ -1,0 +1,105 @@
+"Prestressed TT Panel - New SVG Format
+#deg
+'Dimensions:
+'Rib height -'h = ? {750}'mm
+'Rib top width -'b_2 = ? {200}'mm
+'Slab depth -'h_f = ? {100}'mm
+'Rib spacing c/c -'B_0 = ? {1500}'mm
+'Slab width -'B = ? {2500}'mm
+#post
+'Total height -'H = h + h_f'mm
+'Rib bottom width -'b_1 = b_2 - (h - 30)/10'mm
+'- mean -'b_w = (b_1 + b_2)/2'mm
+'- at <var>z</var> from top -'b(z) = b_2 - (b_2 - b_1)*z/h'mm
+'Rib effective width -'b_f = B/2'mm
+#post
+#show
+'Distance from the center of the first row of tendons to the bottom edge -'d_p1 = ? {80}'mm
+'Number of tendons in one row -'n_ph = ? {2}'
+'Number of rows -'n_pv = ? {3}'
+#pre
+'<img style="width:450pt;" src="https://proektsoft.bg/calcpad/Media/Structures/RC/Precast/TT-section.png" alt="TT-section.png">
+#hide
+x_1 = B_0/2
+x_2 = x_1 + b_2/2
+x_3 = x_2 + 140
+x_4 = x_1 + b_1/2
+x_5 = x_4 - b_1
+x_6 = x_2 - b_2
+x_7 = x_6 - 140
+x_8 = x_1 - 20*(n_ph - 1)
+
+viewbox_x = -b_f - 200
+viewbox_w = B + 300
+viewbox_h = H + 400
+
+#post
+
+#hide
+$svg{width:500; height:500*viewbox_h/viewbox_w; width-unit:pt; height-unit:pt; viewbox:viewbox_x,-150,viewbox_w,viewbox_h; style:font-family: Arial Nova Cond, Noto Sans Cond, Segoe UI; font-size: 54px}
+
+polygon{points:b_f,0 b_f,h_f x_3,h_f x_2,h_f+30 x_4,H x_5,H x_6,h_f+30 x_7,h_f -x_7,h_f -x_6,h_f+30 -x_5,H -x_4,H -x_2,h_f+30 -x_3,h_f -b_f,h_f -b_f,0; fill:lightyellow; stroke:black; stroke-width:8}
+
+line{x1:-x_1; y1:-100; x2:-x_1; y2:H+100; stroke:green; stroke-width:6; stroke-dasharray:60,15,10,15}
+line{x1:x_1; y1:-100; x2:x_1; y2:H+100; stroke:green; stroke-width:6; stroke-dasharray:60,15,10,15}
+
+line{x1:-b_f; y1:-100; x2:-b_f; y2:-20; stroke:goldenrod; stroke-width:4}
+line{x1:b_f; y1:-100; x2:b_f; y2:-20; stroke:goldenrod; stroke-width:4}
+line{x1:-b_f-40; y1:-60; x2:b_f+40; y2:-60; stroke:goldenrod; stroke-width:4}
+circle{cx:b_f; cy:-60; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+circle{cx:-b_f; cy:-60; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+text{x:0; y:-90; content:B = %B% mm; text-anchor:middle; font-size:54}
+
+line{x1:-b_f-200; y1:0; x2:-b_f-120; y2:0; stroke:goldenrod; stroke-width:4}
+line{x1:-b_f-200; y1:H; x2:-b_f-120; y2:H; stroke:goldenrod; stroke-width:4}
+line{x1:-b_f-160; y1:-40; x2:-b_f-160; y2:H+40; stroke:goldenrod; stroke-width:4}
+circle{cx:-b_f-160; cy:0; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+circle{cx:-b_f-160; cy:H; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+text{x:-b_f-160; y:H/2; content:H = %H% mm; text-anchor:middle; transform:rotate(-90,-b_f-190,H/2); font-size:54}
+
+line{x1:-b_f-100; y1:0; x2:-b_f-20; y2:0; stroke:goldenrod; stroke-width:4}
+line{x1:-b_f-100; y1:h_f; x2:-b_f-20; y2:h_f; stroke:goldenrod; stroke-width:4}
+line{x1:-b_f-60; y1:-40; x2:-b_f-60; y2:h_f+40; stroke:goldenrod; stroke-width:4}
+circle{cx:-b_f-60; cy:0; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+circle{cx:-b_f-60; cy:h_f; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+text{x:-b_f-60; y:h_f/2; content:hf = %h_f% mm; text-anchor:middle; transform:rotate(-90,-b_f-90,h_f/2); font-size:54}
+
+line{x1:-b_f-100; y1:h_f; x2:-b_f-20; y2:h_f; stroke:goldenrod; stroke-width:4}
+line{x1:-b_f-100; y1:H; x2:-b_f-20; y2:H; stroke:goldenrod; stroke-width:4}
+line{x1:-b_f-60; y1:h_f+60; x2:-b_f-60; y2:H+40; stroke:goldenrod; stroke-width:4}
+circle{cx:-b_f-60; cy:h_f; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+circle{cx:-b_f-60; cy:H; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+text{x:-b_f-60; y:(h_f+H)/2; content:h = %h% mm; text-anchor:middle; transform:rotate(-90,-b_f-90,(h_f+H)/2); font-size:54}
+
+line{x1:-x_1; y1:H+230; x2:-x_1; y2:H+310; stroke:goldenrod; stroke-width:4}
+line{x1:x_1; y1:H+230; x2:x_1; y2:H+310; stroke:goldenrod; stroke-width:4}
+line{x1:-x_1-40; y1:H+270; x2:x_1+40; y2:H+270; stroke:goldenrod; stroke-width:4}
+circle{cx:x_1; cy:H+270; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+circle{cx:-x_1; cy:H+270; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+text{x:0; y:H+240; content:B0 = %B_0% mm; text-anchor:middle; font-size:54}
+
+line{x1:-x_2; y1:h_f+170; x2:-x_2; y2:h_f+250; stroke:goldenrod; stroke-width:4}
+line{x1:-x_6; y1:h_f+170; x2:-x_6; y2:h_f+250; stroke:goldenrod; stroke-width:4}
+line{x1:-x_2-40; y1:h_f+210; x2:-x_6+40; y2:h_f+210; stroke:goldenrod; stroke-width:4}
+circle{cx:-x_6; cy:h_f+210; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+circle{cx:-x_2; cy:h_f+210; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+text{x:(-x_2-x_6)/2; y:h_f+180; content:b2 = %b_2% mm; text-anchor:middle; font-size:54}
+
+line{x1:-x_4; y1:H+130; x2:-x_4; y2:H+210; stroke:goldenrod; stroke-width:4}
+line{x1:-x_5; y1:H+130; x2:-x_5; y2:H+210; stroke:goldenrod; stroke-width:4}
+line{x1:-x_4-40; y1:H+170; x2:-x_5+40; y2:H+170; stroke:goldenrod; stroke-width:4}
+circle{cx:-x_5; cy:H+170; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+circle{cx:-x_4; cy:H+170; r:12; fill:goldenrod; stroke:goldenrod; stroke-width:4}
+text{x:(-x_4-x_5)/2; y:H+140; content:b1 = %b_1% mm; text-anchor:middle; font-size:54}
+
+#for i = 0 : n_pv - 1
+	#for j = 0 : n_ph - 1
+		circle{cx:x_1 - 20*(n_ph - 1) + 40*j; cy:H-d_p1-40*i; r:10; fill:red; stroke:red; stroke-width:1}
+		circle{cx:-x_1 + 20*(n_ph - 1) - 40*j; cy:H-d_p1-40*i; r:10; fill:red; stroke:red; stroke-width:1}
+	#loop
+#loop
+
+$end
+#show
+
+#equ

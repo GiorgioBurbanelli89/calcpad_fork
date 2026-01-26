@@ -1,0 +1,29 @@
+"Prueba de MultLangCode con Calcpad
+'Calculo en Calcpad:
+a = 5
+b = 10
+c = a + b
+
+@{python}
+import math
+x = 5
+y = 10
+resultado = x + y
+print(f"Python: {x} + {y} = {resultado}")
+print(f"Raiz cuadrada de {resultado}: {math.sqrt(resultado):.4f}")
+@{end python}
+
+'Mas calculos en Calcpad:
+d = c * 2
+e = sqr(d)
+
+@{powershell}
+$a = 5
+$b = 10
+$suma = $a + $b
+Write-Host "PowerShell: $a + $b = $suma"
+Write-Host "Fecha actual: $(Get-Date -Format 'yyyy-MM-dd')"
+@{end powershell}
+
+'Resultado final de Calcpad:
+resultado_final = a + b + c + d

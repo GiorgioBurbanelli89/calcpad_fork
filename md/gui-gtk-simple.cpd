@@ -1,0 +1,109 @@
+﻿'Ejemplo GUI GTK - Ejecutable Simple en C
+
+"GTK es el framework nativo de GNOME (Linux)."
+
+@{gtk}
+#include <stdio.h>
+
+// Calculadora simple con GTK (simulada para este ejemplo)
+int main() {
+    printf("=== GTK GUI Framework - Calculadora Simple ===\n");
+    printf("GTK es el toolkit nativo de GNOME (Linux)\n");
+    printf("Usado por: GIMP, Inkscape, Blender, GNOME\n");
+    printf("\n");
+
+    // SimulaciÃ³n de GUI (sin ventana real, solo output)
+    printf("Interfaz simulada:\n");
+    printf("â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”\n");
+    printf("â”‚   Calculadora GTK 4            â”‚\n");
+    printf("â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\n");
+    printf("â”‚ NÃºmero 1: [  7  ]              â”‚\n");
+    printf("â”‚ NÃºmero 2: [  4  ]              â”‚\n");
+    printf("â”‚                                â”‚\n");
+    printf("â”‚ [ + ] [ - ] [ Ã— ] [ Ã· ]        â”‚\n");
+    printf("â”‚                                â”‚\n");
+    printf("â”‚ Resultado: 11                  â”‚\n");
+    printf("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜\n");
+    printf("\n");
+
+    // LÃ³gica de ejemplo
+    int num1 = 7;
+    int num2 = 4;
+    int suma = num1 + num2;
+
+    printf("CÃ¡lculo: %d + %d = %d\n", num1, num2, suma);
+    printf("\n");
+    printf("Para instalar GTK en Linux:\n");
+    printf("$ sudo apt install libgtk-4-dev\n");
+    printf("$ pkg-config --modversion gtk4\n");
+    printf("\n");
+    printf("Compilar app GTK:\n");
+    printf("$ gcc main.c -o app $(pkg-config --cflags --libs gtk4)\n");
+    printf("$ ./app\n");
+    printf("\n");
+    printf("Ventajas de GTK:\n");
+    printf("âœ“ Nativo en Linux/GNOME\n");
+    printf("âœ“ Ligero y rÃ¡pido\n");
+    printf("âœ“ API simple en C\n");
+    printf("âœ“ Perfecto para apps Linux\n");
+
+    return 0;
+}
+@{end gtk}
+
+'CÃ³digo GTK real (requiere GTK instalado):
+
+"Para crear una ventana GTK real necesitas:"
+
+"1. Instalar GTK:"
+"   $ sudo apt install libgtk-4-dev"
+
+"2. CÃ³digo mÃ­nimo (main.c):"
+
+@{gtk}
+#include <gtk/gtk.h>
+
+static void on_button_clicked(GtkWidget *widget, gpointer data) {
+    GtkWidget *label = GTK_WIDGET(data);
+    gtk_label_set_text(GTK_LABEL(label), "Â¡BotÃ³n presionado!");
+}
+
+static void activate(GtkApplication *app, gpointer user_data) {
+    GtkWidget *window;
+    GtkWidget *box;
+    GtkWidget *button;
+    GtkWidget *label;
+
+    window = gtk_application_window_new(app);
+    gtk_window_set_title(GTK_WINDOW(window), "Calcpad GTK");
+    gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
+
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_window_set_child(GTK_WINDOW(window), box);
+
+    label = gtk_label_new("Hola desde GTK!");
+    gtk_box_append(GTK_BOX(box), label);
+
+    button = gtk_button_new_with_label("Calcular");
+    g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), label);
+    gtk_box_append(GTK_BOX(box), button);
+
+    gtk_window_present(GTK_WINDOW(window));
+}
+
+int main(int argc, char **argv) {
+    GtkApplication *app;
+    int status;
+
+    app = gtk_application_new("com.calcpad.gtk", G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+    status = g_application_run(G_APPLICATION(app), argc, argv);
+    g_object_unref(app);
+
+    return status;
+}
+@{end gtk}
+
+3. Compilar:
+   $ gcc main.c -o calcpad-gtk $(pkg-config --cflags --libs gtk4)
+   $ ./calcpad-gtk

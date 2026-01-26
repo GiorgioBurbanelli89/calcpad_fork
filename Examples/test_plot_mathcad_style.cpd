@@ -1,0 +1,36 @@
+"Gráfica estilo Mathcad Prime con @{plot}"
+'Datos de ejemplo (similar a la imagen de Mathcad)
+@{plot}
+x: [2; 2.5; 3; 4; 5; 6]
+y: [2; 2.9; 3; 3.5; 4.2; 5]
+title: ""
+xlabel: "x (m)"
+ylabel: "F (tonnef)"
+color: #003399
+grid: true
+width: 500
+height: 400
+@{end plot}
+
+'Segundo ejemplo: Función cuadrática
+@{plot}
+x: [0; 1; 2; 3; 4; 5]
+y: [0; 1; 4; 9; 16; 25]
+xlabel: "t (s)"
+ylabel: "d (m)"
+color: #006600
+legend: "d = t²"
+grid: true
+@{end plot}
+
+'Tercer ejemplo: Datos con unidades
+@{plot}
+x: [0; 2; 4; 6; 8; 10]
+y: [0; 5; 8; 12; 15; 20]
+xlabel: "Longitud (m)"
+ylabel: "Carga (kN)"
+title: "Diagrama de carga"
+color: #990000
+style: solid
+legend: "P(L)"
+@{end plot}

@@ -1,0 +1,58 @@
+
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+ <meta name="generator" content="Adobe RoboHelp 2019">
+<title>cPluginContract Interface</title>
+<link rel="StyleSheet" href="../../../SAP2000.CSS" type="text/css">
+</head>
+
+<body>
+<script type="text/javascript" src="../../../ehlpdhtm.js" language="JavaScript1.2"></script>
+
+<h1>cPluginContract Interface</h1>
+<p class="Comment">The cPluginContract interface is used to ensure that 
+ the cPlugin class you create contains the correct methods, so that your plugin can 
+    be successfully added to and run by SAP2000</p>
+<h2>Methods</h2>
+<h3 style="margin-left: 40px;"><span style="text-decoration: none; ">Main</span></h3>
+<p class="Coding" style="margin-left: 88px;">Sub Main ( ByRef SapModel 
+ As cSapModel, ByRef ISapPlugin As cPluginCallback )Dim instance As cPluginContract</p>
+<p class="Coding">&#160;</p>
+<p class="Comment" style="margin-left: 88px;">This method is the entry 
+ point for launching the plugin.</p>
+<p class="ParameterName" style="margin-left: 88px;">SapModel</p>
+<p class="Comment" style="margin-left: 88px;">The parameter SapModel is 
+ a reference to the SapModel object upon which all operations will be performed. 
+ The SapModel object will be provided to your plugin by the main SAP2000 
+ program</p>
+<p class="ParameterName" style="margin-left: 88px;">&#160;</p>
+<p class="ParameterName" style="margin-left: 88px;">ISapPlugin</p>
+<p class="Comment" style="margin-left: 88px;">The parameter <span style="font-style: italic;">ISapPlugin</span> 
+ is a reference to the callback object, used to retrieve the plugin status 
+ and notify the program when the plugin is closed. The callback object 
+ will be passed from the main SAP200 program to your plugin.</p>
+<h3 style="margin-left: 40px;">Info</h3>
+<p class="Coding" style="margin-left: 88px;">Function Info ( ByRef Text 
+ As String ) As Integer</p>
+<p class="Comment" style="margin-left: 88px;">This method provides information 
+ about the plugin</p>
+<p class="ParameterName" style="margin-left: 88px;">&#160;</p>
+<p class="ParameterName" style="margin-left: 88px;">Text</p>
+<p class="Comment" style="margin-left: 88px;">The parameter <span style="font-style: italic;">Text</span> 
+ should be filled with information about the plugin, e.g. author, version, 
+ description&#160;</p>
+<p class="ParameterName" style="margin-left: 88px;">&#160;</p>
+<p class="ParameterName" style="margin-left: 88px;">Return Value</p>
+<p class="Comment" style="margin-left: 88px;">This method returns a zero 
+ if the information is successfully retrieved; otherwise it returns a non-zero 
+ value. &#160;</p>
+<h2>See Also</h2>
+<p class="Block-Text"><a href="../cPlugincallback_Properties/cPluginCallback_Interfacey.htm">cPluginCallback 
+ Interface</a></p>
+<p class="Block-Text"><a href="../Plugin_Example_for_SAP2000_API_CHM.htm">Plugin 
+ Example</a></p>
+<p class="Block-Text">&#160;</p>
+</body>
+</html>

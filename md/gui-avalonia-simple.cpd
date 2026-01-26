@@ -1,0 +1,77 @@
+﻿'Ejemplo GUI Avalonia - Ejecutable Simple
+'
+'Este es un ejemplo minimalista de Avalonia que se puede ejecutar directamente.
+
+@{avalonia}
+using System;
+
+// Calculadora simple con Avalonia UI
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("=== Avalonia UI - Calculadora Simple ===");
+        Console.WriteLine("Avalonia es cross-platform (Windows/Linux/macOS)");
+        Console.WriteLine("Usa XAML como WPF, pero funciona en todas las plataformas");
+        Console.WriteLine();
+
+        // SimulaciÃ³n de GUI (sin ventana real, solo output)
+        Console.WriteLine("Interfaz simulada:");
+        Console.WriteLine("â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”");
+        Console.WriteLine("â”‚   Calculadora Avalonia         â”‚");
+        Console.WriteLine("â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤");
+        Console.WriteLine("â”‚ NÃºmero 1: [  5  ]              â”‚");
+        Console.WriteLine("â”‚ NÃºmero 2: [ 10  ]              â”‚");
+        Console.WriteLine("â”‚                                â”‚");
+        Console.WriteLine("â”‚ [ + ] [ - ] [ Ã— ] [ Ã· ]        â”‚");
+        Console.WriteLine("â”‚                                â”‚");
+        Console.WriteLine("â”‚ Resultado: 15                  â”‚");
+        Console.WriteLine("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜");
+        Console.WriteLine();
+
+        // LÃ³gica de ejemplo
+        int num1 = 5;
+        int num2 = 10;
+        int suma = num1 + num2;
+
+        Console.WriteLine($"CÃ¡lculo: {num1} + {num2} = {suma}");
+        Console.WriteLine();
+        Console.WriteLine("Para crear una app Avalonia real:");
+        Console.WriteLine("$ dotnet new install Avalonia.Templates");
+        Console.WriteLine("$ dotnet new avalonia.app -n CalcpadAvalonia");
+        Console.WriteLine("$ cd CalcpadAvalonia");
+        Console.WriteLine("$ dotnet run");
+        Console.WriteLine();
+        Console.WriteLine("Ventajas de Avalonia:");
+        Console.WriteLine("âœ“ Usa XAML (como WPF)");
+        Console.WriteLine("âœ“ Cross-platform nativo");
+        Console.WriteLine("âœ“ CÃ³digo muy similar a WPF");
+        Console.WriteLine("âœ“ Perfecto para portar Calcpad a Linux");
+    }
+}
+@{end avalonia}
+
+'ComparaciÃ³n WPF vs Avalonia:
+'
+'WPF XAML:
+@{xaml}
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <StackPanel>
+        <TextBlock Text="Hola WPF"/>
+        <Button Content="Click" Click="Button_Click"/>
+    </StackPanel>
+</Window>
+@{end xaml}
+'
+'Avalonia XAML:
+@{xaml}
+<Window xmlns="https://github.com/avaloniaui">
+    <StackPanel>
+        <TextBlock Text="Hola Avalonia"/>
+        <Button Content="Click" Click="Button_Click"/>
+    </StackPanel>
+</Window>
+@{end xaml}
+
+'Â¡El cÃ³digo es prÃ¡cticamente idÃ©ntico!
+'Solo cambia el namespace xmlns.

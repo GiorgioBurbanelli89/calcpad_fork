@@ -1,0 +1,2020 @@
+[
+  {
+    "filename": "Ensamblaje_Placas.mcdx",
+    "regions": [
+      {
+        "id": "0",
+        "top": "9.4488188976377945",
+        "left": "9.4488188976377945",
+        "width": "678.61408711018123",
+        "height": "374.2571252946708",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "1",
+        "top": "406.29921259842519",
+        "left": "9.4488188976377945",
+        "width": "471.55063860406545",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "2",
+        "top": "444.09448818897636",
+        "left": "37.795275590551178",
+        "width": "320.2702702702702",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "3",
+        "top": "444.09448818897636",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "E"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "4",
+        "top": "481.88976377952753",
+        "left": "37.795275590551178",
+        "width": "320.72072072072069",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "5",
+        "top": "481.88976377952753",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "ν"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "6",
+        "top": "519.6850393700787",
+        "left": "37.795275590551178",
+        "width": "321.17117117117118",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "7",
+        "top": "519.6850393700787",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "G"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "8",
+        "top": "566.92913385826762",
+        "left": "37.795275590551178",
+        "width": "322.972972972973",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "9",
+        "top": "566.92913385826762",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "d"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "10",
+        "top": "614.17322834645665",
+        "left": "37.795275590551178",
+        "width": "321.17117117117118",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "11",
+        "top": "614.17322834645665",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "κ"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "12",
+        "top": "680.31496062992119",
+        "left": "37.795275590551178",
+        "width": "321.62162162162156",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "13",
+        "top": "680.31496062992119",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "14",
+        "top": "765.35433070866134",
+        "left": "37.795275590551178",
+        "width": "320.72072072072081",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "15",
+        "top": "765.35433070866134",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "16",
+        "top": "812.59842519685037",
+        "left": "37.795275590551178",
+        "width": "623.42342342342306",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "17",
+        "top": "850.39370078740149",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "18",
+        "top": "850.39370078740149",
+        "left": "274.01574803149606",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "19",
+        "top": "907.08661417322833",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "20",
+        "top": "907.08661417322833",
+        "left": "274.01574803149606",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "21",
+        "top": "963.779527559055",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "N"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "22",
+        "top": "1011.023622047244",
+        "left": "37.795275590551178",
+        "width": "622.07207207207193",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "23",
+        "top": "1086.6141732283463",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "dN"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "24",
+        "top": "1171.6535433070865",
+        "left": "37.795275590551178",
+        "width": "625.67567567567562",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "25",
+        "top": "1228.3464566929133",
+        "left": "56.69291338582677",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "L1"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "26",
+        "top": "1228.3464566929133",
+        "left": "170.0787401574803",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "L2"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "27",
+        "top": "1313.3858267716535",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "unknown",
+        "content": null
+      },
+      {
+        "id": "28",
+        "top": "1360.6299212598424",
+        "left": "207.87401574803147",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "XY"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "29",
+        "top": "1464.5669291338581",
+        "left": "37.795275590551178",
+        "width": "200",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "30",
+        "top": "1464.5669291338581",
+        "left": "264.56692913385825",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "J"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "31",
+        "top": "1521.259842519685",
+        "left": "37.795275590551178",
+        "width": "601.801801801802",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "32",
+        "top": "1577.9527559055116",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "d'N"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "33",
+        "top": "1634.6456692913384",
+        "left": "37.795275590551178",
+        "width": "601.801801801802",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "34",
+        "top": "1691.3385826771653",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "f"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "35",
+        "top": "1748.0314960629919",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "36",
+        "top": "2003.1496062992123",
+        "left": "37.795275590551178",
+        "width": "601.801801801802",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "37",
+        "top": "2069.2913385826769",
+        "left": "37.795275590551178",
+        "width": "1517.7033333333331",
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "38",
+        "top": "2286.6141732283463",
+        "left": "37.795275590551178",
+        "width": "601.801801801802",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "39",
+        "top": "2362.2047244094488",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "unknown",
+        "content": null
+      },
+      {
+        "id": "40",
+        "top": "2626.7716535433069",
+        "left": "47.244094488188971",
+        "width": "601.801801801802",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "41",
+        "top": "2674.0157480314961",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "42",
+        "top": "2692.9133858267714",
+        "left": "462.99212598425191",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "43",
+        "top": "2730.7086614173227",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "44",
+        "top": "2787.4015748031493",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "45",
+        "top": "2796.8503937007872",
+        "left": "462.99212598425191",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "46",
+        "top": "2834.6456692913384",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "47",
+        "top": "3004.7244094488187",
+        "left": "47.244094488188971",
+        "width": "601.801801801802",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "48",
+        "top": "3070.8661417322833",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "j"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "49",
+        "top": "3137.0078740157478",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "Φ"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "50",
+        "top": "3137.0078740157478",
+        "left": "425.19685039370074",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "51",
+        "top": "3203.1496062992123",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "52",
+        "top": "3259.842519685039",
+        "left": "47.244094488188971",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "53",
+        "top": "3382.6771653543306",
+        "left": "18.897637795275589",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "54",
+        "top": "3599.9999999999995",
+        "left": "9.4488188976377945",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "55",
+        "top": "3817.322834645669",
+        "left": "0",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "56",
+        "top": "4110.23622047244",
+        "left": "0",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "57",
+        "top": "4195.27559055118",
+        "left": "425.19685039370074",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "P"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "58",
+        "top": "4233.070866141732",
+        "left": "425.19685039370074",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "I"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "59",
+        "top": "4261.4173228346453",
+        "left": "132.28346456692913",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "Q"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "60",
+        "top": "4261.4173228346453",
+        "left": "236.22047244094486",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "D"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "61",
+        "top": "4299.2125984251961",
+        "left": "425.19685039370074",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "62",
+        "top": "4365.3543307086611",
+        "left": "28.346456692913385",
+        "width": "290.633027522936",
+        "height": "257.79313740735",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "63",
+        "top": "4365.3543307086611",
+        "left": "330.70866141732279",
+        "width": "320.311926605505",
+        "height": "258.126827301139",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "64",
+        "top": "4979.5275590551173",
+        "left": "0",
+        "width": "697.474747474748",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "65",
+        "top": "5036.2204724409448",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "Lx"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "66",
+        "top": "5036.2204724409448",
+        "left": "160.62992125984252",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "Ly"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "67",
+        "top": "5092.9133858267714",
+        "left": "37.795275590551178",
+        "width": "187.662337662338",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "68",
+        "top": "5092.9133858267714",
+        "left": "226.77165354330708",
+        "width": "196.103896103896",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "69",
+        "top": "5092.9133858267714",
+        "left": "425.19685039370074",
+        "width": "235.064935064935",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "70",
+        "top": "5168.5039370078739",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "unknown",
+        "content": null
+      },
+      {
+        "id": "71",
+        "top": "5168.5039370078739",
+        "left": "226.77165354330708",
+        "width": null,
+        "height": null,
+        "type": "unknown",
+        "content": null
+      },
+      {
+        "id": "72",
+        "top": "5168.5039370078739",
+        "left": "434.64566929133855",
+        "width": null,
+        "height": null,
+        "type": "unknown",
+        "content": null
+      },
+      {
+        "id": "73",
+        "top": "5244.0944881889764",
+        "left": "207.87401574803147",
+        "width": "467.56541946935675",
+        "height": "266.32717379736027",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "74",
+        "top": "5555.9055118110227",
+        "left": "37.795275590551178",
+        "width": "318.253968253969",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "75",
+        "top": "5555.9055118110227",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "76",
+        "top": "5593.7007874015744",
+        "left": "37.795275590551178",
+        "width": "318.253968253969",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "77",
+        "top": "5593.7007874015744",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "78",
+        "top": "5631.4960629921252",
+        "left": "37.795275590551178",
+        "width": "318.253968253969",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "79",
+        "top": "5631.4960629921252",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "80",
+        "top": "5669.2913385826769",
+        "left": "37.795275590551178",
+        "width": "318.253968253969",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "81",
+        "top": "5669.2913385826769",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "82",
+        "top": "5707.0866141732276",
+        "left": "37.795275590551178",
+        "width": "318.253968253969",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "83",
+        "top": "5707.0866141732276",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "84",
+        "top": "5744.8818897637793",
+        "left": "37.795275590551178",
+        "width": "318.253968253969",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "85",
+        "top": "5744.8818897637793",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "86",
+        "top": "5744.8818897637793",
+        "left": "548.03149606299212",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "i"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "87",
+        "top": "5782.67716535433",
+        "left": "37.795275590551178",
+        "width": "318.253968253969",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "88",
+        "top": "5782.67716535433",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "f"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "89",
+        "top": "5924.4094488188975",
+        "left": "37.795275590551178",
+        "width": "316.545252805447",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "90",
+        "top": "5924.4094488188975",
+        "left": "359.05511811023621",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "Mre"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "91",
+        "top": "5990.5511811023616",
+        "left": "595.275590551181",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "92",
+        "top": "6113.3858267716532",
+        "left": "28.346456692913385",
+        "width": "318.493304753499",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "93",
+        "top": "6113.3858267716532",
+        "left": "368.50393700787396",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "Mgl"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "94",
+        "top": "6245.6692913385823",
+        "left": "576.37795275590543",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "95",
+        "top": "6444.0944881889754",
+        "left": "689.763779527559",
+        "width": "380.54232601014036",
+        "height": "205.13043478260897",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "96",
+        "top": "6462.9921259842513",
+        "left": "18.897637795275589",
+        "width": "321.090707350901",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "97",
+        "top": "6472.44094488189",
+        "left": "368.50393700787396",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "a"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "98",
+        "top": "6708.6614173228345",
+        "left": "188.97637795275588",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "K'"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "99",
+        "top": "6755.9055118110227",
+        "left": "188.97637795275588",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "K"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "100",
+        "top": "6803.1496062992119",
+        "left": "56.69291338582677",
+        "width": "300.145252805447",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "101",
+        "top": "6803.1496062992119",
+        "left": "387.40157480314957",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "nv"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "102",
+        "top": "6803.1496062992119",
+        "left": "491.33858267716533",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "103",
+        "top": "6850.393700787401",
+        "left": "56.69291338582677",
+        "width": "300.145252805447",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "104",
+        "top": "6850.393700787401",
+        "left": "377.95275590551176",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "105",
+        "top": "7256.6929133858266",
+        "left": "85.039370078740149",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "106",
+        "top": "7653.5433070866138",
+        "left": "85.039370078740149",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "107",
+        "top": "7927.5590551181094",
+        "left": "75.590551181102356",
+        "width": "296.249148909343",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "108",
+        "top": "7927.5590551181094",
+        "left": "396.85039370078738",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "109",
+        "top": "8088.1889763779518",
+        "left": "66.141732283464563",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "110",
+        "top": "8267.71653543307",
+        "left": "56.69291338582677",
+        "width": "659.857978279031",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "111",
+        "top": "8286.614173228345",
+        "left": "718.11023622047242",
+        "width": "320.311926605505",
+        "height": "258.126827301139",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "112",
+        "top": "8418.8976377952749",
+        "left": "56.69291338582677",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "113",
+        "top": "8418.8976377952749",
+        "left": "311.81102362204723",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "Q"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "114",
+        "top": "8418.8976377952749",
+        "left": "453.54330708661416",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "D"
+          ],
+          "expressions": []
+        }
+      }
+    ],
+    "stats": {
+      "text_regions": 36,
+      "math_regions": 68,
+      "plot_regions": 0,
+      "picture_regions": 6,
+      "solve_blocks": 0,
+      "chart_components": 0
+    }
+  },
+  {
+    "filename": "Grafica.mcdx",
+    "regions": [
+      {
+        "id": "0",
+        "top": "113.38582677165354",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "unknown",
+        "content": null
+      },
+      {
+        "id": "1",
+        "top": "113.38582677165354",
+        "left": "188.97637795275588",
+        "width": "343.78582677165355",
+        "height": "287.09291338582676",
+        "type": "plot",
+        "content": {
+          "type": "xyPlot",
+          "axes": {
+            "x": {
+              "start": "2",
+              "end": "6"
+            },
+            "y": {
+              "start": "17500",
+              "end": "45000"
+            }
+          }
+        }
+      }
+    ],
+    "stats": {
+      "text_regions": 0,
+      "math_regions": 0,
+      "plot_regions": 1,
+      "picture_regions": 0,
+      "solve_blocks": 0,
+      "chart_components": 0
+    }
+  },
+  {
+    "filename": "Matriz_copia.mcdx",
+    "regions": [
+      {
+        "id": "0",
+        "top": "37.795275590551178",
+        "left": "94.488188976377941",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "A"
+          ],
+          "expressions": []
+        }
+      }
+    ],
+    "stats": {
+      "text_regions": 0,
+      "math_regions": 1,
+      "plot_regions": 0,
+      "picture_regions": 0,
+      "solve_blocks": 0,
+      "chart_components": 0
+    }
+  },
+  {
+    "filename": "Modos de vibracion.mcdx",
+    "regions": [
+      {
+        "id": "0",
+        "top": "18.897637795275589",
+        "left": "18.897637795275589",
+        "width": "622.666666666667",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "1",
+        "top": "56.692913385829087",
+        "left": "18.897637795275589",
+        "width": "622.095238095238",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "2",
+        "top": "85.039370078739665",
+        "left": "425.19685039370074",
+        "width": "252.238095238095",
+        "height": "222.824191943004",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "3",
+        "top": "198.42519685039289",
+        "left": "0",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "4",
+        "top": "321.25984251968544",
+        "left": "18.897637795275589",
+        "width": "622.095238095238",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "5",
+        "top": "434.64566929133866",
+        "left": "0",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "6",
+        "top": "548.03149606299212",
+        "left": "18.897637795275589",
+        "width": "167.289253754251",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "7",
+        "top": "576.37795275590634",
+        "left": "18.897637795275589",
+        "width": "626.103896103896",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "8",
+        "top": "718.11023622047378",
+        "left": "18.897637795275589",
+        "width": "295.238095238095",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "9",
+        "top": "718.11023622047378",
+        "left": "349.60629921259834",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "λ"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "10",
+        "top": "755.90551181102364",
+        "left": "349.60629921259834",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "w2"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "11",
+        "top": "784.25196850393786",
+        "left": "18.897637795275589",
+        "width": "295.238095238095",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "12",
+        "top": "793.70078740157476",
+        "left": "377.95275590551176",
+        "width": "134.67399267399307",
+        "height": "125.69572649572672",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "13",
+        "top": "869.2913385826771",
+        "left": "18.897637795275589",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "w"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "14",
+        "top": "869.2913385826771",
+        "left": "188.97637795275588",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "15",
+        "top": "963.779527559055",
+        "left": "18.897637795275589",
+        "width": "590.857142857143",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "16",
+        "top": "1001.5748031496062",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "j"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "17",
+        "top": "1058.267716535433",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "ϕ"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "18",
+        "top": "1058.267716535433",
+        "left": "226.77165354330708",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "19",
+        "top": "1228.3464566929133",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      }
+    ],
+    "stats": {
+      "text_regions": 8,
+      "math_regions": 10,
+      "plot_regions": 0,
+      "picture_regions": 2,
+      "solve_blocks": 0,
+      "chart_components": 0
+    }
+  },
+  {
+    "filename": "Solucion de una ecuacion diferencial.mcdx",
+    "regions": [
+      {
+        "id": "0",
+        "top": "18.897637795275589",
+        "left": "18.897637795275589",
+        "width": "623.481481481481",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "1",
+        "top": "56.692913385829087",
+        "left": "18.897637795275589",
+        "width": "622.666666666667",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "2",
+        "top": "94.48818897637895",
+        "left": "18.897637795275589",
+        "width": "590.095238095238",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "3",
+        "top": "113.38582677165388",
+        "left": "18.897637795275589",
+        "width": "329.534717658668",
+        "height": "224.39745059614",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "4",
+        "top": "377.95275590551387",
+        "left": "18.897637795275589",
+        "width": "200",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "5",
+        "top": "377.95275590551387",
+        "left": "236.22047244094486",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "K"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "6",
+        "top": "434.64566929133866",
+        "left": "18.897637795275589",
+        "width": "200",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "7",
+        "top": "434.64566929133866",
+        "left": "236.22047244094486",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "M"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "8",
+        "top": "481.88976377952781",
+        "left": "18.897637795275589",
+        "width": "200",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "9",
+        "top": "519.68503937008131",
+        "left": "18.897637795275589",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "10",
+        "top": "519.68503937008131",
+        "left": "132.28346456692913",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "11",
+        "top": "519.68503937008131",
+        "left": "264.5669291338582",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            ""
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "12",
+        "top": "557.48031496063118",
+        "left": "18.897637795275589",
+        "width": "200",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "13",
+        "top": "595.275590551181",
+        "left": "18.897637795275589",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "t'"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "14",
+        "top": "963.779527559055",
+        "left": "18.897637795275589",
+        "width": "333.64705882353",
+        "height": null,
+        "type": "text",
+        "content": null
+      },
+      {
+        "id": "15",
+        "top": "982.67716535433067",
+        "left": "18.897637795275589",
+        "width": "488.485873089393",
+        "height": "399.91662806855",
+        "type": "solveblock",
+        "content": {
+          "constraints": [
+            "equation",
+            "equation",
+            "equation"
+          ],
+          "solver_type": "odesolve",
+          "variables": []
+        }
+      },
+      {
+        "id": "23",
+        "top": "1398.4251968503936",
+        "left": "0",
+        "width": "444.16",
+        "height": "243.84",
+        "type": "chartComponent",
+        "content": null
+      },
+      {
+        "id": "31",
+        "top": "1474.0157480314958",
+        "left": "434.64566929133855",
+        "width": "231.755229357798",
+        "height": "35.1413879448485",
+        "type": "picture",
+        "content": null
+      },
+      {
+        "id": "32",
+        "top": "1530.7086614173227",
+        "left": "434.64566929133855",
+        "width": "234.158532110092",
+        "height": "63.2497184435305",
+        "type": "picture",
+        "content": null
+      }
+    ],
+    "stats": {
+      "text_regions": 8,
+      "math_regions": 6,
+      "plot_regions": 0,
+      "picture_regions": 3,
+      "solve_blocks": 1,
+      "chart_components": 1
+    }
+  },
+  {
+    "filename": "test_mathcad.mcdx",
+    "regions": [
+      {
+        "id": "0",
+        "top": "94.488188976377941",
+        "left": "18.897637795275589",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "1",
+        "top": "170.0787401574803",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "E"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "2",
+        "top": "170.0787401574803",
+        "left": "188.97637795275588",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "I"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "3",
+        "top": "207.87401574803147",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "A"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "4",
+        "top": "207.87401574803147",
+        "left": "226.77165354330708",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "L"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "5",
+        "top": "245.66929133858267",
+        "left": "37.795275590551178",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [
+            "P"
+          ],
+          "expressions": []
+        }
+      },
+      {
+        "id": "6",
+        "top": "302.36220472440942",
+        "left": "18.897637795275589",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      },
+      {
+        "id": "7",
+        "top": "377.95275590551176",
+        "left": "18.897637795275589",
+        "width": null,
+        "height": null,
+        "type": "math",
+        "content": {
+          "defines": [],
+          "expressions": []
+        }
+      }
+    ],
+    "stats": {
+      "text_regions": 0,
+      "math_regions": 8,
+      "plot_regions": 0,
+      "picture_regions": 0,
+      "solve_blocks": 0,
+      "chart_components": 0
+    }
+  }
+]

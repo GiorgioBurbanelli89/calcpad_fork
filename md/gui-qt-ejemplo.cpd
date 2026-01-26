@@ -1,0 +1,111 @@
+﻿'GUI con Qt (C++ para Linux/Windows/macOS)
+
+"Qt es un framework muy potente y maduro para aplicaciones cross-platform."
+"Se usa en aplicaciones como VLC, Telegram Desktop, KDE Plasma."
+
+"Ventajas:"
+"- Muy potente y completo"
+"- Excelente rendimiento"
+"- QML para interfaces modernas"
+"- Gran comunidad y documentaciÃ³n"
+
+"Ejemplo de ventana simple con Qt:"
+
+@{cpp}
+#include <QApplication>
+#include <QWidget>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QMessageBox>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    // Crear ventana principal
+    QWidget window;
+    window.setWindowTitle("Mi AplicaciÃ³n Qt");
+    window.resize(400, 300);
+
+    // Crear layout vertical
+    QVBoxLayout *layout = new QVBoxLayout(&window);
+
+    // Crear label
+    QLabel *label = new QLabel("Ejemplo de Qt", &window);
+    label->setStyleSheet("font-size: 20px;");
+    layout->addWidget(label);
+
+    // Crear botÃ³n
+    QPushButton *button = new QPushButton("PresiÃ³name", &window);
+    layout->addWidget(button);
+
+    // Crear label para resultado
+    QLabel *resultLabel = new QLabel("", &window);
+    resultLabel->setStyleSheet("font-size: 16px; color: blue;");
+    layout->addWidget(resultLabel);
+
+    // Conectar evento click
+    QObject::connect(button, &QPushButton::clicked, [&]() {
+        resultLabel->setText("Â¡Hola desde Qt!");
+        QMessageBox::information(&window, "Mensaje", "Â¡BotÃ³n presionado!");
+    });
+
+    window.show();
+
+    return app.exec();
+}
+@{end cpp}
+
+Para compilar con Qt:
+$ sudo apt-get install qt6-base-dev  # Linux
+$ qmake -project
+$ qmake
+$ make
+$ ./mi_app
+
+Ejemplo con QML (interfaz moderna):
+
+@{cmd}
+// main.qml
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+
+ApplicationWindow {
+    visible: true
+    width: 400
+    height: 300
+    title: "Mi AplicaciÃ³n Qt QML"
+
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 20
+
+        Text {
+            text: "Ejemplo de Qt QML"
+            font.pixelSize: 20
+        }
+
+        Button {
+            text: "PresiÃ³name"
+            Layout.preferredWidth: 150
+            Layout.preferredHeight: 40
+            onClicked: {
+                resultLabel.text = "Â¡Hola desde Qt QML!"
+            }
+        }
+
+        Text {
+            id: resultLabel
+            font.pixelSize: 16
+            color: "blue"
+        }
+    }
+}
+@{end cmd}
+
+Recursos:
+- https://www.qt.io/
+- https://doc.qt.io/
+- https://www.qt.io/download-open-source

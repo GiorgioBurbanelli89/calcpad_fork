@@ -1,0 +1,270 @@
+"PLACA GRUESA Q4 - MÉTODO POMPILLA (Matrices Aumentadas)
+'===========================================================
+'Fuente: CLASE 05 - Ing. Alexis Pompilla Yábar
+'Método de Elementos Finitos - Teoría de Reissner-Mindlin
+'===========================================================
+
+"<h2>1. PARÁMETROS DE ENTRADA</h2>
+
+"<h3>Propiedades del Material</h3>
+E = 2*10^7
+'Módulo de Elasticidad: E ="E
+ν = 0.30
+'Coeficiente de Poisson: ν ="ν
+G = E/(2*(1 + ν))
+'Módulo de corte: G ="G
+
+"<h3>Geometría de la Placa</h3>
+t = 0.02
+'Espesor de la placa: t ="t
+κ = 5/6
+'Coeficiente de corrección por corte: κ ="κ
+
+"<h3>Coordenadas de los Nodos (Sentido antihorario)</h3>
+x_1 = 0
+y_1 = -1
+x_2 = 1
+y_2 = -1
+x_3 = 1
+y_3 = 0
+x_4 = 0
+y_4 = 0
+
+"<h2>2. VISUALIZACIÓN DEL ELEMENTO</h2>
+#hide
+'Parámetros para el gráfico SVG
+w_svg = 300
+h_svg = 300
+margin = 40
+'Escala
+x_min = min(x_1; min(x_2; min(x_3; x_4))) - 0.2
+x_max = max(x_1; max(x_2; max(x_3; x_4))) + 0.2
+y_min = min(y_1; min(y_2; min(y_3; y_4))) - 0.2
+y_max = max(y_1; max(y_2; max(y_3; y_4))) + 0.2
+scale_x = (w_svg - 2*margin)/(x_max - x_min)
+scale_y = (h_svg - 2*margin)/(y_max - y_min)
+scale = min(scale_x; scale_y)
+'Transformación de coordenadas
+px(x) = margin + (x - x_min)*scale
+py(y) = h_svg - margin - (y - y_min)*scale
+'Coordenadas de pantalla
+px_1 = px(x_1)
+py_1 = py(y_1)
+px_2 = px(x_2)
+py_2 = py(y_2)
+px_3 = px(x_3)
+py_3 = py(y_3)
+px_4 = px(x_4)
+py_4 = py(y_4)
+'Centro del elemento
+x_c = (x_1 + x_2 + x_3 + x_4)/4
+y_c = (y_1 + y_2 + y_3 + y_4)/4
+px_c = px(x_c)
+py_c = py(y_c)
+#show
+#val
+'<svg viewbox="0 0 'w_svg' 'h_svg'" xmlns="http://www.w3.org/2000/svg" style="width:'w_svg'pt; height:'h_svg'pt; background:#f8f8f8;">
+'<style>.node{fill:red;} .element{stroke:#2a7;stroke-width:2;fill:#afa;fill-opacity:0.3;} .label{font-family:Arial;font-size:12px;} .axis{stroke:#888;stroke-width:1;}</style>
+'<!-- Ejes -->
+'<line x1="'margin'" y1="'h_svg - margin'" x2="'w_svg - margin'" y2="'h_svg - margin'" class="axis" marker-end="url(#arrow)"/>
+'<line x1="'margin'" y1="'h_svg - margin'" x2="'margin'" y2="'margin'" class="axis"/>
+'<text x="'w_svg - margin + 10'" y="'h_svg - margin + 5'" class="label">X</text>
+'<text x="'margin - 5'" y="'margin - 10'" class="label">Y</text>
+'<!-- Elemento Q4 -->
+'<polygon points="'px_1','py_1' 'px_2','py_2' 'px_3','py_3' 'px_4','py_4'" class="element"/>
+'<!-- Nodos -->
+'<circle cx="'px_1'" cy="'py_1'" r="8" class="node"/><text x="'px_1 - 20'" y="'py_1 + 5'" class="label" fill="red">1('x_1','y_1')</text>
+'<circle cx="'px_2'" cy="'py_2'" r="8" class="node"/><text x="'px_2 + 10'" y="'py_2 + 5'" class="label" fill="red">2('x_2','y_2')</text>
+'<circle cx="'px_3'" cy="'py_3'" r="8" class="node"/><text x="'px_3 + 10'" y="'py_3 + 5'" class="label" fill="red">3('x_3','y_3')</text>
+'<circle cx="'px_4'" cy="'py_4'" r="8" class="node"/><text x="'px_4 - 20'" y="'py_4 + 5'" class="label" fill="red">4('x_4','y_4')</text>
+'<!-- Centro -->
+'<circle cx="'px_c'" cy="'py_c'" r="4" fill="blue"/>
+'<text x="'px_c + 8'" y="'py_c'" class="label" fill="blue">Centro</text>
+'<!-- Título -->
+'<text x="'w_svg/2'" y="20" text-anchor="middle" style="font-family:Arial;font-size:14px;font-weight:bold;">Elemento Q4 - Placa Gruesa Mindlin</text>
+'</svg>
+#equ
+
+"Coordenadas de los nodos:
+"<table class='bordered'>
+"<tr><th>Nodo</th><th>X</th><th>Y</th></tr>
+"<tr><td>1</td><td>"x_1"</td><td>"y_1"</td></tr>
+"<tr><td>2</td><td>"x_2"</td><td>"y_2"</td></tr>
+"<tr><td>3</td><td>"x_3"</td><td>"y_3"</td></tr>
+"<tr><td>4</td><td>"x_4"</td><td>"y_4"</td></tr>
+"</table>
+
+"<h2>3. MATRICES CONSTITUTIVAS</h2>
+
+"<h3>3.1 Matriz Constitutiva a Flexión D_f (3×3)</h3>
+c_f = E*t^3/(12*(1 - ν^2))
+'Coeficiente de flexión: c_f ="c_f
+D_f = c_f*[1; ν; 0|ν; 1; 0|0; 0; (1 - ν)/2]
+
+"<h3>3.2 Matriz Constitutiva a Corte D_s (2×2)</h3>
+c_s = κ*G*t
+'Coeficiente de corte: c_s ="c_s
+D_s = c_s*[1; 0|0; 1]
+
+"<h2>4. FUNCIONES DE FORMA BILINEALES</h2>
+N_1(ξ; η) = (1 - ξ)*(1 - η)/4
+N_2(ξ; η) = (1 + ξ)*(1 - η)/4
+N_3(ξ; η) = (1 + ξ)*(1 + η)/4
+N_4(ξ; η) = (1 - ξ)*(1 + η)/4
+
+"<h3>Derivadas respecto a ξ</h3>
+dN1_dξ(ξ; η) = -(1 - η)/4
+dN2_dξ(ξ; η) = (1 - η)/4
+dN3_dξ(ξ; η) = (1 + η)/4
+dN4_dξ(ξ; η) = -(1 + η)/4
+
+"<h3>Derivadas respecto a η</h3>
+dN1_dη(ξ; η) = -(1 - ξ)/4
+dN2_dη(ξ; η) = -(1 + ξ)/4
+dN3_dη(ξ; η) = (1 + ξ)/4
+dN4_dη(ξ; η) = (1 - ξ)/4
+
+"<h2>5. JACOBIANO DE LA TRANSFORMACIÓN</h2>
+J_11(ξ; η) = dN1_dξ(ξ; η)*x_1 + dN2_dξ(ξ; η)*x_2 + dN3_dξ(ξ; η)*x_3 + dN4_dξ(ξ; η)*x_4
+J_12(ξ; η) = dN1_dξ(ξ; η)*y_1 + dN2_dξ(ξ; η)*y_2 + dN3_dξ(ξ; η)*y_3 + dN4_dξ(ξ; η)*y_4
+J_21(ξ; η) = dN1_dη(ξ; η)*x_1 + dN2_dη(ξ; η)*x_2 + dN3_dη(ξ; η)*x_3 + dN4_dη(ξ; η)*x_4
+J_22(ξ; η) = dN1_dη(ξ; η)*y_1 + dN2_dη(ξ; η)*y_2 + dN3_dη(ξ; η)*y_3 + dN4_dη(ξ; η)*y_4
+
+detJ(ξ; η) = J_11(ξ; η)*J_22(ξ; η) - J_12(ξ; η)*J_21(ξ; η)
+
+"Jacobiano en el centro (0, 0):
+J_centro = [J_11(0; 0); J_12(0; 0)|J_21(0; 0); J_22(0; 0)]
+"|J(0,0)| = "detJ(0; 0)
+
+Ji_11(ξ; η) = J_22(ξ; η)/detJ(ξ; η)
+Ji_12(ξ; η) = -J_12(ξ; η)/detJ(ξ; η)
+Ji_21(ξ; η) = -J_21(ξ; η)/detJ(ξ; η)
+Ji_22(ξ; η) = J_11(ξ; η)/detJ(ξ; η)
+
+"<h2>6. DERIVADAS EN COORDENADAS FÍSICAS</h2>
+dN1_dx(ξ; η) = Ji_11(ξ; η)*dN1_dξ(ξ; η) + Ji_12(ξ; η)*dN1_dη(ξ; η)
+dN1_dy(ξ; η) = Ji_21(ξ; η)*dN1_dξ(ξ; η) + Ji_22(ξ; η)*dN1_dη(ξ; η)
+dN2_dx(ξ; η) = Ji_11(ξ; η)*dN2_dξ(ξ; η) + Ji_12(ξ; η)*dN2_dη(ξ; η)
+dN2_dy(ξ; η) = Ji_21(ξ; η)*dN2_dξ(ξ; η) + Ji_22(ξ; η)*dN2_dη(ξ; η)
+dN3_dx(ξ; η) = Ji_11(ξ; η)*dN3_dξ(ξ; η) + Ji_12(ξ; η)*dN3_dη(ξ; η)
+dN3_dy(ξ; η) = Ji_21(ξ; η)*dN3_dξ(ξ; η) + Ji_22(ξ; η)*dN3_dη(ξ; η)
+dN4_dx(ξ; η) = Ji_11(ξ; η)*dN4_dξ(ξ; η) + Ji_12(ξ; η)*dN4_dη(ξ; η)
+dN4_dy(ξ; η) = Ji_21(ξ; η)*dN4_dξ(ξ; η) + Ji_22(ξ; η)*dN4_dη(ξ; η)
+
+"<h2>7. INTEGRACIÓN NUMÉRICA (GAUSS-LEGENDRE)</h2>
+
+"<h3>7.1 Puntos de Gauss 2×2 (para flexión)</h3>
+g = 1/sqr(3)
+'Coordenada de Gauss: g = ±"g
+
+ξ_1 = -g
+η_1 = -g
+ξ_2 = g
+η_2 = -g
+ξ_3 = g
+η_3 = g
+ξ_4 = -g
+η_4 = g
+
+"<h3>7.2 Visualización de puntos de Gauss en espacio natural</h3>
+#hide
+w_g = 250
+h_g = 250
+mg = 30
+sc_g = (w_g - 2*mg)/2
+pgx(ξ) = mg + (ξ + 1)*sc_g
+pgy(η) = h_g - mg - (η + 1)*sc_g
+pgx_1 = pgx(ξ_1)
+pgy_1 = pgy(η_1)
+pgx_2 = pgx(ξ_2)
+pgy_2 = pgy(η_2)
+pgx_3 = pgx(ξ_3)
+pgy_3 = pgy(η_3)
+pgx_4 = pgx(ξ_4)
+pgy_4 = pgy(η_4)
+#show
+#val
+'<svg viewbox="0 0 'w_g' 'h_g'" xmlns="http://www.w3.org/2000/svg" style="width:'w_g'pt; height:'h_g'pt; background:#fff8f0;">
+'<style>.gp{fill:orange;} .nat{stroke:#aaa;stroke-width:1;fill:#ffa;fill-opacity:0.2;}</style>
+'<!-- Elemento natural [-1,1]×[-1,1] -->
+'<rect x="'mg'" y="'mg'" width="'w_g - 2*mg'" height="'h_g - 2*mg'" class="nat"/>
+'<!-- Ejes -->
+'<line x1="'mg'" y1="'h_g/2'" x2="'w_g - mg'" y2="'h_g/2'" stroke="#888" stroke-dasharray="4"/>
+'<line x1="'w_g/2'" y1="'mg'" x2="'w_g/2'" y2="'h_g - mg'" stroke="#888" stroke-dasharray="4"/>
+'<text x="'w_g - mg + 5'" y="'h_g/2 + 4'" style="font-size:11px;">ξ</text>
+'<text x="'w_g/2 + 5'" y="'mg - 5'" style="font-size:11px;">η</text>
+'<!-- Puntos de Gauss -->
+'<circle cx="'pgx_1'" cy="'pgy_1'" r="8" class="gp"/><text x="'pgx_1 - 15'" y="'pgy_1 + 20'" style="font-size:10px;">GP1</text>
+'<circle cx="'pgx_2'" cy="'pgy_2'" r="8" class="gp"/><text x="'pgx_2 + 5'" y="'pgy_2 + 20'" style="font-size:10px;">GP2</text>
+'<circle cx="'pgx_3'" cy="'pgy_3'" r="8" class="gp"/><text x="'pgx_3 + 5'" y="'pgy_3 - 10'" style="font-size:10px;">GP3</text>
+'<circle cx="'pgx_4'" cy="'pgy_4'" r="8" class="gp"/><text x="'pgx_4 - 15'" y="'pgy_4 - 10'" style="font-size:10px;">GP4</text>
+'<!-- Punto central (integración reducida) -->
+'<circle cx="'w_g/2'" cy="'h_g/2'" r="6" fill="blue"/>
+'<text x="'w_g/2 + 10'" y="'h_g/2 + 15'" style="font-size:10px;fill:blue;">Centro (corte)</text>
+'<!-- Etiquetas esquinas -->
+'<text x="'mg - 20'" y="'h_g - mg + 15'" style="font-size:10px;">(-1,-1)</text>
+'<text x="'w_g - mg - 5'" y="'h_g - mg + 15'" style="font-size:10px;">(1,-1)</text>
+'<text x="'w_g - mg - 5'" y="'mg - 5'" style="font-size:10px;">(1,1)</text>
+'<text x="'mg - 20'" y="'mg - 5'" style="font-size:10px;">(-1,1)</text>
+'<text x="'w_g/2 - 60'" y="15" style="font-size:12px;font-weight:bold;">Puntos de Gauss 2×2</text>
+'</svg>
+#equ
+
+"<h2>8. MATRICES DE DEFORMACIÓN</h2>
+
+"<h3>8.1 Matriz B_b para Flexión (3×12)</h3>
+B_b1 = [0; dN1_dx(ξ_1; η_1); 0; 0; dN2_dx(ξ_1; η_1); 0; 0; dN3_dx(ξ_1; η_1); 0; 0; dN4_dx(ξ_1; η_1); 0|0; 0; dN1_dy(ξ_1; η_1); 0; 0; dN2_dy(ξ_1; η_1); 0; 0; dN3_dy(ξ_1; η_1); 0; 0; dN4_dy(ξ_1; η_1)|0; dN1_dy(ξ_1; η_1); dN1_dx(ξ_1; η_1); 0; dN2_dy(ξ_1; η_1); dN2_dx(ξ_1; η_1); 0; dN3_dy(ξ_1; η_1); dN3_dx(ξ_1; η_1); 0; dN4_dy(ξ_1; η_1); dN4_dx(ξ_1; η_1)]
+
+B_b2 = [0; dN1_dx(ξ_2; η_2); 0; 0; dN2_dx(ξ_2; η_2); 0; 0; dN3_dx(ξ_2; η_2); 0; 0; dN4_dx(ξ_2; η_2); 0|0; 0; dN1_dy(ξ_2; η_2); 0; 0; dN2_dy(ξ_2; η_2); 0; 0; dN3_dy(ξ_2; η_2); 0; 0; dN4_dy(ξ_2; η_2)|0; dN1_dy(ξ_2; η_2); dN1_dx(ξ_2; η_2); 0; dN2_dy(ξ_2; η_2); dN2_dx(ξ_2; η_2); 0; dN3_dy(ξ_2; η_2); dN3_dx(ξ_2; η_2); 0; dN4_dy(ξ_2; η_2); dN4_dx(ξ_2; η_2)]
+
+B_b3 = [0; dN1_dx(ξ_3; η_3); 0; 0; dN2_dx(ξ_3; η_3); 0; 0; dN3_dx(ξ_3; η_3); 0; 0; dN4_dx(ξ_3; η_3); 0|0; 0; dN1_dy(ξ_3; η_3); 0; 0; dN2_dy(ξ_3; η_3); 0; 0; dN3_dy(ξ_3; η_3); 0; 0; dN4_dy(ξ_3; η_3)|0; dN1_dy(ξ_3; η_3); dN1_dx(ξ_3; η_3); 0; dN2_dy(ξ_3; η_3); dN2_dx(ξ_3; η_3); 0; dN3_dy(ξ_3; η_3); dN3_dx(ξ_3; η_3); 0; dN4_dy(ξ_3; η_3); dN4_dx(ξ_3; η_3)]
+
+B_b4 = [0; dN1_dx(ξ_4; η_4); 0; 0; dN2_dx(ξ_4; η_4); 0; 0; dN3_dx(ξ_4; η_4); 0; 0; dN4_dx(ξ_4; η_4); 0|0; 0; dN1_dy(ξ_4; η_4); 0; 0; dN2_dy(ξ_4; η_4); 0; 0; dN3_dy(ξ_4; η_4); 0; 0; dN4_dy(ξ_4; η_4)|0; dN1_dy(ξ_4; η_4); dN1_dx(ξ_4; η_4); 0; dN2_dy(ξ_4; η_4); dN2_dx(ξ_4; η_4); 0; dN3_dy(ξ_4; η_4); dN3_dx(ξ_4; η_4); 0; dN4_dy(ξ_4; η_4); dN4_dx(ξ_4; η_4)]
+
+"<h3>8.2 Matriz B_s para Corte (2×12)</h3>
+B_s = [dN1_dx(0; 0); -N_1(0; 0); 0; dN2_dx(0; 0); -N_2(0; 0); 0; dN3_dx(0; 0); -N_3(0; 0); 0; dN4_dx(0; 0); -N_4(0; 0); 0|dN1_dy(0; 0); 0; -N_1(0; 0); dN2_dy(0; 0); 0; -N_2(0; 0); dN3_dy(0; 0); 0; -N_3(0; 0); dN4_dy(0; 0); 0; -N_4(0; 0)]
+
+"<h2>9. MATRICES DE RIGIDEZ</h2>
+
+"<h3>9.1 Matriz de Rigidez a Flexión K_b</h3>
+K_b1 = transp(B_b1)*D_f*B_b1*detJ(ξ_1; η_1)
+K_b2 = transp(B_b2)*D_f*B_b2*detJ(ξ_2; η_2)
+K_b3 = transp(B_b3)*D_f*B_b3*detJ(ξ_3; η_3)
+K_b4 = transp(B_b4)*D_f*B_b4*detJ(ξ_4; η_4)
+
+K_b = K_b1 + K_b2 + K_b3 + K_b4
+
+"<h3>9.2 Matriz de Rigidez a Corte K_s</h3>
+K_s = transp(B_s)*D_s*B_s*detJ(0; 0)*4
+
+"<h3>9.3 Matriz de Rigidez Total K_T</h3>
+K_T = K_b + K_s
+
+"<h2>10. RESULTADOS</h2>
+
+"<h3>Matriz K_b (Flexión)</h3>
+K_b
+
+"<h3>Matriz K_s (Corte) ×10³</h3>
+K_s_1000 = K_s/1000
+
+"<h3>Matriz K_T (Total) ×10³</h3>
+K_T_1000 = K_T/1000
+
+"<h2>11. VERIFICACIÓN CON PDF POMPILLA</h2>
+"<table class='bordered'>
+"<tr><th>Elemento</th><th>Calcpad</th><th>PDF</th><th>Error %</th></tr>
+err_Kb22 = abs(K_b.(2;2) - 6.593)/6.593*100
+err_Ks11 = abs(K_s_1000.(1;1) - 64.103)/64.103*100
+err_KT22 = abs(K_T_1000.(2;2) - 8.019)/8.019*100
+"<tr><td>K_b(2,2)</td><td>"K_b.(2;2)"</td><td>6.593</td><td>"err_Kb22"%</td></tr>
+"<tr><td>K_s(1,1)×10³</td><td>"K_s_1000.(1;1)"</td><td>64.103</td><td>"err_Ks11"%</td></tr>
+"<tr><td>K_T(2,2)×10³</td><td>"K_T_1000.(2;2)"</td><td>8.019</td><td>"err_KT22"%</td></tr>
+"</table>
+
+"<h2>12. GRÁFICO DE FUNCIONES DE FORMA</h2>
+$Plot{N_1(x; 0) & N_2(x; 0) & N_3(x; 0) & N_4(x; 0) @ x = -1 : 1}
+'<p style="text-align:center"><i>Funciones de forma N₁, N₂, N₃, N₄ vs ξ (η=0)</i></p>
+
+"<h3>Superficie de función de forma N₁(ξ, η)</h3>
+$Map{N_1(x; y) @ x = -1 : 1 & y = -1 : 1}

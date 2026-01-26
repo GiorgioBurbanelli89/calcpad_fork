@@ -1,0 +1,105 @@
+' ============================================
+' Prueba manual - Datos LOSA del Excel
+' ============================================
+
+'<h2>LOSA - Datos de entrada</h2>
+
+#val
+'<table class="bordered">
+'<tr><th>Variable</th><th>Valor</th><th>Unidad</th><th>Descripción</th></tr>
+
+Ht = 25
+'<tr><td><b>Ht</b></td><td>'Ht'</td><td>cm</td><td>Altura total</td></tr>
+
+tc = 5
+'<tr><td><b>tc</b></td><td>'tc'</td><td>cm</td><td>tc</td></tr>
+
+bn = 10
+'<tr><td><b>bn</b></td><td>'bn'</td><td>cm</td><td>bn</td></tr>
+
+ba = 40
+'<tr><td><b>ba</b></td><td>'ba'</td><td>cm</td><td>ba</td></tr>
+
+Lmax = 6.55
+'<tr><td><b>Lmax</b></td><td>'Lmax'</td><td>m</td><td>Luz máxima</td></tr>
+
+hmin = 19.65
+'<tr><td><b>hmin</b></td><td>'hmin'</td><td>cm</td><td>hmin</td></tr>
+
+Imin = 63228
+'<tr><td><b>Imin</b></td><td>'Imin'</td><td>cm4</td><td>Inercia mínima</td></tr>
+
+'</table>
+#equ
+
+'<h3>Tabla de datos (A, y, Ay, Io, d2, It)</h3>
+'<table class="bordered">
+'<tr><th>i</th><th>A</th><th>y</th><th>Ay</th><th>Io</th><th>d2</th><th>It</th></tr>
+
+' Fila 1
+A1 = 200
+y1 = 10
+Ay1 = A1*y1
+Io1 = 6667
+d2_1 = 48.23
+It1 = A1*d2_1 + Io1
+'<tr><td>1</td><td>'A1'</td><td>'y1'</td><td>'Ay1'</td><td>'Io1'</td><td>'d2_1'</td><td>'It1'</td></tr>
+
+' Fila 2
+A2 = 200
+y2 = 10
+Ay2 = A2*y2
+Io2 = 6667
+d2_2 = 48.23
+It2 = A2*d2_2 + Io2
+'<tr><td>2</td><td>'A2'</td><td>'y2'</td><td>'Ay2'</td><td>'Io2'</td><td>'d2_2'</td><td>'It2'</td></tr>
+
+' Fila 3
+A3 = 500
+y3 = 22.5
+Ay3 = A3*y3
+Io3 = 1042
+d2_3 = 30.86
+It3 = A3*d2_3 + Io3
+'<tr><td>3</td><td>'A3'</td><td>'y3'</td><td>'Ay3'</td><td>'Io3'</td><td>'d2_3'</td><td>'It3'</td></tr>
+
+'</table>
+
+'<h3>Totales</h3>
+#val
+A_total = A1 + A2 + A3
+'A total = 'A_total' cm²
+
+Ay_total = Ay1 + Ay2 + Ay3
+'Ay total = 'Ay_total' cm³
+
+It_total = It1 + It2 + It3
+'It total = 'It_total' cm⁴
+
+#equ
+
+'<h3>Centro de gravedad</h3>
+cg = Ay_total/A_total
+'cg = 'cg' cm
+
+'<h3>Altura de losa maciza y luz máxima</h3>
+Altura_losa_maciza = 18.0
+'Altura losa maciza = 'Altura_losa_maciza' cm
+
+Luz_maxima = 6.0
+'Luz máxima = 'Luz_maxima' m
+
+'<h3>Comparación con Excel</h3>
+'<table class="bordered">
+'<tr><th>Variable</th><th>Calcpad</th><th>Excel</th><th>Diferencia</th></tr>
+
+#hide
+diff_A_total = abs(A_total - 900)
+diff_Ay_total = abs(Ay_total - 15250)
+diff_cg = abs(cg - 16.94)
+#show
+
+'<tr><td>A total</td><td>'A_total'</td><td>900</td><td>'diff_A_total'</td></tr>
+'<tr><td>Ay total</td><td>'Ay_total'</td><td>15250</td><td>'diff_Ay_total'</td></tr>
+'<tr><td>cg</td><td>'cg'</td><td>16.94</td><td>'diff_cg'</td></tr>
+'</table>

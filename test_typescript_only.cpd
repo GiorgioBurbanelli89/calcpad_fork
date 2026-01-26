@@ -1,0 +1,24 @@
+"Test: TypeScript Only
+'Probando TypeScript con ts-node
+
+"Simple suma:
+@{ts}
+const a: number = 5;
+const b: number = 10;
+const suma: number = a + b;
+console.log(`suma = ${suma}`);
+@{end ts}
+
+"Con tipos:
+@{ts}
+interface Punto {
+    x: number;
+    y: number;
+}
+
+const p: Punto = { x: 3, y: 4 };
+const distancia: number = Math.sqrt(p.x * p.x + p.y * p.y);
+console.log(`distancia = ${distancia.toFixed(2)}`);
+@{end ts}
+
+'Fin del test TypeScript

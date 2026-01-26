@@ -1,0 +1,89 @@
+
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="OriginalFile" content="Creating an API client in DotNet 6.docx">
+ <meta name="generator" content="Adobe RoboHelp 2019">
+<title>Creating an API client in DotNet 6</title>
+<link rel="StyleSheet" href="../SAP2000.CSS" type="text/css">
+<style type="text/css">/*<![CDATA[*/
+A:visited {
+	color: #954F72;
+}
+A:link {
+	color: #0000ff;
+}
+/*]]>*/</style>
+</head>
+
+<body style="word-wrap: break-word;">
+<script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2"></script>
+
+<h1>Creating an API client in .NET 6</h1>
+<p><span style="font-size: 12.0pt; line-height: 107%; font-family: 'Times New Roman', serif;">T</span>he 
+ SAP2000 (or CSiBridge) API is provided as a .NET Framework 4.7.1 class 
+ library. The .NET remoting libraries used by the SAP2000 API are no longer 
+ supported in .NET 6 . The VB.NET or C# examples provided in this help file 
+ can be compiled in a .NET 6 client but will produce a runtime error.</p>
+<p>Users who must create a .NET 6 client can still access the SAP2000 API 
+ using COM. This can be done by changing one line in the example code:</p>
+<h2>Original VB.NET Example:</h2>
+<p class="Coding">&#160;<span style="color: #00B050;">'create API helper 
+ object</span></p>
+<p class="Coding">&#160;Dim myHelper As cHelper</p>
+<p class="Coding">&#160;Try</p>
+<p class="Coding">&#160;&#160;&#160;&#160;&#160;myHelper = New Helper</p>
+<p class="Coding">&#160;</p>
+<p class="Coding">&#160;Catch ex As Exception</p>
+<p class="Coding">&#160;</p>
+<p class="Coding">&#160;&#160;&#160;&#160;&#160;MsgBox(&quot;Cannot create 
+ an instance of the Helper object&quot;)</p>
+<p class="Coding">&#160;</p>
+<p class="Coding">&#160;End Try</p>
+<p>&#160;</p>
+<h2>Modified VB.NET Example:</h2>
+<p class="Coding"><span style="color: #00B050;">'create API helper object</span></p>
+<p class="Coding">Dim myHelper As cHelper</p>
+<p class="Coding">Try</p>
+<p class="Coding">&#160;&#160;&#160;&#160;&#160;&#160;myHelper = Activator.CreateInstance(Type.GetTypeFromProgID(&quot;SAP2000v1.Helper&quot;, 
+ True))</p>
+<p class="Coding">&#160;</p>
+<p class="Coding">Catch ex As Exception</p>
+<p class="Coding">&#160;&#160;&#160;&#160;&#160;&#160;MsgBox(&quot;Cannot 
+ create an instance of the Helper object&quot;)</p>
+<p class="Coding">&#160;</p>
+<p class="Coding">End Try</p>
+<p>&#160;</p>
+<h2>Original C# Example:</h2>
+<p class="Coding"><span style="color: #00B050;">//create API helper object</span></p>
+<p class="Coding">cHelper myHelper;</p>
+<p class="Coding">try</p>
+<p class="Coding">{</p>
+<p class="Coding">&#160;&#160;&#160;&#160;myHelper = new Helper();</p>
+<p class="Coding">}</p>
+<p class="Coding">catch (Exception ex)</p>
+<p class="Coding">{</p>
+<p class="Coding">&#160;&#160;&#160;&#160;Console.WriteLine(&quot;Cannot 
+ create an instance of the Helper object&quot;);</p>
+<p class="Coding">&#160;&#160;&#160;&#160;return;</p>
+<p class="Coding">}</p>
+<p>&#160;</p>
+<h2><span style="font-size: 12.0pt; line-height: 107%; font-family: 'Times New Roman', serif;">Modified 
+ C# Example:</span></h2>
+<p class="Coding"><span style="color: #00B050;">//create API helper object</span></p>
+<p class="Coding">cHelper myHelper;</p>
+<p class="Coding">try</p>
+<p class="Coding">{</p>
+<p class="Coding">&#160;&#160;&#160;&#160;myHelper = (cHelper)Activator.CreateInstance(Type.GetTypeFromProgID(&quot;SAP2000v1.Helper&quot;, 
+ true));</p>
+<p class="Coding">}</p>
+<p class="Coding">catch (Exception ex)</p>
+<p class="Coding">{</p>
+<p class="Coding">&#160;&#160;&#160;&#160;Console.WriteLine(&quot;Cannot 
+ create an instance of the Helper object&quot;);</p>
+<p class="Coding">&#160;&#160;&#160;&#160;return;</p>
+<p class="Coding">}</p>
+<p class="Coding">&#160;</p>
+</body>
+</html>

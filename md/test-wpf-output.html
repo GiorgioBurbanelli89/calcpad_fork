@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Created with Calcpad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <script src="https://calcpad.local/file:///C:/Users/j-b-j/Documents/Calcpad-7.5.7/Calcpad.Cli/bin/Debug/net10.0/doc/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-size: 11pt;
+            font-family: 'Segoe UI', 'Arial Nova', Helvetica, sans-serif;
+            margin-left: 5mm;
+            max-width: 190mm;
+        }
+
+        h1, h2, h3, h4, h5, h6, .errorHeader, .roundBox {
+            font-family: 'Arial Nova', Helvetica, sans-serif;
+            margin: 0.5em 0 0.5em 0;
+            padding: 0;
+            line-height: 150%;
+        }
+
+        h1 {font-size: 2.1em;}
+        h2 {font-size: 1.7em;}
+        h3 {font-size: 1.4em;}
+        h4 {font-size: 1.2em;}
+        h5 {font-size: 1.1em;}
+        h6 {font-size: 1em;}
+
+        p, li {
+            margin: 0.3em 0 0.3em 0;
+            padding: 0;
+            line-height: 150%;
+        }
+
+        select, kbd {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        a:hover {
+            background-color: #e9f6ff;
+        }
+
+        .eq, input[type="text"], table.matrix {
+            font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+        }
+
+            .eq var {
+                color: #06d;
+                font-size: 105%;
+            }
+
+            .eq i {
+                color: #086;
+                font-style: normal;
+                font-size: 90%;
+            }
+
+            i.unit {
+                color: #043!important;
+                font-size: 90%!important;
+                vertical-align: -1pt;
+            }
+
+            sup.unit {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 70%!important;
+            }
+
+            .eq b {
+                font-weight: 600;
+            }
+
+            .eq sub {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 80%;
+                vertical-align: -18%;
+                margin-left: 1pt;
+            }
+
+            .eq sup {
+                display: inline-block;
+                margin-left: 1pt;
+                margin-top: -3pt;
+                font-size: 75%;
+            }
+
+            .eq small {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 70%;
+            }
+
+                .eq small var {
+                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-size: 8.5pt;
+                }
+
+                .eq small i {
+                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-size: 6pt;
+                }
+
+            .eq u, input, select {
+                background-color: LightYellow;
+            }
+
+                input[type="text"], select {
+                    font-size: 10pt;
+                    padding: 0.2em 0.4em;
+                    border: 0.5pt solid #CCC;
+                    border-radius: 0.35em;
+                    box-shadow: 0.06em 0.06em 0.5em #ddd;
+                    min-width: 3em;
+                }
+
+                input[type="text"] {
+                    text-align: right;
+                }
+
+                input[type="checkbox"],
+                input[type="radio"] {
+                    vertical-align: baseline;
+                    position: relative;
+                    bottom: -1pt;
+                    margin-right: 1pt;
+                }
+
+                    input[type="checkbox"].post:disabled:not(:checked),
+                    input[type="checkbox"].post:disabled:not(:checked) + label,
+                    input[type="radio"].post:disabled:not(:checked),
+                    input[type="radio"].post:disabled:not(:checked) + label {
+                        display: none;
+                    }
+
+                select:disabled {
+                    background: none;
+                    color: #444;
+                }
+
+                select.post:disabled {
+                    font-size: 12pt;
+                    border: none;
+                    box-shadow: none;
+                    color: red;
+                    background: none;
+                    appearance: none;
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                }
+
+                select.post:disabled::-ms-expand {
+                    display: none;
+                }
+
+                input[type="text"]:focus {
+                    box-shadow: 0.1em 0.1em 1em #ccc;
+                    color: black;
+                }
+
+        td, th {
+            padding: 2pt 4pt 2pt 4pt;
+            vertical-align: top;
+        }
+
+        small {
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+            table.bordered {
+                margin-top: 1em;
+            }
+
+                table.bordered th {
+                    background-color: #F0F0F0;
+                    border: solid 1pt #AAAAAA;
+                }
+
+                table.bordered td {
+                    border: solid 1pt #CCCCCC;
+                }
+
+            table.centered td, .matrix .td {
+                text-align: center;
+            }
+
+            table.data td {
+                text-align: right;
+            }
+
+                table.data td:first-child {
+                    text-align: left;
+                    padding-left: 0;
+                }
+
+        .matrix {
+            display: inline-table;
+        }
+
+            .matrix .tr {
+                display: table-row;
+            }
+
+            .matrix .td {
+                white-space: nowrap;
+                padding: 0 2pt 0 2pt;
+                min-width: 10pt;
+                display: table-cell;
+                font-size: 10pt;
+            }
+
+                .matrix .td:first-child,
+                .matrix .td:last-child {
+                    width: 0.75pt;
+                    min-width: 0.75pt;
+                    max-width: 0.75pt;
+                    padding: 0 1pt 0 1pt;
+                }
+
+                .matrix .td:first-child {
+                    border-left: solid 1pt black;
+                }
+
+                .matrix .td:last-child {
+                    border-right: solid 1pt black;
+                }
+
+            .matrix .tr:first-child .td:first-child,
+            .matrix .tr:first-child .td:last-child {
+                border-top: solid 1pt black;
+            }
+
+            .matrix .tr:last-child .td:first-child,
+            .matrix .tr:last-child .td:last-child {
+                border-bottom: solid 1pt black;
+            }
+
+        .block {
+            display: inline-block;
+            vertical-align: middle;
+            padding-left: 4pt;
+            margin-left: -1pt;
+            border-left: solid 1pt #80b0e8;
+            background: linear-gradient(to right, rgba(0, 192, 255, 0.06), rgba(0, 192, 255, 0.03));
+        }
+
+            .block .block {
+                background: linear-gradient(to right, rgba(0, 192, 255, 0.04), rgba(0, 192, 255, 0.02));
+            }
+
+        .dvcs:has(.block):not(.block *) {
+            display: inline-block;
+            border-left: solid 1pt #80b0e8;
+            padding-left: 0;
+            margin-left: 3pt;
+        }
+
+            .dvcs:has(.block):not(.block *)::before {
+                content: " 🞀";
+                font-size: 9pt;
+                color: #90c4f0;
+                margin-left: -4.5pt;
+            }
+
+        .arr {
+            color: #90c4f0;
+        }
+
+        .r0, .r1, .r2, .r3,
+        .o0, .o1, .o2, .o3,
+        .b1, .b2, .b3,
+        .c1, .c2, .c3, .c4,
+        .c5, .c6, .c7, .c8 {
+            display: inline-block;
+        }
+
+        .r0, .r1, .r2, .r3 {
+            margin-top: -1.5pt;
+            margin-right: 1.5pt;
+            vertical-align: top;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: right top;
+        }
+
+        .o0, .o1, .o2, .o3 {
+            border-top: solid 0.75pt;
+            line-height: 130%;
+            vertical-align: middle;
+            margin-top: 0.75pt;
+            padding-top: 1.25pt;
+            padding-left: 1pt;
+            padding-right: 1pt;
+        }
+
+        .r {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 150%;
+            display: inline-block;
+            vertical-align: top;
+            margin-left: -9.5pt;
+            position: relative;
+            top: 1pt;
+        }
+
+        .r0 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDEwIDIwIiBoZWlnaHQ9IjE1cHQiIHdpZHRoPSIxMHB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMCwxMyAyLDEyIDUsMTkgOSwwIiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MC42cHQ7IHN0cm9rZS1saW5lam9pbjpyb3VuZDsgc3Ryb2tlLWxpbmVjYXA6cm91bmQ7IGZpbGw6bm9uZSIgLz4NCiAgPGxpbmUgeDE9IjIuMiIgeTE9IjEyLjMiIHgyPSI0LjYiIHkyPSIxOC43IiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MC44cHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 8pt;
+            height: 16pt;
+            margin-left: -8pt;
+        }
+
+        .r1 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE1IDQwIiBoZWlnaHQ9IjMwcHQiIHdpZHRoPSIxNXB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMSwyNiAzLDI0IDgsMzggMTQsMCIgc3R5bGU9InN0cm9rZTpibGFjazsgc3Ryb2tlLXdpZHRoOjAuNnB0OyBzdHJva2UtbGluZWpvaW46cm91bmQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyBmaWxsOm5vbmUiIC8+DQogIDxsaW5lIHgxPSIzLjIiIHkxPSIyNC40IiB4Mj0iNy42IiB5Mj0iMzcuNiIgc3R5bGU9InN0cm9rZTpibGFjazsgc3Ryb2tlLXdpZHRoOjFwdDsgc3Ryb2tlLWxpbmVjYXA6cm91bmQ7IiAvPg0KPC9zdmc+");
+            width: 12pt;
+            height: 32pt;
+            margin-left: -12pt;
+        }
+
+        .r2 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDIwIDYwIiBoZWlnaHQ9IjQ1cHQiIHdpZHRoPSIyMHB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMiwzNyA1LDM0IDExLDU1IDE5LDAiIHN0eWxlPSJzdHJva2U6YmxhY2s7IHN0cm9rZS13aWR0aDowLjZwdDsgc3Ryb2tlLWxpbmVqb2luOnJvdW5kOyBzdHJva2UtbGluZWNhcDpyb3VuZDsgZmlsbDpub25lIiAvPg0KICA8bGluZSB4MT0iNS4xIiB5MT0iMzQuNiIgeDI9IjEwLjYiIHkyPSI1NC40IiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MS4ycHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 16pt;
+            height: 48pt;
+            margin-left: -16pt;
+        }
+
+        .r3 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDI1IDgwIiBoZWlnaHQ9IjYwcHQiIHdpZHRoPSIyNXB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMyw1MCA3LDQ2IDE1LDc0IDI0LDAiIHN0eWxlPSJzdHJva2U6YmxhY2s7IHN0cm9rZS13aWR0aDowLjZwdDsgc3Ryb2tlLWxpbmVqb2luOnJvdW5kOyBzdHJva2UtbGluZWNhcDpyb3VuZDsgZmlsbDpub25lIiAvPg0KICA8bGluZSB4MT0iNy4xIiB5MT0iNDYuOCIgeDI9IjE0LjUiIHkyPSI3My4yIiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MS4ycHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 19pt;
+            height: 62pt;
+            margin-left: -19pt;
+        }
+
+        .nth {
+            position: relative;
+            bottom: 1pt;
+        }
+
+        .eq small.nth {font-size: 70%;}
+        .dvr small {font-size: 65%;}
+        sup.raised {vertical-align: top;}
+
+        sup .r0, sup .r1, sup .r2, sup .r3 {
+            zoom: 0.7;
+            -moz-transform: scale(0.7);
+            -webkit-transform: scale(0.7);
+            transform: scale(0.7);
+            transform-origin: top right;
+            max-height: none;
+        }
+
+        sup .r0 { margin-left: -5pt; }
+        sup .r1 { margin-left: -11pt; }
+        sup .r2 { margin-left: -13pt; }
+        sup .r3 { margin-left: -16pt; }
+
+        .b1, .b2, .b3, .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+            vertical-align: middle;
+            font-weight: 100;
+            font-stretch: ultra-condensed;
+        }
+
+        .b2, .b3, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+            font-family: 'Jost* Hairline', sans-serif;
+        }
+
+        .b0, .b1, .c1 {
+            font-family: 'Jost* Thin', sans-serif;
+        }
+
+        .b0 {
+            font-size: 120%;
+            font-weight: 600;
+            padding: 0 1pt 0 1pt;
+        }
+
+        .b1 {
+            font-size: 240%;
+            margin-top: -3pt;
+            margin-left: -1pt;
+            margin-right: -1pt;
+        }
+
+        .b2 {
+            font-size: 370%;
+            margin-top: -5pt;
+            margin-left: -3pt;
+            margin-right: -3pt;
+        }
+
+        .b3 {
+            font-size: 520%;
+            margin-top: -8pt;
+            margin-left: -5pt;
+            margin-right: -5pt;
+        }
+
+        .c1 {
+            font-size: 240%;
+            margin-top: -4pt;
+        }
+
+        .c2 {
+            font-size: 360%;
+            margin-top: -6pt;
+            margin-left: -2.5pt;
+            margin-right: -0.5pt;
+        }
+
+        .c3 {
+            font-size: 480%;
+            margin-top: -8pt;
+            margin-left: -3pt;
+            margin-right: -1pt;
+        }
+
+        .c4 {
+            font-size: 600%;
+            margin-top: -10pt;
+            margin-left: -4pt;
+            margin-right: -2pt;
+            transform: scaleX(0.9);
+        }
+
+        .c5 {
+            font-size: 710%;
+            margin-top: -11.5pt;
+            margin-left: -6pt;
+            margin-right: -4pt;
+            transform: scaleX(0.8);
+        }
+
+        .c6 {
+            font-size: 820%;
+            margin-top: -13pt;
+            margin-left: -7pt;
+            margin-right: -5pt;
+            transform: scaleX(0.7);
+        }
+
+        .c7 {
+            font-size: 930%;
+            margin-top: -14.5pt;
+            margin-left: -8pt;
+            margin-right: -6pt;
+            transform: scaleX(0.6);
+        }
+
+        .c8 {
+            font-size: 1040%;
+            margin-top: -16pt;
+            margin-left: -9pt;
+            margin-right: -7pt;
+            transform: scaleX(0.5);
+        }
+
+        .dvc, .dvr, .dvs {
+            display: inline-block;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .dvc {
+            padding-left: 2pt;
+            padding-right: 2pt;
+            text-align: center;
+            line-height: 110%;
+        }
+
+        .dvr {
+            text-align: center;
+            line-height: 110%;
+            margin-bottom: 4pt;
+        }
+
+        .dvs {
+            text-align: left;
+            line-height: 110%;
+        }
+
+        .dvl {
+            display: block;
+            border-bottom: solid 1pt black;
+            margin-top: 1pt;
+            margin-bottom: 1pt;
+        }
+
+        .nary {
+            color: #C080F0;
+            font-size: 240%;
+            font-family: Georgia Pro Light, serif;
+            font-weight: 200;
+            line-height: 80%;
+            display: block;
+            margin: -1pt 1pt 3pt 1pt;
+        }
+
+            .nary em {
+                display: block;
+                transform: scaleX(0.7) rotate(7deg);
+            }
+
+        .dvc.down {
+            position: relative;
+            top: 0.5em;
+        }
+
+        .dvc.up {
+            position: relative;
+            bottom: 0.6em;
+        }
+
+        .low {
+            font-size: 70%;
+            display: inline-block;
+            position: relative;
+            top: 1.2em;
+        }
+
+        .cond {
+            color: #E000D0;
+        }
+
+        .err {
+            color: Crimson;
+            background-color: #FEE;
+        }
+
+        .ok {
+            color: Green;
+            background-color: #F0FFF0;
+        }
+
+        .ref {
+            float: right;
+            margin-left: 18pt;
+            color: Green;
+            background-color: #F8FFF0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .side {
+            float: right;
+            max-width: 50%;
+        }
+
+        .plot {
+            max-width: 100%
+        }
+
+        .indent {
+            border-left: 0.75pt solid #dddddd;
+            padding-left: 2em;
+        }
+
+        span.indent {
+            display: inline-block;
+        }
+
+        .fold {
+            height: 2.4em;
+            overflow: hidden;
+        }
+
+        .unfold {
+            height: auto;
+            overflow: auto;
+        }
+
+            .fold > :first-child, .unfold > :first-child {
+                cursor: pointer;
+            }
+
+                .fold > :first-child:hover, .unfold > :first-child:hover {
+                    color: #0066bb;
+                    text-decoration: underline;
+                }
+
+                .fold > :first-child::after {
+                    content: " ... ▼";
+                    font-size: 80%;
+                }
+
+                .unfold > :first-child::after {
+                    content: " ▲";
+                    font-size: 80%;
+                }
+
+        .vec {
+            font-family: 'Cambria Math', serif;
+            color: #8af;
+            font-style: normal;
+            display: inline-block;
+            vertical-align: 2pt;
+            margin-left: 3pt;
+            margin-right: -7pt;
+        }
+
+        small .vec, sup .vec {
+            margin-left: 2pt;
+            margin-right: -6pt;
+        }
+
+        #Units {
+            float: right;
+        }
+
+        @media screen {
+            .no-screen {
+                display: none;
+            }
+        }
+
+        @media print {
+            .side {
+                zoom: 0.8;
+                -moz-transform: scale(0.8);
+            }
+
+            body {
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        @page {
+            size: A4 portrait;
+            margin-left: 20mm;
+            margin-right: 10mm;
+            margin-top: 10mm;
+            margin-bottom: 10mm;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .value {
+            position: relative;
+            background-color: #f4fbff;
+            border-radius: 3pt;
+        }
+
+            .value:after {
+                content: "";
+                position: absolute;
+                left: 100%;
+                top: -100%;
+                transform: translateY(-50%);
+                margin-left: 2pt;
+                height: 16pt;
+                line-height: 16pt;
+                vertical-align: middle;
+                width: fit-content;
+                white-space: nowrap;
+                min-width: 10pt;
+                z-index: 1;
+                padding: 0 6pt 0 6pt;
+                border-radius: 6pt 6pt 6pt 0;
+                background: #000;
+                color: #fff;
+                font-family: 'Segoe UI', sans-serif;
+                font-style: normal;
+                font-size: 10pt;
+                text-align: center;
+                display: none;
+                opacity: 0;
+                transition: opacity 2s;
+                user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                -moz-user-select: none;
+            }
+
+            .value:hover:after {
+                content: attr(data-value);
+                display: block;
+                opacity: 1;
+            }
+
+        .errorHeader {
+            color: white;
+            background-color: crimson;
+            font-size: 10pt;
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 0;
+            width: 100vw;
+            max-width: 100%;
+            height: 1.8em;
+            line-height: 1.2em;
+            padding-left: 6pt;
+            overflow-x: hidden;
+        }
+
+        .roundBox {
+            background-color: #fee;
+            color: crimson;
+            font-size: 9pt;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            display: inline-block;
+            border-radius: 4pt;
+            min-width: 1.1em;
+            padding-left: 2pt;
+            padding-right: 2pt;
+            margin-top: 2pt;
+        }
+
+            .roundBox:hover {
+                background-color: white;
+            }
+
+        .lineLink {
+            background: none;
+            color: #b0e0ff;
+            font-family: Calibri, sans-serif;
+            font-size: 10pt;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: left;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            width: 2em;
+            height: 4em;
+            z-index: 1;
+        }
+
+            .lineLink:hover {
+                background: none;
+                color: #09e;
+            }
+    </style>
+</head>
+<body>
+    <script>
+        var contextMenu = false;
+        function getVerticalPosition(line) { return document.querySelector("[data-text='" + line + "']").getBoundingClientRect().top; }
+        function isNumeric(s) { return s.match(/^-?\d+(?:\.\d+)?$/); }
+        if (window.jQuery) {
+            function getHtmlWithInput() {
+                $("input[type=text]").each(function () {
+                    $(this).attr("value", $(this).val());
+                });
+                $("input[type=hidden]").each(function () {
+                    $(this).attr("value", $(this).val());
+                });
+                $("textarea").each(function () {
+                    $(this).html($(this).val());
+                });
+                $("input[type=radio]").each(function () {
+                    if (this.checked)
+                        $(this).attr("checked", "checked");
+                    else
+                        $(this).removeAttr("checked");
+                });
+                $("input[type=checkbox]").each(function () {
+                    if (this.checked)
+                        $(this).attr("checked", "checked");
+                    else
+                        $(this).removeAttr("checked");
+                });
+                $("select option").each(function () {
+                    if (this.selected) {
+                        $(this).attr("selected", "true");
+                    }
+                    else
+                        $(this).removeAttr("selected");
+                });
+                return document.body.outerHTML;
+            }
+
+            function getTargetId(element) {
+                var id = $(element).attr("name");
+                if (id != null && id.length > 0)
+                    return id;
+
+                return $(element).data("target");
+            }
+
+            function getValue(id, source) {
+                var value = "";
+                var target = $("#" + id + " input");
+                var domObj = target.get(0);
+                if (domObj == null || domObj.Length == 0) {
+                    target = $("#" + id + " .eq u");
+                    target.each(function () {
+                        value += $(this).text() + ";";
+                    });
+                    $(source).prop('disabled', true);
+                }
+                else {
+                    target.each(function () {
+                        value += $(this).val() + ";";
+                    });
+                }
+                if (value.length > 1) {
+                    value = value.slice(0, -1);
+                }
+                return value;
+            }
+
+            $(document).ready(function () {
+
+                $(".dvcs:has(.block) > :first-child").html("&hairsp;");
+
+                $("#Units").change(function () { $(".Units").text($(this).val()); });
+
+                $(".fold > :first-child").click(function () {
+                    if ($(this).parent().hasClass("fold")) {
+                        $(this).parent().removeClass("fold").addClass("unfold");
+                    }
+                    else {
+                        $(this).parent().removeClass("unfold").addClass("fold");
+                    }
+                });
+
+                $("select").each(function (index) {
+                    if ($(this).prop("id") != "Units") {
+                        var id = getTargetId(this);
+                        if (id != null && id.length > 0) {
+                            var value = getValue(id, this);
+                            $(this).val(value);
+                        }
+                    }
+
+                });
+
+                $("select").change(function () {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var target = $("#" + id + " input");
+                        if (target != null) {
+                            var values = $(this).val().split(";");
+                            target.each(function (index) {
+                                $(this).val(values[index]);
+                            });
+                        }
+                    }
+                });
+
+                $("input:radio, input:checkbox").each(function (index) {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var value = getValue(id, this);
+                        $(this).prop("checked", $(this).val() == value);
+                    }
+                });
+
+                $("input:radio, input:checkbox").change(function () {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var target = $("#" + id + " input");
+                        if (target != null) {
+                            if ($(this).prop("checked")) {
+                                var values = $(this).val().split(";");
+                                target.each(function (index) {
+                                    $(this).val(values[index]);
+                                });
+                            }
+                            else if ($(this).prop("type") == "checkbox") {
+                                target.each(function () {
+                                    $(this).val("0");
+                                });
+                            }
+                        }
+                    }
+                });
+
+                $(".line:not(style, script)").each(function () {
+                    var line = $(this).prop("id").split("-")[1];
+                    var $lineLink = $('<a class="lineLink" href="#0" data-text="' + line + '" title="Code line ' + line + '">&larr;</a>');
+                    $(this).append($lineLink);
+                    $lineLink.hide();
+                    $(this).hover(function () {
+                        $(".lineLink").hide();
+                        $lineLink.show();
+                    });
+                    $(window).scroll(function () {
+                        $lineLink.hide();
+                    });
+                });
+
+                $("body").mouseleave(function () {
+                    $(".lineLink").hide();
+                });
+
+                $(".roundBox").click(function () {
+                    var line = $(this).data("line");
+                    var e = document.getElementById("line-" + line);
+                    if (e) {
+                        window.scrollTo(0, e.offsetTop - $(this).outerHeight() - 20);
+                    }
+                });
+                $(".money").each(function () { $(this).text(Number(($(this).text())).toFixed(2)); });
+
+                $("input").change(function() {
+                    var e = $(this);
+                    var s = e.val();
+                    if (isNumeric(s)) {
+                        e.css("color", "black");
+                        e.removeAttr("title");
+                    } else {
+                        e.css("color", "red");
+                        e.attr("title", "Invalid number");
+                    }
+                });
+
+                $("a").click(function () {
+                    chrome.webview.postMessage('clicked');
+                });
+
+                window.addEventListener('click', () => {
+                    chrome.webview.postMessage('focused');
+                });
+            });
+        }
+        document.oncontextmenu = function () { contextMenu = true; };
+        document.onmousedown = function () { contextMenu = false; };
+    </script><h3>Test de WPF (XAML + C#) </h3>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Probando WPF con botón funcional: </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>--- WPF --- </p>
+<img src="data:image/png;base64,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" style="max-width:100%; border:1px solid #ddd; border-radius:4px; margin:10px 0;" alt="WPF Screenshot" /> 
+<p>--- End WPF --- </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Fin del test de WPF </p>
+ </body></html>

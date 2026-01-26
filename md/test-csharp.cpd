@@ -1,0 +1,30 @@
+'Test de C# Console
+
+'Probando código C# con bucle y cálculos:
+
+@{csharp}
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Calculando tabla de multiplicar del 5:");
+        for (int i = 1; i <= 10; i++)
+        {
+            int resultado = 5 * i;
+            Console.WriteLine($"5 × {i} = {resultado}");
+        }
+
+        Console.WriteLine("\nSuma de números del 1 al 10:");
+        int suma = 0;
+        for (int i = 1; i <= 10; i++)
+        {
+            suma += i;
+        }
+        Console.WriteLine($"Suma total: {suma}");
+    }
+}
+@{end csharp}
+
+'Fin del test de C#

@@ -1,0 +1,388 @@
+"Práctica Combinada: HTML + CSS + TypeScript
+'Ejemplo inspirado en awatif-ui para practicar las 3 tecnologías juntas
+
+#hide
+
+'========================================
+'  1. DEFINIR ESTILOS CSS
+'========================================
+
+@{css}
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  max-width: 800px;
+  width: 100%;
+}
+
+h1 {
+  color: #667eea;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.node-info {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  transition: transform 0.3s ease;
+}
+
+.node-info:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.node-card {
+  background: white;
+  border-left: 4px solid #667eea;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+
+.node-id {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 1.2em;
+}
+
+.coordinates {
+  color: #555;
+  margin-top: 5px;
+}
+
+.value-display {
+  display: inline-block;
+  background: #764ba2;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: scale(1.05);
+}
+
+.stat-value {
+  font-size: 2em;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+@{end css}
+
+'========================================
+'  2. DEFINIR ESTRUCTURA HTML
+'========================================
+
+@{html}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizador de Nodos 3D</title>
+</head>
+<body>
+  <div class="container">
+    <h1>🔷 Visualizador de Nodos 3D</h1>
+
+    <div id="nodes-container"></div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div>Total de Nodos</div>
+        <div class="stat-value" id="total-nodes">0</div>
+      </div>
+      <div class="stat-card">
+        <div>Valor Máximo</div>
+        <div class="stat-value" id="max-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div>Valor Promedio</div>
+        <div class="stat-value" id="avg-value">0</div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <button onclick="updateValues()">🔄 Actualizar Valores</button>
+      <button onclick="addNode()">➕ Agregar Nodo</button>
+    </div>
+  </div>
+</body>
+</html>
+@{end html}
+
+'========================================
+'  3. LÓGICA CON TYPESCRIPT
+'========================================
+
+@{ts}
+// Definir tipos e interfaces (como en awatif-ui)
+type Node3D = [number, number, number];
+
+interface NodeData {
+  id: number;
+  position: Node3D;
+  value: number;
+}
+
+interface Stats {
+  total: number;
+  max: number;
+  average: number;
+}
+
+// Clase para gestionar nodos (similar a awatif-ui)
+class NodeManager {
+  private nodes: NodeData[] = [];
+
+  constructor(initialNodes: Node3D[], initialValues: number[]) {
+    initialNodes.forEach((pos, idx) => {
+      this.nodes.push({
+        id: idx,
+        position: pos,
+        value: initialValues[idx]
+      });
+    });
+  }
+
+  getNodes(): NodeData[] {
+    return this.nodes;
+  }
+
+  updateValue(id: number, newValue: number): void {
+    const node = this.nodes.find(n => n.id === id);
+    if (node) {
+      node.value = newValue;
+    }
+  }
+
+  addNode(position: Node3D, value: number): void {
+    this.nodes.push({
+      id: this.nodes.length,
+      position,
+      value
+    });
+  }
+
+  getStats(): Stats {
+    const values = this.nodes.map(n => n.value);
+    return {
+      total: this.nodes.length,
+      max: Math.max(...values),
+      average: values.reduce((a, b) => a + b, 0) / values.length
+    };
+  }
+
+  // Método para obtener color basado en valor (como lut en awatif-ui)
+  getColorForValue(value: number): string {
+    const stats = this.getStats();
+    const normalized = (value - 0) / (stats.max - 0);
+
+    // Crear gradiente de colores (rainbow)
+    if (normalized < 0.25) {
+      return '#0000FF'; // Azul
+    } else if (normalized < 0.5) {
+      return '#00FFFF'; // Cyan
+    } else if (normalized < 0.75) {
+      return '#00FF00'; // Verde
+    } else {
+      return '#FF0000'; // Rojo
+    }
+  }
+}
+
+// Inicializar el gestor (datos como en awatif-ui color-map)
+const initialNodes: Node3D[] = [
+  [0, 0, 0],
+  [5, 0, 0],
+  [5, 0, 5],
+  [0, 0, 5]
+];
+
+const initialValues = [0, 5, 10, 3];
+
+const manager = new NodeManager(initialNodes, initialValues);
+
+// Función para renderizar nodos
+function renderNodes(): void {
+  const container = document.getElementById('nodes-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  manager.getNodes().forEach(node => {
+    const nodeDiv = document.createElement('div');
+    nodeDiv.className = 'node-card fade-in';
+    nodeDiv.style.borderLeftColor = manager.getColorForValue(node.value);
+
+    nodeDiv.innerHTML = `
+      <div class="node-id">Nodo #${node.id}</div>
+      <div class="coordinates">
+        Posición: (${node.position[0]}, ${node.position[1]}, ${node.position[2]})
+      </div>
+      <span class="value-display">Valor: ${node.value.toFixed(2)}</span>
+    `;
+
+    container.appendChild(nodeDiv);
+  });
+
+  updateStats();
+}
+
+// Actualizar estadísticas
+function updateStats(): void {
+  const stats = manager.getStats();
+
+  const totalEl = document.getElementById('total-nodes');
+  const maxEl = document.getElementById('max-value');
+  const avgEl = document.getElementById('avg-value');
+
+  if (totalEl) totalEl.textContent = stats.total.toString();
+  if (maxEl) maxEl.textContent = stats.max.toFixed(2);
+  if (avgEl) avgEl.textContent = stats.average.toFixed(2);
+}
+
+// Función global para actualizar valores (llamada desde HTML button)
+(window as any).updateValues = function(): void {
+  manager.getNodes().forEach((node, idx) => {
+    const newValue = Math.random() * 20;
+    manager.updateValue(idx, newValue);
+  });
+  renderNodes();
+  console.log('Valores actualizados!');
+};
+
+// Función global para agregar nodo
+(window as any).addNode = function(): void {
+  const x = Math.random() * 10;
+  const y = Math.random() * 10;
+  const z = Math.random() * 10;
+  const value = Math.random() * 20;
+
+  manager.addNode([x, y, z], value);
+  renderNodes();
+  console.log(`Nuevo nodo agregado: (${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)})`);
+};
+
+// Renderizar inicialmente
+renderNodes();
+
+// Simular actualización después de 2 segundos (como en awatif-ui)
+setTimeout(() => {
+  console.log('Actualizando valores automáticamente...');
+  manager.updateValue(0, 1);
+  manager.updateValue(1, 5);
+  manager.updateValue(2, 0);
+  manager.updateValue(3, 8);
+  renderNodes();
+}, 2000);
+
+console.log('✅ Aplicación inicializada con TypeScript!');
+console.log('📊 Total de nodos:', manager.getStats().total);
+@{end ts}
+
+#show
+
+'========================================
+'  RESUMEN
+'========================================
+
+"Este ejemplo combina HTML + CSS + TypeScript en Calcpad
+'Similar a como funciona awatif-ui
+
+'Conceptos demostrados:
+'  ✓ Tipos e Interfaces TypeScript
+'  ✓ Clases con métodos privados
+'  ✓ Gestión de estado reactivo
+'  ✓ DOM manipulation
+'  ✓ Eventos y callbacks
+'  ✓ Animaciones CSS
+'  ✓ Gradientes y efectos visuales
+'  ✓ Grid layout responsivo
+
+'Para probar:
+'  1. Abre este archivo en Calcpad.Wpf
+'  2. Presiona F5 para calcular
+'  3. Se abrirá una ventana con la visualización
+'  4. Haz clic en los botones para interactuar
+
+'Inspirado en: awatif-ui/src/color-map/

@@ -1,0 +1,194 @@
+
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="OriginalFile" content="Plugin Example for SAP2000 API CHM.docx">
+ <meta name="generator" content="Adobe RoboHelp 2019">
+<title>Plugin Example for SAP2000 API CHM</title>
+<link rel="StyleSheet" href="../../SAP2000.CSS" type="text/css">
+</head>
+
+<body style="word-wrap: break-word;">
+<script type="text/javascript" src="../../ehlpdhtm.js" language="JavaScript1.2"></script>
+
+<h1><b><span style="font-size: 16.0pt; line-height: 107%;">Plugin Example</span></b></h1>
+<h2><b><u><span style="font-size: 12.0pt; line-height: 107%;">Remarks</span></u></b></h2>
+<p class="Comment">This VB.NET plugin example can be created with Visual 
+ Studio 2017 or higher.</p>
+<p class="Comment">This page shows how to create a simple .NET plugin that 
+ can be added to the Tools menu in the SAP2000 program. This plugin has 
+ minimal functionality, it is intended to demonstrate the proper way to 
+ implement the cPlugin class.</p>
+<h2><b><u><span style="font-size: 12.0pt; line-height: 107%;">Procedure</span></u></b></h2>
+<ol style="list-style: decimal;">
+	<li><p class="Comment" style="margin-bottom: 2pt;">Create a new project 
+	 of type <b>.NET Framework Class Library (.DLL)</b> . The language 
+	 should be Visual Basic.</p></li>
+	<li><p class="Comment" style="margin-bottom: 2pt;">Navigate to the 
+	 project Properties, and change the Assembly Name to your preferred 
+	 plugin assembly name, for example SimplePlugin .</p></li>
+	<li><p class="Comment" style="margin-bottom: 2pt;">Add a reference 
+	 to <b>C:\ Program Files\Computers and Structures\SAP2000 24\SAP2000v1.DLL</b> 
+	 to the project. Modify the path as appropriate for CSiBridge or if 
+	 you have installed the program in a different location. If you want 
+	 to create a plugin that can be used in other CSi products that support 
+	 plugins, you can instead add a reference to the cross-product API 
+	 library, <b>C:\ Program Files\Computers and Structures\SAP2000 24\CSiAPIv1v1.DLL</b></p></li>
+	<li><p class="Comment" style="margin-bottom: 2pt;">Import the SAP2000v1 
+	 (or CSiAPIv1 ) namespace, either at the project level (on the References 
+	 page of the project Properties), or with an <b>Imports SAP2000v1</b> 
+	 line at the top of your class file.</p></li>
+	<li><p class="Comment" style="margin-bottom: 2pt;">Paste the example 
+	 code below into the class file. Please pay attention to the comments 
+	 in this code block, they contain additional important information</p></li>
+	<li><p class="Comment" style="margin-bottom: 2pt;">Compile the project, 
+	 selecting either AnyCPU or x64 as the platform. Please note that all 
+	 CSi programs are 64-bit. The output plugin assembly is a file with 
+	 the name you selected in Step 2 and a DLL extension.</p></li>
+	<li><p class="Comment" style="margin-bottom: 2pt;">To add this plugin 
+	 to the Tools menu in SAP2000, navigate to the Tools menu and select 
+	 <b>Add/Show Plugins</b> . This will open the External Plugin Data 
+	 form shown below</p></li>
+</ol>
+<p><img src="Plugin_Example_for_SAP2000_API_CHM_files/image001.png" alt="Graphical user interface, text, application Description automatically generated" width="625" height="222" border="0"></p>
+<ol start="8" style="list-style: decimal;">
+	<li><p class="Comment" style="margin-bottom: 2.0pt;">In the External 
+	 Plugin Data form, click <b>Browse</b>, then locate and select your 
+	 plugin assembly DLL .</p></li>
+	<li><p class="Comment" style="margin-bottom: 2.0pt;">The textbox fields 
+	 will automatically populate with your plugin information. You can 
+	 modify the Menu Text field as preferred.</p></li>
+	<li><p class="Comment" style="margin-bottom: 2.0pt;">Click the <b>Add</b> 
+	 button. Check that the Status field reads OK. You can click the <b>Info</b> 
+	 button to view information about the plugin.</p></li>
+	<li><p class="Comment" style="margin-bottom: 2.0pt;">Close the External 
+	 Plugin Data form.</p></li>
+	<li><p class="Comment" style="margin-bottom: 2.0pt;">Your plugin now 
+	 appears in the Tools menu drop-down. Click on it to run your plugin.</p></li>
+</ol>
+<h2><b><u><span style="font-size: 12.0pt; line-height: 107%;">Example Code</span></u></b></h2>
+<p style="margin-bottom: 0in; line-height: normal; text-autospace: none;">&#160;</p>
+<p class="Coding" style="color: #808080;">''' &#160;<span style="color: #808080;">&lt;summary&gt;</span>&#160;</p>
+<p class="Coding"><span style="color: #808080;">'''</span> This is the 
+ class that the CSi program will use when starting your plugin.&#160;</p>
+<p class="Coding"><span style="color: #808080;">'''</span> The name of 
+ this class must be cPlugin , with that exact capitalization.&#160;</p>
+<p class="Coding"><span style="color: #808080;">'''</span> It should implement 
+ the cPluginContract interface, as demonstrated below.&#160;</p>
+<p class="Coding"><span style="color: #808080;">''' &#160;</span><span 
+	 cascadia="" style="font-size: 9.5pt;">&lt;/summary&gt;&#160;</span></p>
+<p class="Coding">&#160;</p>
+<p class="Coding">Public &#160;Class &#160;cPlugin&#160;</p>
+<p class="Coding" style="margin-left: 88px;">Implements cPluginContract</p>
+<p class="Coding">&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">''' 
+ </span>&#160;&lt;summary&gt;&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ The entry point for launching the plugin&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">''' 
+ &#160;</span>&lt;/summary&gt;<span cascadia="" style="font-size: 9.5pt;">&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ &#160;&lt;param name=&quot;SapModel&quot;&gt;&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ A reference to the SapModel object upon which all operations will be performed&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ &#160;&lt;/param&gt;&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ &#160;&lt;param name=&quot;ISapPlugin&quot;&gt;&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ A reference to the callback object, used to retrieve the plugin status 
+ and notify the program when the plugin is closed&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ &#160;&lt;/param&gt;&#160;</p>
+<p class="Coding">&#160;</p>
+<p class="Coding" style="margin-left: 88px;">Public &#160;Sub Main(ByRef 
+ SapModel As cSapModel, ByRef ISapPlugin As cPluginCallback) Implements 
+ cPluginContract.Main</p>
+<p class="Coding">&#160;</p>
+<p class="Coding" style="margin-left: 128px;">Dim errorCode As &#160;Integer 
+ = -1</p>
+<p class="Coding" style="margin-left: 128px;">&#160;</p>
+<p class="Coding" style="margin-left: 128px;">Try&#160;</p>
+<p class="Coding">&#160;</p>
+<p class="Coding" style="margin-left: 168px;"><span cascadia="" style="font-size: 9.5pt;">D</span>im 
+ ret As &#160;Integer = -1</p>
+<p class="Coding" style="margin-left: 168px;">ret = SapModel.InitializeNewModel()</p>
+<p class="Coding" style="margin-left: 168px;">ret = SapModel.File.NewBlank()</p>
+<p class="Coding" style="margin-left: 168px;">ret = SapModel.PropMaterial.SetMaterial(&quot;CONC&quot;, 
+ eMatType.Concrete)</p>
+<p class="Coding" style="margin-left: 168px;">ret = SapModel.PropFrame.SetRectangle(&quot;R1&quot;, 
+ &quot;CONC&quot;, 12, 12)</p>
+<p class="Coding" style="margin-left: 168px;">&#160;</p>
+<p class="Coding" style="margin-left: 168px;"><span cascadia="" style="font-size: 9.5pt;">D</span>im 
+ frameName As &#160;String = &quot;&quot;&#160;</p>
+<p class="Coding" style="margin-left: 168px;">ret = SapModel.FrameObj.AddByCoord(0, 
+ 0, 0, 10, 0, 0, frameName, &quot;R1&quot;, &quot;1&quot;)</p>
+<p class="Coding" style="margin-left: 168px;">ret = SapModel.View.RefreshView(0, 
+ False)</p>
+<p class="Coding" style="margin-left: 168px;">&#160;</p>
+<p class="Coding" style="margin-left: 168px;"><span cascadia="" style="font-size: 9.5pt;">M</span>sgBox(&quot;Hello 
+ CSI World&quot;)</p>
+<p class="Coding" style="margin-left: 168px;">errorCode = 0</p>
+<p class="Coding">&#160;</p>
+<p class="Coding" style="margin-left: 128px;"><span cascadia="" style="font-size: 9.5pt;">C</span>atch 
+ ex As Exception</p>
+<p class="Coding" style="margin-left: 168px;">errorCode = 1</p>
+<p class="Coding" style="margin-left: 128px;">Finally&#160;</p>
+<p class="Coding" style="margin-left: 168px;">'It is not necessarily required 
+ to call ISapPlugin.Finish before the Main method returns.&#160;</p>
+<p class="Coding" style="margin-left: 168px;">'For instance, your plugin 
+ may launch an interactive form for users.&#160;</p>
+<p class="Coding" style="margin-left: 168px;">'In that case, you would 
+ pass a reference to the ISapPlugin object to your form, &#160;</p>
+<p class="Coding" style="margin-left: 168px;">'and call ISapPlugin.Finish 
+ in that form's closing event&#160;</p>
+<p class="Coding" style="margin-left: 168px;">ISapPlugin.Finish(errorCode)</p>
+<p class="Coding" style="margin-left: 128px;">End &#160;Try&#160;</p>
+<p class="Coding" style="margin-left: 128px;">&#160;</p>
+<p class="Coding" style="margin-left: 88px;">End &#160;Sub&#160;</p>
+<p class="Coding" style="margin-left: 88px;">&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">''' 
+ </span><span cascadia="" style="font-size: 9.5pt;">&#160;&lt;summary&gt;&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ <span cascadia="" style="font-size: 9.5pt;">Provides information about 
+ the plugin&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">''' 
+ &#160;</span><span cascadia="" style="font-size: 9.5pt;">&lt;/summary&gt;&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ <span cascadia="" style="font-size: 9.5pt;">&#160;&lt;param name=&quot;Text&quot;&gt;&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ <span cascadia="" style="font-size: 9.5pt;">Information about the plugin, 
+ e.g. author, version, description&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ <span cascadia="" style="font-size: 9.5pt;">&#160;&lt;/param&gt;&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ <span cascadia="" style="font-size: 9.5pt;">&#160;&lt;returns&gt;&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ <span cascadia="" style="font-size: 9.5pt;">Returns zero if the information 
+ is successfully retrieved; otherwise it returns a nonzero value&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;"><span style="color: #808080;">'''</span> 
+ <span cascadia="" style="font-size: 9.5pt;">&#160;&lt;/returns&gt;&#160;</span></p>
+<p class="Coding" style="margin-left: 88px;">Public &#160;Function Info(ByRef 
+ Text As &#160;String) As &#160;Integer &#160;Implements cPluginContract.Info</p>
+<p class="Coding" style="margin-left: 128px;"><span cascadia="" style="font-size: 9.5pt;">T</span>ry&#160;</p>
+<p class="Coding" style="margin-left: 168px;">Text = &quot;A simple example 
+ plugin. Author, Company, Version, Etc&quot;&#160;</p>
+<p class="Coding" style="margin-left: 168px;">Return 0</p>
+<p class="Coding" style="margin-left: 128px;">Catch ex As Exception</p>
+<p class="Coding" style="margin-left: 168px;">Return 1</p>
+<p class="Coding" style="margin-left: 128px;">End &#160;Try&#160;</p>
+<p class="Coding">&#160;</p>
+<p class="Coding" style="margin-left: 88px;"><span cascadia="" style="font-size: 9.5pt;">E</span>nd 
+ &#160;Function&#160;</p>
+<p class="Coding">&#160;</p>
+<p class="Coding">End &#160;Class&#160;</p>
+<p>&#160;</p>
+<h2>See Also</h2>
+<p class="Block-Text"><a href="cPlugincallback_Properties/cPluginCallback_Interfacey.htm">cPluginCallback 
+ Interface</a></p>
+<p class="Block-Text"><a href="cPluginContract_Methods/cPluginContract.htm">cPluginContract 
+ Interface</a></p>
+<p class="Block-Text">&#160;</p>
+</body>
+</html>

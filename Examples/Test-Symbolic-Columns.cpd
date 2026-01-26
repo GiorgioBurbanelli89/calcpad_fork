@@ -1,0 +1,171 @@
+"Ejemplo de Parsers Simbólicos en Columnas"
+
+'<h2>Comparación de Métodos de Cálculo Simbólico</h2>
+
+@{columns 3}
+
+'<h3>Calcpad Nativo</h3>
+
+' Derivada
+f_1 = x^2 + a*x + b
+f_1 = 2*x + a
+
+' Integral
+g_1 = x^3/3 + a*x^2/2 + b*x
+
+' Resultado
+resultado_1 = f_1
+
+---
+
+'<h3>Sintaxis LaTeX</h3>
+
+@{latex}
+' Derivada usando LaTeX
+f_2 = \frac{d}{dx}(x^2 + a \cdot x + b) = 2x + a
+@{end latex}
+
+@{latex}
+' Integral usando LaTeX
+g_2 = \int (x^2 + a \cdot x + b) dx = \frac{x^3}{3} + \frac{a \cdot x^2}{2} + b \cdot x
+@{end latex}
+
+' Resultado
+resultado_2 = f_2
+
+---
+
+'<h3>Symbolic Math (AngouriMath)</h3>
+
+@{symbolic}
+' Derivada simbólica
+df_dx = d/dx(x^2 + a*x + b)
+
+' Simplificación
+simplified = simplify(x^2 - 2*x + 1)
+
+' Resolver ecuación
+' solve(x^2 - 5*x + 6 = 0, x)
+@{end symbolic}
+
+' Evaluación numérica
+' resultado_3 = df_dx
+
+@{end columns}
+
+'<hr>
+
+'<h2>Cálculo Diferencial e Integral</h2>
+
+@{columns 2}
+
+'<h3>Derivadas</h3>
+
+@{symbolic}
+' Derivada de polinomio
+d1 = d/dx(x^3 + 2*x^2 - 5*x + 3)
+
+' Derivada de trigonométrica
+d2 = d/dx(sin(x) * cos(x))
+
+' Derivada de exponencial
+d3 = d/dx(e^(a*x))
+@{end symbolic}
+
+---
+
+'<h3>Integrales</h3>
+
+@{symbolic}
+' Integral de polinomio
+i1 = integrate(3*x^2 + 4*x - 5, x)
+
+' Integral trigonométrica
+i2 = integrate(sin(x), x)
+
+' Integral exponencial
+i3 = integrate(e^x, x)
+@{end symbolic}
+
+@{end columns}
+
+'<hr>
+
+'<h2>Álgebra Simbólica</h2>
+
+@{columns 3}
+
+'<h3>Expansión</h3>
+
+@{symbolic}
+' Expandir expresiones
+exp1 = expand((x + a)^2)
+exp2 = expand((x + 1)*(x - 1))
+exp3 = expand((x + a)*(x + b))
+@{end symbolic}
+
+---
+
+'<h3>Simplificación</h3>
+
+@{symbolic}
+' Simplificar expresiones
+simp1 = simplify(x^2 - x^2 + a)
+simp2 = simplify((x^2 - 1)/(x - 1))
+simp3 = simplify(sin(x)^2 + cos(x)^2)
+@{end symbolic}
+
+---
+
+'<h3>Límites</h3>
+
+@{symbolic}
+' Cálculo de límites
+lim1 = limit((x^2 - 1)/(x - 1), x, 1)
+lim2 = limit(sin(x)/x, x, 0)
+lim3 = limit(1/x, x, inf)
+@{end symbolic}
+
+@{end columns}
+
+'<hr>
+
+'<h2>Mezcla de Sintaxis en Columnas</h2>
+
+@{columns 4}
+
+'<h3>Calcpad</h3>
+' Método nativo
+area_calc = b * x
+vol_calc = area_calc * x
+
+---
+
+'<h3>LaTeX</h3>
+@{latex}
+' Con LaTeX
+area_{latex} = b \cdot x
+vol_{latex} = area_{latex} \cdot x
+@{end latex}
+
+---
+
+'<h3>Python</h3>
+@{pymath}
+' Con Python
+area_py = b * x
+vol_py = area_py * x
+@{end pymath}
+
+---
+
+'<h3>Simbólico</h3>
+@{symbolic}
+' Simbólico
+area_sym = simplify(b * x)
+vol_sym = expand(area_sym * x)
+@{end symbolic}
+
+@{end columns}
+
+'<p><b>Todos los métodos producen resultados equivalentes</b></p>

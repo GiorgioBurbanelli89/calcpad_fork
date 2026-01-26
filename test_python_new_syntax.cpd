@@ -1,0 +1,26 @@
+"Prueba de código Python con nueva sintaxis @{python}
+
+@{python}
+# Código Python
+import math
+from datetime import datetime
+
+print("¡Hola desde Python con nueva sintaxis @{python}!")
+print(f"Fecha y hora actual: {datetime.now()}")
+
+# Cálculos matemáticos
+resultado = math.pi * 2
+print(f"PI * 2 = {resultado}")
+
+# Variables
+x = 10
+y = 20
+suma = x + y
+print(f"{x} + {y} = {suma}")
+
+# Exportar variable a Calcpad
+print(f"CALCPAD:resultado={resultado}")
+print(f"CALCPAD:suma={suma}")
+@{end python}
+
+"Fin del código Python

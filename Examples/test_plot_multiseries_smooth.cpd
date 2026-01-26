@@ -1,0 +1,161 @@
+"Demo de @{plot} con Múltiples Series y Curvas Suavizadas"
+
+'1. Dos funciones en la misma gráfica (estilo de la imagen con f(x) y f'(x))
+@{plot}
+x: [0; 1; 2; 3; 4; 5; 6]
+# Primera serie - función cuadrática (azul)
+y: [0; 1; 4; 9; 16; 25; 36]
+color: #0033CC
+legend: "f(x) = x²"
+smooth: true
+symbol: dot
+symbolsize: 5
+# Segunda serie - derivada lineal (rojo)
+y2: [0; 2; 4; 6; 8; 10; 12]
+color2: #CC0000
+legend2: "f'(x) = 2x"
+smooth2: true
+linewidth2: 1.5
+xlabel: "x"
+ylabel: "y"
+title: "Función y su derivada"
+width: 650
+height: 450
+# Anotaciones
+text: 4, 20, "f(x)", #0033CC, 14, italic
+text: 5.2, 11, "f'(x)", #CC0000, 14, italic
+@{end plot}
+
+'2. Comparación de curvas suavizadas vs líneas rectas
+@{plot}
+x: [0; 1; 2; 3; 4; 5]
+# Serie suavizada
+y: [2; 5; 3; 8; 4; 9]
+color: #006600
+legend: "Curva suavizada"
+smooth: true
+tension: 0.4
+symbol: circle
+symbolsize: 8
+linewidth: 2.5
+# Mismos datos sin suavizar
+y2: [2; 5; 3; 8; 4; 9]
+color2: #999999
+legend2: "Líneas rectas"
+smooth2: false
+style2: dash
+symbol2: square
+symbolsize2: 6
+xlabel: "t"
+ylabel: "v(t)"
+title: "Smooth vs Linear"
+@{end plot}
+
+'3. Tres series de datos
+@{plot}
+x: [0; 1; 2; 3; 4; 5; 6; 7; 8]
+# Serie 1 - Seno
+y: [0; 0.84; 0.91; 0.14; -0.76; -0.96; -0.28; 0.66; 0.99]
+color: #0066CC
+legend: "sin(x)"
+smooth: true
+linewidth: 2
+# Serie 2 - Coseno
+y2: [1; 0.54; -0.42; -0.99; -0.65; 0.28; 0.96; 0.75; -0.15]
+color2: #CC3300
+legend2: "cos(x)"
+smooth2: true
+linewidth2: 2
+# Serie 3 - Tangente (truncada)
+y3: [0; 1.56; -2.19; -0.14; 1.16; -3.38; -0.29; 0.87; -6.8]
+color3: #009900
+legend3: "tan(x)"
+smooth3: true
+style3: dash
+linewidth3: 1.5
+xlabel: "x (rad)"
+ylabel: "f(x)"
+title: "Funciones trigonométricas"
+ylim: -4, 4
+@{end plot}
+
+'4. Estilo Mathcad Prime: Derivada con anotaciones Δx, Δy
+@{plot}
+x: [0; 0.5; 1; 1.5; 2; 2.5; 3; 3.5; 4]
+# Función cuadrática
+y: [0; 0.25; 1; 2.25; 4; 6.25; 9; 12.25; 16]
+color: #0033CC
+smooth: true
+linewidth: 2.5
+symbol: none
+legend: "f(x)"
+# Línea tangente en x=2
+y2: [-2; -1; 0; 1; 2; 3; 4; 5; 6]
+color2: #CC0000
+smooth2: false
+linewidth2: 1.5
+legend2: "tangente"
+xlabel: "x"
+ylabel: "f(x)"
+title: ""
+# Anotaciones estilo derivada
+vline: 2, #666666
+hline: 4, #666666
+text: 2.1, 4.5, "f(a)", #0033CC, 12
+text: 3.1, 9.5, "f(a+Δx)", #0033CC, 12
+text: 2.5, 2.5, "Δx", #666666, 11
+text: 3.3, 6.5, "Δy", #666666, 11
+arrow: 2.8, 6, 3, 8.8, #CC0000, 1.5
+circle: 2, 4, 0.15, #0033CC
+circle: 3, 9, 0.15, #0033CC
+@{end plot}
+
+'5. Series con diferentes estilos de línea y marcadores
+@{plot}
+x: [1; 2; 3; 4; 5; 6]
+y: [10; 15; 13; 17; 14; 19]
+color: #0066CC
+style: solid
+symbol: circle
+legend: "Serie A"
+smooth: true
+
+y2: [8; 12; 14; 11; 16; 15]
+color2: #CC6600
+style2: dash
+symbol2: square
+legend2: "Serie B"
+smooth2: true
+
+y3: [5; 9; 7; 12; 10; 14]
+color3: #009933
+style3: dot
+symbol3: triangle
+legend3: "Serie C"
+smooth3: true
+
+xlabel: "Tiempo (s)"
+ylabel: "Valor"
+title: "Comparación de series"
+@{end plot}
+
+'6. Función con puntos de datos y curva de ajuste
+@{plot}
+x: [0; 1; 2; 3; 4; 5]
+# Datos experimentales (solo puntos)
+y: [1.2; 2.1; 3.8; 5.2; 6.9; 8.1]
+color: #CC0000
+style: none
+symbol: circle
+symbolsize: 10
+legend: "Datos"
+# Curva de ajuste suavizada
+y2: [1; 2; 4; 5; 7; 8]
+color2: #0033CC
+smooth2: true
+linewidth2: 2
+legend2: "Ajuste"
+xlabel: "x"
+ylabel: "y"
+title: "Datos vs Curva de ajuste"
+@{end plot}

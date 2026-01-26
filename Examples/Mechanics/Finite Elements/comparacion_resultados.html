@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparacion Calcpad vs Octave vs Python</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 { color: #333; }
+        h2 { color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 5px; }
+        h3 { color: #666; }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .column {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .column.calcpad { border-left: 4px solid #ff6600; }
+        .column.octave { border-left: 4px solid #00aa44; }
+        .column.python { border-left: 4px solid #3366cc; }
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .code { font-family: 'Consolas', 'Monaco', monospace; }
+        .error { color: #cc0000; background-color: #ffeeee; padding: 2px 5px; }
+        .ok { color: #00aa00; background-color: #eeffee; padding: 2px 5px; }
+        .warning { color: #cc6600; background-color: #ffffee; padding: 2px 5px; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f0f0f0; }
+        .matrix { font-family: monospace; white-space: pre; }
+    </style>
+</head>
+<body>
+    <h1>Comparacion Sistematica: Calcpad vs Octave vs Python</h1>
+    <p>Analisis de problemas del parser de Calcpad en calculo matricial</p>
+
+    <h2>TEST 1: Variables Simples</h2>
+    <div class="container">
+        <div class="column calcpad">
+            <h3>Calcpad CLI</h3>
+            <pre class="code">
+a = 6       <span class="ok">OK: a = 6</span>
+b = 4       <span class="ok">OK: b = 4</span>
+t = 0.1     <span class="ok">OK: t = 0.1</span>
+
+E = 35000'MPa   <span class="ok">OK: E = 35000 MPa</span>
+q = 10'kN/m2    <span class="ok">OK: q = 10 kN/m2</span>
+
+'texto'n = 16   <span class="error">ERROR: n undefined</span>
+n               <span class="error">Undefined variable</span>
+
+c = a + b       <span class="ok">OK: c = 10</span>
+d = a*b         <span class="ok">OK: d = 24</span>
+e = a/b         <span class="ok">OK: e = 1.5</span>
+            </pre>
+        </div>
+        <div class="column octave">
+            <h3>Octave</h3>
+            <pre class="code">
+a = 6;      <span class="ok">OK: a = 6</span>
+b = 4;      <span class="ok">OK: b = 4</span>
+t = 0.1;    <span class="ok">OK: t = 0.1</span>
+
+E = 35000e6;    <span class="ok">OK: E = 3.5e+10</span>
+q = 10;         <span class="ok">OK: q = 10</span>
+
+n = 16;         <span class="ok">OK: n = 16</span>
+
+c = a + b;      <span class="ok">OK: c = 10</span>
+d = a * b;      <span class="ok">OK: d = 24</span>
+e = a / b;      <span class="ok">OK: e = 1.5</span>
+            </pre>
+        </div>
+        <div class="column python">
+            <h3>Python</h3>
+            <pre class="code">
+a = 6       <span class="ok">OK: a = 6</span>
+b = 4       <span class="ok">OK: b = 4</span>
+t = 0.1     <span class="ok">OK: t = 0.1</span>
+
+E = 35000e6     <span class="ok">OK: E = 3.5e+10</span>
+q = 10          <span class="ok">OK: q = 10</span>
+
+n = 16          <span class="ok">OK: n = 16</span>
+
+c = a + b       <span class="ok">OK: c = 10</span>
+d = a * b       <span class="ok">OK: d = 24</span>
+e = a / b       <span class="ok">OK: e = 1.5</span>
+            </pre>
+        </div>
+    </div>
+
+    <h2>TEST 2: Matrices</h2>
+    <div class="container">
+        <div class="column calcpad">
+            <h3>Calcpad CLI</h3>
+            <pre class="code">
+<b>Sintaxis de matriz:</b>
+D = [1; nu; 0|nu; 1; 0|0; 0; (1-nu)/2]
+
+<span class="ok">OK: D = </span>
+<span class="matrix">| 1      0.15   0     |
+| 0.15   1      0     |
+| 0      0      0.425 |</span>
+
+<b>Acceso a elementos:</b>
+D.(1; 1) = 1      <span class="ok">OK</span>
+D.(1; 2) = 0.15   <span class="ok">OK</span>
+D.(3; 3) = 0.425  <span class="ok">OK</span>
+
+<b>Crear vector:</b>
+v = vector(4)     <span class="ok">OK: [0 0 0 0]</span>
+
+<b>Crear matriz:</b>
+A = matrix(3; 2)  <span class="ok">OK</span>
+            </pre>
+        </div>
+        <div class="column octave">
+            <h3>Octave</h3>
+            <pre class="code">
+<b>Sintaxis de matriz:</b>
+D = [1, nu, 0; nu, 1, 0; 0, 0, (1-nu)/2];
+
+<span class="ok">OK: D = </span>
+<span class="matrix">   1.0000   0.1500        0
+   0.1500   1.0000        0
+        0        0   0.4250</span>
+
+<b>Acceso a elementos:</b>
+D(1,1) = 1        <span class="ok">OK</span>
+D(1,2) = 0.15     <span class="ok">OK</span>
+D(3,3) = 0.425    <span class="ok">OK</span>
+
+<b>Crear vector:</b>
+v = zeros(4, 1);  <span class="ok">OK</span>
+
+<b>Crear matriz:</b>
+A = zeros(3, 2);  <span class="ok">OK</span>
+            </pre>
+        </div>
+        <div class="column python">
+            <h3>Python (numpy)</h3>
+            <pre class="code">
+<b>Sintaxis de matriz:</b>
+D = np.array([
+    [1, nu, 0],
+    [nu, 1, 0],
+    [0, 0, (1-nu)/2]
+])
+
+<span class="ok">OK: D = </span>
+<span class="matrix">[[1.    0.15  0.   ]
+ [0.15  1.    0.   ]
+ [0.    0.    0.425]]</span>
+
+<b>Acceso a elementos (0-based):</b>
+D[0,0] = 1.0      <span class="ok">OK</span>
+D[0,1] = 0.15     <span class="ok">OK</span>
+D[2,2] = 0.425    <span class="ok">OK</span>
+
+<b>Crear vector:</b>
+v = np.zeros(4)   <span class="ok">OK</span>
+
+<b>Crear matriz:</b>
+A = np.zeros((3,2)) <span class="ok">OK</span>
+            </pre>
+        </div>
+    </div>
+
+    <h2>TEST 3: Bucles</h2>
+    <div class="container">
+        <div class="column calcpad">
+            <h3>Calcpad CLI</h3>
+            <pre class="code">
+<b>Bucle simple:</b>
+#for i = 1 : n
+    v.i = i*10
+#loop
+
+<span class="ok">OK: v = [10 20 30 40]</span>
+
+<b>Bucle anidado:</b>
+#for i = 1 : 3
+    #for j = 1 : 3
+        A.(i; j) = i + j
+    #loop
+#loop
+
+<span class="ok">OK: A = </span>
+<span class="matrix">| 2  3  4 |
+| 3  4  5 |
+| 4  5  6 |</span>
+
+<b>$Repeat:</b>
+$Repeat{B.(i; 1) = i @ i = 1 : 2}
+<span class="ok">OK</span>
+            </pre>
+        </div>
+        <div class="column octave">
+            <h3>Octave</h3>
+            <pre class="code">
+<b>Bucle simple:</b>
+for i = 1:n
+    v(i) = i * 10;
+end
+
+<span class="ok">OK: v = [10 20 30 40]</span>
+
+<b>Bucle anidado:</b>
+for i = 1:3
+    for j = 1:3
+        A(i, j) = i + j;
+    end
+end
+
+<span class="ok">OK: A = </span>
+<span class="matrix">   2   3   4
+   3   4   5
+   4   5   6</span>
+            </pre>
+        </div>
+        <div class="column python">
+            <h3>Python</h3>
+            <pre class="code">
+<b>Bucle simple:</b>
+for i in range(1, n+1):
+    v[i-1] = i * 10
+
+<span class="ok">OK: v = [10. 20. 30. 40.]</span>
+
+<b>Bucle anidado:</b>
+for i in range(1, 4):
+    for j in range(1, 4):
+        A[i-1, j-1] = i + j
+
+<span class="ok">OK: A = </span>
+<span class="matrix">[[2. 3. 4.]
+ [3. 4. 5.]
+ [4. 5. 6.]]</span>
+            </pre>
+        </div>
+    </div>
+
+    <h2>PROBLEMA CRITICO IDENTIFICADO</h2>
+    <div style="background: #ffeeee; padding: 20px; border-radius: 8px; border: 2px solid #cc0000;">
+        <h3 style="color: #cc0000;">Variables definidas en texto NO funcionan en Calcpad CLI</h3>
+        <table>
+            <tr>
+                <th>Sintaxis Calcpad</th>
+                <th>Resultado</th>
+                <th>Octave/Python</th>
+            </tr>
+            <tr>
+                <td><code>'texto -'n = 16</code></td>
+                <td><span class="error">ERROR: n undefined</span></td>
+                <td><span class="ok">n = 16 funciona</span></td>
+            </tr>
+            <tr>
+                <td><code>'E = 35000'MPa</code></td>
+                <td><span class="error">ERROR: E undefined</span></td>
+                <td><span class="ok">E = 35000e6 funciona</span></td>
+            </tr>
+            <tr>
+                <td><code>'k -'k = 100</code> en #show<br>luego usar k en #hide</td>
+                <td><span class="error">ERROR: k undefined</span></td>
+                <td><span class="ok">k = 100 funciona</span></td>
+            </tr>
+        </table>
+        <p><strong>Impacto:</strong> Los archivos .cpd que usan el formato
+        <code>'texto'variable = valor</code> NO funcionan correctamente en el CLI,
+        aunque funcionan en la aplicacion de escritorio Calcpad.</p>
+        <p><strong>Solucion temporal:</strong> No mezclar texto con definicion de variables.
+        Usar lineas separadas:</p>
+        <pre class="code">
+a = 6
+b = 4
+'Dimensiones: a = 6m, b = 4m
+        </pre>
+    </div>
+
+    <h2>Tabla Resumen de Sintaxis</h2>
+    <table>
+        <tr>
+            <th>Operacion</th>
+            <th>Calcpad</th>
+            <th>Octave</th>
+            <th>Python (numpy)</th>
+        </tr>
+        <tr>
+            <td>Crear matriz</td>
+            <td><code>[a;b|c;d]</code></td>
+            <td><code>[a,b;c,d]</code></td>
+            <td><code>np.array([[a,b],[c,d]])</code></td>
+        </tr>
+        <tr>
+            <td>Acceder elemento</td>
+            <td><code>A.(i; j)</code></td>
+            <td><code>A(i, j)</code></td>
+            <td><code>A[i-1, j-1]</code></td>
+        </tr>
+        <tr>
+            <td>Argumentos funcion</td>
+            <td><code>f(x; y)</code></td>
+            <td><code>f(x, y)</code></td>
+            <td><code>f(x, y)</code></td>
+        </tr>
+        <tr>
+            <td>Indices</td>
+            <td>1-based</td>
+            <td>1-based</td>
+            <td>0-based</td>
+        </tr>
+        <tr>
+            <td>Transpuesta</td>
+            <td><code>transp(A)</code></td>
+            <td><code>A'</code></td>
+            <td><code>A.T</code></td>
+        </tr>
+        <tr>
+            <td>Resolver sistema</td>
+            <td><code>clsolve(K; F)</code></td>
+            <td><code>K \ F</code></td>
+            <td><code>solve(K, F)</code></td>
+        </tr>
+    </table>
+
+</body>
+</html>

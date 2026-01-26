@@ -1,0 +1,148 @@
+"========================================================
+"GRAFICACIÓN DE MESH FEM CON OCTAVE - CAPTURA AUTOMÁTICA
+"Usando método clone de Nelson (QPixmap::grab)
+"========================================================
+
+'<h2>Datos de Entrada</h2>
+
+'Dimensiones de la losa
+a = 6'm
+b = 4'm
+
+'Elementos del mesh
+n_a = 6
+n_b = 4
+
+'Totales
+n_e = n_a*n_b
+n_j = (n_a + 1)*(n_b + 1)
+
+'<hr>
+
+'<h2>Método 1: Octave con Captura Automática (Clone de Nelson)</h2>
+
+@{octave}
+% Datos del mesh
+a = 6;
+b = 4;
+n_a = 6;
+n_b = 4;
+
+% Generar coordenadas de nodos
+[X, Y] = meshgrid(linspace(0, a, n_a+1), linspace(0, b, n_b+1));
+x_nodes = X(:);
+y_nodes = Y(:);
+n_nodes = length(x_nodes);
+
+% Generar conectividad de elementos
+elements = [];
+for i = 1:n_a
+    for j = 1:n_b
+        n1 = (i-1)*(n_b+1) + j;
+        n2 = n1 + (n_b+1);
+        n3 = n2 + 1;
+        n4 = n1 + 1;
+        elements = [elements; n1 n2 n3 n4];
+    end
+end
+
+% Crear figura
+figure('Position', [100 100 800 550], 'Color', 'w');
+hold on;
+
+% Dibujar fondo
+patch([0 a a 0], [0 0 b b], [1 1 0.8], ...
+      'FaceAlpha', 0.2, ...
+      'EdgeColor', 'none');
+
+% Dibujar elementos
+for e = 1:size(elements, 1)
+    nodes = elements(e, :);
+    x_elem = x_nodes(nodes);
+    y_elem = y_nodes(nodes);
+
+    patch(x_elem, y_elem, [0.5 1 0.5], ...
+          'FaceAlpha', 0.1, ...
+          'EdgeColor', [0 0.5 0], ...
+          'LineWidth', 1.5);
+
+    x_center = mean(x_elem);
+    y_center = mean(y_elem);
+    text(x_center, y_center, num2str(e), ...
+         'HorizontalAlignment', 'center', ...
+         'VerticalAlignment', 'middle', ...
+         'FontSize', 10, ...
+         'FontWeight', 'bold', ...
+         'Color', [0 0.4 0]);
+end
+
+% Nodos
+plot(x_nodes, y_nodes, 'o', ...
+     'MarkerSize', 8, ...
+     'MarkerFaceColor', [1 0.27 0], ...
+     'MarkerEdgeColor', [1 0.27 0]);
+
+% Apoyos en bordes
+border_nodes = unique([find(x_nodes == 0); ...
+                       find(x_nodes == a); ...
+                       find(y_nodes == 0); ...
+                       find(y_nodes == b)]);
+
+for i = 1:length(border_nodes)
+    n = border_nodes(i);
+    x = x_nodes(n);
+    y = y_nodes(n);
+
+    % Líneas de apoyo
+    line_len = 0.2;
+    if y == 0 || y == b
+        plot([x-line_len x+line_len], [y y], 'r-', 'LineWidth', 2);
+    end
+    if x == 0 || x == a
+        plot([x x], [y-line_len y+line_len], 'r-', 'LineWidth', 2);
+    end
+
+    % Círculo de apoyo
+    plot(x, y, 'o', ...
+         'MarkerSize', 10, ...
+         'MarkerFaceColor', [1 0.8 0.8], ...
+         'MarkerEdgeColor', 'r', ...
+         'LineWidth', 1.5);
+end
+
+% Configuración
+axis equal;
+xlim([-0.5 a+0.5]);
+ylim([-0.5 b+0.5]);
+xlabel('X (m)', 'FontSize', 12, 'FontWeight', 'bold');
+ylabel('Y (m)', 'FontSize', 12, 'FontWeight', 'bold');
+title({'Mesh de Elementos Finitos - Losa Rectangular', ...
+       'Capturado con método Nelson (grab)'}, ...
+      'FontSize', 14, 'FontWeight', 'bold');
+grid on;
+box on;
+
+% Pausar para permitir captura automática
+pause(2);
+
+fprintf('Gráfica lista para captura automática\n');
+@{end octave}
+
+'<p>La imagen fue capturada automáticamente usando el método clone de Nelson/Qt</p>
+'<p><img src="C:\Users\j-b-j\AppData\Local\Temp\octave_auto_capture.png" width="800" style="border:2px solid #ccc; border-radius:8px;"></p>
+
+'<hr>
+
+'<div style="background:#e0f2fe;padding:15px;border-left:4px solid #0284c7;margin:20px 0;">
+'<h3>📊 Método Implementado</h3>
+'<p><strong>Técnica:</strong> Clone del método de Nelson para captura de gráficas</p>
+'<p><strong>Similar a:</strong> QPixmap::grab() de Qt usado por Nelson</p>
+'<p><strong>Implementación:</strong> Python con win32gui (BitBlt) para captura automática de ventanas</p>
+'<p><strong>Ventajas:</strong></p>
+'<ul>
+'<li>✓ Captura automática sin intervención manual</li>
+'<li>✓ Funciona con Octave estándar (FLTK)</li>
+'<li>✓ No requiere Qt ni modificaciones de Octave</li>
+'<li>✓ Compatible con Calcpad CLI</li>
+'</ul>
+'</div>

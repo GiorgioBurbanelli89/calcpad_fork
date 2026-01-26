@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<comments xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><authors><author>LEGION</author></authors><commentList><comment ref="D21" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">COMPARAR T(S) PARA AGREGAR VALOR DE K
+</t></r></text></comment><comment ref="D23" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+INGRESAR EL VALOR DEL PRIMER MODO DEL ETABS PARA VER LA FLEXIBILIDAD DEL EDIFICIO, EL 1ER MODO  DEBE SER MENOR AL TM2 PARA QUE CUMPLA CON LA NORMA
+
+</t></r></text></comment><comment ref="D29" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+Sds ingresar al etabs en concrete desingn, en el sds del etabs
+</t></r></text></comment><comment ref="D30" authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t>LEGION:</t></r><r><rPr><sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">
+VALOR A INGRESAR EN EL ETABS, BASE SHEAR COEFFICIENTE, C
+</t></r></text></comment></commentList></comments>

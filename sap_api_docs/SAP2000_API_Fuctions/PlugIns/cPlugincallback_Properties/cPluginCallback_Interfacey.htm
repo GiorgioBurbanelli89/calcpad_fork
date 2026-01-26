@@ -1,0 +1,63 @@
+
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+ <meta name="generator" content="Adobe RoboHelp 2019">
+<title>cPluginCallback Interface</title>
+<link rel="StyleSheet" href="../../../SAP2000.CSS" type="text/css">
+</head>
+
+<body>
+<script type="text/javascript" src="../../../ehlpdhtm.js" language="JavaScript1.2"></script>
+
+<h1>cPluginCallback Interface</h1>
+<p class="Comment">The cPluginCallback interface is used to check the plugin 
+ state, and tell SAP2000 when the plugin has finished. The callback object 
+ that implements the interface will be passed from the main SAP200 program 
+ to your plugin.</p>
+<h2>Methods</h2>
+<h3 style="margin-left: 40px;">Finish</h3>
+<p class="Coding" style="margin-left: 88px;"><span class="keyword">Sub 
+ Finish ( iVal As Integer)</span></p>
+<p class="Coding">&#160;</p>
+<p class="Comment" style="margin-left: 88px;">This method must be called 
+ when the plugin has finished. Otherwise the main SAP2000 program will 
+ wait indefinitely.</p>
+<p class="ParameterName" style="margin-left: 88px;"><span class="identifier">iVal</span></p>
+<p class="Comment" style="margin-left: 88px;">The parameter <i>iVal</i> 
+ sets the <i>ErrorFlag</i> property</p>
+<h2>Properties</h2>
+<h3 style="margin-left: 40px;">ErrorFlag</h3>
+<p class="Coding" style="margin-left: 88px;"><span class="keyword">ReadOnly</span> 
+ <span class="keyword">Property</span> <span class="identifier">ErrorFlag</span> 
+ <span class="keyword">As</span> <span class="identifier">Integer</span></p>
+<p class="Coding" style="margin-left: 88px;">&#160;</p>
+<p class="Comment" style="margin-left: 88px;"><span class="identifier">This 
+ proper i</span>ndicates whether an error has occurred. </p>
+<p class="Comment" style="margin-left: 88px;"><span class="identifier">It 
+ </span>returns a zero if the plugin completed successfully; a non-zero 
+ value indicates that an error occurred </p>
+<p class="Coding" style="margin-left: 88px;">&#160;</p>
+<h3 style="margin-left: 40px;">Finished</h3>
+<p class="Coding" style="margin-left: 88px;"><span class="keyword">ReadOnly</span> 
+ <span class="keyword">Property</span> <span class="identifier">Finished</span> 
+ <span class="keyword">As</span> <span class="identifier">Boolean</span> 
+ </p>
+<p class="Coding" style="margin-left: 88px;">&#160;</p>
+<p class="Comment" style="margin-left: 88px;"><span class="identifier">T</span>his 
+ property indicates whether the plugin is finished, i.e. whether the <span 
+	 style="font-style: italic;">Finish </span>method has been called. 
+ </p>
+<p class="Comment" style="margin-left: 88px;"><span>It </span>returns <span 
+	 style="font-style: italic;">true</span> if the plugin is finished, 
+ otherwise, it returns <span style="font-style: italic;">false</span>. 
+ </p>
+<h2>See Also</h2>
+<p class="Block-Text"><a href="../cPluginContract_Methods/cPluginContract.htm">cPluginContract 
+ Interface</a></p>
+<p class="Block-Text"><a href="../Plugin_Example_for_SAP2000_API_CHM.htm">Plugin 
+ Example</a></p>
+<p class="Block-Text">&#160;</p>
+</body>
+</html>

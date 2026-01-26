@@ -1,0 +1,53 @@
+"Three.js Viewer - Ejemplo Simple
+'Usando @{three} para crear visualizaciones 3D con estructura estilo awatif-ui
+'Funciones disponibles: getViewer, getColorMap, getLegend, getParameters, getToolbar, getReport
+
+"1. Datos FEM
+nodos = 4
+elementos = 2
+
+"========================================
+"2. Visualizacion 3D con Color Map
+"========================================
+@{three}
+// Datos FEM
+const nodes = [[0, 0, 0], [5, 0, 0], [5, 0, 5], [0, 0, 5]];
+const elements = [[0, 1, 2], [0, 2, 3]];
+const values = [0, 2.5, 10, 5];  // Desplazamientos
+
+// Crear viewer 3D
+const viewer = getViewer({ gridSize: 10 });
+document.body.appendChild(viewer);
+
+// Crear color map y agregarlo a la escena
+const colorMap = getColorMap(nodes, elements, values);
+viewer._scene.add(colorMap);
+
+// Agregar leyenda
+const legend = getLegend(values, 5);
+document.body.appendChild(legend);
+
+// Agregar wireframe
+const wireGeom = new THREE.BufferGeometry();
+wireGeom.setAttribute('position', new THREE.Float32BufferAttribute(nodes.flat(), 3));
+wireGeom.setIndex(new THREE.Uint16BufferAttribute(elements.flat(), 1));
+viewer._scene.add(new THREE.LineSegments(
+    new THREE.WireframeGeometry(wireGeom),
+    new THREE.LineBasicMaterial({ color: 0xffffff })
+));
+
+// Agregar reporte
+const report = getReport({
+    Nodos: nodes.length,
+    Elementos: elements.length,
+    'Min': Math.min(...values).toFixed(1) + ' mm',
+    'Max': Math.max(...values).toFixed(1) + ' mm'
+});
+document.body.appendChild(report);
+
+console.log('Three.js Viewer cargado correctamente!');
+@{end three}
+
+'========================================
+'El viewer se renderiza directamente en el WebView2
+'========================================

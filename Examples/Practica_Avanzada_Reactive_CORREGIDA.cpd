@@ -1,0 +1,512 @@
+"Práctica Avanzada: Estado Reactivo (estilo awatif-ui) - CORREGIDA
+'Ejemplo que simula el patrón reactivo de van.js y awatif-ui
+
+#hide
+
+'========================================
+'  HTML CON CSS INTEGRADO Y TYPESCRIPT
+'========================================
+
+@{html}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reactive Mesh Viewer</title>
+  <style>
+:root {
+  --primary: #667eea;
+  --secondary: #764ba2;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.header h1 {
+  color: var(--primary);
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+.header p {
+  color: #666;
+  font-size: 1.1em;
+}
+
+.controls {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+button {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+button.danger {
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+}
+
+button.success {
+  background: linear-gradient(135deg, var(--success), #059669);
+}
+
+.mesh-container {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.node-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.node-item {
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  border-radius: 10px;
+  padding: 15px;
+  transition: all 0.3s;
+  border-left: 4px solid var(--primary);
+  cursor: pointer;
+}
+
+.node-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.node-item.highlight {
+  border-left-color: var(--success);
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+}
+
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.node-id {
+  font-weight: bold;
+  font-size: 1.2em;
+  color: var(--primary);
+}
+
+.node-value {
+  background: var(--primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+.node-coords {
+  color: #555;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+.stats-panel {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.stat-box {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.9em;
+  opacity: 0.9;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.pulse {
+  animation: pulse 0.5s ease-in-out;
+}
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <h1>🔷 Reactive Mesh Viewer</h1>
+      <p>Sistema de estado reactivo inspirado en awatif-ui</p>
+    </div>
+
+    <div class="controls">
+      <button onclick="app.addNode()">➕ Agregar Nodo</button>
+      <button onclick="app.updateRandomValues()">🔄 Actualizar Valores</button>
+      <button onclick="app.highlightMaxValue()">⭐ Destacar Máximo</button>
+      <button class="danger" onclick="app.removeLastNode()">🗑️ Eliminar Último</button>
+      <button class="success" onclick="app.resetMesh()">↺ Reset</button>
+    </div>
+
+    <div class="mesh-container">
+      <h2 style="color: #667eea; margin-bottom: 15px;">📊 Nodos de la Malla</h2>
+      <div id="nodes-container" class="node-grid"></div>
+    </div>
+
+    <div class="stats-panel">
+      <h3 style="color: #667eea;">📈 Estadísticas</h3>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">Total Nodos</div>
+          <div class="stat-value" id="stat-total">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Valor Máximo</div>
+          <div class="stat-value" id="stat-max">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Valor Mínimo</div>
+          <div class="stat-value" id="stat-min">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Promedio</div>
+          <div class="stat-value" id="stat-avg">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+@{end html}
+
+@{ts}
+// Tipos inspirados en awatif-fem
+type Node = [number, number, number];
+type Element = number[];
+
+interface NodeData {
+  id: number;
+  position: Node;
+  value: number;
+  highlighted: boolean;
+}
+
+// Clase para estado reactivo (similar a van.state)
+class ReactiveState<T> {
+  private _value: T;
+  private observers: Array<(value: T) => void> = [];
+
+  constructor(initialValue: T) {
+    this._value = initialValue;
+  }
+
+  get value(): T {
+    return this._value;
+  }
+
+  set value(newValue: T) {
+    this._value = newValue;
+    this.notify();
+  }
+
+  // Observar cambios
+  subscribe(observer: (value: T) => void): void {
+    this.observers.push(observer);
+  }
+
+  private notify(): void {
+    this.observers.forEach(observer => observer(this._value));
+  }
+}
+
+// Aplicación principal (similar a awatif-ui pattern)
+class MeshViewerApp {
+  private nodes: ReactiveState<NodeData[]>;
+  private elements: ReactiveState<Element[]>;
+
+  constructor() {
+    // Inicializar con datos similares a awatif-ui color-map
+    const initialNodes: NodeData[] = [
+      { id: 0, position: [0, 0, 0], value: 0, highlighted: false },
+      { id: 1, position: [5, 0, 0], value: 5, highlighted: false },
+      { id: 2, position: [5, 0, 5], value: 10, highlighted: false },
+      { id: 3, position: [0, 0, 5], value: 3, highlighted: false }
+    ];
+
+    const initialElements: Element[] = [
+      [0, 1, 2],
+      [0, 2, 3]
+    ];
+
+    this.nodes = new ReactiveState(initialNodes);
+    this.elements = new ReactiveState(initialElements);
+
+    // Subscribirse a cambios (patrón reactivo)
+    this.nodes.subscribe(() => this.render());
+
+    // Render inicial
+    this.render();
+
+    console.log('✅ App inicializada con estado reactivo');
+  }
+
+  // Renderizar nodos (similar a van.derive en awatif-ui)
+  private render(): void {
+    const container = document.getElementById('nodes-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    this.nodes.value.forEach(node => {
+      const nodeEl = document.createElement('div');
+      nodeEl.className = `node-item slide-in ${node.highlighted ? 'highlight' : ''}`;
+
+      nodeEl.innerHTML = `
+        <div class="node-header">
+          <span class="node-id">Nodo #${node.id}</span>
+          <span class="node-value">${node.value.toFixed(1)}</span>
+        </div>
+        <div class="node-coords">
+          📍 (${node.position[0]}, ${node.position[1]}, ${node.position[2]})
+        </div>
+      `;
+
+      container.appendChild(nodeEl);
+    });
+
+    this.updateStats();
+  }
+
+  // Actualizar estadísticas
+  private updateStats(): void {
+    const values = this.nodes.value.map(n => n.value);
+
+    const stats = {
+      total: this.nodes.value.length,
+      max: Math.max(...values),
+      min: Math.min(...values),
+      avg: values.reduce((a, b) => a + b, 0) / values.length
+    };
+
+    this.updateStatElement('stat-total', stats.total.toString());
+    this.updateStatElement('stat-max', stats.max.toFixed(2));
+    this.updateStatElement('stat-min', stats.min.toFixed(2));
+    this.updateStatElement('stat-avg', stats.avg.toFixed(2));
+  }
+
+  private updateStatElement(id: string, value: string): void {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = value;
+      el.classList.add('pulse');
+      setTimeout(() => el.classList.remove('pulse'), 500);
+    }
+  }
+
+  // Métodos públicos para controles
+  addNode(): void {
+    const newId = this.nodes.value.length;
+    const x = Math.random() * 10;
+    const y = Math.random() * 10;
+    const z = Math.random() * 10;
+    const value = Math.random() * 15;
+
+    const newNode: NodeData = {
+      id: newId,
+      position: [x, y, z],
+      value: value,
+      highlighted: false
+    };
+
+    // Actualizar estado (trigger reactivity)
+    this.nodes.value = [...this.nodes.value, newNode];
+
+    console.log(`➕ Nodo agregado: #${newId} en (${x.toFixed(1)}, ${y.toFixed(1)}, ${z.toFixed(1)})`);
+  }
+
+  updateRandomValues(): void {
+    // Actualizar valores aleatoriamente (como en awatif-ui timeout)
+    this.nodes.value = this.nodes.value.map(node => ({
+      ...node,
+      value: Math.random() * 15,
+      highlighted: false
+    }));
+
+    console.log('🔄 Valores actualizados');
+  }
+
+  highlightMaxValue(): void {
+    const maxValue = Math.max(...this.nodes.value.map(n => n.value));
+
+    this.nodes.value = this.nodes.value.map(node => ({
+      ...node,
+      highlighted: node.value === maxValue
+    }));
+
+    console.log('⭐ Nodo con valor máximo destacado');
+  }
+
+  removeLastNode(): void {
+    if (this.nodes.value.length > 1) {
+      this.nodes.value = this.nodes.value.slice(0, -1);
+      console.log('🗑️ Último nodo eliminado');
+    } else {
+      console.log('⚠️ No se puede eliminar el último nodo');
+    }
+  }
+
+  resetMesh(): void {
+    // Reset a valores iniciales
+    this.nodes.value = [
+      { id: 0, position: [0, 0, 0], value: 0, highlighted: false },
+      { id: 1, position: [5, 0, 0], value: 5, highlighted: false },
+      { id: 2, position: [5, 0, 5], value: 10, highlighted: false },
+      { id: 3, position: [0, 0, 5], value: 3, highlighted: false }
+    ];
+
+    console.log('↺ Malla reseteada');
+  }
+}
+
+// Crear instancia global de la app
+const app = new MeshViewerApp();
+(window as any).app = app;
+
+// Simulación de actualización automática (como awatif-ui setTimeout)
+setTimeout(() => {
+  console.log('🤖 Actualización automática después de 3 segundos...');
+  app.updateRandomValues();
+}, 3000);
+
+console.log('🚀 Sistema reactivo listo!');
+console.log('💡 Tip: Observa la consola para ver los logs de eventos');
+@{end ts}
+
+#show
+
+'========================================
+'  ANÁLISIS DEL PATRÓN REACTIVO
+'========================================
+
+"Este ejemplo demuestra el patrón reactivo usado en awatif-ui:
+
+'1. ESTADO REACTIVO (ReactiveState<T>):
+'   • Similar a van.state() en awatif-ui
+'   • Notifica a observers cuando cambia
+'   • Trigger automático de re-render
+
+'2. PATRÓN OBSERVER:
+'   • subscribe() para escuchar cambios
+'   • notify() para propagar actualizaciones
+'   • Similar a van.derive() en awatif-ui
+
+'3. INMUTABILIDAD:
+'   • Uso de spread operator (...)
+'   • Crear nuevos arrays en lugar de mutar
+'   • Como en: nodes.val = [...nodes.rawVal]
+
+'4. ARQUITECTURA SIMILAR A AWATIF-UI:
+'   • Separación de datos y vista
+'   • Estado centralizado
+'   • Render declarativo
+
+'5. CONCEPTOS AVANZADOS TYPESCRIPT:
+'   • Generics (ReactiveState<T>)
+'   • Type aliases (type Node = [...])
+'   • Interfaces
+'   • Clases privadas y públicas
+'   • Array methods (map, filter, reduce)
+
+'⚠️ NOTA IMPORTANTE:
+'   CSS integrado dentro del <style> en HTML
+'   No se usa @{css} separado porque Calcpad lo procesaría
+
+"¡Ahora puedes entender cómo funciona awatif-ui internamente!

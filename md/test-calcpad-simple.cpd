@@ -1,0 +1,11 @@
+"Test Calcpad Simple"
+
+'Este es un comentario de Calcpad
+a = 5
+b = 10
+
+'Suma de a y b
+c = a + b
+
+'Resultado
+c

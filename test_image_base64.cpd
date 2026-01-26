@@ -1,0 +1,12 @@
+' Test de imagen Base64 en Calcpad
+' ================================
+
+a = 5
+b = 10
+c = a + b
+
+@{image png base64}
+iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNk+M9Qz0AEYBxVSF+FABJADq4MYzHlAAAAAElFTkSuQmCC
+@{end image}
+
+d = c*2

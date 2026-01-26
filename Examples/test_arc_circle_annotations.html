@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Created with Calcpad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <script src="https://calcpad.local/file:///C:/Users/j-b-j/Documents/Calcpad-7.5.7/Calcpad.Cli/bin/Release/net10.0/doc/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-size: 11pt;
+            font-family: 'Segoe UI', 'Arial Nova', Helvetica, sans-serif;
+            margin-left: 5mm;
+            max-width: 190mm;
+        }
+
+        h1, h2, h3, h4, h5, h6, .errorHeader, .roundBox {
+            font-family: 'Arial Nova', Helvetica, sans-serif;
+            margin: 0.5em 0 0.5em 0;
+            padding: 0;
+            line-height: 150%;
+        }
+
+        h1 {font-size: 2.1em;}
+        h2 {font-size: 1.7em;}
+        h3 {font-size: 1.4em;}
+        h4 {font-size: 1.2em;}
+        h5 {font-size: 1.1em;}
+        h6 {font-size: 1em;}
+
+        p, li {
+            margin: 0.3em 0 0.3em 0;
+            padding: 0;
+            line-height: 150%;
+        }
+
+        select, kbd {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        a:hover {
+            background-color: #e9f6ff;
+        }
+
+        .eq, input[type="text"], table.matrix {
+            font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+        }
+
+            .eq var {
+                color: #06d;
+                font-size: 105%;
+            }
+
+            .eq i {
+                color: #086;
+                font-style: normal;
+                font-size: 90%;
+            }
+
+            i.unit {
+                color: #043!important;
+                font-size: 90%!important;
+                vertical-align: -1pt;
+            }
+
+            sup.unit {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 70%!important;
+            }
+
+            .eq b {
+                font-weight: 600;
+            }
+
+            .eq sub {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 80%;
+                vertical-align: -18%;
+                margin-left: 1pt;
+            }
+
+            .eq sup {
+                display: inline-block;
+                margin-left: 1pt;
+                margin-top: -3pt;
+                font-size: 75%;
+            }
+
+            .eq small {
+                font-family: Calibri, Candara, Corbel, sans-serif;
+                font-size: 70%;
+            }
+
+                .eq small var {
+                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-size: 8.5pt;
+                }
+
+                .eq small i {
+                    font-family: 'Georgia Pro', 'Century Schoolbook', 'Times New Roman', Times, serif;
+                    font-size: 6pt;
+                }
+
+            .eq u, input, select {
+                background-color: LightYellow;
+            }
+
+                input[type="text"], select {
+                    font-size: 10pt;
+                    padding: 0.2em 0.4em;
+                    border: 0.5pt solid #CCC;
+                    border-radius: 0.35em;
+                    box-shadow: 0.06em 0.06em 0.5em #ddd;
+                    min-width: 3em;
+                }
+
+                input[type="text"] {
+                    text-align: right;
+                }
+
+                input[type="checkbox"],
+                input[type="radio"] {
+                    vertical-align: baseline;
+                    position: relative;
+                    bottom: -1pt;
+                    margin-right: 1pt;
+                }
+
+                    input[type="checkbox"].post:disabled:not(:checked),
+                    input[type="checkbox"].post:disabled:not(:checked) + label,
+                    input[type="radio"].post:disabled:not(:checked),
+                    input[type="radio"].post:disabled:not(:checked) + label {
+                        display: none;
+                    }
+
+                select:disabled {
+                    background: none;
+                    color: #444;
+                }
+
+                select.post:disabled {
+                    font-size: 12pt;
+                    border: none;
+                    box-shadow: none;
+                    color: red;
+                    background: none;
+                    appearance: none;
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                }
+
+                select.post:disabled::-ms-expand {
+                    display: none;
+                }
+
+                input[type="text"]:focus {
+                    box-shadow: 0.1em 0.1em 1em #ccc;
+                    color: black;
+                }
+
+        td, th {
+            padding: 2pt 4pt 2pt 4pt;
+            vertical-align: top;
+        }
+
+        small {
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+            table.bordered {
+                margin-top: 1em;
+            }
+
+                table.bordered th {
+                    background-color: #F0F0F0;
+                    border: solid 1pt #AAAAAA;
+                }
+
+                table.bordered td {
+                    border: solid 1pt #CCCCCC;
+                }
+
+            table.centered td, .matrix .td {
+                text-align: center;
+            }
+
+            table.data td {
+                text-align: right;
+            }
+
+                table.data td:first-child {
+                    text-align: left;
+                    padding-left: 0;
+                }
+
+        .matrix {
+            display: inline-table;
+        }
+
+            .matrix .tr {
+                display: table-row;
+            }
+
+            .matrix .td {
+                white-space: nowrap;
+                padding: 0 2pt 0 2pt;
+                min-width: 10pt;
+                display: table-cell;
+                font-size: 10pt;
+            }
+
+                .matrix .td:first-child,
+                .matrix .td:last-child {
+                    width: 0.75pt;
+                    min-width: 0.75pt;
+                    max-width: 0.75pt;
+                    padding: 0 1pt 0 1pt;
+                }
+
+                .matrix .td:first-child {
+                    border-left: solid 1pt black;
+                }
+
+                .matrix .td:last-child {
+                    border-right: solid 1pt black;
+                }
+
+            .matrix .tr:first-child .td:first-child,
+            .matrix .tr:first-child .td:last-child {
+                border-top: solid 1pt black;
+            }
+
+            .matrix .tr:last-child .td:first-child,
+            .matrix .tr:last-child .td:last-child {
+                border-bottom: solid 1pt black;
+            }
+
+        .block {
+            display: inline-block;
+            vertical-align: middle;
+            padding-left: 4pt;
+            margin-left: -1pt;
+            border-left: solid 1pt #80b0e8;
+            background: linear-gradient(to right, rgba(0, 192, 255, 0.06), rgba(0, 192, 255, 0.03));
+        }
+
+            .block .block {
+                background: linear-gradient(to right, rgba(0, 192, 255, 0.04), rgba(0, 192, 255, 0.02));
+            }
+
+        .dvcs:has(.block):not(.block *) {
+            display: inline-block;
+            border-left: solid 1pt #80b0e8;
+            padding-left: 0;
+            margin-left: 3pt;
+        }
+
+            .dvcs:has(.block):not(.block *)::before {
+                content: " 🞀";
+                font-size: 9pt;
+                color: #90c4f0;
+                margin-left: -4.5pt;
+            }
+
+        .arr {
+            color: #90c4f0;
+        }
+
+        .r0, .r1, .r2, .r3,
+        .o0, .o1, .o2, .o3,
+        .b1, .b2, .b3,
+        .c1, .c2, .c3, .c4,
+        .c5, .c6, .c7, .c8 {
+            display: inline-block;
+        }
+
+        .r0, .r1, .r2, .r3 {
+            margin-top: -1.5pt;
+            margin-right: 1.5pt;
+            vertical-align: top;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: right top;
+        }
+
+        .o0, .o1, .o2, .o3 {
+            border-top: solid 0.75pt;
+            line-height: 130%;
+            vertical-align: middle;
+            margin-top: 0.75pt;
+            padding-top: 1.25pt;
+            padding-left: 1pt;
+            padding-right: 1pt;
+        }
+
+        .r {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 150%;
+            display: inline-block;
+            vertical-align: top;
+            margin-left: -9.5pt;
+            position: relative;
+            top: 1pt;
+        }
+
+        .r0 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDEwIDIwIiBoZWlnaHQ9IjE1cHQiIHdpZHRoPSIxMHB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMCwxMyAyLDEyIDUsMTkgOSwwIiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MC42cHQ7IHN0cm9rZS1saW5lam9pbjpyb3VuZDsgc3Ryb2tlLWxpbmVjYXA6cm91bmQ7IGZpbGw6bm9uZSIgLz4NCiAgPGxpbmUgeDE9IjIuMiIgeTE9IjEyLjMiIHgyPSI0LjYiIHkyPSIxOC43IiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MC44cHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 8pt;
+            height: 16pt;
+            margin-left: -8pt;
+        }
+
+        .r1 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE1IDQwIiBoZWlnaHQ9IjMwcHQiIHdpZHRoPSIxNXB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMSwyNiAzLDI0IDgsMzggMTQsMCIgc3R5bGU9InN0cm9rZTpibGFjazsgc3Ryb2tlLXdpZHRoOjAuNnB0OyBzdHJva2UtbGluZWpvaW46cm91bmQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyBmaWxsOm5vbmUiIC8+DQogIDxsaW5lIHgxPSIzLjIiIHkxPSIyNC40IiB4Mj0iNy42IiB5Mj0iMzcuNiIgc3R5bGU9InN0cm9rZTpibGFjazsgc3Ryb2tlLXdpZHRoOjFwdDsgc3Ryb2tlLWxpbmVjYXA6cm91bmQ7IiAvPg0KPC9zdmc+");
+            width: 12pt;
+            height: 32pt;
+            margin-left: -12pt;
+        }
+
+        .r2 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDIwIDYwIiBoZWlnaHQ9IjQ1cHQiIHdpZHRoPSIyMHB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMiwzNyA1LDM0IDExLDU1IDE5LDAiIHN0eWxlPSJzdHJva2U6YmxhY2s7IHN0cm9rZS13aWR0aDowLjZwdDsgc3Ryb2tlLWxpbmVqb2luOnJvdW5kOyBzdHJva2UtbGluZWNhcDpyb3VuZDsgZmlsbDpub25lIiAvPg0KICA8bGluZSB4MT0iNS4xIiB5MT0iMzQuNiIgeDI9IjEwLjYiIHkyPSI1NC40IiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MS4ycHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 16pt;
+            height: 48pt;
+            margin-left: -16pt;
+        }
+
+        .r3 {
+            content: "";
+            background-image: url("data: image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDI1IDgwIiBoZWlnaHQ9IjYwcHQiIHdpZHRoPSIyNXB4Ij4NCiAgPHBvbHlsaW5lIHBvaW50cz0iMyw1MCA3LDQ2IDE1LDc0IDI0LDAiIHN0eWxlPSJzdHJva2U6YmxhY2s7IHN0cm9rZS13aWR0aDowLjZwdDsgc3Ryb2tlLWxpbmVqb2luOnJvdW5kOyBzdHJva2UtbGluZWNhcDpyb3VuZDsgZmlsbDpub25lIiAvPg0KICA8bGluZSB4MT0iNy4xIiB5MT0iNDYuOCIgeDI9IjE0LjUiIHkyPSI3My4yIiBzdHlsZT0ic3Ryb2tlOmJsYWNrOyBzdHJva2Utd2lkdGg6MS4ycHQ7IHN0cm9rZS1saW5lY2FwOnJvdW5kOyIgLz4NCjwvc3ZnPg==");
+            width: 19pt;
+            height: 62pt;
+            margin-left: -19pt;
+        }
+
+        .nth {
+            position: relative;
+            bottom: 1pt;
+        }
+
+        .eq small.nth {font-size: 70%;}
+        .dvr small {font-size: 65%;}
+        sup.raised {vertical-align: top;}
+
+        sup .r0, sup .r1, sup .r2, sup .r3 {
+            zoom: 0.7;
+            -moz-transform: scale(0.7);
+            -webkit-transform: scale(0.7);
+            transform: scale(0.7);
+            transform-origin: top right;
+            max-height: none;
+        }
+
+        sup .r0 { margin-left: -5pt; }
+        sup .r1 { margin-left: -11pt; }
+        sup .r2 { margin-left: -13pt; }
+        sup .r3 { margin-left: -16pt; }
+
+        .b1, .b2, .b3, .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+            vertical-align: middle;
+            font-weight: 100;
+            font-stretch: ultra-condensed;
+        }
+
+        .b2, .b3, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+            font-family: 'Jost* Hairline', sans-serif;
+        }
+
+        .b0, .b1, .c1 {
+            font-family: 'Jost* Thin', sans-serif;
+        }
+
+        .b0 {
+            font-size: 120%;
+            font-weight: 600;
+            padding: 0 1pt 0 1pt;
+        }
+
+        .b1 {
+            font-size: 240%;
+            margin-top: -3pt;
+            margin-left: -1pt;
+            margin-right: -1pt;
+        }
+
+        .b2 {
+            font-size: 370%;
+            margin-top: -5pt;
+            margin-left: -3pt;
+            margin-right: -3pt;
+        }
+
+        .b3 {
+            font-size: 520%;
+            margin-top: -8pt;
+            margin-left: -5pt;
+            margin-right: -5pt;
+        }
+
+        .c1 {
+            font-size: 240%;
+            margin-top: -4pt;
+        }
+
+        .c2 {
+            font-size: 360%;
+            margin-top: -6pt;
+            margin-left: -2.5pt;
+            margin-right: -0.5pt;
+        }
+
+        .c3 {
+            font-size: 480%;
+            margin-top: -8pt;
+            margin-left: -3pt;
+            margin-right: -1pt;
+        }
+
+        .c4 {
+            font-size: 600%;
+            margin-top: -10pt;
+            margin-left: -4pt;
+            margin-right: -2pt;
+            transform: scaleX(0.9);
+        }
+
+        .c5 {
+            font-size: 710%;
+            margin-top: -11.5pt;
+            margin-left: -6pt;
+            margin-right: -4pt;
+            transform: scaleX(0.8);
+        }
+
+        .c6 {
+            font-size: 820%;
+            margin-top: -13pt;
+            margin-left: -7pt;
+            margin-right: -5pt;
+            transform: scaleX(0.7);
+        }
+
+        .c7 {
+            font-size: 930%;
+            margin-top: -14.5pt;
+            margin-left: -8pt;
+            margin-right: -6pt;
+            transform: scaleX(0.6);
+        }
+
+        .c8 {
+            font-size: 1040%;
+            margin-top: -16pt;
+            margin-left: -9pt;
+            margin-right: -7pt;
+            transform: scaleX(0.5);
+        }
+
+        .dvc, .dvr, .dvs {
+            display: inline-block;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .dvc {
+            padding-left: 2pt;
+            padding-right: 2pt;
+            text-align: center;
+            line-height: 110%;
+        }
+
+        .dvr {
+            text-align: center;
+            line-height: 110%;
+            margin-bottom: 4pt;
+        }
+
+        .dvs {
+            text-align: left;
+            line-height: 110%;
+        }
+
+        .dvl {
+            display: block;
+            border-bottom: solid 1pt black;
+            margin-top: 1pt;
+            margin-bottom: 1pt;
+        }
+
+        .nary {
+            color: #C080F0;
+            font-size: 240%;
+            font-family: Georgia Pro Light, serif;
+            font-weight: 200;
+            line-height: 80%;
+            display: block;
+            margin: -1pt 1pt 3pt 1pt;
+        }
+
+            .nary em {
+                display: block;
+                transform: scaleX(0.7) rotate(7deg);
+            }
+
+        .dvc.down {
+            position: relative;
+            top: 0.5em;
+        }
+
+        .dvc.up {
+            position: relative;
+            bottom: 0.6em;
+        }
+
+        .low {
+            font-size: 70%;
+            display: inline-block;
+            position: relative;
+            top: 1.2em;
+        }
+
+        .cond {
+            color: #E000D0;
+        }
+
+        .err {
+            color: Crimson;
+            background-color: #FEE;
+        }
+
+        .ok {
+            color: Green;
+            background-color: #F0FFF0;
+        }
+
+        .ref {
+            float: right;
+            margin-left: 18pt;
+            color: Green;
+            background-color: #F8FFF0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .side {
+            float: right;
+            max-width: 50%;
+        }
+
+        .plot {
+            max-width: 100%
+        }
+
+        .indent {
+            border-left: 0.75pt solid #dddddd;
+            padding-left: 2em;
+        }
+
+        span.indent {
+            display: inline-block;
+        }
+
+        .fold {
+            height: 2.4em;
+            overflow: hidden;
+        }
+
+        .unfold {
+            height: auto;
+            overflow: auto;
+        }
+
+            .fold > :first-child, .unfold > :first-child {
+                cursor: pointer;
+            }
+
+                .fold > :first-child:hover, .unfold > :first-child:hover {
+                    color: #0066bb;
+                    text-decoration: underline;
+                }
+
+                .fold > :first-child::after {
+                    content: " ... ▼";
+                    font-size: 80%;
+                }
+
+                .unfold > :first-child::after {
+                    content: " ▲";
+                    font-size: 80%;
+                }
+
+        .vec {
+            font-family: 'Cambria Math', serif;
+            color: #8af;
+            font-style: normal;
+            display: inline-block;
+            vertical-align: 2pt;
+            margin-left: 3pt;
+            margin-right: -7pt;
+        }
+
+        small .vec, sup .vec {
+            margin-left: 2pt;
+            margin-right: -6pt;
+        }
+
+        #Units {
+            float: right;
+        }
+
+        @media screen {
+            .no-screen {
+                display: none;
+            }
+        }
+
+        @media print {
+            .side {
+                zoom: 0.8;
+                -moz-transform: scale(0.8);
+            }
+
+            body {
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        @page {
+            size: A4 portrait;
+            margin-left: 20mm;
+            margin-right: 10mm;
+            margin-top: 10mm;
+            margin-bottom: 10mm;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .value {
+            position: relative;
+            background-color: #f4fbff;
+            border-radius: 3pt;
+        }
+
+            .value:after {
+                content: "";
+                position: absolute;
+                left: 100%;
+                top: -100%;
+                transform: translateY(-50%);
+                margin-left: 2pt;
+                height: 16pt;
+                line-height: 16pt;
+                vertical-align: middle;
+                width: fit-content;
+                white-space: nowrap;
+                min-width: 10pt;
+                z-index: 1;
+                padding: 0 6pt 0 6pt;
+                border-radius: 6pt 6pt 6pt 0;
+                background: #000;
+                color: #fff;
+                font-family: 'Segoe UI', sans-serif;
+                font-style: normal;
+                font-size: 10pt;
+                text-align: center;
+                display: none;
+                opacity: 0;
+                transition: opacity 2s;
+                user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                -moz-user-select: none;
+            }
+
+            .value:hover:after {
+                content: attr(data-value);
+                display: block;
+                opacity: 1;
+            }
+
+        .errorHeader {
+            color: white;
+            background-color: crimson;
+            font-size: 10pt;
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 0;
+            width: 100vw;
+            max-width: 100%;
+            height: 1.8em;
+            line-height: 1.2em;
+            padding-left: 6pt;
+            overflow-x: hidden;
+        }
+
+        .roundBox {
+            background-color: #fee;
+            color: crimson;
+            font-size: 9pt;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            display: inline-block;
+            border-radius: 4pt;
+            min-width: 1.1em;
+            padding-left: 2pt;
+            padding-right: 2pt;
+            margin-top: 2pt;
+        }
+
+            .roundBox:hover {
+                background-color: white;
+            }
+
+        .lineLink {
+            background: none;
+            color: #b0e0ff;
+            font-family: Calibri, sans-serif;
+            font-size: 10pt;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: left;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            width: 2em;
+            height: 4em;
+            z-index: 1;
+        }
+
+            .lineLink:hover {
+                background: none;
+                color: #09e;
+            }
+    </style>
+</head>
+<body>
+    <script>
+        var contextMenu = false;
+        function getVerticalPosition(line) { return document.querySelector("[data-text='" + line + "']").getBoundingClientRect().top; }
+        function isNumeric(s) { return s.match(/^-?\d+(?:\.\d+)?$/); }
+        if (window.jQuery) {
+            function getHtmlWithInput() {
+                $("input[type=text]").each(function () {
+                    $(this).attr("value", $(this).val());
+                });
+                $("input[type=hidden]").each(function () {
+                    $(this).attr("value", $(this).val());
+                });
+                $("textarea").each(function () {
+                    $(this).html($(this).val());
+                });
+                $("input[type=radio]").each(function () {
+                    if (this.checked)
+                        $(this).attr("checked", "checked");
+                    else
+                        $(this).removeAttr("checked");
+                });
+                $("input[type=checkbox]").each(function () {
+                    if (this.checked)
+                        $(this).attr("checked", "checked");
+                    else
+                        $(this).removeAttr("checked");
+                });
+                $("select option").each(function () {
+                    if (this.selected) {
+                        $(this).attr("selected", "true");
+                    }
+                    else
+                        $(this).removeAttr("selected");
+                });
+                return document.body.outerHTML;
+            }
+
+            function getTargetId(element) {
+                var id = $(element).attr("name");
+                if (id != null && id.length > 0)
+                    return id;
+
+                return $(element).data("target");
+            }
+
+            function getValue(id, source) {
+                var value = "";
+                var target = $("#" + id + " input");
+                var domObj = target.get(0);
+                if (domObj == null || domObj.Length == 0) {
+                    target = $("#" + id + " .eq u");
+                    target.each(function () {
+                        value += $(this).text() + ";";
+                    });
+                    $(source).prop('disabled', true);
+                }
+                else {
+                    target.each(function () {
+                        value += $(this).val() + ";";
+                    });
+                }
+                if (value.length > 1) {
+                    value = value.slice(0, -1);
+                }
+                return value;
+            }
+
+            $(document).ready(function () {
+
+                $(".dvcs:has(.block) > :first-child").html("&hairsp;");
+
+                $("#Units").change(function () { $(".Units").text($(this).val()); });
+
+                $(".fold > :first-child").click(function () {
+                    if ($(this).parent().hasClass("fold")) {
+                        $(this).parent().removeClass("fold").addClass("unfold");
+                    }
+                    else {
+                        $(this).parent().removeClass("unfold").addClass("fold");
+                    }
+                });
+
+                $("select").each(function (index) {
+                    if ($(this).prop("id") != "Units") {
+                        var id = getTargetId(this);
+                        if (id != null && id.length > 0) {
+                            var value = getValue(id, this);
+                            $(this).val(value);
+                        }
+                    }
+
+                });
+
+                $("select").change(function () {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var target = $("#" + id + " input");
+                        if (target != null) {
+                            var values = $(this).val().split(";");
+                            target.each(function (index) {
+                                $(this).val(values[index]);
+                            });
+                        }
+                    }
+                });
+
+                $("input:radio, input:checkbox").each(function (index) {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var value = getValue(id, this);
+                        $(this).prop("checked", $(this).val() == value);
+                    }
+                });
+
+                $("input:radio, input:checkbox").change(function () {
+                    var id = getTargetId(this);
+                    if (id != null && id.length > 0) {
+                        var target = $("#" + id + " input");
+                        if (target != null) {
+                            if ($(this).prop("checked")) {
+                                var values = $(this).val().split(";");
+                                target.each(function (index) {
+                                    $(this).val(values[index]);
+                                });
+                            }
+                            else if ($(this).prop("type") == "checkbox") {
+                                target.each(function () {
+                                    $(this).val("0");
+                                });
+                            }
+                        }
+                    }
+                });
+
+                $(".line:not(style, script)").each(function () {
+                    var line = $(this).prop("id").split("-")[1];
+                    var $lineLink = $('<a class="lineLink" href="#0" data-text="' + line + '" title="Code line ' + line + '">&larr;</a>');
+                    $(this).append($lineLink);
+                    $lineLink.hide();
+                    $(this).hover(function () {
+                        $(".lineLink").hide();
+                        $lineLink.show();
+                    });
+                    $(window).scroll(function () {
+                        $lineLink.hide();
+                    });
+                });
+
+                $("body").mouseleave(function () {
+                    $(".lineLink").hide();
+                });
+
+                $(".roundBox").click(function () {
+                    var line = $(this).data("line");
+                    var e = document.getElementById("line-" + line);
+                    if (e) {
+                        window.scrollTo(0, e.offsetTop - $(this).outerHeight() - 20);
+                    }
+                });
+                $(".money").each(function () { $(this).text(Number(($(this).text())).toFixed(2)); });
+
+                $("input").change(function() {
+                    var e = $(this);
+                    var s = e.val();
+                    if (isNumeric(s)) {
+                        e.css("color", "black");
+                        e.removeAttr("title");
+                    } else {
+                        e.css("color", "red");
+                        e.attr("title", "Invalid number");
+                    }
+                });
+
+                $("a").click(function () {
+                    chrome.webview.postMessage('clicked');
+                });
+
+                window.addEventListener('click', () => {
+                    chrome.webview.postMessage('focused');
+                });
+            });
+        }
+        document.oncontextmenu = function () { contextMenu = true; };
+        document.onmousedown = function () { contextMenu = false; };
+    </script><h3>Pruebas de Anotaciones: Arcos y Circunferencias </h3>
+<p>&nbsp;</p>
+<p>Explorando las capacidades de acotación angular y círculos en @{plot} </p>
+<p>&nbsp;</p>
+<svg class="plot" width="600" height="400" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#333"/></marker><marker id="arrowhead-annotation" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="currentColor"/></marker><marker id="arrowhead-start" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto"><polygon points="8 0, 0 3, 8 6" fill="#333"/></marker><marker id="arrowhead-end" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#333"/></marker></defs><rect width="600" height="400" fill="white"/><rect x="70" y="30" width="500" height="320" fill="white"/><line x1="70.0" y1="30" x2="70.0" y2="350" stroke="#e0e0e0" stroke-width="0.5"/><line x1="70.0" y1="350" x2="70.0" y2="355" stroke="#333" stroke-width="1"/><text x="70.0" y="368" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">-1</text><line x1="141.4" y1="30" x2="141.4" y2="350" stroke="#e0e0e0" stroke-width="0.5"/><line x1="141.4" y1="350" x2="141.4" y2="355" stroke="#333" stroke-width="1"/><text x="141.4" y="368" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">0</text><line x1="212.9" y1="30" x2="212.9" y2="350" stroke="#e0e0e0" stroke-width="0.5"/><line x1="212.9" y1="350" x2="212.9" y2="355" stroke="#333" stroke-width="1"/><text x="212.9" y="368" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">1</text><line x1="284.3" y1="30" x2="284.3" y2="350" stroke="#e0e0e0" stroke-width="0.5"/><line x1="284.3" y1="350" x2="284.3" y2="355" stroke="#333" stroke-width="1"/><text x="284.3" y="368" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">2</text><line x1="355.7" y1="30" x2="355.7" y2="350" stroke="#e0e0e0" stroke-width="0.5"/><line x1="355.7" y1="350" x2="355.7" y2="355" stroke="#333" stroke-width="1"/><text x="355.7" y="368" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">3</text><line x1="427.1" y1="30" x2="427.1" y2="350" stroke="#e0e0e0" stroke-width="0.5"/><line x1="427.1" y1="350" x2="427.1" y2="355" stroke="#333" stroke-width="1"/><text x="427.1" y="368" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">4</text><line x1="498.6" y1="30" x2="498.6" y2="350" stroke="#e0e0e0" stroke-width="0.5"/><line x1="498.6" y1="350" x2="498.6" y2="355" stroke="#333" stroke-width="1"/><text x="498.6" y="368" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">5</text><line x1="570.0" y1="30" x2="570.0" y2="350" stroke="#e0e0e0" stroke-width="0.5"/><line x1="570.0" y1="350" x2="570.0" y2="355" stroke="#333" stroke-width="1"/><text x="570.0" y="368" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">6</text><line x1="70" y1="350.0" x2="570" y2="350.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="350.0" x2="70" y2="350.0" stroke="#333" stroke-width="1"/><text x="62" y="354.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">-2</text><line x1="70" y1="296.7" x2="570" y2="296.7" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="296.7" x2="70" y2="296.7" stroke="#333" stroke-width="1"/><text x="62" y="300.7" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">-1</text><line x1="70" y1="243.3" x2="570" y2="243.3" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="243.3" x2="70" y2="243.3" stroke="#333" stroke-width="1"/><text x="62" y="247.3" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">0</text><line x1="70" y1="190.0" x2="570" y2="190.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="190.0" x2="70" y2="190.0" stroke="#333" stroke-width="1"/><text x="62" y="194.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">1</text><line x1="70" y1="136.7" x2="570" y2="136.7" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="136.7" x2="70" y2="136.7" stroke="#333" stroke-width="1"/><text x="62" y="140.7" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">2</text><line x1="70" y1="83.3" x2="570" y2="83.3" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="83.3" x2="70" y2="83.3" stroke="#333" stroke-width="1"/><text x="62" y="87.3" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">3</text><line x1="70" y1="30.0" x2="570" y2="30.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="30.0" x2="70" y2="30.0" stroke="#333" stroke-width="1"/><text x="62" y="34.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">4</text><line x1="70" y1="350" x2="70" y2="20" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)"/><line x1="70" y1="350" x2="585" y2="350" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)"/><polyline points="141.43,243.33 212.86,243.33 284.29,243.33 355.71,243.33 427.14,243.33 498.57,243.33 " fill="none" stroke="#CCCCCC" stroke-width="0.5"/><path d="M 177.1,243.3 A 35.7,35.7 0 0,0 172.4,225.5" fill="none" stroke="#CC0000" stroke-width="1.5"/><text x="190.4" y="234.2" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#CC0000">30&#176;</text><path d="M 312.9,243.3 A 28.6,28.6 0 0,0 304.5,223.1" fill="none" stroke="#0000CC" stroke-width="1.5"/><text x="324.5" y="230.7" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#0000CC">45&#176;</text><path d="M 448.6,243.3 A 21.4,21.4 0 0,0 427.1,221.9" fill="none" stroke="#008800" stroke-width="1.5"/><text x="452.9" y="221.6" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#008800">90&#176;</text><path d="M 155.7,136.7 A 14.3,14.3 0 0,0 148.6,124.3" fill="none" stroke="#880000" stroke-width="1.5"/><text x="166.8" y="126.0" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#880000">r=0.2</text><path d="M 312.9,136.7 A 28.6,28.6 0 0,0 298.6,111.9" fill="none" stroke="#880000" stroke-width="1.5"/><text x="322.0" y="118.9" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#880000">r=0.4</text><path d="M 470.0,136.7 A 42.9,42.9 0 0,0 448.6,99.6" fill="none" stroke="#880000" stroke-width="1.5"/><text x="477.2" y="111.7" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#880000">r=0.6</text><path d="M 234.3,296.7 A 21.4,21.4 0 0,0 228.0,281.5" fill="none" stroke="#FF6600" stroke-width="1.5"/><text x="246.5" y="286.7" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#FF6600">↗</text><path d="M 340.6,281.5 A 21.4,21.4 0 0,0 334.3,296.7" fill="none" stroke="#6600FF" stroke-width="1.5"/><text x="322.1" y="286.7" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#6600FF">↖</text><path d="M 498.6,318.1 A 21.4,21.4 0 0,0 513.7,311.8" fill="none" stroke="#006666" stroke-width="1.5"/><text x="512.5" y="334.3" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#006666">↘</text><line x1="141.4" y1="243.3" x2="198.6" y2="243.3" stroke="#CC0000" stroke-width="1.5"/><line x1="141.4" y1="243.3" x2="190.7" y2="222.0" stroke="#CC0000" stroke-width="1.5"/><line x1="284.3" y1="243.3" x2="334.3" y2="243.3" stroke="#0000CC" stroke-width="1.5"/><line x1="284.3" y1="243.3" x2="320.0" y2="216.7" stroke="#0000CC" stroke-width="1.5"/><line x1="427.1" y1="243.3" x2="470.0" y2="243.3" stroke="#008800" stroke-width="1.5"/><line x1="427.1" y1="243.3" x2="427.1" y2="211.3" stroke="#008800" stroke-width="1.5"/><circle cx="141.4" cy="243.3" r="4.0" fill="#CC0000" stroke="none"/><circle cx="284.3" cy="243.3" r="4.0" fill="#0000CC" stroke="none"/><circle cx="427.1" cy="243.3" r="4.0" fill="#008800" stroke="none"/><circle cx="141.4" cy="136.7" r="3.0" fill="#880000" stroke="none"/><circle cx="284.3" cy="136.7" r="3.0" fill="#880000" stroke="none"/><circle cx="427.1" cy="136.7" r="3.0" fill="#880000" stroke="none"/><text x="141.4" y="264.7" text-anchor="start" font-family="Times New Roman, serif" font-size="10" font-style="normal" font-weight="normal" fill="#333333">Origen</text><text x="284.3" y="264.7" text-anchor="start" font-family="Times New Roman, serif" font-size="10" font-style="normal" font-weight="normal" fill="#333333">(2,0)</text><text x="427.1" y="264.7" text-anchor="start" font-family="Times New Roman, serif" font-size="10" font-style="normal" font-weight="normal" fill="#333333">(4,0)</text><text x="320" y="392" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" font-style="italic" fill="#003366">X</text><line x1="317" y1="395" x2="323" y2="395" stroke="#003366" stroke-width="1"/><g transform="rotate(-90, 15, 190)"><text x="15" y="190" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" font-style="italic" fill="#003366">Y</text><line x1="12" y1="193" x2="18" y2="193" stroke="#003366" stroke-width="1"/></g></svg><p>&nbsp;</p>
+<p>--- </p>
+<p>&nbsp;</p>
+<h3>Segunda gráfica: Ángulos mayores a 180° </h3>
+<p>&nbsp;</p>
+<svg class="plot" width="500" height="350" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#333"/></marker><marker id="arrowhead-annotation" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="currentColor"/></marker><marker id="arrowhead-start" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto"><polygon points="8 0, 0 3, 8 6" fill="#333"/></marker><marker id="arrowhead-end" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#333"/></marker></defs><rect width="500" height="350" fill="white"/><rect x="70" y="30" width="400" height="270" fill="white"/><line x1="70.0" y1="30" x2="70.0" y2="300" stroke="#e0e0e0" stroke-width="0.5"/><line x1="70.0" y1="300" x2="70.0" y2="305" stroke="#333" stroke-width="1"/><text x="70.0" y="318" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">-1</text><line x1="127.1" y1="30" x2="127.1" y2="300" stroke="#e0e0e0" stroke-width="0.5"/><line x1="127.1" y1="300" x2="127.1" y2="305" stroke="#333" stroke-width="1"/><text x="127.1" y="318" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">0</text><line x1="184.3" y1="30" x2="184.3" y2="300" stroke="#e0e0e0" stroke-width="0.5"/><line x1="184.3" y1="300" x2="184.3" y2="305" stroke="#333" stroke-width="1"/><text x="184.3" y="318" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">1</text><line x1="241.4" y1="30" x2="241.4" y2="300" stroke="#e0e0e0" stroke-width="0.5"/><line x1="241.4" y1="300" x2="241.4" y2="305" stroke="#333" stroke-width="1"/><text x="241.4" y="318" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">2</text><line x1="298.6" y1="30" x2="298.6" y2="300" stroke="#e0e0e0" stroke-width="0.5"/><line x1="298.6" y1="300" x2="298.6" y2="305" stroke="#333" stroke-width="1"/><text x="298.6" y="318" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">3</text><line x1="355.7" y1="30" x2="355.7" y2="300" stroke="#e0e0e0" stroke-width="0.5"/><line x1="355.7" y1="300" x2="355.7" y2="305" stroke="#333" stroke-width="1"/><text x="355.7" y="318" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">4</text><line x1="412.9" y1="30" x2="412.9" y2="300" stroke="#e0e0e0" stroke-width="0.5"/><line x1="412.9" y1="300" x2="412.9" y2="305" stroke="#333" stroke-width="1"/><text x="412.9" y="318" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">5</text><line x1="470.0" y1="30" x2="470.0" y2="300" stroke="#e0e0e0" stroke-width="0.5"/><line x1="470.0" y1="300" x2="470.0" y2="305" stroke="#333" stroke-width="1"/><text x="470.0" y="318" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" fill="#333">6</text><line x1="70" y1="300.0" x2="470" y2="300.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="300.0" x2="70" y2="300.0" stroke="#333" stroke-width="1"/><text x="62" y="304.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">-2</text><line x1="70" y1="273.0" x2="470" y2="273.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="273.0" x2="70" y2="273.0" stroke="#333" stroke-width="1"/><text x="62" y="277.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">-1.5</text><line x1="70" y1="246.0" x2="470" y2="246.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="246.0" x2="70" y2="246.0" stroke="#333" stroke-width="1"/><text x="62" y="250.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">-1</text><line x1="70" y1="219.0" x2="470" y2="219.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="219.0" x2="70" y2="219.0" stroke="#333" stroke-width="1"/><text x="62" y="223.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">-0.5</text><line x1="70" y1="192.0" x2="470" y2="192.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="192.0" x2="70" y2="192.0" stroke="#333" stroke-width="1"/><text x="62" y="196.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">0</text><line x1="70" y1="165.0" x2="470" y2="165.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="165.0" x2="70" y2="165.0" stroke="#333" stroke-width="1"/><text x="62" y="169.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">0.5</text><line x1="70" y1="138.0" x2="470" y2="138.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="138.0" x2="70" y2="138.0" stroke="#333" stroke-width="1"/><text x="62" y="142.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">1</text><line x1="70" y1="111.0" x2="470" y2="111.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="111.0" x2="70" y2="111.0" stroke="#333" stroke-width="1"/><text x="62" y="115.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">1.5</text><line x1="70" y1="84.0" x2="470" y2="84.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="84.0" x2="70" y2="84.0" stroke="#333" stroke-width="1"/><text x="62" y="88.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">2</text><line x1="70" y1="57.0" x2="470" y2="57.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="57.0" x2="70" y2="57.0" stroke="#333" stroke-width="1"/><text x="62" y="61.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">2.5</text><line x1="70" y1="30.0" x2="470" y2="30.0" stroke="#e0e0e0" stroke-width="0.5"/><line x1="65" y1="30.0" x2="70" y2="30.0" stroke="#333" stroke-width="1"/><text x="62" y="34.0" text-anchor="end" font-family="Times New Roman, serif" font-size="11" fill="#333">3</text><line x1="70" y1="300" x2="70" y2="20" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)"/><line x1="70" y1="300" x2="485" y2="300" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)"/><polyline points="127.14,192.00 412.86,192.00 " fill="none" stroke="#CCCCCC" stroke-width="0.5"/><path d="M 207.1,138.0 A 22.9,22.9 0 0,0 172.9,118.2" fill="none" stroke="#CC0000" stroke-width="1.5"/><text x="203.2" y="109.2" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#CC0000">120&#176;</text><line x1="184.3" y1="138.0" x2="218.6" y2="138.0" stroke="#CC0000" stroke-width="1.5"/><line x1="184.3" y1="138.0" x2="172.9" y2="119.1" stroke="#CC0000" stroke-width="1.5"/><circle cx="184.3" cy="138.0" r="4.0" fill="#CC0000" stroke="none"/><path d="M 378.6,138.0 A 22.9,22.9 0 1,0 355.7,160.9" fill="none" stroke="#0000CC" stroke-width="1.5"/><text x="328.9" y="115.2" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#0000CC">270&#176;</text><line x1="355.7" y1="138.0" x2="390.0" y2="138.0" stroke="#0000CC" stroke-width="1.5"/><line x1="355.7" y1="138.0" x2="355.7" y2="170.4" stroke="#0000CC" stroke-width="1.5"/><circle cx="355.7" cy="138.0" r="4.0" fill="#0000CC" stroke="none"/><path d="M 287.1,219.0 A 17.1,17.1 0 0,1 282.1,231.1" fill="none" stroke="#008800" stroke-width="1.5"/><text x="299.7" y="235.3" text-anchor="middle" font-family="Times New Roman, serif" font-size="13" font-style="italic" fill="#008800">-45&#176;</text><line x1="270.0" y1="219.0" x2="298.6" y2="219.0" stroke="#008800" stroke-width="1.5"/><line x1="270.0" y1="219.0" x2="282.0" y2="230.3" stroke="#008800" stroke-width="1.5"/><circle cx="270.0" cy="219.0" r="4.0" fill="#008800" stroke="none"/><text x="270" y="342" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" font-style="italic" fill="#003366">x</text><line x1="267" y1="345" x2="273" y2="345" stroke="#003366" stroke-width="1"/><g transform="rotate(-90, 15, 165)"><text x="15" y="165" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" font-style="italic" fill="#003366">y</text><line x1="12" y1="168" x2="18" y2="168" stroke="#003366" stroke-width="1"/></g></svg> </body></html>

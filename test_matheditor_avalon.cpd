@@ -1,0 +1,36 @@
+"Test MathEditor con AvalonEdit
+'Este archivo prueba la sincronización entre MathEditor y AvalonEdit
+
+#show
+
+'Ecuaciones de prueba:
+
+'Ecuación cuadrática
+a = 2
+b = -5
+c = 3
+
+'Discriminante
+Δ = b^2 - 4*a*c
+
+'Soluciones
+x_1 = (-b + √Δ)/(2*a)
+x_2 = (-b - √Δ)/(2*a)
+
+'Verificación:
+y_1 = a*x_1^2 + b*x_1 + c
+y_2 = a*x_2^2 + b*x_2 + c
+
+'========================================
+'  INSTRUCCIONES DE PRUEBA
+'========================================
+'
+'1. Abre este archivo en Calcpad
+'2. Verifica que AvalonEdit esté activo (debería tener code folding)
+'3. Presiona el botón "Math Editor" o Ctrl+M
+'4. Deberías ver las ecuaciones en modo visual
+'5. Modifica alguna ecuación en MathEditor
+'6. Vuelve al modo código (presiona "Code Editor" o Ctrl+M)
+'7. Verifica que los cambios se reflejan en AvalonEdit (no en RichTextBox)
+'8. Si ves los cambios, la sincronización funciona correctamente!
+'

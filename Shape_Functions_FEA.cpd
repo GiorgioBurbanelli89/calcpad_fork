@@ -1,0 +1,318 @@
+"Funciones de Forma en Elementos Finitos
+'===========================================================
+'Basado en: Bathe & Wilson (1976) - Numerical Methods in FEA
+'===========================================================
+
+"<h2>1. FUNCIONES DE FORMA 1D - ELEMENTO BARRA</h2>
+'Las funciones de forma (interpolation functions) relacionan las
+'coordenadas naturales con los desplazamientos nodales.
+
+"<h3>1.1 Elemento de 2 Nodos (Lineal)</h3>
+'Coordenada natural: -1 ≤ r ≤ 1
+
+'Funciones de forma (simbólico):
+#noc
+N_1(r) = (1 - r)/2
+N_2(r) = (1 + r)/2
+#eoc
+
+'Verificación en los nodos:
+"En r = -1 (Nodo 1):
+N_1(-1)" = "N_1(-1)
+N_2(-1)" = "N_2(-1)
+
+"En r = +1 (Nodo 2):
+N_1(1)" = "N_1(1)
+N_2(1)" = "N_2(1)
+
+'Propiedad de partición de la unidad:
+"Suma en r = 0: "N_1(0) + N_2(0)
+
+'Gráfica de las funciones de forma:
+$Plot{N_1(x) & N_2(x) @ x = -1 : 1}
+
+"<h3>1.2 Elemento de 3 Nodos (Cuadrático)</h3>
+'Nodos: 1 (r=-1), 3 (r=0), 2 (r=+1)
+
+'Funciones de forma (simbólico):
+#noc
+h_1(r) = r*(r - 1)/2
+h_2(r) = r*(r + 1)/2
+h_3(r) = 1 - r^2
+#eoc
+
+"Verificación:
+"En r = -1 (Nodo 1):
+h_1(-1)" = "h_1(-1)
+h_2(-1)" = "h_2(-1)
+h_3(-1)" = "h_3(-1)
+
+"En r = 0 (Nodo 3):
+h_1(0)" = "h_1(0)
+h_2(0)" = "h_2(0)
+h_3(0)" = "h_3(0)
+
+"En r = +1 (Nodo 2):
+h_1(1)" = "h_1(1)
+h_2(1)" = "h_2(1)
+h_3(1)" = "h_3(1)
+
+$Plot{h_1(x) & h_2(x) & h_3(x) @ x = -1 : 1}
+
+"<h2>2. FUNCIONES DE FORMA 2D - ELEMENTO CUADRILÁTERO</h2>
+
+"<h3>2.1 Elemento de 4 Nodos (Bilineal)</h3>
+'Coordenadas naturales: -1 ≤ r,s ≤ 1
+'
+'     4 -------- 3
+'     |          |
+'  s  |    +     |
+'  ↑  |          |
+'     1 -------- 2
+'        → r
+
+'Funciones de forma (simbólico):
+#noc
+N1(r; s) = (1 - r)*(1 - s)/4
+N2(r; s) = (1 + r)*(1 - s)/4
+N3(r; s) = (1 + r)*(1 + s)/4
+N4(r; s) = (1 - r)*(1 + s)/4
+#eoc
+
+"Verificación en los nodos:
+"Nodo 1 (r=-1, s=-1):
+N1(-1; -1)" = "N1(-1; -1)
+N2(-1; -1)" = "N2(-1; -1)
+N3(-1; -1)" = "N3(-1; -1)
+N4(-1; -1)" = "N4(-1; -1)
+
+"Nodo 3 (r=+1, s=+1):
+N1(1; 1)" = "N1(1; 1)
+N2(1; 1)" = "N2(1; 1)
+N3(1; 1)" = "N3(1; 1)
+N4(1; 1)" = "N4(1; 1)
+
+"Suma de funciones (partición de la unidad):
+"En el centro (r=0, s=0): "N1(0; 0) + N2(0; 0) + N3(0; 0) + N4(0; 0)
+
+'Derivadas de las funciones de forma:
+'∂N/∂r:
+#noc
+dN1dr(r; s) = -(1 - s)/4
+dN2dr(r; s) = (1 - s)/4
+dN3dr(r; s) = (1 + s)/4
+dN4dr(r; s) = -(1 + s)/4
+#eoc
+
+'∂N/∂s:
+#noc
+dN1ds(r; s) = -(1 - r)/4
+dN2ds(r; s) = -(1 + r)/4
+dN3ds(r; s) = (1 + r)/4
+dN4ds(r; s) = (1 - r)/4
+#eoc
+
+"<h3>2.2 Elemento de 8 Nodos (Serendipity)</h3>
+'Incluye nodos intermedios en los lados
+'
+'     4 --- 7 --- 3
+'     |           |
+'     8     +     6
+'     |           |
+'     1 --- 5 --- 2
+
+'Funciones de forma para nodos esquina (simbólico):
+#noc
+'Nodo 1 (r=-1, s=-1):
+N8_1(r; s) = (1 - r)*(1 - s)*(-r - s - 1)/4
+
+'Nodo 2 (r=+1, s=-1):
+N8_2(r; s) = (1 + r)*(1 - s)*(r - s - 1)/4
+
+'Nodo 3 (r=+1, s=+1):
+N8_3(r; s) = (1 + r)*(1 + s)*(r + s - 1)/4
+
+'Nodo 4 (r=-1, s=+1):
+N8_4(r; s) = (1 - r)*(1 + s)*(-r + s - 1)/4
+#eoc
+
+'Funciones de forma para nodos intermedios (simbólico):
+#noc
+'Nodo 5 (r=0, s=-1):
+N8_5(r; s) = (1 - r^2)*(1 - s)/2
+
+'Nodo 6 (r=+1, s=0):
+N8_6(r; s) = (1 + r)*(1 - s^2)/2
+
+'Nodo 7 (r=0, s=+1):
+N8_7(r; s) = (1 - r^2)*(1 + s)/2
+
+'Nodo 8 (r=-1, s=0):
+N8_8(r; s) = (1 - r)*(1 - s^2)/2
+#eoc
+
+"Verificación en nodos:
+"Nodo 5 (r=0, s=-1) - debe ser 1 solo en N8_5:
+N8_1(0; -1)" = "N8_1(0; -1)
+N8_5(0; -1)" = "N8_5(0; -1)
+N8_2(0; -1)" = "N8_2(0; -1)
+
+"Suma en el centro (partición de unidad):
+sum_8 = N8_1(0; 0) + N8_2(0; 0) + N8_3(0; 0) + N8_4(0; 0) + N8_5(0; 0) + N8_6(0; 0) + N8_7(0; 0) + N8_8(0; 0)
+"Suma = "sum_8
+
+"<h2>3. MATRIZ JACOBIANA</h2>
+'La matriz Jacobiana relaciona las derivadas en coordenadas naturales
+'con las derivadas en coordenadas físicas.
+
+'Para un elemento cuadrilátero con nodos en:
+'(x1, y1), (x2, y2), (x3, y3), (x4, y4)
+
+"<h3>Ejemplo: Elemento rectangular 2×1</h3>
+'Nodos:
+x_1 = 0|m
+y_1 = 0|m
+x_2 = 2|m
+y_2 = 0|m
+x_3 = 2|m
+y_3 = 1|m
+x_4 = 0|m
+y_4 = 1|m
+
+'Coordenadas físicas como función de (r,s):
+#noc
+x_phys(r; s) = N1(r; s)*x_1 + N2(r; s)*x_2 + N3(r; s)*x_3 + N4(r; s)*x_4
+y_phys(r; s) = N1(r; s)*y_1 + N2(r; s)*y_2 + N3(r; s)*y_3 + N4(r; s)*y_4
+#eoc
+
+"Coordenadas en el centro (r=0, s=0):
+"x = "x_phys(0; 0)
+"y = "y_phys(0; 0)
+
+'Componentes del Jacobiano:
+'J = [∂x/∂r  ∂y/∂r]
+'    [∂x/∂s  ∂y/∂s]
+#noc
+J_11(r; s) = dN1dr(r; s)*x_1 + dN2dr(r; s)*x_2 + dN3dr(r; s)*x_3 + dN4dr(r; s)*x_4
+J_12(r; s) = dN1dr(r; s)*y_1 + dN2dr(r; s)*y_2 + dN3dr(r; s)*y_3 + dN4dr(r; s)*y_4
+J_21(r; s) = dN1ds(r; s)*x_1 + dN2ds(r; s)*x_2 + dN3ds(r; s)*x_3 + dN4ds(r; s)*x_4
+J_22(r; s) = dN1ds(r; s)*y_1 + dN2ds(r; s)*y_2 + dN3ds(r; s)*y_3 + dN4ds(r; s)*y_4
+#eoc
+
+"Jacobiano en el centro:
+"J11 = "J_11(0; 0)
+"J12 = "J_12(0; 0)
+"J21 = "J_21(0; 0)
+"J22 = "J_22(0; 0)
+
+'Determinante del Jacobiano:
+#noc
+det_J(r; s) = J_11(r; s)*J_22(r; s) - J_12(r; s)*J_21(r; s)
+#eoc
+"|J| = "det_J(0; 0)
+
+'Para un elemento rectangular: |J| = (a/2)(b/2) = área_elem/4
+a = 2|m
+b = 1|m
+"|J| teórico = "a*b/4
+
+"<h2>4. INTEGRACIÓN NUMÉRICA - CUADRATURA DE GAUSS</h2>
+
+"<h3>4.1 Cuadratura de Gauss 1D</h3>
+'Puntos y pesos para diferentes órdenes:
+
+"1 punto (exacto para polinomios hasta grado 1):
+r_g1 = 0
+w_g1 = 2
+
+"2 puntos (exacto para polinomios hasta grado 3):
+r_g2_1 = -1/sqrt(3)
+r_g2_2 = 1/sqrt(3)
+w_g2 = 1
+
+"r₁ = "r_g2_1
+"r₂ = "r_g2_2
+
+"3 puntos (exacto para polinomios hasta grado 5):
+r_g3_1 = -sqrt(3/5)
+r_g3_2 = 0
+r_g3_3 = sqrt(3/5)
+w_g3_1 = 5/9
+w_g3_2 = 8/9
+w_g3_3 = 5/9
+
+"r₁ = "r_g3_1", w₁ = "w_g3_1
+"r₂ = "r_g3_2", w₂ = "w_g3_2
+"r₃ = "r_g3_3", w₃ = "w_g3_3
+
+"<h3>4.2 Ejemplo: Integrar f(r) = r² de -1 a 1</h3>
+'Valor exacto:
+f(r) = r^2
+"Integral exacta = "2/3
+
+'Usando 1 punto de Gauss:
+I_1pt = w_g1*f(r_g1)
+"I (1 punto) = "I_1pt
+
+'Usando 2 puntos de Gauss:
+I_2pt = w_g2*f(r_g2_1) + w_g2*f(r_g2_2)
+"I (2 puntos) = "I_2pt
+
+"<h3>4.3 Cuadratura 2D (2×2 puntos de Gauss)</h3>
+'Puntos de integración en coordenadas (r,s):
+r_g = 1/sqrt(3)
+
+"Punto 1: r = "-r_g", s = "-r_g
+"Punto 2: r = "r_g", s = "-r_g
+"Punto 3: r = "r_g", s = "r_g
+"Punto 4: r = "-r_g", s = "r_g
+
+'Peso en cada punto: w = 1 × 1 = 1
+
+"<h2>5. ELEMENTO MINDLIN PLATE (Q4)</h2>
+'El elemento de placa Mindlin usa las mismas funciones de forma bilineales
+'pero con 3 grados de libertad por nodo: w, θx, θy
+
+"<h3>5.1 Matriz de Rigidez de Flexión</h3>
+'B_b relaciona curvaturas con rotaciones nodales:
+'κ = {∂θx/∂x, ∂θy/∂y, ∂θx/∂y + ∂θy/∂x}
+
+'Para el nodo i:
+'B_b_i = [0    dNi/dx    0   ]
+'        [0      0     dNi/dy]
+'        [0    dNi/dy  dNi/dx]
+
+"<h3>5.2 Matriz de Rigidez de Corte</h3>
+'B_s relaciona deformaciones de corte con desplazamientos y rotaciones:
+'γ = {∂w/∂x + θx, ∂w/∂y + θy}
+
+'Para el nodo i:
+'B_s_i = [dNi/dx   Ni   0 ]
+'        [dNi/dy   0    Ni]
+
+'Integración selectiva:
+'- Flexión: 2×2 puntos de Gauss (completa)
+'- Corte: 1×1 punto de Gauss (reducida) para evitar shear locking
+
+"<h2>6. EJEMPLO NUMÉRICO - INTERPOLACIÓN DE DESPLAZAMIENTOS</h2>
+'Dado un elemento cuadrilátero con desplazamientos nodales:
+u_1 = 0|mm
+u_2 = 1|mm
+u_3 = 1.5|mm
+u_4 = 0.5|mm
+
+'Desplazamiento en cualquier punto del elemento:
+#noc
+u_elem(r; s) = N1(r; s)*u_1 + N2(r; s)*u_2 + N3(r; s)*u_3 + N4(r; s)*u_4
+#eoc
+
+"Desplazamiento en el centro (r=0, s=0):
+"u = "u_elem(0; 0)
+
+"Desplazamiento en r=0.5, s=0.5:
+"u = "u_elem(0.5; 0.5)
+
+"<h2>Referencias</h2>
+'[1] Bathe, K.J. & Wilson, E.L. (1976). Numerical Methods in Finite Element Analysis
+'[2] Zienkiewicz, O.C. (1971). The Finite Element Method in Engineering Science
+'[3] Reddy, J.N. (2006). Theory and Analysis of Elastic Plates and Shells

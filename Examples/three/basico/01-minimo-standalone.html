@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>01 - Three.js Mínimo - Standalone</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #canvas {
+      border: 2px solid #ccc;
+      display: block;
+      margin: 20px auto;
+    }
+
+    .explicacion {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>01 - El Ejemplo Más Simple de Three.js</h1>
+
+  <div id="canvas" style="width: 600px; height: 400px;"></div>
+
+  <div class="explicacion">
+    <h3>✅ Este es un archivo HTML completo</h3>
+    <p>Puedes guardarlo como <code>.html</code> y abrirlo directamente en el navegador.</p>
+    <p><strong>Incluye:</strong></p>
+    <ul>
+      <li>&lt;!DOCTYPE html&gt; - Declara que es HTML5</li>
+      <li>&lt;html&gt; - Etiqueta raíz</li>
+      <li>&lt;head&gt; - Metadatos (título, charset, estilos)</li>
+      <li>&lt;body&gt; - Contenido visible</li>
+    </ul>
+  </div>
+
+  <!-- Cargar Three.js desde CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    // ========================================
+    // PASO 1: CREAR LA ESCENA
+    // ========================================
+    const scene = new THREE.Scene();
+
+    // ========================================
+    // PASO 2: CREAR LA CÁMARA
+    // ========================================
+    const camera = new THREE.PerspectiveCamera(
+      75,        // Ángulo de visión
+      600 / 400, // Aspecto
+      0.1,       // Cerca
+      1000       // Lejos
+    );
+
+    // ========================================
+    // PASO 3: CREAR EL RENDERIZADOR
+    // ========================================
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(600, 400);
+    document.getElementById('canvas').appendChild(renderer.domElement);
+
+    // ========================================
+    // PASO 4: CREAR UN CUBO
+    // ========================================
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+
+    // ========================================
+    // PASO 5: AGREGAR A LA ESCENA
+    // ========================================
+    scene.add(cube);
+
+    // ========================================
+    // PASO 6: POSICIONAR LA CÁMARA
+    // ========================================
+    camera.position.z = 5;
+
+    // ========================================
+    // PASO 7: RENDERIZAR
+    // ========================================
+    renderer.render(scene, camera);
+
+    console.log('✅ Three.js cargado correctamente');
+    console.log('Presiona F12 para ver esta consola');
+  </script>
+</body>
+</html>

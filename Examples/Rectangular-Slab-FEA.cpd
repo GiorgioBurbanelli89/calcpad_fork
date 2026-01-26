@@ -1,0 +1,188 @@
+"========================================================
+"RECTANGULAR SLAB - FINITE ELEMENT ANALYSIS
+"Con visualización usando primitivas SVG de Calcpad
+"========================================================
+
+'<h2>Datos de Entrada</h2>
+
+'Dimensiones de la losa
+a = 6'm - Longitud en dirección X
+b = 4'm - Longitud en dirección Y
+t = 0.2'm - Espesor de la losa
+
+'Propiedades del material
+E = 25000'MPa - Módulo de elasticidad del concreto
+ν = 0.2 - Relación de Poisson
+
+'Carga aplicada
+q = 10'kN/m² - Carga uniformemente distribuida
+
+'<h2>Discretización del Mesh FEM</h2>
+
+'Tamaño de elemento
+a_e = 1.0'm - Dimensión de elemento en X
+b_e = 1.0'm - Dimensión de elemento en Y
+
+'Número de elementos
+n_a = a/a_e - Elementos en dirección X
+n_b = b/b_e - Elementos en dirección Y
+n_e = n_a*n_b - Total de elementos
+
+'Número de nodos
+n_ja = n_a + 1 - Nodos en dirección X
+n_jb = n_b + 1 - Nodos en dirección Y
+n_j = n_ja*n_jb - Total de nodos
+
+'<p class="ref">Total: 'n_e' elementos, 'n_j' nodos</p>
+
+'<hr>
+
+'<h2>Visualización del Mesh FEM (SVG)</h2>
+
+'Escala para visualización
+scale = 80'px/m
+width_svg = a*scale + 100
+height_svg = b*scale + 100
+margin = 50
+
+$svg{width:width_svg; height:height_svg}
+
+'Fondo del área de la losa
+rect{x:margin; y:margin; width:a*scale; height:b*scale; fill:#ffffcc; stroke:none; opacity:0.3}
+
+'Dibujar grid de elementos - líneas verticales
+line{x1:margin+0*a_e*scale; y1:margin; x2:margin+0*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+1*a_e*scale; y1:margin; x2:margin+1*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+2*a_e*scale; y1:margin; x2:margin+2*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+3*a_e*scale; y1:margin; x2:margin+3*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+4*a_e*scale; y1:margin; x2:margin+4*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+5*a_e*scale; y1:margin; x2:margin+5*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin+6*a_e*scale; y1:margin; x2:margin+6*a_e*scale; y2:margin+b*scale; stroke:#008000; stroke-width:1.5}
+
+'Dibujar grid de elementos - líneas horizontales
+line{x1:margin; y1:margin+0*b_e*scale; x2:margin+a*scale; y2:margin+0*b_e*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin; y1:margin+1*b_e*scale; x2:margin+a*scale; y2:margin+1*b_e*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin; y1:margin+2*b_e*scale; x2:margin+a*scale; y2:margin+2*b_e*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin; y1:margin+3*b_e*scale; x2:margin+a*scale; y2:margin+3*b_e*scale; stroke:#008000; stroke-width:1.5}
+line{x1:margin; y1:margin+4*b_e*scale; x2:margin+a*scale; y2:margin+4*b_e*scale; stroke:#008000; stroke-width:1.5}
+
+'Números de elementos (centrados en cada elemento)
+text{x:margin+0.5*a_e*scale; y:margin+0.5*b_e*scale; content:1; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+1.5*a_e*scale; y:margin+0.5*b_e*scale; content:2; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+2.5*a_e*scale; y:margin+0.5*b_e*scale; content:3; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+3.5*a_e*scale; y:margin+0.5*b_e*scale; content:4; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+4.5*a_e*scale; y:margin+0.5*b_e*scale; content:5; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+5.5*a_e*scale; y:margin+0.5*b_e*scale; content:6; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+
+text{x:margin+0.5*a_e*scale; y:margin+1.5*b_e*scale; content:7; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+1.5*a_e*scale; y:margin+1.5*b_e*scale; content:8; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+2.5*a_e*scale; y:margin+1.5*b_e*scale; content:9; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+3.5*a_e*scale; y:margin+1.5*b_e*scale; content:10; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+4.5*a_e*scale; y:margin+1.5*b_e*scale; content:11; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+5.5*a_e*scale; y:margin+1.5*b_e*scale; content:12; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+
+text{x:margin+0.5*a_e*scale; y:margin+2.5*b_e*scale; content:13; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+1.5*a_e*scale; y:margin+2.5*b_e*scale; content:14; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+2.5*a_e*scale; y:margin+2.5*b_e*scale; content:15; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+3.5*a_e*scale; y:margin+2.5*b_e*scale; content:16; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+4.5*a_e*scale; y:margin+2.5*b_e*scale; content:17; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+5.5*a_e*scale; y:margin+2.5*b_e*scale; content:18; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+
+text{x:margin+0.5*a_e*scale; y:margin+3.5*b_e*scale; content:19; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+1.5*a_e*scale; y:margin+3.5*b_e*scale; content:20; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+2.5*a_e*scale; y:margin+3.5*b_e*scale; content:21; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+3.5*a_e*scale; y:margin+3.5*b_e*scale; content:22; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+4.5*a_e*scale; y:margin+3.5*b_e*scale; content:23; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+text{x:margin+5.5*a_e*scale; y:margin+3.5*b_e*scale; content:24; font-size:14; fill:#006400; font-weight:bold; text-anchor:middle}
+
+'Nodos en todas las intersecciones
+circle{cx:margin+0*a_e*scale; cy:margin+0*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+0*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+0*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+0*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+0*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+0*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+0*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+circle{cx:margin+0*a_e*scale; cy:margin+1*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+1*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+1*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+1*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+1*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+1*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+1*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+circle{cx:margin+0*a_e*scale; cy:margin+2*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+2*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+2*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+2*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+2*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+2*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+2*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+circle{cx:margin+0*a_e*scale; cy:margin+3*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+3*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+3*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+3*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+3*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+3*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+3*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+circle{cx:margin+0*a_e*scale; cy:margin+4*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+1*a_e*scale; cy:margin+4*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+2*a_e*scale; cy:margin+4*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+3*a_e*scale; cy:margin+4*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+4*a_e*scale; cy:margin+4*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+5*a_e*scale; cy:margin+4*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+circle{cx:margin+6*a_e*scale; cy:margin+4*b_e*scale; r:6; fill:#ff4500; stroke:#ff4500; stroke-width:1}
+
+'Apoyos en las 4 esquinas (círculos rojos más grandes)
+circle{cx:margin; cy:margin; r:12; fill:#ffcccc; stroke:#ff0000; stroke-width:3}
+circle{cx:margin+a*scale; cy:margin; r:12; fill:#ffcccc; stroke:#ff0000; stroke-width:3}
+circle{cx:margin; cy:margin+b*scale; r:12; fill:#ffcccc; stroke:#ff0000; stroke-width:3}
+circle{cx:margin+a*scale; cy:margin+b*scale; r:12; fill:#ffcccc; stroke:#ff0000; stroke-width:3}
+
+'Título
+text{x:width_svg/2; y:25; content:MESH FEM - LOSA RECTANGULAR; font-size:18; fill:#000000; font-weight:bold; text-anchor:middle}
+
+'Dimensiones
+text{x:margin+a*scale/2; y:margin+b*scale+35; content:a = %a% m; font-size:14; fill:#0000ff; text-anchor:middle}
+text{x:15; y:margin+b*scale/2; content:b = %b% m; font-size:14; fill:#0000ff; text-anchor:start}
+
+$end
+
+'<hr>
+
+'<h2>Resumen del Modelo FEM</h2>
+
+'<div style="background:#e0f2fe;padding:15px;border-left:4px solid #0284c7;margin:20px 0;">
+'<h3>📐 Geometría</h3>
+'<p><strong>Dimensiones:</strong> 'a' × 'b' × 't'm</p>
+'<p><strong>Área total:</strong> 'A_total = a*b'm²</p>
+'<p><strong>Volumen:</strong> 'V = A_total*t'm³</p>
+'</div>
+
+'<div style="background:#fef3c7;padding:15px;border-left:4px solid #f59e0b;margin:20px 0;">
+'<h3>🔢 Discretización FEM</h3>
+'<p><strong>Elementos:</strong> 'n_e' cuadriláteros de 'a_e' × 'b_e'm</p>
+'<p><strong>Nodos:</strong> 'n_j' nodos totales ('n_ja' × 'n_jb')</p>
+'<p><strong>Apoyos:</strong> 4 apoyos en las esquinas</p>
+'<p><strong>DOF por nodo:</strong> 3 (w, θx, θy)</p>
+'<p><strong>DOF totales:</strong> 'n_DOF = n_j*3'</p>
+'</div>
+
+'<div style="background:#d1fae5;padding:15px;border-left:4px solid #10b981;margin:20px 0;">
+'<h3>⚙️ Propiedades del Material</h3>
+'<p><strong>Concreto f''c:</strong> 'E' MPa</p>
+'<p><strong>Poisson:</strong> 'ν'</p>
+'<p><strong>Rigidez flexional:</strong> 'D = E*t^3/(12*(1 - ν^2))'kN·m</p>
+'</div>
+
+'<div style="background:#fee2e2;padding:15px;border-left:4px solid #ef4444;margin:20px 0;">
+'<h3>📊 Carga Aplicada</h3>
+'<p><strong>Carga distribuida:</strong> 'q' kN/m²</p>
+'<p><strong>Carga total:</strong> 'Q_total = q*A_total' kN</p>
+'<p><strong>Carga por elemento:</strong> 'q_e = q*a_e*b_e' kN</p>
+'</div>
+
+'<p class="ref"><strong>Nota:</strong> Gráfica generada con primitivas SVG nativas de Calcpad</p>

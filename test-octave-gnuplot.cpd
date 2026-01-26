@@ -1,0 +1,40 @@
+"Test Octave con Gnuplot"
+
+@{octave}
+% Forzar el uso de gnuplot toolkit
+graphics_toolkit('gnuplot');
+
+% Datos simples
+x = [0 1 2 3 4 5];
+y = [0 1 4 9 16 25];
+
+% Crear figura
+h = figure();
+plot(x, y, '-o', 'LineWidth', 2);
+title('Test con Gnuplot');
+xlabel('X');
+ylabel('Y');
+grid on;
+
+% Intentar guardar con diferentes métodos
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/test_gnuplot.png';
+
+% Método 1: png normal
+try
+    print(h, output_file, '-dpng');
+    fprintf('Imagen guardada con -dpng\n');
+catch
+    fprintf('Error con -dpng\n');
+end
+
+% Método 2: svg (más compatible)
+output_svg = 'C:/Users/j-b-j/AppData/Local/Temp/test_gnuplot.svg';
+try
+    print(h, output_svg, '-dsvg');
+    fprintf('SVG guardado en: %s\n', output_svg);
+catch
+    fprintf('Error con -dsvg\n');
+end
+
+close(h);
+@{end octave}

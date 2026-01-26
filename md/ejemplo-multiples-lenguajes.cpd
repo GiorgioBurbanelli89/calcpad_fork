@@ -1,0 +1,55 @@
+﻿'Ejemplo: MÃºltiples Lenguajes en un Archivo
+'
+'Este archivo muestra cÃ³mo usar diferentes lenguajes.
+'Cada bloque es INDEPENDIENTE y usa su propia directiva.
+
+'=== 1. Python ===
+@{python}
+print("Hola desde Python")
+x = 10 + 5
+print(f"Suma: 10 + 5 = {x}")
+@{end python}
+
+'=== 2. C++ ===
+@{cpp}
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hola desde C++" << endl;
+    int resultado = 20 * 3;
+    cout << "MultiplicaciÃ³n: 20 * 3 = " << resultado << endl;
+    return 0;
+}
+@{end cpp}
+
+'=== 3. C# con Avalonia ===
+@{avalonia}
+using System;
+
+class CalculadoraSimple {
+    static void Main() {
+        Console.WriteLine("Hola desde C# (Avalonia)");
+        int a = 100;
+        int b = 50;
+        Console.WriteLine($"DivisiÃ³n: {a} / {b} = {a/b}");
+    }
+}
+@{end avalonia}
+
+'=== 4. PowerShell ===
+@{powershell}
+Write-Host "Hola desde PowerShell"
+$suma = 7 + 3
+Write-Host "Suma: 7 + 3 = $suma"
+@{end powershell}
+
+'=== 5. Bash ===
+@{bash}
+echo "Hola desde Bash"
+resultado=$((15 + 25))
+echo "Suma: 15 + 25 = $resultado"
+@{end bash}
+
+'Nota: Cada bloque se ejecuta INDEPENDIENTEMENTE.
+'No puedes mezclar lenguajes dentro de un mismo bloque.

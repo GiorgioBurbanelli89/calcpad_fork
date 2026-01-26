@@ -1,0 +1,61 @@
+﻿'Prueba de Mensajes DinÃ¡micos en MÃºltiples Lenguajes
+
+"Este ejemplo muestra cÃ³mo Calcpad maneja diferentes tipos de salida"
+
+<b>1. Python - Salida de consola</b>
+@{python}
+print("Hola desde Python!")
+print("5 + 10 =", 5 + 10)
+@{end python}
+
+<b>2. C++ - Salida de consola</b>
+@{cpp}
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hola desde C++!" << endl;
+    cout << "5 * 10 = " << (5 * 10) << endl;
+    return 0;
+}
+@{end cpp}
+
+<b>3. Qt - Ventana GUI (sin salida de consola)</b>
+@{qt}
+#include <QApplication>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QWidget>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    QMainWindow window;
+    window.setWindowTitle("Calcpad - Qt Test");
+    window.resize(400, 300);
+
+    QWidget *centralWidget = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout();
+
+    QLabel *label = new QLabel("Ventana Qt activa!");
+    label->setStyleSheet("font-size: 16px; color: blue;");
+
+    QPushButton *button = new QPushButton("Click aquÃ­");
+
+    layout->addWidget(label);
+    layout->addWidget(button);
+
+    centralWidget->setLayout(layout);
+    window.setCentralWidget(centralWidget);
+
+    QObject::connect(button, &QPushButton::clicked, [&label]() {
+        label->setText("Â¡BotÃ³n presionado!");
+    });
+
+    window.show();
+    return app.exec();
+}
+@{end qt}

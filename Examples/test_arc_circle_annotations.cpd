@@ -1,0 +1,127 @@
+"Pruebas de Anotaciones: Arcos y Circunferencias"
+
+'Explorando las capacidades de acotación angular y círculos en @{plot}
+
+@{plot}
+# Datos base - una línea simple para referencia
+x: [0; 1; 2; 3; 4; 5]
+y: [0; 0; 0; 0; 0; 0]
+color: #CCCCCC
+linewidth: 0.5
+symbol: none
+
+xlabel: "X"
+ylabel: "Y"
+title: ""
+xlim: -1, 6
+ylim: -2, 4
+width: 600
+height: 400
+background: white
+grid: true
+showlegend: false
+
+# ============================================
+# PRUEBA 1: Ángulos en diferentes posiciones
+# ============================================
+
+# Ángulo de 30° en origen
+angle: 0, 0, 0, 30, 0.5, "30°", #CC0000
+
+# Ángulo de 45° en (2, 0)
+angle: 2, 0, 0, 45, 0.4, "45°", #0000CC
+
+# Ángulo de 90° en (4, 0)
+angle: 4, 0, 0, 90, 0.3, "90°", #008800
+
+# ============================================
+# PRUEBA 2: Ángulos con diferentes radios
+# ============================================
+
+# Mismo ángulo (60°), diferentes radios en Y=2
+angle: 0, 2, 0, 60, 0.2, "r=0.2", #880000
+angle: 2, 2, 0, 60, 0.4, "r=0.4", #880000
+angle: 4, 2, 0, 60, 0.6, "r=0.6", #880000
+
+# ============================================
+# PRUEBA 3: Ángulos en diferentes direcciones
+# ============================================
+
+# Ángulo hacia arriba-derecha (0° a 45°)
+angle: 1, -1, 0, 45, 0.3, "↗", #FF6600
+
+# Ángulo hacia arriba-izquierda (135° a 180°)
+angle: 3, -1, 135, 180, 0.3, "↖", #6600FF
+
+# Ángulo hacia abajo (270° a 315°)
+angle: 5, -1, 270, 315, 0.3, "↘", #006666
+
+# ============================================
+# PRUEBA 4: Líneas de referencia para los ángulos
+# ============================================
+
+# Líneas desde origen para ángulo 30°
+line: 0, 0, 0.8, 0, #CC0000
+line: 0, 0, 0.69, 0.4, #CC0000
+
+# Líneas desde (2,0) para ángulo 45°
+line: 2, 0, 2.7, 0, #0000CC
+line: 2, 0, 2.5, 0.5, #0000CC
+
+# Líneas desde (4,0) para ángulo 90°
+line: 4, 0, 4.6, 0, #008800
+line: 4, 0, 4, 0.6, #008800
+
+# Puntos en los vértices
+point: 0, 0, #CC0000, 4, filled
+point: 2, 0, #0000CC, 4, filled
+point: 4, 0, #008800, 4, filled
+point: 0, 2, #880000, 3, filled
+point: 2, 2, #880000, 3, filled
+point: 4, 2, #880000, 3, filled
+
+# Etiquetas
+text: 0, -0.4, "Origen", #333333, 10, normal
+text: 2, -0.4, "(2,0)", #333333, 10, normal
+text: 4, -0.4, "(4,0)", #333333, 10, normal
+
+@{end plot}
+
+'---
+
+"Segunda gráfica: Ángulos mayores a 180°"
+
+@{plot}
+x: [0; 5]
+y: [0; 0]
+color: #CCCCCC
+linewidth: 0.5
+symbol: none
+
+xlim: -1, 6
+ylim: -2, 3
+width: 500
+height: 350
+background: white
+grid: true
+showlegend: false
+
+# Ángulo pequeño (< 180°)
+angle: 1, 1, 0, 120, 0.4, "120°", #CC0000
+line: 1, 1, 1.6, 1, #CC0000
+line: 1, 1, 0.8, 1.35, #CC0000
+point: 1, 1, #CC0000, 4, filled
+
+# Ángulo grande (> 180°) - el arco mayor
+angle: 4, 1, 0, 270, 0.4, "270°", #0000CC
+line: 4, 1, 4.6, 1, #0000CC
+line: 4, 1, 4, 0.4, #0000CC
+point: 4, 1, #0000CC, 4, filled
+
+# Ángulo negativo (en sentido horario)
+angle: 2.5, -0.5, 0, -45, 0.3, "-45°", #008800
+line: 2.5, -0.5, 3.0, -0.5, #008800
+line: 2.5, -0.5, 2.71, -0.71, #008800
+point: 2.5, -0.5, #008800, 4, filled
+
+@{end plot}

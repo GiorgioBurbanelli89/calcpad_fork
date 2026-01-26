@@ -1,0 +1,24 @@
+"Test Parser Simbólico (AngouriMath)"
+
+'<h2>Parser Simbólico con AngouriMath</h2>
+
+@{symbolic}
+' Derivada de un polinomio
+f_deriv = d/dx(x^2 + a*x + b)
+
+' Integral de un polinomio
+f_integral = integrate(x^2 + a*x + b, x)
+
+' Simplificación
+f_simp = simplify(x^2 - x^2 + a)
+
+' Expansión
+f_expand = expand((x + a)^2)
+
+' Límite
+f_limit = limit((x^2 - 1)/(x - 1), x, 1)
+@{end symbolic}
+
+'<p>Resultados del parser simbólico:</p>
+
+'<p>Todos los cálculos anteriores se procesaron simbólicamente</p>

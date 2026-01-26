@@ -1,0 +1,11 @@
+﻿'Test C Language
+
+@{c}
+#include <stdio.h>
+
+int main() {
+    printf("Hola desde C!\n");
+    printf("La suma de 5 + 3 = %d\n", 5 + 3);
+    return 0;
+}
+@{end c}

@@ -1,0 +1,15 @@
+"Simple Octave Test"
+
+@{octave}
+x = [0 1 2 3];
+y = [0 1 4 9];
+plot(x, y);
+title('Simple Plot');
+xlabel('X');
+ylabel('Y');
+
+output_file = 'C:/Users/j-b-j/AppData/Local/Temp/test_octave.png';
+print(output_file, '-dpng', '-r150');
+fprintf('Image saved: %s\n', output_file);
+fprintf('<img src="%s" width="600">\n', output_file);
+@{end octave}

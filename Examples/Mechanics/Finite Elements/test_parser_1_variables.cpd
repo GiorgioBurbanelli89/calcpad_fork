@@ -1,0 +1,32 @@
+"TEST 1: Variables simples y en texto
+'====================================
+'
+'PRUEBA 1A: Variables simples
+a = 6
+b = 4
+t = 0.1
+'Resultados:
+a
+b
+t
+'
+'PRUEBA 1B: Variables con unidades
+E = 35000'MPa
+q = 10'kN/m2
+'Resultados:
+E
+q
+'
+'PRUEBA 1C: Variables en texto (PROBLEMA POTENCIAL)
+'Definiendo en texto:'n = 16
+'Usando n:
+n
+'
+'PRUEBA 1D: Expresiones
+c = a + b
+d = a*b
+e = a/b
+'Resultados:
+c
+d
+e

@@ -1,0 +1,42 @@
+﻿'Test Qt Real GUI Window
+
+"Este ejemplo crea una VENTANA REAL de Qt con botones"
+
+@{qt}
+#include <QApplication>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QWidget>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    QMainWindow window;
+    window.setWindowTitle("Calcpad - Qt GUI Test");
+    window.resize(400, 300);
+
+    QWidget *centralWidget = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout();
+
+    QLabel *label = new QLabel("Hola desde Qt GUI!");
+    label->setStyleSheet("font-size: 18px; color: blue;");
+
+    QPushButton *button = new QPushButton("Calcular 5 + 10");
+
+    layout->addWidget(label);
+    layout->addWidget(button);
+
+    centralWidget->setLayout(layout);
+    window.setCentralWidget(centralWidget);
+
+    QObject::connect(button, &QPushButton::clicked, [&label]() {
+        label->setText("Resultado: 5 + 10 = 15");
+    });
+
+    window.show();
+    return app.exec();
+}
+@{end qt}

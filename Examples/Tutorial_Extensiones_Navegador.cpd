@@ -1,0 +1,716 @@
+"====================================================================
+"📚 TUTORIAL: CÓMO HACER EXTENSIONES DE NAVEGADOR
+"====================================================================
+"Por: Claude Code
+"Fecha: Enero 2026
+"Nivel: Principiante → Intermedio
+
+'🎯 OBJETIVO
+'Aprender a crear extensiones de navegador que detecten y descarguen videos
+
+"====================================================================
+"PARTE 1: ¿QUÉ ES UNA EXTENSIÓN DE NAVEGADOR?
+"====================================================================
+
+'Una extensión de navegador es un programa pequeño que:
+'  • Se ejecuta dentro del navegador (Edge, Chrome, Firefox)
+'  • Puede modificar páginas web
+'  • Puede interceptar peticiones HTTP
+'  • Agrega funcionalidades nuevas
+
+'EJEMPLOS DE EXTENSIONES:
+'  ✓ Video DownloadHelper - Descarga videos
+'  ✓ Grammarly - Corrector de escritura
+'  ✓ AdBlock - Bloquea anuncios
+'  ✓ LastPass - Gestor de contraseñas
+
+"====================================================================
+"PARTE 2: ESTRUCTURA DE UNA EXTENSIÓN
+"====================================================================
+
+'Toda extensión tiene esta estructura de carpetas:
+
+'Mi-Extension/
+'├── manifest.json          ← Archivo de configuración (OBLIGATORIO)
+'├── background.js          ← Código de fondo (service worker)
+'├── content.js             ← Código inyectado en páginas
+'├── popup.html             ← Interfaz del usuario
+'├── popup.js               ← Lógica de la interfaz
+'├── styles.css             ← Estilos visuales
+'└── icons/                 ← Iconos de la extensión
+'    ├── icon16.png
+'    ├── icon48.png
+'    └── icon128.png
+
+"--------------------------------------------------------------------
+"2.1 - manifest.json (El cerebro de la extensión)
+"--------------------------------------------------------------------
+
+'Es un archivo JSON que define:
+'  • Nombre y versión de la extensión
+'  • Permisos que necesita
+'  • Qué scripts ejecutar
+'  • Iconos a usar
+
+'EJEMPLO BÁSICO:
+
+'{
+'  "manifest_version": 3,
+'  "name": "Mi Primera Extensión",
+'  "version": "1.0.0",
+'  "description": "Detecta videos en páginas web",
+'
+'  "permissions": [
+'    "activeTab",      ← Acceder a pestaña actual
+'    "storage",        ← Guardar datos localmente
+'    "webRequest"      ← Interceptar peticiones HTTP
+'  ],
+'
+'  "host_permissions": [
+'    "<all_urls>"      ← Acceso a todos los sitios
+'  ],
+'
+'  "action": {
+'    "default_popup": "popup.html"   ← UI al hacer clic
+'  },
+'
+'  "background": {
+'    "service_worker": "background.js"  ← Código de fondo
+'  },
+'
+'  "content_scripts": [{
+'    "matches": ["<all_urls>"],        ← En qué sitios
+'    "js": ["content.js"]               ← Qué ejecutar
+'  }]
+'}
+
+"--------------------------------------------------------------------
+"2.2 - background.js (El motor de fondo)
+"--------------------------------------------------------------------
+
+'Se ejecuta en segundo plano TODO EL TIEMPO
+'Funciones típicas:
+'  • Interceptar peticiones HTTP
+'  • Guardar datos
+'  • Comunicarse con content scripts
+'  • Procesar tareas pesadas
+
+'EJEMPLO - Interceptar peticiones HTTP:
+
+'chrome.webRequest.onBeforeRequest.addListener(
+'  function(details) {
+'    const url = details.url;
+'
+'    // ¿Es un video?
+'    if (url.includes('.mp4') || url.includes('.webm')) {
+'      console.log("Video detectado:", url);
+'      // Guardar la URL
+'      saveVideoUrl(url);
+'    }
+'  },
+'  { urls: ["<all_urls>"] }
+');
+
+"--------------------------------------------------------------------
+"2.3 - content.js (El espía de páginas)
+"--------------------------------------------------------------------
+
+'Se INYECTA en cada página web que visitas
+'Puede:
+'  • Leer el HTML de la página
+'  • Modificar elementos
+'  • Detectar elementos <video>
+'  • Interceptar JavaScript
+
+'EJEMPLO - Buscar videos en el DOM:
+
+'// Buscar todos los elementos <video>
+'const videos = document.querySelectorAll('video');
+'
+'videos.forEach(video => {
+'  const src = video.src;
+'  console.log("Video encontrado:", src);
+'
+'  // Enviar al background
+'  chrome.runtime.sendMessage({
+'    action: 'video-detected',
+'    url: src
+'  });
+'});
+
+"--------------------------------------------------------------------
+"2.4 - popup.html + popup.js (La interfaz)
+"--------------------------------------------------------------------
+
+'Es la ventana que aparece al hacer clic en el icono
+'Contiene botones, listas, configuración, etc.
+
+'EJEMPLO - popup.html:
+
+'<!DOCTYPE html>
+'<html>
+'<body>
+'  <h1>Videos Detectados</h1>
+'  <div id="video-list"></div>
+'  <button onclick="downloadAll()">Descargar Todos</button>
+'  <script src="popup.js"></script>
+'</body>
+'</html>
+
+"====================================================================
+"PARTE 3: CÓMO DETECTAR VIDEOS EN CUALQUIER WEB
+"====================================================================
+
+'Hay 4 técnicas principales:
+
+"--------------------------------------------------------------------
+"TÉCNICA 1: Interceptar peticiones HTTP (La más potente)
+"--------------------------------------------------------------------
+
+'USO: webRequest API
+'DETECTA: Archivos .mp4, .webm, .m3u8, .mpd, etc.
+
+'VENTAJAS:
+'  ✓ Detecta TODO el tráfico HTTP
+'  ✓ Funciona con videos ocultos
+'  ✓ No depende del HTML
+
+'DESVENTAJAS:
+'  ✗ Requiere permiso <all_urls>
+'  ✗ Puede ser bloqueado por CORS
+
+'CÓDIGO:
+'chrome.webRequest.onBeforeRequest.addListener(
+'  function(details) {
+'    const url = details.url;
+'
+'    // Lista de extensiones de video
+'    const videoExtensions = [
+'      '.mp4', '.webm', '.m4v', '.avi',
+'      '.mov', '.flv', '.wmv', '.mkv',
+'      '.m3u8', '.mpd', '.ts'
+'    ];
+'
+'    // ¿Contiene alguna extensión de video?
+'    const isVideo = videoExtensions.some(ext =>
+'      url.toLowerCase().includes(ext)
+'    );
+'
+'    if (isVideo) {
+'      // ¡Video detectado!
+'      storeVideo(url);
+'    }
+'  },
+'  { urls: ["<all_urls>"] }
+');
+
+'EJEMPLO REAL:
+'Usuario visita: https://example.com/watch
+'Browser solicita: https://cdn.example.com/video.mp4
+'                              ↓
+'webRequest lo intercepta: "¡.mp4 detectado!"
+'                              ↓
+'Guarda URL y muestra en popup
+
+"--------------------------------------------------------------------
+"TÉCNICA 2: Buscar elementos <video> en el DOM
+"--------------------------------------------------------------------
+
+'USO: document.querySelectorAll()
+'DETECTA: Tags HTML <video>
+
+'VENTAJAS:
+'  ✓ Simple de implementar
+'  ✓ Funciona en HTML estándar
+
+'DESVENTAJAS:
+'  ✗ No detecta streams ocultos
+'  ✗ No funciona con videos dinámicos
+
+'CÓDIGO:
+'// Buscar todos los <video>
+'const videos = document.querySelectorAll('video');
+'
+'videos.forEach(video => {
+'  let src = video.src;
+'
+'  // Si no tiene src, buscar en <source>
+'  if (!src) {
+'    const source = video.querySelector('source');
+'    if (source) src = source.src;
+'  }
+'
+'  if (src) {
+'    console.log("Video HTML5 detectado:", src);
+'  }
+'});
+
+'EJEMPLO REAL:
+'<video controls>
+'  <source src="movie.mp4" type="video/mp4">
+'  <source src="movie.webm" type="video/webm">
+'</video>
+'                ↓
+'querySelectorAll detecta el <video>
+'                ↓
+'Extrae src="movie.mp4"
+
+"--------------------------------------------------------------------
+"TÉCNICA 3: Detectar streams HLS y DASH
+"--------------------------------------------------------------------
+
+'HLS (HTTP Live Streaming):
+'  • Formato: .m3u8
+'  • Usado por: Apple, Twitch, sitios de streaming
+'  • Contiene: Playlist con fragmentos .ts
+
+'DASH (Dynamic Adaptive Streaming):
+'  • Formato: .mpd
+'  • Usado por: YouTube, Netflix
+'  • Contiene: Manifest XML con segmentos
+
+'CÓDIGO - Detectar HLS:
+'chrome.webRequest.onBeforeRequest.addListener(
+'  function(details) {
+'    if (details.url.includes('.m3u8')) {
+'      console.log("HLS stream detectado!");
+'
+'      // Descargar la playlist
+'      fetch(details.url)
+'        .then(r => r.text())
+'        .then(playlist => {
+'          // Parsear segmentos
+'          const segments = parseM3U8(playlist);
+'          console.log("Segmentos:", segments);
+'        });
+'    }
+'  },
+'  { urls: ["<all_urls>"] }
+');
+'
+'function parseM3U8(content) {
+'  const lines = content.split('\n');
+'  const segments = [];
+'
+'  lines.forEach(line => {
+'    // URLs no empiezan con #
+'    if (!line.startsWith('#') && line.trim()) {
+'      segments.push(line.trim());
+'    }
+'  });
+'
+'  return segments;
+'}
+
+'EJEMPLO - Archivo .m3u8:
+'#EXTM3U
+'#EXT-X-VERSION:3
+'#EXTINF:10.0,
+'segment0.ts
+'#EXTINF:10.0,
+'segment1.ts
+'#EXTINF:10.0,
+'segment2.ts
+
+"--------------------------------------------------------------------
+"TÉCNICA 4: Scripts específicos por sitio
+"--------------------------------------------------------------------
+
+'Algunos sitios (YouTube, Facebook) necesitan código especial
+
+'EJEMPLO - YouTube:
+'// YouTube guarda datos en window.ytInitialPlayerResponse
+'const playerData = window.ytInitialPlayerResponse;
+'
+'if (playerData) {
+'  const formats = playerData.streamingData?.formats || [];
+'
+'  formats.forEach(format => {
+'    console.log("YouTube video:");
+'    console.log("  URL:", format.url);
+'    console.log("  Quality:", format.qualityLabel);
+'    console.log("  Type:", format.mimeType);
+'  });
+'}
+
+"====================================================================
+"PARTE 4: CÓMO FUNCIONAN JUNTAS LAS 4 TÉCNICAS
+"====================================================================
+
+'ESCENARIO: Usuario visita https://example.com/video
+
+'PASO 1: background.js intercepta peticiones HTTP
+'  → Detecta: video.mp4, stream.m3u8
+'  → Guarda URLs
+
+'PASO 2: content.js busca en el DOM
+'  → Encuentra: <video src="...">
+'  → Notifica al background
+
+'PASO 3: Si detecta .m3u8, parsea playlist
+'  → Descarga archivo .m3u8
+'  → Extrae URLs de fragmentos .ts
+
+'PASO 4: Si es YouTube, usa script específico
+'  → Lee window.ytInitialPlayerResponse
+'  → Extrae todos los formatos disponibles
+
+'RESULTADO: Lista completa de videos en la página
+
+"====================================================================
+"PARTE 5: EJEMPLO COMPLETO - DETECTOR DE VIDEOS
+"====================================================================
+
+'Vamos a crear una extensión que detecte y descargue videos
+
+"--------------------------------------------------------------------
+"Archivo: manifest.json
+"--------------------------------------------------------------------
+
+'{
+'  "manifest_version": 3,
+'  "name": "Video Detector Pro",
+'  "version": "1.0.0",
+'  "description": "Detecta y descarga videos de cualquier sitio",
+'
+'  "permissions": [
+'    "webRequest",
+'    "downloads",
+'    "storage",
+'    "notifications"
+'  ],
+'
+'  "host_permissions": ["<all_urls>"],
+'
+'  "background": {
+'    "service_worker": "background.js"
+'  },
+'
+'  "content_scripts": [{
+'    "matches": ["<all_urls>"],
+'    "js": ["content.js"]
+'  }],
+'
+'  "action": {
+'    "default_popup": "popup.html"
+'  }
+'}
+
+"--------------------------------------------------------------------
+"Archivo: background.js
+"--------------------------------------------------------------------
+
+'let detectedVideos = {};
+'
+'// Interceptar peticiones
+'chrome.webRequest.onBeforeRequest.addListener(
+'  function(details) {
+'    const url = details.url;
+'    const tabId = details.tabId;
+'
+'    // Extensiones de video
+'    const videoExts = ['.mp4', '.webm', '.m3u8'];
+'
+'    // ¿Es video?
+'    const isVideo = videoExts.some(ext => url.includes(ext));
+'
+'    if (isVideo) {
+'      // Guardar por pestaña
+'      if (!detectedVideos[tabId]) {
+'        detectedVideos[tabId] = [];
+'      }
+'
+'      detectedVideos[tabId].push({
+'        url: url,
+'        timestamp: Date.now()
+'      });
+'
+'      // Actualizar badge
+'      chrome.action.setBadgeText({
+'        tabId: tabId,
+'        text: detectedVideos[tabId].length.toString()
+'      });
+'    }
+'  },
+'  { urls: ["<all_urls>"] }
+');
+'
+'// Escuchar mensajes del popup
+'chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+'  if (msg.action === 'getVideos') {
+'    sendResponse({ videos: detectedVideos[msg.tabId] || [] });
+'  }
+'
+'  if (msg.action === 'download') {
+'    chrome.downloads.download({
+'      url: msg.url,
+'      filename: 'video_' + Date.now() + '.mp4'
+'    });
+'  }
+'});
+
+"--------------------------------------------------------------------
+"Archivo: content.js
+"--------------------------------------------------------------------
+
+'// Buscar videos en el DOM
+'function detectVideos() {
+'  const videos = document.querySelectorAll('video');
+'
+'  videos.forEach(video => {
+'    const src = video.src || video.querySelector('source')?.src;
+'
+'    if (src) {
+'      chrome.runtime.sendMessage({
+'        action: 'video-from-dom',
+'        url: src
+'      });
+'    }
+'  });
+'}
+'
+'// Ejecutar al cargar
+'detectVideos();
+'
+'// Observar nuevos videos
+'new MutationObserver(() => detectVideos())
+'  .observe(document.body, { childList: true, subtree: true });
+
+"--------------------------------------------------------------------
+"Archivo: popup.html
+"--------------------------------------------------------------------
+
+'<!DOCTYPE html>
+'<html>
+'<head>
+'  <title>Videos Detectados</title>
+'</head>
+'<body>
+'  <h1>Videos Detectados</h1>
+'  <div id="video-list"></div>
+'  <script src="popup.js"></script>
+'</body>
+'</html>
+
+"--------------------------------------------------------------------
+"Archivo: popup.js
+"--------------------------------------------------------------------
+
+'async function loadVideos() {
+'  const [tab] = await chrome.tabs.query({
+'    active: true,
+'    currentWindow: true
+'  });
+'
+'  const response = await chrome.runtime.sendMessage({
+'    action: 'getVideos',
+'    tabId: tab.id
+'  });
+'
+'  const videoList = document.getElementById('video-list');
+'  videoList.innerHTML = '';
+'
+'  response.videos.forEach(video => {
+'    const div = document.createElement('div');
+'    div.innerHTML = `
+'      <p>${video.url}</p>
+'      <button onclick="download('${video.url}')">Descargar</button>
+'    `;
+'    videoList.appendChild(div);
+'  });
+'}
+'
+'function download(url) {
+'  chrome.runtime.sendMessage({
+'    action: 'download',
+'    url: url
+'  });
+'}
+'
+'loadVideos();
+
+"====================================================================
+"PARTE 6: CONCEPTOS CLAVE EXPLICADOS
+"====================================================================
+
+"--------------------------------------------------------------------
+"6.1 - ¿Qué es webRequest?
+"--------------------------------------------------------------------
+
+'Es una API que permite INTERCEPTAR peticiones HTTP
+
+'ANALOGÍA:
+'  El navegador es como un cartero
+'  webRequest es como revisar cada carta antes de entregarla
+'  Puedes ver: destino, contenido, tamaño
+
+'USO:
+'chrome.webRequest.onBeforeRequest.addListener(
+'  callback,                    ← Función a ejecutar
+'  { urls: ["<all_urls>"] },    ← En qué URLs
+'  ["requestBody"]              ← Qué info quieres
+');
+
+"--------------------------------------------------------------------
+"6.2 - ¿Qué es un Content Script?
+"--------------------------------------------------------------------
+
+'Es JavaScript que se INYECTA en páginas web
+
+'ANALOGÍA:
+'  La página web es una casa
+'  Content script es un inspector que entra a revisar
+'  Puede ver muebles (elementos HTML), leer documentos, etc.
+
+'LIMITACIONES:
+'  ✗ No puede acceder a variables JavaScript de la página
+'  ✗ Corre en contexto aislado
+'  ✓ Puede leer/modificar HTML
+'  ✓ Puede interceptar eventos
+
+"--------------------------------------------------------------------
+"6.3 - ¿Qué es un Service Worker?
+"--------------------------------------------------------------------
+
+'Es código que corre en SEGUNDO PLANO
+
+'ANALOGÍA:
+'  Es como un mayordomo que trabaja 24/7
+'  No tiene interfaz visual
+'  Procesa tareas mientras tú navegas
+
+'USOS:
+'  • Interceptar peticiones HTTP
+'  • Guardar datos
+'  • Enviar notificaciones
+'  • Procesar en segundo plano
+
+"--------------------------------------------------------------------
+"6.4 - HLS vs DASH vs MP4
+"--------------------------------------------------------------------
+
+'MP4:
+'  • Archivo único
+'  • Descarga progresiva
+'  • Fácil de descargar
+
+'HLS (.m3u8):
+'  • Playlist con fragmentos .ts
+'  • Streaming adaptativo
+'  • Requiere FFmpeg para descargar
+
+'DASH (.mpd):
+'  • Manifest XML
+'  • Usado por YouTube, Netflix
+'  • Requiere youtube-dl/yt-dlp
+
+"====================================================================
+"PARTE 7: CÓMO INSTALAR TU EXTENSIÓN
+"====================================================================
+
+'PASOS:
+
+'1. Crea una carpeta con todos los archivos
+'   Mi-Extension/
+'   ├── manifest.json
+'   ├── background.js
+'   ├── content.js
+'   ├── popup.html
+'   └── popup.js
+
+'2. Abre Microsoft Edge
+
+'3. Ve a: edge://extensions/
+
+'4. Activa "Modo de desarrollador"
+
+'5. Clic en "Cargar extensión desempaquetada"
+
+'6. Selecciona tu carpeta
+
+'7. ¡Listo! Verás tu extensión instalada
+
+"====================================================================
+"PARTE 8: EJERCICIOS PRÁCTICOS
+"====================================================================
+
+'EJERCICIO 1: Detector básico
+'  → Crea una extensión que cuente cuántos <img> hay en una página
+'  → Muestra el número en el badge del icono
+
+'EJERCICIO 2: Descargador de imágenes
+'  → Detecta todas las imágenes de una página
+'  → Permite descargarlas con un clic
+
+'EJERCICIO 3: Bloqueador de anuncios simple
+'  → Intercepta peticiones a dominios de anuncios
+'  → Bloquéalas usando webRequest
+
+'EJERCICIO 4: Detector de videos completo
+'  → Combina las 4 técnicas
+'  → Detecta videos de YouTube, Vimeo y sitios genéricos
+'  → Permite descargar en HD
+
+"====================================================================
+"PARTE 9: RECURSOS PARA APRENDER MÁS
+"====================================================================
+
+'DOCUMENTACIÓN OFICIAL:
+'  • Chrome Extensions: https://developer.chrome.com/docs/extensions/
+'  • MDN Web Extensions: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions
+
+'TUTORIALES:
+'  • Getting Started Guide (oficial de Google)
+'  • Extension Development Course (YouTube)
+
+'HERRAMIENTAS:
+'  • FFmpeg - Para procesar streams HLS/DASH
+'  • yt-dlp - Para descargar de YouTube
+'  • Postman - Para probar APIs
+
+"====================================================================
+"RESUMEN FINAL
+"====================================================================
+
+'ESTRUCTURA DE UNA EXTENSIÓN:
+'  manifest.json    → Configuración
+'  background.js    → Motor de fondo
+'  content.js       → Espía de páginas
+'  popup.html       → Interfaz
+
+'TÉCNICAS DE DETECCIÓN:
+'  1. webRequest    → Interceptar HTTP
+'  2. DOM parsing   → Buscar <video>
+'  3. HLS/DASH      → Parsear playlists
+'  4. Site-specific → YouTube, etc.
+
+'PERMISOS IMPORTANTES:
+'  webRequest       → Ver peticiones HTTP
+'  <all_urls>       → Acceso a todos los sitios
+'  downloads        → Descargar archivos
+'  storage          → Guardar datos
+
+'FLUJO TÍPICO:
+'  1. Usuario visita una página
+'  2. background.js intercepta peticiones
+'  3. content.js busca en el DOM
+'  4. Se combinan resultados
+'  5. popup.html muestra lista
+'  6. Usuario descarga video
+
+"====================================================================
+
+'¡Felicidades! Ahora entiendes cómo funcionan las extensiones de navegador.
+
+'PRÓXIMOS PASOS:
+'  → Crea tu primera extensión
+'  → Experimenta con webRequest
+'  → Combina las 4 técnicas de detección
+'  → Comparte tu extensión
+
+'¿DUDAS?
+'  Revisa la documentación oficial
+'  Experimenta con el código
+'  Lee el código de extensiones open source
+
+"¡Mucha suerte en tu viaje creando extensiones! 🚀
