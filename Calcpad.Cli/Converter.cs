@@ -13,12 +13,32 @@ namespace Calcpad.Cli
         private readonly string _htmlWorksheet;
         private readonly bool _isSilent;
 
-        internal Converter(bool isSilent)
+        internal Converter(bool isSilent) : this(isSilent, null)
+        {
+        }
+
+        internal Converter(bool isSilent, string customTemplate)
         {
             var appUrl = $"file:///{Program.AppPath.Replace("\\", "/")}doc/";
-            var templatePath =  $"{Program.AppPath}doc{Path.DirectorySeparatorChar}template{Program.AddCultureExt("html")}";
+
+            // Si se especifica un template personalizado, usarlo
+            string templatePath;
+            if (!string.IsNullOrEmpty(customTemplate))
+            {
+                templatePath = $"{Program.AppPath}doc{Path.DirectorySeparatorChar}{customTemplate}.html";
+                if (!File.Exists(templatePath))
+                {
+                    // Fallback al template por defecto
+                    templatePath = $"{Program.AppPath}doc{Path.DirectorySeparatorChar}template{Program.AddCultureExt("html")}";
+                }
+            }
+            else
+            {
+                templatePath = $"{Program.AppPath}doc{Path.DirectorySeparatorChar}template{Program.AddCultureExt("html")}";
+            }
+
             _htmlWorksheet = File.ReadAllText(templatePath).Replace("jquery", appUrl + "jquery");
-            _isSilent = isSilent;   
+            _isSilent = isSilent;
         }
 
         internal void ToHtml(string html, string path)
@@ -90,10 +110,10 @@ namespace Calcpad.Cli
 
         private string HtmlApplyWorksheet(string s)
         {
-            
+
             _sb.Append(_htmlWorksheet);
             _sb.Append(s);
-            _sb.Append(" </body></html>");
+            _sb.Append("</div> </body></html>");  // Cierra el div container antes de cerrar body
             return _sb.ToString();
         }
 

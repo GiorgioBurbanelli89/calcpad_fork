@@ -349,9 +349,26 @@ namespace Calcpad.Cli
             }
             i += isMcdx ? 5 : (isXlsx ? 5 : (isDocx ? 5 : (isSMath ? 3 : 4)));
             var outFile = fileName[i..].Trim();
+
+            // Detectar flag -s (silent mode)
             var isSilent = outFile.EndsWith(" -s");
             if (isSilent)
                 outFile = outFile[..^3];
+
+            // Detectar flag -t (template personalizado)
+            string customTemplate = null;
+            var templateIndex = outFile.IndexOf(" -t ", StringComparison.OrdinalIgnoreCase);
+            if (templateIndex < 0)
+                templateIndex = outFile.IndexOf(" -t", StringComparison.OrdinalIgnoreCase);
+
+            if (templateIndex >= 0)
+            {
+                var afterTemplate = outFile[(templateIndex + 3)..].Trim();
+                var spaceIdx = afterTemplate.IndexOf(' ');
+                customTemplate = spaceIdx > 0 ? afterTemplate[..spaceIdx] : afterTemplate;
+                outFile = outFile[..templateIndex].Trim() + (spaceIdx > 0 ? " " + afterTemplate[(spaceIdx + 1)..].Trim() : "");
+                outFile = outFile.Trim();
+            }
 
             // Check for -cpd option (convert mcdx to cpd only, no processing)
             var cpdOnly = outFile.EndsWith(" -cpd") || outFile.EndsWith(" cpd") ||
@@ -622,7 +639,7 @@ namespace Calcpad.Cli
                 var unwrappedCode = result.ProcessedCode;
                 var hasMacroErrors = result.HasMacroErrors;
                 string htmlResult;
-                Converter converter = new(isSilent);
+                Converter converter = new(isSilent, customTemplate);
                 if (hasMacroErrors)
                 {
                     htmlResult = CalcpadReader.CodeToHtml(unwrappedCode);
