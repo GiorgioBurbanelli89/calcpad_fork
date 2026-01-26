@@ -625,6 +625,113 @@ namespace Calcpad.Wpf.MathEditor
                     var lineText = lines[i];
                     var trimmed = lineText.Trim();
 
+                    // Detectar inicio de bloque de columnas: #columns N o @{columns N}
+                    bool isColumnsBlock = trimmed.StartsWith("#columns ") ||
+                                         (trimmed.StartsWith("@{columns ") && trimmed.EndsWith("}")) ||
+                                         (trimmed.StartsWith("@{columns") && trimmed.EndsWith("}"));
+                    if (isColumnsBlock)
+                    {
+                        // Extraer el número de columnas
+                        string columnsPart;
+                        if (trimmed.StartsWith("#columns "))
+                        {
+                            columnsPart = trimmed.Substring(9).Trim(); // Después de "#columns "
+                        }
+                        else
+                        {
+                            // @{columns N} - extraer entre "columns " y "}"
+                            var startIdx = trimmed.IndexOf("columns") + 7;
+                            var endIdx = trimmed.LastIndexOf('}');
+                            columnsPart = trimmed.Substring(startIdx, endIdx - startIdx).Trim();
+                        }
+
+                        int columnCount = 2;
+                        if (int.TryParse(columnsPart, out int parsedCount))
+                        {
+                            columnCount = Math.Max(2, Math.Min(4, parsedCount));
+                        }
+
+                        var mathColumns = new MathColumns(columnCount);
+                        int currentColumn = 0;
+                        i++; // Saltar la línea de inicio
+
+                        while (i < lines.Length)
+                        {
+                            var columnLine = lines[i];
+                            var columnTrimmed = columnLine.Trim();
+
+                            // Verificar si es el cierre del bloque de columnas: #end columns o @{end columns}
+                            if (columnTrimmed == "#end columns" || columnTrimmed == "@{end columns}")
+                            {
+                                break;
+                            }
+
+                            // Verificar si es separador de columna: #column o @{column}
+                            if (columnTrimmed == "#column" || columnTrimmed == "@{column}")
+                            {
+                                currentColumn++;
+                                if (currentColumn >= columnCount)
+                                    currentColumn = columnCount - 1;
+                                i++;
+                                continue;
+                            }
+
+                            // Detectar bloque externo dentro de columna
+                            // Excluir @{column} ya que es separador, y @{columns} ya que es anidado
+                            if (columnTrimmed.StartsWith("@{") &&
+                                !columnTrimmed.StartsWith("@{end") &&
+                                !columnTrimmed.StartsWith("@{calcpad") &&
+                                !columnTrimmed.StartsWith("@{column}") &&
+                                !columnTrimmed.StartsWith("@{columns"))
+                            {
+                                int endIdxCol = columnTrimmed.IndexOf('}');
+                                if (endIdxCol > 2)
+                                {
+                                    string langCol = columnTrimmed.Substring(2, endIdxCol - 2).Trim();
+                                    var codeBuilderCol = new System.Text.StringBuilder();
+                                    i++;
+
+                                    while (i < lines.Length)
+                                    {
+                                        var blockLineCol = lines[i];
+                                        var blockTrimmedCol = blockLineCol.Trim();
+
+                                        if (blockTrimmedCol.StartsWith($"@{{end {langCol}}}") ||
+                                            blockTrimmedCol.StartsWith($"@{{end{langCol}}}") ||
+                                            blockTrimmedCol == "@{end}")
+                                        {
+                                            break;
+                                        }
+
+                                        codeBuilderCol.AppendLine(blockLineCol);
+                                        i++;
+                                    }
+
+                                    var externalBlockCol = new MathExternalBlock(langCol, codeBuilderCol.ToString().TrimEnd(), collapsed: true);
+                                    mathColumns.AddElementToColumn(currentColumn, externalBlockCol);
+                                    i++;
+                                    continue;
+                                }
+                            }
+
+                            // Línea normal dentro de columna
+                            var parsedCol = ParseCalcpad(columnLine);
+                            foreach (var elem in parsedCol)
+                            {
+                                mathColumns.AddElementToColumn(currentColumn, elem);
+                            }
+                            i++;
+                        }
+
+                        // Agregar el MathColumns como una línea
+                        var columnsLine = new List<MathElement>();
+                        columnsLine.Add(mathColumns);
+                        _lines.Add(columnsLine);
+
+                        i++; // Saltar la línea #end columns
+                        continue;
+                    }
+
                     // Detectar inicio de bloque externo: @{language}
                     if (trimmed.StartsWith("@{") && !trimmed.StartsWith("@{end") && !trimmed.StartsWith("@{calcpad"))
                     {
@@ -4049,10 +4156,11 @@ namespace Calcpad.Wpf.MathEditor
                                 }
                             }
 
-                            // Para elementos compuestos (matrices, vectores, fracciones, etc.), usar HitTest
+                            // Para elementos compuestos (matrices, vectores, fracciones, columnas, etc.), usar HitTest
                             if (element is MathMatrix || element is MathVector ||
                                 element is MathFraction || element is MathRoot ||
-                                element is MathPower || element is MathSubscript)
+                                element is MathPower || element is MathSubscript ||
+                                element is MathColumns)
                             {
                                 DebugLog($"CLICK: Composite element, using HitTest");
                                 // El elemento ya tiene X, Y del render anterior
@@ -4064,6 +4172,39 @@ namespace Calcpad.Wpf.MathEditor
                                 {
                                     // Click dentro de una celda - limpiar selección de estructura
                                     ClearStructureSelection();
+
+                                    // NUEVO: Si el hit es un MathExternalBlock dentro de MathColumns, manejarlo especialmente
+                                    if (hitElement is MathExternalBlock externalBlockInColumns)
+                                    {
+                                        DebugLog($"CLICK: MathExternalBlock inside MathColumns: {externalBlockInColumns.Language}");
+
+                                        // Click en header: verificar si es en [+] o [-]
+                                        if (externalBlockInColumns.IsClickOnHeader(pos.X, pos.Y, _fontSize))
+                                        {
+                                            DebugLog($"CLICK: External block header in columns {externalBlockInColumns.Language}, toggling collapse");
+                                            externalBlockInColumns.ToggleCollapse();
+                                            Render();
+                                            break;
+                                        }
+                                        else if (!externalBlockInColumns.IsCollapsed)
+                                        {
+                                            // Click en área de código (expandido): posicionar cursor para editar
+                                            externalBlockInColumns.SetCursorFromClick(pos.X, pos.Y, _fontSize, hitElement.X, hitElement.Y);
+                                            externalBlockInColumns.IsCursorHere = true;
+                                            _currentElement = externalBlockInColumns;
+                                            DebugLog($"CLICK: Set cursor in external block inside columns");
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            // Click en bloque colapsado (fuera del header): expandir
+                                            DebugLog($"CLICK: External block collapsed in columns {externalBlockInColumns.Language}, expanding");
+                                            externalBlockInColumns.ToggleCollapse();
+                                            Render();
+                                            break;
+                                        }
+                                    }
+
                                     foundElement = hitElement;
                                     // Calcular posición del cursor dentro del sub-elemento
                                     double relX = pos.X - hitElement.X;
@@ -4217,6 +4358,21 @@ namespace Calcpad.Wpf.MathEditor
                             {
                                 overClickableArea = true;
                                 break;
+                            }
+                        }
+                        // NUEVO: Verificar MathExternalBlock dentro de MathColumns
+                        else if (element is MathColumns mathColumns)
+                        {
+                            // Usar HitTest para encontrar el elemento bajo el cursor
+                            var hitElement = mathColumns.HitTest(pos.X, pos.Y);
+                            if (hitElement is MathExternalBlock externalBlockInColumns)
+                            {
+                                // Verificar si está sobre el header clickeable
+                                if (externalBlockInColumns.IsClickOnHeader(pos.X, pos.Y, _fontSize))
+                                {
+                                    overClickableArea = true;
+                                    break;
+                                }
                             }
                         }
                         x += element.Width;

@@ -2168,16 +2168,9 @@ namespace Calcpad.Wpf
                 if (!string.IsNullOrEmpty(trimmed))
                 {
                     // Check if it starts with a language directive (new syntax @{language})
-                    if (trimmed.StartsWith("@{python}") || trimmed.StartsWith("@{octave}") ||
-                        trimmed.StartsWith("@{julia}") || trimmed.StartsWith("@{powershell}") ||
-                        trimmed.StartsWith("@{csharp}") || trimmed.StartsWith("@{cpp}") ||
-                        trimmed.StartsWith("@{bash}") || trimmed.StartsWith("@{cmd}") ||
-                        trimmed.StartsWith("@{r}") || trimmed.StartsWith("@{xaml}") ||
-                        trimmed.StartsWith("@{wpf}") || trimmed.StartsWith("@{c}") ||
-                        trimmed.StartsWith("@{fortran}") || trimmed.StartsWith("@{markdown}") ||
-                        trimmed.StartsWith("@{avalonia}") || trimmed.StartsWith("@{qt}") ||
-                        trimmed.StartsWith("@{gtk}") || trimmed.StartsWith("@{html}") ||
-                        trimmed.StartsWith("@{opensees}"))
+                    // Use MultLangManager.DetectDirective for proper detection including @{ts:filename} syntax
+                    var (isDirective, _, _) = Calcpad.Common.MultLangCode.MultLangManager.DetectDirective(trimmed);
+                    if (isDirective)
                     {
                         isExternalLanguage = true;
                         break; // Found external language directive, stop searching
@@ -3252,6 +3245,120 @@ namespace Calcpad.Wpf
             {
                 btn.ContextMenu.PlacementTarget = btn;
                 btn.ContextMenu.IsOpen = true;
+            }
+        }
+
+        /// <summary>
+        /// Excel button click - opens context menu
+        /// </summary>
+        private void ExcelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.ContextMenu != null)
+            {
+                btn.ContextMenu.PlacementTarget = btn;
+                btn.ContextMenu.IsOpen = true;
+            }
+        }
+
+        /// <summary>
+        /// Import from Microsoft Excel (.xlsx)
+        /// </summary>
+        private void ImportExcel_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog
+            {
+                DefaultExt = ".xlsx",
+                Filter = "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*",
+                Title = "Importar archivo Excel",
+                CheckFileExists = true,
+                Multiselect = false
+            };
+            var result = (bool)dlg.ShowDialog();
+            if (result)
+            {
+                try
+                {
+                    var converter = new Calcpad.Common.XlsxConverter();
+                    string convertedContent = converter.Convert(dlg.FileName);
+
+                    // Mostrar información de conversión
+                    var info = $"Archivo: {Path.GetFileName(dlg.FileName)}\n" +
+                               $"Hojas: {string.Join(", ", converter.SheetNames.Values)}\n";
+                    if (converter.Warnings.Count > 0)
+                        info += $"Advertencias: {converter.Warnings.Count}";
+
+                    // Preguntar si crear nuevo archivo o insertar
+                    var msgResult = MessageBox.Show(
+                        "¿Desea crear un nuevo archivo con el contenido importado?\n\n" +
+                        "Sí = Crear nuevo archivo\n" +
+                        "No = Insertar en documento actual\n\n" +
+                        info,
+                        "Importar Excel",
+                        MessageBoxButton.YesNoCancel,
+                        MessageBoxImage.Question);
+
+                    if (msgResult == MessageBoxResult.Yes)
+                    {
+                        // Crear nuevo archivo - cancelar parsing si está activo
+                        if (_isParsing)
+                            _parser.Cancel();
+
+                        _parser.ShowWarnings = true;
+
+                        // Insertar contenido convertido según editor activo
+                        if (_isAvalonEditActive && TextEditor != null)
+                        {
+                            TextEditor.Text = convertedContent;
+                            TextEditor.CaretOffset = 0;
+                        }
+                        else
+                        {
+                            _document.Blocks.Clear();
+                            foreach (var line in convertedContent.Split('\n'))
+                            {
+                                var p = new Paragraph();
+                                p.Inlines.Add(new Run(line.TrimEnd('\r')));
+                                _highlighter.Parse(p, IsComplex, GetLineNumber(p), true);
+                                _document.Blocks.Add(p);
+                            }
+                            RichTextBox.CaretPosition = _document.ContentStart;
+                        }
+
+                        _highlighter.Defined.Clear(IsComplex);
+
+                        // Sugerir nombre basado en el archivo Excel
+                        var suggestedName = Path.ChangeExtension(dlg.FileName, ".cpd");
+                        CurrentFileName = suggestedName;
+                        Title = Path.GetFileName(suggestedName) + " - Calcpad";
+                    }
+                    else if (msgResult == MessageBoxResult.No)
+                    {
+                        // Insertar en posición actual
+                        InsertTextAtCursor(convertedContent);
+                    }
+
+                    // Mostrar advertencias si las hay
+                    if (converter.Warnings.Count > 0)
+                    {
+                        var warningsText = string.Join("\n", converter.Warnings.Take(10));
+                        if (converter.Warnings.Count > 10)
+                            warningsText += $"\n... y {converter.Warnings.Count - 10} más";
+
+                        MessageBox.Show(
+                            $"La conversión generó {converter.Warnings.Count} advertencias:\n\n{warningsText}",
+                            "Advertencias de conversión",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error al importar archivo Excel:\n\n{ex.Message}",
+                        "Error de importación",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
             }
         }
 
@@ -5834,6 +5941,224 @@ namespace Calcpad.Wpf
                               MessageBoxButton.OK,
                               MessageBoxImage.Error);
             }
+        }
+
+        /// <summary>
+        /// Abre el editor visual de MathCad Prime con rejilla
+        /// </summary>
+        private void OpenMathcadPrimeEditor_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MathcadPrimeEditor.MathcadPrimeEditorWindow editorWindow = null;
+                string action = null;
+
+                // Check if clicked from context menu
+                if (sender is MenuItem menuItem && menuItem.Tag != null)
+                {
+                    action = menuItem.Tag.ToString();
+                }
+                else if (sender is Button btn && btn.ContextMenu != null)
+                {
+                    // Show context menu
+                    btn.ContextMenu.PlacementTarget = btn;
+                    btn.ContextMenu.IsOpen = true;
+                    return;
+                }
+
+                // Handle action
+                if (action == "new")
+                {
+                    // Crear nuevo documento
+                    editorWindow = new MathcadPrimeEditor.MathcadPrimeEditorWindow();
+                }
+                else if (action == "open")
+                {
+                    // Abrir archivo existente
+                    var dlg = new Microsoft.Win32.OpenFileDialog
+                    {
+                        Filter = "MathCad Prime (*.mcdx)|*.mcdx|Todos los archivos (*.*)|*.*",
+                        Title = "Abrir archivo MathCad Prime"
+                    };
+
+                    if (dlg.ShowDialog() == true)
+                    {
+                        editorWindow = new MathcadPrimeEditor.MathcadPrimeEditorWindow(dlg.FileName);
+                    }
+                }
+                else
+                {
+                    // Fallback: show dialog
+                    var result = MessageBox.Show(
+                        "¿Desea abrir un archivo .mcdx existente?\n\n" +
+                        "Sí = Abrir archivo\n" +
+                        "No = Crear nuevo documento",
+                        "MathCad Prime Editor",
+                        MessageBoxButton.YesNoCancel,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var dlg = new Microsoft.Win32.OpenFileDialog
+                        {
+                            Filter = "MathCad Prime (*.mcdx)|*.mcdx|Todos los archivos (*.*)|*.*",
+                            Title = "Abrir archivo MathCad Prime"
+                        };
+
+                        if (dlg.ShowDialog() == true)
+                        {
+                            editorWindow = new MathcadPrimeEditor.MathcadPrimeEditorWindow(dlg.FileName);
+                        }
+                    }
+                    else if (result == MessageBoxResult.No)
+                    {
+                        editorWindow = new MathcadPrimeEditor.MathcadPrimeEditorWindow();
+                    }
+                }
+
+                if (editorWindow != null)
+                {
+                    editorWindow.Owner = this;
+                    editorWindow.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al abrir MathCad Prime Editor:\n{ex.Message}",
+                              "Error",
+                              MessageBoxButton.OK,
+                              MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Word button click - opens context menu
+        /// </summary>
+        private void WordBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.ContextMenu != null)
+            {
+                btn.ContextMenu.PlacementTarget = btn;
+                btn.ContextMenu.IsOpen = true;
+            }
+        }
+
+        /// <summary>
+        /// Open MiniWord viewer window
+        /// </summary>
+        private void OpenMiniWord_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog
+            {
+                DefaultExt = ".docx",
+                Filter = "Word Documents (*.docx)|*.docx|All Files (*.*)|*.*",
+                Title = "Abrir documento Word en MiniWord",
+                CheckFileExists = true,
+                Multiselect = false
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                try
+                {
+                    var window = new MiniWord.MiniWordWindow(dlg.FileName);
+                    window.Owner = this;
+                    window.ImportToCalcpad += MiniWord_ImportToCalcpad;
+                    window.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error abriendo documento:\n\n{ex.Message}",
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handle import from MiniWord to Calcpad
+        /// </summary>
+        private void MiniWord_ImportToCalcpad(object sender, MiniWord.ImportToCalcpadEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.Content)) return;
+
+            // Convert text content to Calcpad syntax (comments)
+            var lines = e.Content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            var calcpadContent = string.Join(Environment.NewLine, lines.Select(l => "'" + l)) + Environment.NewLine;
+
+            // Insert at cursor position using existing helper
+            InsertTextAtCursor(calcpadContent);
+
+            MessageBox.Show(
+                "Contenido importado como comentarios.\n\nPuedes editar las lineas para convertirlas en expresiones Calcpad.",
+                "Importado desde MiniWord",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// Open MiniExcel viewer window
+        /// </summary>
+        private void OpenMiniExcel_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog
+            {
+                DefaultExt = ".xlsx",
+                Filter = "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*",
+                Title = "Abrir archivo Excel en MiniExcel",
+                CheckFileExists = true,
+                Multiselect = false
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                try
+                {
+                    var window = new MiniExcel.MiniExcelWindow(dlg.FileName);
+                    window.Owner = this;
+                    window.ImportToCalcpad += MiniExcel_ImportToCalcpad;
+                    window.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error abriendo archivo:\n\n{ex.Message}",
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handle import from MiniExcel to Calcpad
+        /// </summary>
+        private void MiniExcel_ImportToCalcpad(object sender, MiniExcel.ExcelImportEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.Content)) return;
+
+            // Add comment header
+            var header = $"' Importado desde Excel: {Path.GetFileName(e.SourceFile ?? "")}" +
+                        (string.IsNullOrEmpty(e.SheetName) ? "" : $" - Hoja: {e.SheetName}");
+            var content = header + Environment.NewLine + e.Content + Environment.NewLine;
+
+            // Insert at cursor position using existing helper
+            InsertTextAtCursor(content);
+
+            var formatInfo = e.Format switch
+            {
+                MiniExcel.ImportFormat.Matrix => "matriz",
+                MiniExcel.ImportFormat.Vector => "vector",
+                _ => "valores"
+            };
+
+            MessageBox.Show(
+                $"Datos importados como {formatInfo}.",
+                "Importado desde MiniExcel",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
 
         #endregion

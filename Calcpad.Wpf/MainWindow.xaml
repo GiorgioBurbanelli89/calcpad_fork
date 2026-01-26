@@ -1870,14 +1870,6 @@
                 ToolTip="{x:Static wpf:MainWindowResources.InsertImage}">
             <Image Source="Resources/image.png" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Center"/>
         </Button>
-        <Button Grid.Row="0" Click="ImportMathcadButton_Click" x:Name="ImportMathcadButton"
-                HorizontalAlignment="Left" VerticalAlignment="Top"
-                Height="24" Width="24" Margin="271,24,0,0"
-                Focusable="false" IsTabStop="false"
-                Background="{x:Null}" BorderBrush="{x:Null}"
-                ToolTip="Importar archivo Mathcad Prime (.mcdx)">
-            <Image Source="Resources/form.png" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Center"/>
-        </Button>
         <Button Grid.Row="0" Click="KeyPadButton_Click" x:Name="KeyPadButton" Tag="F"
                 VerticalAlignment="Top" HorizontalAlignment="Left"
                 Height="24" Width="24" Margin="298,24,0,0"
@@ -1935,13 +1927,33 @@
                 ToolTip="{x:Static wpf:MainWindowResources.PrintPreview}">
             <Image Source="Resources/print.png" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Button>
-        <Button Grid.Row="0" Click="WordButton_Click" x:Name="WordButton" 
+        <Button Grid.Row="0" Click="WordBtn_Click" x:Name="WordButton"
                 VerticalAlignment="Top" HorizontalAlignment="Right"
                 Height="24" Width="24" Margin="0,24,31,0"
-                Focusable="false" IsTabStop="false" 
+                Focusable="false" IsTabStop="false"
                 Background="{x:Null}" BorderBrush="{x:Null}"
                 ToolTip="{x:Static wpf:MainWindowResources.OpenWithWord}" >
-            <Image Source="Resources/word.png" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <Button.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Exportar a Word" Click="WordButton_Click">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📄" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="Abrir .docx en MiniWord (Visor)" Click="OpenMiniWord_Click">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📝" FontSize="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </Button.ContextMenu>
+            <Grid>
+                <Image Source="Resources/word.png" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Path Data="M0,0 L4,4 L8,0" Stroke="#666" StrokeThickness="1.5"
+                      HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                      Margin="0,0,-1,1" Width="8" Height="5"/>
+            </Grid>
         </Button>
         <Button Grid.Row="0" Click="PdfButton_Click" x:Name="PdfButton" 
                 VerticalAlignment="Top" HorizontalAlignment="Right" 
@@ -1981,35 +1993,122 @@
                     Foreground="White" FontSize="9" FontWeight="Bold"
                     Content="mathCAD" Padding="2"
                     ToolTip="Toggle Code/mathCAD Mode (Ctrl+M)"/>
-            <!-- Import/Export buttons for Mathcad and SMath -->
-            <Button Click="ImportMathcadPrime_Click" x:Name="ImportMathcadPrimeBtn"
-                    Height="20" Width="20" VerticalAlignment="Center"
+            <!-- Mathcad Prime Button with dropdown menu -->
+            <Button x:Name="MathcadBtn" Click="MathcadBtn_Click"
+                    Height="24" Width="24" VerticalAlignment="Center"
                     HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
-                    Canvas.Left="250" Canvas.Top="2" Background="#FF6B35"
-                    Foreground="White" FontSize="10" FontWeight="Bold"
-                    Content="M↓" Padding="0"
-                    ToolTip="Importar desde Mathcad Prime (.mcdx)"/>
-            <Button Click="ExportMathcadPrime_Click" x:Name="ExportMathcadPrimeBtn"
-                    Height="20" Width="20" VerticalAlignment="Center"
+                    Canvas.Left="250" Canvas.Top="0" Background="{x:Null}" BorderBrush="{x:Null}"
+                    ToolTip="Mathcad Prime (.mcdx)">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Editor Visual MathCad Prime..." Click="OpenMathcadPrimeEditor_Click" Tag="open">
+                            <MenuItem.Icon>
+                                <TextBlock Text="📐" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Importar archivo .mcdx (a Calcpad)" Click="ImportMathcadPrime_Click">
+                            <MenuItem.Icon>
+                                <TextBlock Text="📂" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Exportar como .mcdx (desde Calcpad)" Click="ExportMathcadPrime_Click">
+                            <MenuItem.Icon>
+                                <TextBlock Text="💾" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </Button.ContextMenu>
+                <Grid>
+                    <Image Source="Resources/Mathcad.png" Width="20" Height="20"/>
+                    <Path Data="M0,0 L4,4 L8,0" Stroke="#666" StrokeThickness="1.5"
+                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                          Margin="0,0,-1,1" Width="8" Height="5"/>
+                </Grid>
+            </Button>
+            <!-- SMath Studio Button with dropdown menu -->
+            <Button x:Name="SMathBtn" Click="SMathBtn_Click"
+                    Height="24" Width="24" VerticalAlignment="Center"
                     HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
-                    Canvas.Left="272" Canvas.Top="2" Background="#FF6B35"
-                    Foreground="White" FontSize="10" FontWeight="Bold"
-                    Content="M↑" Padding="0"
-                    ToolTip="Exportar a Mathcad Prime (.mcdx)"/>
-            <Button Click="ImportSMath_Click" x:Name="ImportSMathBtn"
-                    Height="20" Width="20" VerticalAlignment="Center"
+                    Canvas.Left="278" Canvas.Top="0" Background="{x:Null}" BorderBrush="{x:Null}"
+                    ToolTip="SMath Studio (.sm)">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Abrir archivo .sm" Click="ImportSMath_Click">
+                            <MenuItem.Icon>
+                                <TextBlock Text="📂" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Guardar como .sm" Click="ExportSMath_Click">
+                            <MenuItem.Icon>
+                                <TextBlock Text="💾" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </Button.ContextMenu>
+                <Grid>
+                    <Image Source="Resources/Smath.png" Width="20" Height="20"/>
+                    <Path Data="M0,0 L4,4 L8,0" Stroke="#666" StrokeThickness="1.5"
+                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                          Margin="0,0,-1,1" Width="8" Height="5"/>
+                </Grid>
+            </Button>
+            <!-- Excel Button with dropdown menu -->
+            <Button x:Name="ExcelBtn" Click="ExcelBtn_Click"
+                    Height="24" Width="24" VerticalAlignment="Center"
                     HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
-                    Canvas.Left="297" Canvas.Top="2" Background="#2E8B57"
-                    Foreground="White" FontSize="10" FontWeight="Bold"
-                    Content="S↓" Padding="0"
-                    ToolTip="Importar desde SMath Studio (.sm)"/>
-            <Button Click="ExportSMath_Click" x:Name="ExportSMathBtn"
-                    Height="20" Width="20" VerticalAlignment="Center"
+                    Canvas.Left="306" Canvas.Top="0" Background="{x:Null}" BorderBrush="{x:Null}"
+                    ToolTip="Microsoft Excel (.xlsx)">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Importar archivo .xlsx" Click="ImportExcel_Click">
+                            <MenuItem.Icon>
+                                <TextBlock Text="📂" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Abrir en MiniExcel (Visor)" Click="OpenMiniExcel_Click">
+                            <MenuItem.Icon>
+                                <TextBlock Text="📊" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </Button.ContextMenu>
+                <Grid>
+                    <Image Source="Resources/Excel.png" Width="20" Height="20"/>
+                    <Path Data="M0,0 L4,4 L8,0" Stroke="#666" StrokeThickness="1.5"
+                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                          Margin="0,0,-1,1" Width="8" Height="5"/>
+                </Grid>
+            </Button>
+            <!-- Word Button with dropdown menu -->
+            <Button x:Name="WordBtn" Click="WordBtn_Click"
+                    Height="24" Width="24" VerticalAlignment="Center"
                     HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
-                    Canvas.Left="319" Canvas.Top="2" Background="#2E8B57"
-                    Foreground="White" FontSize="10" FontWeight="Bold"
-                    Content="S↑" Padding="0"
-                    ToolTip="Exportar a SMath Studio (.sm)"/>
+                    Canvas.Left="332" Canvas.Top="0" Background="{x:Null}" BorderBrush="{x:Null}"
+                    ToolTip="Microsoft Word (.docx)">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Exportar a Word (.docx)" Click="WordButton_Click">
+                            <MenuItem.Icon>
+                                <TextBlock Text="📄" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Abrir en MiniWord (Visor)" Click="OpenMiniWord_Click">
+                            <MenuItem.Icon>
+                                <TextBlock Text="📝" FontSize="14"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </Button.ContextMenu>
+                <Grid>
+                    <Image Source="Resources/word.png" Width="20" Height="20"/>
+                    <Path Data="M0,0 L4,4 L8,0" Stroke="#666" StrokeThickness="1.5"
+                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                          Margin="0,0,-1,1" Width="8" Height="5"/>
+                </Grid>
+            </Button>
         </Canvas>
         <Separator Grid.Row="0" HorizontalAlignment="Left" Height="2" Margin="85,35,0,0" 
                    VerticalAlignment="Top" Width="24" IsTabStop="False" 

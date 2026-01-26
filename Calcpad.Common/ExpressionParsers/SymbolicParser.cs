@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Calcpad.Common.ExpressionParsers
@@ -195,7 +196,17 @@ namespace Calcpad.Common.ExpressionParsers
                 {
                     processed = ProcessLimit(trimmed);
                 }
-                // 7. Asignación normal con evaluación simbólica
+                // 7. ODE: solve_ode(ecuación, función, variable)
+                else if (trimmed.Contains("solve_ode("))
+                {
+                    processed = ProcessODE(trimmed);
+                }
+                // 8. Verificar ODE: verify_ode(solución, ecuación, función, variable)
+                else if (trimmed.Contains("verify_ode("))
+                {
+                    processed = ProcessVerifyODE(trimmed);
+                }
+                // 9. Asignación normal con evaluación simbólica
                 else if (trimmed.Contains("="))
                 {
                     processed = ProcessAssignment(trimmed);
@@ -626,6 +637,332 @@ namespace Calcpad.Common.ExpressionParsers
             return null;
         }
 
+        /// <summary>
+        /// Procesa ecuaciones diferenciales ordinarias (ODEs)
+        /// Soporta:
+        /// - ODEs de primer orden: y' = f(x) o y' + p*y = q(x)
+        /// - ODEs de segundo orden homogéneas: y'' + a*y' + b*y = 0
+        /// </summary>
+        private string ProcessODE(string line)
+        {
+            // solve_ode(ecuación, función, variable)
+            // Sintaxis mejorada SIN '=' interno:
+            // sol = solve_ode(y' - 2*x, y, x)           ' ODE: y' = 2*x
+            // sol = solve_ode(y' + 2*y, y, x)           ' ODE: y' + 2*y = 0
+            // sol = solve_ode(y'' - 3*y' + 2*y, y, x)   ' ODE: y'' - 3*y' + 2*y = 0
+
+            // Regex que NO captura '=' dentro de solve_ode()
+            var match = Regex.Match(line, @"(\w+)\s*=\s*solve_ode\(([^,]+),\s*([a-zA-Z])\s*,\s*([a-zA-Z])\)");
+            if (match.Success)
+            {
+                var varName = match.Groups[1].Value;
+                var equation = match.Groups[2].Value;
+                var function = match.Groups[3].Value;  // y
+                var variable = match.Groups[4].Value;  // x
+
+                try
+                {
+                    LogDebug($"ProcessODE: equation={equation}, function={function}, variable={variable}");
+
+                    // Normalizar ecuación: remover espacios extra
+                    equation = equation.Trim();
+
+                    // Detectar tipo de ODE
+                    string result = null;
+
+                    // Caso 1: y'' + a*y' + b*y (segundo orden, asumimos = 0)
+                    if (equation.Contains("''"))
+                    {
+                        // Si no tiene '=', agregar = 0
+                        if (!equation.Contains("="))
+                            equation += " = 0";
+                        result = SolveSecondOrderLinearHomogeneous(equation, function, variable);
+                    }
+                    // Caso 2: y' - f(x) (primer orden separable: y' = f(x))
+                    // Detectar si la ecuación NO contiene 'y' (solo y' y x)
+                    else if (equation.Contains("'"))
+                    {
+                        // Remover y' de la ecuación para ver qué queda
+                        var withoutYPrime = equation.Replace(function + "'", "").Trim();
+
+                        // Si no contiene 'y' (solo x), es separable
+                        if (!withoutYPrime.Contains(function))
+                        {
+                            LogDebug($"Detected separable ODE: {equation}");
+
+                            // Parsear y' +/- f(x)
+                            var separableMatch = Regex.Match(equation, function + @"'\s*([-+])\s*(.+)");
+                            if (separableMatch.Success)
+                            {
+                                var sign = separableMatch.Groups[1].Value;
+                                var expr = separableMatch.Groups[2].Value.Trim();
+
+                                LogDebug($"Sign: {sign}, Expr: {expr}");
+
+                                if (sign == "-")
+                                    result = SolveFirstOrderSeparable($"{function}' = {expr}", function, variable);
+                                else
+                                    result = SolveFirstOrderSeparable($"{function}' = -({expr})", function, variable);
+                            }
+                            else
+                            {
+                                // Si no hay operador, asumir que es y' = <resto>
+                                result = SolveFirstOrderSeparable($"{function}' = 0", function, variable);
+                            }
+                        }
+                        // Caso 3: y' + p*y (primer orden lineal: contiene 'y')
+                        else
+                        {
+                            // Si no tiene '=', agregar = 0
+                            if (!equation.Contains("="))
+                                equation += " = 0";
+                            result = SolveFirstOrderLinear(equation, function, variable);
+                        }
+                    }
+                    else
+                    {
+                        result = "Tipo de ODE no soportado aún";
+                    }
+
+                    // Formatear la solución como HTML con etiquetas de Calcpad
+                    var formattedResult = FormatMathExpression(result);
+                    var formattedVarName = $"<var>{varName}</var>";
+
+                    // Retornar como HTML literal con clase eq para aplicar estilos
+                    return $"'<p class=\"eq\">{formattedVarName} <b>=</b> {formattedResult}</p>";
+                }
+                catch (Exception ex)
+                {
+                    LogDebug($"ProcessODE ERROR: {ex.Message}\n{ex.StackTrace}");
+                    return $"' {varName} = solve_ode({equation}, {function}, {variable})\n' Error: {ex.Message}";
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Resuelve ODE de primer orden separable: y' = f(x)
+        /// Solución: y = ∫f(x)dx + C
+        /// </summary>
+        private string SolveFirstOrderSeparable(string equation, string function, string variable)
+        {
+            LogDebug($"SolveFirstOrderSeparable: {equation}");
+
+            // Extraer f(x) de "y' = f(x)"
+            var match = Regex.Match(equation, @"[a-zA-Z]'\s*=\s*(.+)");
+            if (!match.Success)
+                return "No se pudo parsear la ecuación";
+
+            var rightSide = match.Groups[1].Value.Trim();
+            LogDebug($"Right side: {rightSide}");
+
+            try
+            {
+                // Integrar f(x)
+                var entity = ParseExpression(rightSide);
+                var variableEntity = ParseExpression(variable);
+
+                var methods = _entityType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(m => m.Name == "Integrate")
+                    .ToArray();
+
+                var intMethod = methods.FirstOrDefault(m =>
+                {
+                    var pars = m.GetParameters();
+                    return pars.Length == 1 &&
+                           (pars[0].ParameterType.Name == "Variable" ||
+                            pars[0].ParameterType.Name == "Entity");
+                });
+
+                var result = intMethod?.Invoke(entity, new object[] { variableEntity });
+                var simplified = Simplify(result);
+
+                return $"{function} = {simplified} + C";
+            }
+            catch (Exception ex)
+            {
+                LogDebug($"SolveFirstOrderSeparable ERROR: {ex.Message}");
+                return $"Error al integrar: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Resuelve ODE lineal de primer orden: y' + p(x)*y = q(x)
+        /// Usa el factor integrante: μ(x) = e^(∫p(x)dx)
+        /// </summary>
+        private string SolveFirstOrderLinear(string equation, string function, string variable)
+        {
+            LogDebug($"SolveFirstOrderLinear: {equation}");
+
+            // Parsear y' + p*y = q
+            // Por ahora, implementar caso simple: y' + a*y = 0
+            var match = Regex.Match(equation, @"[a-zA-Z]'\s*\+\s*([^=]+)\*[a-zA-Z]\s*=\s*0");
+            if (match.Success)
+            {
+                var coefficient = match.Groups[1].Value.Trim();
+                LogDebug($"Homogeneous first order: coefficient = {coefficient}");
+
+                // Solución: y = C*e^(-a*x)
+                return $"{function} = C*e^(-({coefficient})*{variable})";
+            }
+
+            // Caso general requiere factor integrante
+            return "ODE lineal de primer orden (caso general) - en desarrollo";
+        }
+
+        /// <summary>
+        /// Resuelve ODE lineal de segundo orden homogénea con coeficientes constantes:
+        /// y'' + a*y' + b*y = 0
+        /// Solución usando ecuación característica: r² + a*r + b = 0
+        /// </summary>
+        private string SolveSecondOrderLinearHomogeneous(string equation, string function, string variable)
+        {
+            LogDebug($"SolveSecondOrderLinearHomogeneous: {equation}");
+
+            try
+            {
+                // Parsear y'' + a*y' + b*y = 0
+                // Extraer coeficientes a y b
+
+                // Remover espacios y normalizar
+                var normalized = equation.Replace(" ", "");
+                LogDebug($"Normalized: {normalized}");
+
+                // Regex para capturar: y'' + (coef)*y' + (coef)*y = 0
+                // Casos:
+                // y'' - 3*y' + 2*y = 0
+                // y'' + 4*y' + 4*y = 0
+                // y'' + y = 0
+
+                double a = 0, b = 0;
+
+                // Buscar coeficiente de y'
+                var yPrimeMatch = Regex.Match(normalized, @"([+-]?\d*\.?\d*)\*?" + function + "''");
+                var yPrimeCoef = Regex.Match(normalized, @"([+-]?\d+\.?\d*)\*?" + function + "'(?!')");
+                var yCoef = Regex.Match(normalized, @"([+-]?\d+\.?\d*)\*?" + function + "(?!')");
+
+                if (yPrimeCoef.Success)
+                {
+                    var coefStr = yPrimeCoef.Groups[1].Value;
+                    if (string.IsNullOrEmpty(coefStr) || coefStr == "+") coefStr = "1";
+                    if (coefStr == "-") coefStr = "-1";
+                    a = double.Parse(coefStr);
+                }
+
+                if (yCoef.Success)
+                {
+                    var coefStr = yCoef.Groups[1].Value;
+                    if (string.IsNullOrEmpty(coefStr) || coefStr == "+") coefStr = "1";
+                    if (coefStr == "-") coefStr = "-1";
+                    b = double.Parse(coefStr);
+                }
+
+                LogDebug($"Coefficients: a={a}, b={b}");
+
+                // Resolver ecuación característica: r² + a*r + b = 0
+                var discriminant = a * a - 4 * b;
+                LogDebug($"Discriminant: {discriminant}");
+
+                if (discriminant > 0)
+                {
+                    // Dos raíces reales distintas
+                    var r1 = (-a + Math.Sqrt(discriminant)) / 2.0;
+                    var r2 = (-a - Math.Sqrt(discriminant)) / 2.0;
+                    LogDebug($"Real roots: r1={r1}, r2={r2}");
+
+                    return $"{function} = C1*e^({r1:F4}*{variable}) + C2*e^({r2:F4}*{variable})";
+                }
+                else if (Math.Abs(discriminant) < 1e-10)
+                {
+                    // Raíz doble
+                    var r = -a / 2.0;
+                    LogDebug($"Repeated root: r={r}");
+
+                    return $"{function} = (C1 + C2*{variable})*e^({r:F4}*{variable})";
+                }
+                else
+                {
+                    // Raíces complejas conjugadas
+                    var alpha = -a / 2.0;
+                    var beta = Math.Sqrt(-discriminant) / 2.0;
+                    LogDebug($"Complex roots: α={alpha}, β={beta}");
+
+                    return $"{function} = e^({alpha:F4}*{variable})*(C1*cos({beta:F4}*{variable}) + C2*sin({beta:F4}*{variable}))";
+                }
+            }
+            catch (Exception ex)
+            {
+                LogDebug($"SolveSecondOrderLinearHomogeneous ERROR: {ex.Message}");
+                return $"Error: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Verifica si una solución satisface una ODE
+        /// verify_ode(solución, ecuación, función, variable)
+        /// </summary>
+        private string ProcessVerifyODE(string line)
+        {
+            var match = Regex.Match(line, @"(\w+)\s*=\s*verify_ode\((.+?),\s*(.+?),\s*([a-zA-Z])\s*,\s*([a-zA-Z])\)");
+            if (match.Success)
+            {
+                var varName = match.Groups[1].Value;
+                var solution = match.Groups[2].Value;
+                var equation = match.Groups[3].Value;
+                var function = match.Groups[4].Value;
+                var variable = match.Groups[5].Value;
+
+                try
+                {
+                    LogDebug($"ProcessVerifyODE: solution={solution}, equation={equation}");
+
+                    // Derivar la solución según el orden de la ODE
+                    var solutionEntity = ParseExpression(solution);
+                    var variableEntity = ParseExpression(variable);
+
+                    // Obtener y'
+                    var methods = _entityType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                        .Where(m => m.Name == "Differentiate")
+                        .ToArray();
+
+                    var diffMethod = methods.FirstOrDefault(m =>
+                    {
+                        var pars = m.GetParameters();
+                        return pars.Length == 1 &&
+                               (pars[0].ParameterType.Name == "Variable" ||
+                                pars[0].ParameterType.Name == "Entity");
+                    });
+
+                    var yPrime = diffMethod?.Invoke(solutionEntity, new object[] { variableEntity });
+                    LogDebug($"y' = {yPrime}");
+
+                    string verificationResult = "Verificación simbólica - en desarrollo";
+
+                    // Si la ecuación tiene y'', calcular también la segunda derivada
+                    if (equation.Contains("''"))
+                    {
+                        var yDoublePrime = diffMethod?.Invoke(yPrime, new object[] { variableEntity });
+                        LogDebug($"y'' = {yDoublePrime}");
+                        verificationResult = $"y' = {Simplify(yPrime)}, y'' = {Simplify(yDoublePrime)}";
+                    }
+                    else
+                    {
+                        verificationResult = $"y' = {Simplify(yPrime)}";
+                    }
+
+                    return $"' {varName} = verify_ode({solution}, {equation})\n' {verificationResult}";
+                }
+                catch (Exception ex)
+                {
+                    LogDebug($"ProcessVerifyODE ERROR: {ex.Message}\n{ex.StackTrace}");
+                    return $"' {varName} = verify_ode(...)\n' Error: {ex.Message}";
+                }
+            }
+
+            return null;
+        }
+
         private string Simplify(object entity)
         {
             if (entity == null) return "";
@@ -702,6 +1039,161 @@ namespace Calcpad.Common.ExpressionParsers
                 error = ex.Message;
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Formatea una expresión matemática como HTML con etiquetas de Calcpad.
+        /// Convierte variables a <var>, números a <i>, operadores a <b>, y exponentes a <sup>
+        /// </summary>
+        private string FormatMathExpression(string expr)
+        {
+            if (string.IsNullOrEmpty(expr))
+                return expr;
+
+            // Lista de funciones matemáticas comunes
+            var mathFunctions = new[] { "sin", "cos", "tan", "log", "ln", "exp", "sqrt", "abs" };
+
+            var result = new StringBuilder();
+            var i = 0;
+
+            while (i < expr.Length)
+            {
+                var c = expr[i];
+
+                // Variables y funciones (letras)
+                if (char.IsLetter(c))
+                {
+                    var varName = new StringBuilder();
+                    varName.Append(c);
+                    i++;
+
+                    // Capturar letras y números (C1, C2, sin, cos, etc.)
+                    while (i < expr.Length && (char.IsLetterOrDigit(expr[i]) || expr[i] == '_'))
+                    {
+                        varName.Append(expr[i]);
+                        i++;
+                    }
+
+                    var name = varName.ToString();
+
+                    // Verificar si es una función matemática conocida
+                    if (mathFunctions.Contains(name.ToLower()))
+                    {
+                        // Formatear como función (sin negrita)
+                        result.Append($"<var>{name}</var>");
+                    }
+                    else
+                    {
+                        // Formatear como variable normal
+                        result.Append($"<var>{name}</var>");
+                    }
+                    continue;
+                }
+
+                // Números (enteros o decimales)
+                if (char.IsDigit(c) || (c == '.' && i + 1 < expr.Length && char.IsDigit(expr[i + 1])))
+                {
+                    var number = new StringBuilder();
+                    while (i < expr.Length && (char.IsDigit(expr[i]) || expr[i] == '.'))
+                    {
+                        number.Append(expr[i]);
+                        i++;
+                    }
+                    result.Append($"<i>{number}</i>");
+                    continue;
+                }
+
+                // Exponentes con ^
+                if (c == '^')
+                {
+                    result.Append("<b>^</b>");
+                    i++;
+
+                    // Saltar espacios después del ^
+                    while (i < expr.Length && char.IsWhiteSpace(expr[i]))
+                        i++;
+
+                    // Si el exponente está entre paréntesis
+                    if (i < expr.Length && expr[i] == '(')
+                    {
+                        result.Append("<sup><b>(</b>");
+                        i++;
+                        var exponent = new StringBuilder();
+                        int parenCount = 1;
+
+                        while (i < expr.Length && parenCount > 0)
+                        {
+                            if (expr[i] == '(') parenCount++;
+                            if (expr[i] == ')') parenCount--;
+
+                            if (parenCount == 0)
+                            {
+                                result.Append(FormatMathExpression(exponent.ToString()));
+                                result.Append("<b>)</b></sup>");
+                            }
+                            else
+                            {
+                                exponent.Append(expr[i]);
+                            }
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        // Exponente simple (un número o variable)
+                        result.Append("<sup>");
+                        var exponent = new StringBuilder();
+
+                        // Capturar signo negativo si existe
+                        if (i < expr.Length && (expr[i] == '-' || expr[i] == '+'))
+                        {
+                            exponent.Append(expr[i]);
+                            i++;
+                        }
+
+                        // Capturar el exponente
+                        while (i < expr.Length && (char.IsLetterOrDigit(expr[i]) || expr[i] == '.'))
+                        {
+                            exponent.Append(expr[i]);
+                            i++;
+                        }
+
+                        result.Append(FormatMathExpression(exponent.ToString()));
+                        result.Append("</sup>");
+                    }
+                    continue;
+                }
+
+                // Operadores matemáticos
+                if ("+-*/=<>".Contains(c))
+                {
+                    result.Append($"<b>{c}</b>");
+                    i++;
+                    continue;
+                }
+
+                // Paréntesis
+                if (c == '(' || c == ')')
+                {
+                    result.Append($"<b>{c}</b>");
+                    i++;
+                    continue;
+                }
+
+                // Espacios - mantener
+                if (char.IsWhiteSpace(c))
+                {
+                    result.Append(' ');
+                    i++;
+                    continue;
+                }
+
+                // Cualquier otro carácter
+                result.Append(c);
+                i++;
+            }
+
+            return result.ToString();
         }
     }
 }

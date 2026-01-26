@@ -72,10 +72,11 @@ namespace Calcpad.Wpf
         {
             try
             {
-                // Open Imgur apps page where user can see their Client-ID
+                // Open Imgur API apps page where user can see their Client-ID
+                // After registering, the Client-ID appears on this page
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = "https://imgur.com/account/settings/apps",
+                    FileName = "https://api.imgur.com/oauth2/addclient",
                     UseShellExecute = true
                 });
             }

@@ -712,6 +712,7 @@ namespace Calcpad.Core
 
         /// <summary>
         /// Parse #columns N directive - starts a multi-column layout
+        /// NOTE: For @{columns N} syntax, use the external parser in MultLangProcessor
         /// </summary>
         private void ParseKeywordColumns(ReadOnlySpan<char> s)
         {
@@ -750,6 +751,7 @@ namespace Calcpad.Core
 
         /// <summary>
         /// Parse #column directive - moves to next column
+        /// NOTE: For @{column} syntax, use the external parser in MultLangProcessor
         /// </summary>
         private void ParseKeywordColumn()
         {
@@ -777,6 +779,7 @@ namespace Calcpad.Core
 
         /// <summary>
         /// Parse #end columns directive - ends the multi-column layout
+        /// NOTE: For @{end columns} syntax, use the external parser in MultLangProcessor
         /// </summary>
         private void ParseKeywordEndColumns()
         {

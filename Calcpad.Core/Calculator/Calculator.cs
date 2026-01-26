@@ -18,6 +18,15 @@ namespace Calcpad.Core
         protected int _degrees;
         protected bool _returnAngleUnits;
 
+        // Registry for dynamic function/operator loading from JSON
+        private static readonly Lazy<CalculatorRegistry> _registry = new(() =>
+        {
+            var reg = CalculatorRegistry.Instance;
+            reg.LoadFromJson(); // Try to load JSON config
+            return reg;
+        });
+        internal static CalculatorRegistry Registry => _registry.Value;
+
         protected static readonly double[] FromRad =
         [
             180.0 / Math.PI,
@@ -208,11 +217,76 @@ namespace Calcpad.Core
 
         internal static readonly sbyte UnitMultOrder = (sbyte)(OperatorOrder[OperatorIndex['*']] - 2);
         internal static bool IsOperator(char name) => OperatorIndex.ContainsKey(name);
-        internal static bool IsFunction(string name) => FunctionIndex.ContainsKey(name);
-        internal static bool IsFunction2(string name) => Function2Index.ContainsKey(name);
-        internal static bool IsFunction3(string name) => Function3Index.ContainsKey(name);
-        internal static bool IsMultiFunction(string name) => MultiFunctionIndex.ContainsKey(name);
+
+        internal static bool IsFunction(string name)
+        {
+            if (FunctionIndex.ContainsKey(name))
+                return true;
+            // Check registry for aliases (e.g., "sen" -> "sin" for Spanish)
+            if (Registry.FunctionAliases.TryGetValue(name.ToLowerInvariant(), out var alias))
+                return FunctionIndex.ContainsKey(alias);
+            return false;
+        }
+
+        internal static bool IsFunction2(string name)
+        {
+            if (Function2Index.ContainsKey(name))
+                return true;
+            if (Registry.FunctionAliases.TryGetValue(name.ToLowerInvariant(), out var alias))
+                return Function2Index.ContainsKey(alias);
+            return false;
+        }
+
+        internal static bool IsFunction3(string name)
+        {
+            if (Function3Index.ContainsKey(name))
+                return true;
+            if (Registry.FunctionAliases.TryGetValue(name.ToLowerInvariant(), out var alias))
+                return Function3Index.ContainsKey(alias);
+            return false;
+        }
+
+        internal static bool IsMultiFunction(string name)
+        {
+            if (MultiFunctionIndex.ContainsKey(name))
+                return true;
+            if (Registry.FunctionAliases.TryGetValue(name.ToLowerInvariant(), out var alias))
+                return MultiFunctionIndex.ContainsKey(alias);
+            return false;
+        }
+
         internal static bool IsInterpolation(string name) => InterpolationIndex.ContainsKey(name);
+
+        /// <summary>
+        /// Get function index, resolving aliases from Registry
+        /// </summary>
+        internal static int GetFunctionIndexWithAlias(string name)
+        {
+            if (FunctionIndex.TryGetValue(name, out var index))
+                return index;
+            // Try alias
+            if (Registry.FunctionAliases.TryGetValue(name.ToLowerInvariant(), out var alias))
+            {
+                if (FunctionIndex.TryGetValue(alias, out index))
+                    return index;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Get function2 index, resolving aliases from Registry
+        /// </summary>
+        internal static int GetFunction2IndexWithAlias(string name)
+        {
+            if (Function2Index.TryGetValue(name, out var index))
+                return index;
+            if (Registry.FunctionAliases.TryGetValue(name.ToLowerInvariant(), out var alias))
+            {
+                if (Function2Index.TryGetValue(alias, out index))
+                    return index;
+            }
+            return -1;
+        }
         internal abstract IScalarValue EvaluateOperator(long index, in IScalarValue a, in IScalarValue b);
         internal abstract IScalarValue EvaluateFunction(long index, in IScalarValue a);
         internal abstract IScalarValue EvaluateFunction2(long index, in IScalarValue a, in IScalarValue b);

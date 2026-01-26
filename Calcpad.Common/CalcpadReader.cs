@@ -324,7 +324,7 @@ namespace Calcpad.Common
             return _stringBuilder.ToString();
         }
 
-        #region Import Directives (@{mathcad:file}, @{smathstudio:file})
+        #region Import Directives (@{mathcad:file}, @{smathstudio:file}, @{excel:file})
 
         // Pattern to match @{mathcad:filepath} - captures the file path
         private static readonly Regex MathcadDirectivePattern = new(@"@\{mathcad:([^}]+)\}", RegexOptions.IgnoreCase);
@@ -332,10 +332,14 @@ namespace Calcpad.Common
         // Pattern to match @{smathstudio:filepath} or @{smath:filepath} - captures the file path
         private static readonly Regex SMathDirectivePattern = new(@"@\{(?:smathstudio|smath):([^}]+)\}", RegexOptions.IgnoreCase);
 
+        // Pattern to match @{excel:filepath} or @{xlsx:filepath} - captures the file path
+        private static readonly Regex ExcelDirectivePattern = new(@"@\{(?:excel|xlsx):([^}]+)\}", RegexOptions.IgnoreCase);
+
         /// <summary>
         /// Processes import directives in code:
         /// - @{mathcad:file.mcdx} - Imports and converts Mathcad Prime file
         /// - @{smathstudio:file.sm} or @{smath:file.sm} - Imports and converts SMath Studio file
+        /// - @{excel:file.xlsx} or @{xlsx:file.xlsx} - Imports and converts Excel file
         /// </summary>
         /// <param name="code">Code containing import directives</param>
         /// <param name="basePath">Base directory for resolving relative paths</param>
@@ -348,7 +352,9 @@ namespace Calcpad.Common
             // Quick check: if no import directives, return as-is
             if (!code.Contains("@{mathcad:", StringComparison.OrdinalIgnoreCase) &&
                 !code.Contains("@{smathstudio:", StringComparison.OrdinalIgnoreCase) &&
-                !code.Contains("@{smath:", StringComparison.OrdinalIgnoreCase))
+                !code.Contains("@{smath:", StringComparison.OrdinalIgnoreCase) &&
+                !code.Contains("@{excel:", StringComparison.OrdinalIgnoreCase) &&
+                !code.Contains("@{xlsx:", StringComparison.OrdinalIgnoreCase))
             {
                 return code;
             }
@@ -367,6 +373,13 @@ namespace Calcpad.Common
             {
                 var filePath = match.Groups[1].Value.Trim();
                 return ProcessSMathImport(filePath, basePath);
+            });
+
+            // Process Excel directives
+            code = ExcelDirectivePattern.Replace(code, match =>
+            {
+                var filePath = match.Groups[1].Value.Trim();
+                return ProcessExcelImport(filePath, basePath);
             });
 
             return code;
@@ -501,6 +514,71 @@ namespace Calcpad.Common
         }
 
         /// <summary>
+        /// Processes an Excel import directive
+        /// </summary>
+        private static string ProcessExcelImport(string filePath, string basePath)
+        {
+            try
+            {
+                // Resolve relative path
+                if (!Path.IsPathRooted(filePath))
+                {
+                    filePath = Path.Combine(basePath, filePath);
+                }
+
+                if (!File.Exists(filePath))
+                {
+                    return $"' ERROR: Archivo Excel no encontrado: {filePath}";
+                }
+
+                var converter = new XlsxConverter();
+                var result = converter.Convert(filePath);
+
+                // Add header comment
+                var sb = new StringBuilder();
+                sb.AppendLine($"' === Importado de Excel: {Path.GetFileName(filePath)} ===");
+
+                // Skip the header that XlsxConverter adds (similar to Mathcad/SMath)
+                var lines = result.Split('\n');
+                bool skipHeader = true;
+                foreach (var line in lines)
+                {
+                    var trimmed = line.TrimEnd('\r');
+                    if (skipHeader && trimmed.StartsWith("'"))
+                    {
+                        if (trimmed.StartsWith("' ===") && !trimmed.Contains("Importado"))
+                            continue;
+                        if (string.IsNullOrWhiteSpace(trimmed.TrimStart('\'')))
+                            continue;
+                        if (trimmed.Contains("Versión") || trimmed.Contains("Archivo:") ||
+                            trimmed.Contains("Fecha:") || trimmed.Contains("Hojas:"))
+                            continue;
+                    }
+                    skipHeader = false;
+                    sb.AppendLine(trimmed);
+                }
+
+                sb.AppendLine($"' === Fin importación Excel ===");
+
+                // Add warnings if any
+                if (converter.Warnings.Count > 0)
+                {
+                    sb.AppendLine("' Advertencias:");
+                    foreach (var warning in converter.Warnings)
+                    {
+                        sb.AppendLine($"'   - {warning}");
+                    }
+                }
+
+                return sb.ToString().TrimEnd();
+            }
+            catch (Exception ex)
+            {
+                return $"' ERROR al importar Excel: {ex.Message}";
+            }
+        }
+
+        /// <summary>
         /// Checks if code contains any import directives
         /// </summary>
         public static bool HasImportDirectives(string code)
@@ -510,7 +588,9 @@ namespace Calcpad.Common
 
             return code.Contains("@{mathcad:", StringComparison.OrdinalIgnoreCase) ||
                    code.Contains("@{smathstudio:", StringComparison.OrdinalIgnoreCase) ||
-                   code.Contains("@{smath:", StringComparison.OrdinalIgnoreCase);
+                   code.Contains("@{smath:", StringComparison.OrdinalIgnoreCase) ||
+                   code.Contains("@{excel:", StringComparison.OrdinalIgnoreCase) ||
+                   code.Contains("@{xlsx:", StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion

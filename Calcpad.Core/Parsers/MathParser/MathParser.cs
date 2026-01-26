@@ -850,6 +850,68 @@ namespace Calcpad.Core
 
         public override string ToString() => _output.Render(OutputWriter.OutputFormat.Text);
         public string ToHtml() => _output.Render(OutputWriter.OutputFormat.Html);
+
+        /// <summary>
+        /// Returns only the result formatted as HTML (no equation, no substitution)
+        /// Used by #noc mode to show formatted math without the full equation
+        /// </summary>
+        public string ResultAsHtml
+        {
+            get
+            {
+                var writer = new HtmlWriter(_settings, Phasor);
+                if (_result is IScalarValue scalar)
+                    return writer.FormatValue(scalar);
+
+                if (_result is Vector vector)
+                    return writer.FormatVector(vector);
+
+                if (_result is Matrix matrix)
+                    return writer.FormatMatrix(matrix);
+
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Returns variable = result formatted as HTML (for #noc mode)
+        /// Shows only the assignment and final formatted result, no intermediate substitution
+        /// </summary>
+        public string ToHtmlResultOnly()
+        {
+            var writer = new HtmlWriter(_settings, Phasor);
+            var sb = new StringBuilder();
+
+            // Check if this is an assignment (has a variable being assigned)
+            if (_rpn != null && _rpn.Length >= 2 && _rpn[^1].Content == "=")
+            {
+                var firstToken = _rpn[0];
+                string varName = firstToken.Content;
+
+                // Format the variable name
+                if (firstToken.Type == TokenTypes.Vector ||
+                    firstToken.Type == TokenTypes.VectorIndex)
+                    sb.Append(writer.FormatVariable("\u20D7" + varName, string.Empty, true));
+                else if (firstToken.Type == TokenTypes.Matrix ||
+                         firstToken.Type == TokenTypes.MatrixIndex)
+                    sb.Append(writer.FormatVariable(varName, string.Empty, true));
+                else
+                    sb.Append(writer.FormatVariable(varName, string.Empty, false));
+
+                sb.Append(writer.FormatOperator('='));
+            }
+
+            // Append the formatted result
+            if (_result is IScalarValue scalar)
+                sb.Append(writer.FormatValue(scalar));
+            else if (_result is Vector vector)
+                sb.Append(writer.FormatVector(vector));
+            else if (_result is Matrix matrix)
+                sb.Append(writer.FormatMatrix(matrix));
+
+            return sb.ToString();
+        }
+
         public string ToXml() => _output.Render(OutputWriter.OutputFormat.Xml)
             .Replace("    ", string.Empty).ReplaceLineEndings();
 

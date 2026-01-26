@@ -62,6 +62,10 @@
     <Resource Include="resources\search.png" />
     <Resource Include="resources\undo.png" />
     <Resource Include="resources\word.png" />
+    <Resource Include="resources\Mathcad.png" />
+    <Resource Include="resources\Smath.png" />
+    <Resource Include="resources\Excel.png" />
+    <Resource Include="resources\MSWord.png" />
   </ItemGroup>
 
   <ItemGroup>

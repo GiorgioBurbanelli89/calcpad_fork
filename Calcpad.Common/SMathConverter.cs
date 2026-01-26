@@ -1,5 +1,5 @@
 // SMathConverter.cs - Conversor de SMath Studio (.sm) a Calcpad (.cpd)
-// El formato .sm es XML plano (no ZIP como .mcdx)
+// SMath Studio usa notación polaca inversa (RPN) en su formato XML
 
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,7 @@ namespace Calcpad.Common
 {
     /// <summary>
     /// Conversor de archivos SMath Studio (.sm) a Calcpad (.cpd)
+    /// Implementa un evaluador RPN para interpretar las expresiones matemáticas
     /// </summary>
     public class SMathConverter
     {
@@ -33,8 +34,6 @@ namespace Calcpad.Common
         /// <summary>
         /// Convierte un archivo .sm a formato .cpd (string)
         /// </summary>
-        /// <param name="smPath">Ruta al archivo .sm</param>
-        /// <returns>Contenido en formato Calcpad</returns>
         public string Convert(string smPath)
         {
             if (!File.Exists(smPath))
@@ -46,7 +45,6 @@ namespace Calcpad.Common
 
             try
             {
-                // SMath files are plain XML
                 var doc = XDocument.Load(smPath);
                 var root = doc.Root;
 
@@ -90,38 +88,41 @@ namespace Calcpad.Common
         }
 
         /// <summary>
-        /// Extrae la versión de SMath Studio
+        /// Extrae la versión de SMath Studio desde el processing instruction
         /// </summary>
         private void ExtractSMathVersion(XElement root)
         {
             try
             {
-                // Look for version attribute in root or metadata
-                var versionAttr = root.Attribute("version");
-                if (versionAttr != null)
+                // Look in processing instructions first
+                var doc = root.Document;
+                if (doc != null)
                 {
-                    _smathVersion = versionAttr.Value;
-                    return;
-                }
-
-                // Try to find in settings or metadata elements
-                var settings = root.Element("settings");
-                if (settings != null)
-                {
-                    var ver = settings.Element("version")?.Value;
-                    if (!string.IsNullOrEmpty(ver))
+                    foreach (var node in doc.Nodes())
                     {
-                        _smathVersion = ver;
-                        return;
+                        if (node is XProcessingInstruction pi && pi.Target == "application")
+                        {
+                            // Parse: progid="SMath Studio" version="1.1.8763.0"
+                            var match = Regex.Match(pi.Data, @"version\s*=\s*""([^""]+)""");
+                            if (match.Success)
+                            {
+                                _smathVersion = match.Groups[1].Value;
+                                return;
+                            }
+                        }
                     }
                 }
 
-                // Check for "generator" or similar attributes
-                var generator = root.Attribute("generator")?.Value;
-                if (!string.IsNullOrEmpty(generator))
+                // Fallback to settings
+                var settings = root.Element(GetNs(root) + "settings");
+                if (settings != null)
                 {
-                    _smathVersion = generator;
-                    return;
+                    var identity = settings.Element(GetNs(root) + "identity");
+                    if (identity != null)
+                    {
+                        _smathVersion = "SMath Studio";
+                        return;
+                    }
                 }
 
                 _smathVersion = "SMath Studio";
@@ -132,31 +133,31 @@ namespace Calcpad.Common
             }
         }
 
+        private XNamespace GetNs(XElement element)
+        {
+            return element.GetDefaultNamespace();
+        }
+
         /// <summary>
         /// Procesa el documento XML del worksheet
         /// </summary>
         private void ProcessWorksheet(XElement root)
         {
-            // SMath structure varies, but typically has regions or math elements
-            // Common structures:
-            // <worksheet><regions><region>...</region></regions></worksheet>
-            // or <math><region>...</region></math>
+            var ns = GetNs(root);
 
-            var regions = root.Descendants("region").ToList();
-            if (regions.Count == 0)
+            // Find all regions
+            var regionsContainer = root.Element(ns + "regions");
+            if (regionsContainer == null)
             {
-                // Try alternative structures
-                regions = root.Descendants("math").ToList();
+                _warnings.Add("No se encontró el contenedor de regiones");
+                return;
             }
-            if (regions.Count == 0)
-            {
-                // Try to find any element with math content
-                regions = root.Elements().ToList();
-            }
+
+            var regions = regionsContainer.Elements(ns + "region").ToList();
 
             foreach (var region in regions)
             {
-                ProcessRegion(region);
+                ProcessRegion(region, ns);
             }
 
             if (_output.Length == 0 || _output.ToString().Trim().Split('\n').Length <= 7)
@@ -168,64 +169,85 @@ namespace Calcpad.Common
         /// <summary>
         /// Procesa una región del documento
         /// </summary>
-        private void ProcessRegion(XElement region)
+        private void ProcessRegion(XElement region, XNamespace ns)
         {
-            var regionType = region.Attribute("type")?.Value ?? region.Name.LocalName;
-
-            switch (regionType.ToLowerInvariant())
+            // Check for math region
+            var math = region.Element(ns + "math");
+            if (math != null)
             {
-                case "math":
-                case "expression":
-                case "formula":
-                    ProcessMathRegion(region);
-                    break;
-                case "text":
-                case "comment":
-                    ProcessTextRegion(region);
-                    break;
-                case "plot":
-                case "graph":
-                    _warnings.Add("Gráfico no soportado - se omitió");
-                    _output.AppendLine("' [Gráfico de SMath - no soportado]");
-                    break;
-                case "region":
-                    // Generic region - try to detect content type
-                    var mathContent = region.Descendants("math").FirstOrDefault() ??
-                                     region.Descendants("e").FirstOrDefault() ??
-                                     region.Descendants("expr").FirstOrDefault();
-                    if (mathContent != null)
-                        ProcessMathRegion(region);
-                    else
-                        ProcessTextRegion(region);
-                    break;
-                default:
-                    // Try to extract any math-like content
-                    var content = region.Value?.Trim();
-                    if (!string.IsNullOrEmpty(content))
+                ProcessMathRegion(math, ns);
+                return;
+            }
+
+            // Check for text region
+            var text = region.Element(ns + "text");
+            if (text != null)
+            {
+                ProcessTextRegion(text, ns);
+                return;
+            }
+
+            // Check for picture region (embedded images)
+            // Note: <picture> element may not have namespace in SMath files
+            var picture = region.Element(ns + "picture") ?? region.Element("picture");
+            if (picture != null)
+            {
+                ProcessPictureRegion(picture, ns);
+                return;
+            }
+
+            // Check for nested regions (areas/collapsed sections)
+            var area = region.Element(ns + "area");
+            if (area != null)
+            {
+                var title = area.Element(ns + "title");
+                if (title != null)
+                {
+                    var titleText = GetTextContent(title);
+                    if (!string.IsNullOrWhiteSpace(titleText))
                     {
-                        if (content.Contains("=") || content.Contains(":="))
-                            _output.AppendLine(CleanExpression(content));
-                        else
-                            _output.AppendLine($"' {content}");
+                        _output.AppendLine($"' === {titleText} ===");
                     }
-                    break;
+                }
+            }
+
+            // Process nested regions recursively
+            foreach (var nestedRegion in region.Elements(ns + "region"))
+            {
+                ProcessRegion(nestedRegion, ns);
             }
         }
 
         /// <summary>
-        /// Procesa una región matemática
+        /// Procesa una región matemática usando evaluador RPN
         /// </summary>
-        private void ProcessMathRegion(XElement region)
+        private void ProcessMathRegion(XElement math, XNamespace ns)
         {
             try
             {
-                // SMath uses different XML structures for math
-                // Try to find the expression content
-                var expr = ExtractExpression(region);
+                var input = math.Element(ns + "input");
+                if (input == null) return;
 
-                if (!string.IsNullOrWhiteSpace(expr))
+                var elements = input.Elements(ns + "e").ToList();
+                if (elements.Count == 0) return;
+
+                // Convert RPN to infix notation
+                var expression = EvaluateRPN(elements);
+
+                if (!string.IsNullOrWhiteSpace(expression))
                 {
-                    _output.AppendLine(CleanExpression(expr));
+                    // Check if there's a description
+                    var description = math.Element(ns + "description");
+                    if (description != null)
+                    {
+                        var descText = GetTextContent(description);
+                        if (!string.IsNullOrWhiteSpace(descText))
+                        {
+                            _output.AppendLine($"' {descText}");
+                        }
+                    }
+
+                    _output.AppendLine(CleanExpression(expression));
                 }
             }
             catch (Exception ex)
@@ -235,146 +257,289 @@ namespace Calcpad.Common
         }
 
         /// <summary>
-        /// Extrae una expresión del elemento
+        /// Evalúa una lista de elementos RPN y retorna expresión infija
         /// </summary>
-        private string ExtractExpression(XElement elem)
+        private string EvaluateRPN(List<XElement> elements)
         {
-            // SMath stores expressions in various ways
-            // Try different approaches
+            var stack = new Stack<string>();
 
-            // 1. Direct value
-            var directValue = elem.Value?.Trim();
-            if (!string.IsNullOrEmpty(directValue) &&
-                (directValue.Contains("=") || directValue.Contains(":=")))
+            foreach (var elem in elements)
             {
-                return directValue;
-            }
+                var type = elem.Attribute("type")?.Value ?? "";
+                var value = elem.Value?.Trim() ?? "";
+                var style = elem.Attribute("style")?.Value ?? "";
+                var argsAttr = elem.Attribute("args")?.Value;
+                int args = 0;
+                if (!string.IsNullOrEmpty(argsAttr))
+                    int.TryParse(argsAttr, out args);
 
-            // 2. Look for specific SMath elements
-            var eElement = elem.Descendants("e").FirstOrDefault();
-            if (eElement != null)
-            {
-                return ProcessSMathExpression(eElement);
-            }
-
-            // 3. Look for "math" child
-            var mathElement = elem.Descendants("math").FirstOrDefault();
-            if (mathElement != null)
-            {
-                return ProcessSMathExpression(mathElement);
-            }
-
-            // 4. Look for assignment patterns in child elements
-            var children = elem.Elements().ToList();
-            if (children.Count > 0)
-            {
-                var sb = new StringBuilder();
-                foreach (var child in children)
+                switch (type.ToLowerInvariant())
                 {
-                    var childExpr = ExtractExpression(child);
-                    if (!string.IsNullOrWhiteSpace(childExpr))
-                        sb.AppendLine(childExpr);
+                    case "operand":
+                        if (style == "unit")
+                        {
+                            // Unit - push as is
+                            stack.Push(ConvertUnit(value));
+                        }
+                        else if (style == "string")
+                        {
+                            // String literal
+                            stack.Push($"\"{value}\"");
+                        }
+                        else
+                        {
+                            // Variable or number
+                            stack.Push(ConvertIdentifier(value));
+                        }
+                        break;
+
+                    case "operator":
+                        if (args >= 2 && stack.Count >= 2)
+                        {
+                            var right = stack.Pop();
+                            var left = stack.Pop();
+                            var result = ApplyOperator(value, left, right);
+                            stack.Push(result);
+                        }
+                        else if (args == 1 && stack.Count >= 1)
+                        {
+                            var operand = stack.Pop();
+                            var result = ApplyUnaryOperator(value, operand);
+                            stack.Push(result);
+                        }
+                        else
+                        {
+                            _warnings.Add($"Operador '{value}' con argumentos insuficientes");
+                        }
+                        break;
+
+                    case "function":
+                        if (args > 0 && stack.Count >= args)
+                        {
+                            var funcArgs = new List<string>();
+                            for (int i = 0; i < args; i++)
+                            {
+                                funcArgs.Insert(0, stack.Pop());
+                            }
+                            var result = ApplyFunction(value, funcArgs);
+                            stack.Push(result);
+                        }
+                        else if (args == 0)
+                        {
+                            // Function with no args (constant)
+                            stack.Push(ConvertFunction(value, new List<string>()));
+                        }
+                        else
+                        {
+                            _warnings.Add($"Función '{value}' con argumentos insuficientes (necesita {args}, hay {stack.Count})");
+                        }
+                        break;
+
+                    case "bracket":
+                        // Brackets are typically handled implicitly in RPN
+                        break;
+
+                    default:
+                        // Unknown type - try to use as operand
+                        if (!string.IsNullOrWhiteSpace(value))
+                        {
+                            stack.Push(value);
+                        }
+                        break;
                 }
-                return sb.ToString().Trim();
             }
 
-            return directValue ?? "";
+            if (stack.Count == 1)
+            {
+                return stack.Pop();
+            }
+            else if (stack.Count > 1)
+            {
+                // Multiple values on stack - might be a display expression
+                return string.Join(" ", stack.Reverse());
+            }
+
+            return "";
         }
 
         /// <summary>
-        /// Procesa una expresión SMath específica
+        /// Aplica un operador binario
         /// </summary>
-        private string ProcessSMathExpression(XElement expr)
+        private string ApplyOperator(string op, string left, string right)
         {
-            var sb = new StringBuilder();
-
-            // SMath uses operators like ≔ for assignment
-            // We need to convert to Calcpad syntax
-
-            foreach (var node in expr.Nodes())
+            switch (op)
             {
-                if (node is XElement el)
+                case ":":
+                case "≔":
+                case ":=":
+                    // Assignment operator
+                    return $"{left} = {right}";
+
+                case "→":
+                case "=":
+                    // Evaluation/equality
+                    return $"{left} = {right}";
+
+                case "+":
+                    return $"{left} + {right}";
+
+                case "-":
+                    return NeedsParens(right, "-") ? $"{left} - ({right})" : $"{left} - {right}";
+
+                case "*":
+                case "·":
+                case "×":
+                    var leftP = NeedsParens(left, "*") ? $"({left})" : left;
+                    var rightP = NeedsParens(right, "*") ? $"({right})" : right;
+                    return $"{leftP}*{rightP}";
+
+                case "/":
+                case "÷":
+                    rightP = NeedsParens(right, "/") ? $"({right})" : right;
+                    return $"{left}/{rightP}";
+
+                case "^":
+                    leftP = NeedsParens(left, "^") ? $"({left})" : left;
+                    rightP = NeedsParens(right, "^") ? $"({right})" : right;
+                    return $"{leftP}^{rightP}";
+
+                case "%":
+                    return $"{left} % {right}";
+
+                case "<":
+                case ">":
+                case "≤":
+                case "<=":
+                case "≥":
+                case ">=":
+                case "==":
+                case "≠":
+                case "!=":
+                    return $"{left} {ConvertComparisonOp(op)} {right}";
+
+                case "∧":
+                case "and":
+                    return $"{left} ∧ {right}";
+
+                case "∨":
+                case "or":
+                    return $"{left} ∨ {right}";
+
+                default:
+                    return $"{left} {op} {right}";
+            }
+        }
+
+        /// <summary>
+        /// Aplica un operador unario
+        /// </summary>
+        private string ApplyUnaryOperator(string op, string operand)
+        {
+            switch (op)
+            {
+                case "-":
+                    return $"-{operand}";
+                case "+":
+                    return operand;
+                case "!":
+                    return $"{operand}!";
+                case "√":
+                    return $"sqrt({operand})";
+                case "²":
+                    return $"{operand}^2";
+                case "³":
+                    return $"{operand}^3";
+                default:
+                    return $"{op}({operand})";
+            }
+        }
+
+        /// <summary>
+        /// Aplica una función
+        /// </summary>
+        private string ApplyFunction(string funcName, List<string> args)
+        {
+            var calcpadFunc = ConvertFunctionName(funcName);
+
+            // Special handling for certain functions
+            switch (funcName.ToLowerInvariant())
+            {
+                case "mat":
+                case "matrix":
+                    // Matrix creation - args are: elements..., rows, cols
+                    return CreateMatrix(args);
+
+                case "vec":
+                case "vector":
+                    // Vector creation
+                    return $"[{string.Join("; ", args)}]";
+
+                case "sys":
+                case "augment":
+                    // System of equations or augmented matrix
+                    return $"[{string.Join(" | ", args)}]";
+
+                default:
+                    return $"{calcpadFunc}({string.Join("; ", args)})";
+            }
+        }
+
+        /// <summary>
+        /// Crea una matriz desde los argumentos de la función mat()
+        /// </summary>
+        private string CreateMatrix(List<string> args)
+        {
+            if (args.Count < 2)
+                return $"[{string.Join("; ", args)}]";
+
+            // Last two args are typically rows and cols counts
+            // But in SMath, mat(a,b,c,rows,cols) creates a matrix
+            // Try to parse the dimensions
+            if (int.TryParse(args[args.Count - 2], out int rows) &&
+                int.TryParse(args[args.Count - 1], out int cols))
+            {
+                var elements = args.Take(args.Count - 2).ToList();
+
+                if (elements.Count == rows * cols || elements.Count == rows)
                 {
-                    var localName = el.Name.LocalName.ToLowerInvariant();
-                    switch (localName)
+                    // Build matrix in Calcpad format [row1 | row2 | ...]
+                    var sb = new StringBuilder("[");
+
+                    if (rows == 1 || cols == 1)
                     {
-                        case "v": // Variable
-                        case "var":
-                        case "id":
-                            sb.Append(CleanIdentifier(el.Value));
-                            break;
-                        case "n": // Number
-                        case "num":
-                        case "real":
-                            sb.Append(el.Value);
-                            break;
-                        case "o": // Operator
-                        case "op":
-                            var op = el.Value?.Trim();
-                            sb.Append(ConvertOperator(op));
-                            break;
-                        case "f": // Function
-                        case "func":
-                            sb.Append(ConvertFunction(el));
-                            break;
-                        case "mat": // Matrix
-                        case "matrix":
-                            sb.Append(ProcessMatrix(el));
-                            break;
-                        case "vec": // Vector
-                        case "vector":
-                            sb.Append(ProcessVector(el));
-                            break;
-                        default:
-                            // Recurse into unknown elements
-                            sb.Append(ProcessSMathExpression(el));
-                            break;
+                        // Vector
+                        sb.Append(string.Join("; ", elements));
                     }
-                }
-                else if (node is XText text)
-                {
-                    sb.Append(text.Value);
+                    else
+                    {
+                        // Matrix - elements might be in row or column major order
+                        for (int r = 0; r < rows && r * cols < elements.Count; r++)
+                        {
+                            if (r > 0) sb.Append(" | ");
+                            var rowElements = new List<string>();
+                            for (int c = 0; c < cols && r * cols + c < elements.Count; c++)
+                            {
+                                rowElements.Add(elements[r * cols + c]);
+                            }
+                            sb.Append(string.Join("; ", rowElements));
+                        }
+                    }
+
+                    sb.Append("]");
+                    return sb.ToString();
                 }
             }
 
-            return sb.ToString();
+            // Fallback - just create a simple vector
+            return $"[{string.Join("; ", args)}]";
         }
 
         /// <summary>
-        /// Convierte operadores de SMath a Calcpad
+        /// Convierte nombre de función de SMath a Calcpad
         /// </summary>
-        private string ConvertOperator(string op)
+        private string ConvertFunctionName(string funcName)
         {
-            return op switch
-            {
-                "≔" => " = ",      // Assignment
-                ":=" => " = ",     // Assignment
-                "→" => " = ",      // Evaluation
-                "·" => "*",        // Multiplication
-                "×" => "*",        // Multiplication
-                "÷" => "/",        // Division
-                "²" => "^2",       // Square
-                "³" => "^3",       // Cube
-                "√" => "sqrt",     // Square root
-                "∑" => "sum",      // Sum
-                "∏" => "product",  // Product
-                "∫" => "integral", // Integral
-                "π" => "π",        // Pi
-                "∞" => "∞",        // Infinity
-                _ => op ?? ""
-            };
-        }
-
-        /// <summary>
-        /// Convierte funciones de SMath a Calcpad
-        /// </summary>
-        private string ConvertFunction(XElement func)
-        {
-            var funcName = func.Attribute("name")?.Value ?? func.Value;
-            var args = func.Elements().Select(e => ProcessSMathExpression(e));
-
-            // Map SMath function names to Calcpad
-            var calcpadFunc = funcName?.ToLowerInvariant() switch
+            return funcName?.ToLowerInvariant() switch
             {
                 "sqrt" => "sqrt",
                 "sin" => "sin",
@@ -383,143 +548,307 @@ namespace Calcpad.Common
                 "asin" => "asin",
                 "acos" => "acos",
                 "atan" => "atan",
+                "atan2" => "atan2",
+                "sinh" => "sinh",
+                "cosh" => "cosh",
+                "tanh" => "tanh",
                 "log" => "log",
+                "log10" => "log",
                 "ln" => "ln",
                 "exp" => "exp",
                 "abs" => "abs",
                 "floor" => "floor",
                 "ceil" => "ceiling",
+                "ceiling" => "ceiling",
                 "round" => "round",
+                "trunc" => "trunc",
+                "sign" => "sign",
                 "max" => "max",
                 "min" => "min",
                 "sum" => "sum",
+                "product" => "product",
                 "det" => "det",
                 "transpose" => "transp",
+                "transp" => "transp",
                 "inverse" => "inv",
-                _ => funcName
+                "inv" => "inv",
+                "identity" => "identity",
+                "diagonal" => "diagonal",
+                "eigenvalues" => "eigenvalues",
+                "eigenvectors" => "eigenvectors",
+                "rank" => "rank",
+                "trace" => "trace",
+                "norm" => "norm",
+                "cross" => "cross",
+                "dot" => "dot",
+                "if" => "if",
+                "mod" => "mod",
+                "gcd" => "gcd",
+                "lcm" => "lcm",
+                "fact" => "fact",
+                "comb" => "comb",
+                "perm" => "perm",
+                "random" => "random",
+                _ => funcName ?? "unknown"
             };
-
-            return $"{calcpadFunc}({string.Join("; ", args)})";
         }
 
         /// <summary>
-        /// Procesa una matriz de SMath
+        /// Convierte identificador de SMath a Calcpad
         /// </summary>
-        private string ProcessMatrix(XElement matrix)
-        {
-            var rows = matrix.Elements("row").ToList();
-            if (rows.Count == 0)
-            {
-                rows = matrix.Elements("r").ToList();
-            }
-            if (rows.Count == 0)
-            {
-                // Try to parse inline
-                return $"[{matrix.Value}]";
-            }
-
-            var sb = new StringBuilder("[");
-            for (int r = 0; r < rows.Count; r++)
-            {
-                if (r > 0) sb.Append(" | ");
-
-                var cells = rows[r].Elements().ToList();
-                for (int c = 0; c < cells.Count; c++)
-                {
-                    if (c > 0) sb.Append("; ");
-                    sb.Append(ProcessSMathExpression(cells[c]));
-                }
-            }
-            sb.Append("]");
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Procesa un vector de SMath
-        /// </summary>
-        private string ProcessVector(XElement vector)
-        {
-            var elements = vector.Elements().ToList();
-            if (elements.Count == 0)
-            {
-                return $"[{vector.Value}]";
-            }
-
-            var values = elements.Select(e => ProcessSMathExpression(e));
-            return $"[{string.Join("; ", values)}]";
-        }
-
-        /// <summary>
-        /// Procesa una región de texto
-        /// </summary>
-        private void ProcessTextRegion(XElement region)
-        {
-            var content = region.Value?.Trim();
-            if (!string.IsNullOrEmpty(content))
-            {
-                // Convert to Calcpad comment
-                foreach (var line in content.Split('\n'))
-                {
-                    _output.AppendLine($"' {line.Trim()}");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Limpia un identificador
-        /// </summary>
-        private string CleanIdentifier(string id)
+        private string ConvertIdentifier(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return "";
 
-            // Remove subscript markers
-            id = Regex.Replace(id, @"_(\d+)", "$1");
+            // Check if it's a number (don't replace dots in numbers like 1.35)
+            // Also handle comma as decimal separator (Russian locale)
+            var normalizedId = id.Replace(',', '.');
+            if (double.TryParse(normalizedId, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out _))
+            {
+                return normalizedId; // Return number with normalized decimal point
+            }
 
-            // Convert common Greek letters
+            // Replace dots with underscores for variable names (R.y -> R_y)
+            id = id.Replace(".", "_");
+
+            // Handle Greek letter names
             id = id.Replace("alpha", "α")
                    .Replace("beta", "β")
                    .Replace("gamma", "γ")
                    .Replace("delta", "δ")
                    .Replace("epsilon", "ε")
+                   .Replace("zeta", "ζ")
+                   .Replace("eta", "η")
                    .Replace("theta", "θ")
+                   .Replace("iota", "ι")
+                   .Replace("kappa", "κ")
                    .Replace("lambda", "λ")
                    .Replace("mu", "μ")
+                   .Replace("nu", "ν")
+                   .Replace("xi", "ξ")
+                   .Replace("omicron", "ο")
                    .Replace("pi", "π")
+                   .Replace("rho", "ρ")
                    .Replace("sigma", "σ")
+                   .Replace("tau", "τ")
+                   .Replace("upsilon", "υ")
+                   .Replace("phi", "φ")
+                   .Replace("chi", "χ")
+                   .Replace("psi", "ψ")
                    .Replace("omega", "ω");
 
             return id.Trim();
         }
 
         /// <summary>
-        /// Limpia una expresión para Calcpad
+        /// Convierte unidades de SMath a Calcpad
+        /// </summary>
+        private string ConvertUnit(string unit)
+        {
+            // Most units are the same, but some need conversion
+            return unit switch
+            {
+                "М" => "M",      // Russian M
+                "м" => "m",      // Russian m (meters)
+                "мм" => "mm",    // Russian mm
+                "см" => "cm",    // Russian cm
+                "кг" => "kg",    // Russian kg
+                "Н" => "N",      // Russian N (Newton)
+                "Па" => "Pa",    // Russian Pa
+                "МПа" => "MPa",  // Russian MPa
+                "кН" => "kN",    // Russian kN
+                _ => unit
+            };
+        }
+
+        /// <summary>
+        /// Convierte operador de comparación
+        /// </summary>
+        private string ConvertComparisonOp(string op)
+        {
+            return op switch
+            {
+                "≤" => "≤",
+                "<=" => "≤",
+                "≥" => "≥",
+                ">=" => "≥",
+                "≠" => "≠",
+                "!=" => "≠",
+                "==" => "≡",
+                _ => op
+            };
+        }
+
+        /// <summary>
+        /// Determina si una expresión necesita paréntesis
+        /// </summary>
+        private bool NeedsParens(string expr, string contextOp)
+        {
+            if (string.IsNullOrEmpty(expr)) return false;
+
+            // If it contains +, - and we're doing * or /
+            if ((contextOp == "*" || contextOp == "/") &&
+                (expr.Contains("+") || expr.Contains("-")))
+            {
+                return true;
+            }
+
+            // If it contains +, -, *, / and we're doing ^
+            if (contextOp == "^" &&
+                (expr.Contains("+") || expr.Contains("-") ||
+                 expr.Contains("*") || expr.Contains("/")))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Procesa una región de texto
+        /// </summary>
+        private void ProcessTextRegion(XElement text, XNamespace ns)
+        {
+            var content = GetTextContent(text);
+            if (!string.IsNullOrEmpty(content))
+            {
+                foreach (var line in content.Split('\n'))
+                {
+                    var trimmed = line.Trim();
+                    if (!string.IsNullOrEmpty(trimmed))
+                    {
+                        _output.AppendLine($"' {trimmed}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Extrae contenido de texto de un elemento
+        /// </summary>
+        private string GetTextContent(XElement element)
+        {
+            // Try to get from content/p structure
+            var content = element.Descendants().FirstOrDefault(e => e.Name.LocalName == "content");
+            if (content != null)
+            {
+                var paragraphs = content.Descendants().Where(e => e.Name.LocalName == "p");
+                var text = string.Join("\n", paragraphs.Select(p => p.Value));
+                if (!string.IsNullOrEmpty(text))
+                    return text;
+            }
+
+            // Fallback to direct value
+            return element.Value?.Trim() ?? "";
+        }
+
+        /// <summary>
+        /// Limpia una expresión final
         /// </summary>
         private string CleanExpression(string expr)
         {
             if (string.IsNullOrEmpty(expr))
                 return "";
 
-            // Convert assignment operators
-            expr = expr.Replace("≔", "=")
-                       .Replace(":=", "=")
-                       .Replace("→", "=");
-
-            // Convert multiplication
-            expr = expr.Replace("·", "*")
-                       .Replace("×", "*");
-
-            // Convert division
-            expr = expr.Replace("÷", "/");
-
-            // Convert powers
-            expr = expr.Replace("²", "^2")
-                       .Replace("³", "^3");
-
-            // Clean up whitespace
+            // Remove excessive whitespace
             expr = Regex.Replace(expr, @"\s+", " ").Trim();
 
+            // Remove unnecessary outer parentheses from the whole expression
+            while (expr.StartsWith("(") && expr.EndsWith(")") && IsMatchingParens(expr))
+            {
+                expr = expr.Substring(1, expr.Length - 2);
+            }
+
             return expr;
+        }
+
+        /// <summary>
+        /// Verifica si los paréntesis externos coinciden
+        /// </summary>
+        private bool IsMatchingParens(string expr)
+        {
+            int depth = 0;
+            for (int i = 0; i < expr.Length - 1; i++)
+            {
+                if (expr[i] == '(') depth++;
+                else if (expr[i] == ')') depth--;
+
+                if (depth == 0) return false; // Parentheses closed before end
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Convierte una función con sus argumentos
+        /// </summary>
+        private string ConvertFunction(string funcName, List<string> args)
+        {
+            var calcpadFunc = ConvertFunctionName(funcName);
+            if (args.Count == 0)
+                return calcpadFunc;
+            return $"{calcpadFunc}({string.Join("; ", args)})";
+        }
+
+        /// <summary>
+        /// Procesa una región de imagen (picture) de SMath Studio
+        /// SMath embebe imágenes como: <picture><raw format="png" encoding="base64">...</raw></picture>
+        /// </summary>
+        private void ProcessPictureRegion(XElement picture, XNamespace ns)
+        {
+            try
+            {
+                // SMath stores images as <raw format="png" encoding="base64">base64data</raw>
+                var raw = picture.Element(ns + "raw");
+                if (raw == null)
+                {
+                    // Try without namespace
+                    raw = picture.Element("raw");
+                }
+
+                if (raw == null)
+                {
+                    _warnings.Add("Imagen encontrada pero sin elemento <raw>");
+                    return;
+                }
+
+                // Get format (png, jpg, etc.)
+                var format = raw.Attribute("format")?.Value ?? "png";
+                var encoding = raw.Attribute("encoding")?.Value ?? "base64";
+
+                if (encoding.ToLower() != "base64")
+                {
+                    _warnings.Add($"Codificación de imagen no soportada: {encoding}");
+                    return;
+                }
+
+                // Get the Base64 content
+                var base64Content = raw.Value?.Trim();
+                if (string.IsNullOrWhiteSpace(base64Content))
+                {
+                    _warnings.Add("Imagen sin contenido Base64");
+                    return;
+                }
+
+                // Clean up whitespace from Base64
+                base64Content = base64Content
+                    .Replace("\n", "")
+                    .Replace("\r", "")
+                    .Replace(" ", "")
+                    .Replace("\t", "");
+
+                // Generate @{image} directive for Calcpad/GlobalParser
+                _output.AppendLine();
+                _output.AppendLine($"@{{image {format} base64}}");
+                _output.AppendLine(base64Content);
+                _output.AppendLine("@{end image}");
+                _output.AppendLine();
+            }
+            catch (Exception ex)
+            {
+                _warnings.Add($"Error al procesar imagen: {ex.Message}");
+            }
         }
     }
 }

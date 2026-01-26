@@ -129,10 +129,18 @@ namespace Calcpad.Core
                         }
                         else if (hasOperators && res != subst || string.IsNullOrEmpty(subst))
                         {
-                            if (_stringBuilder.Length > 0)
-                                _stringBuilder.Append(assignment);
+                            // Skip adding result if it's a vector/matrix that would duplicate
+                            var isVectorOrMatrix = _parser._result is Vector || _parser._result is Matrix;
+                            var wouldDuplicate = isVectorOrMatrix && !string.IsNullOrEmpty(subst) &&
+                                _stringBuilder.ToString().EndsWith(subst);
 
-                            _stringBuilder.Append(res);
+                            if (!wouldDuplicate)
+                            {
+                                if (_stringBuilder.Length > 0)
+                                    _stringBuilder.Append(assignment);
+
+                                _stringBuilder.Append(res);
+                            }
                         }
                         if (splitted)
                             _stringBuilder.Append("</span>");
