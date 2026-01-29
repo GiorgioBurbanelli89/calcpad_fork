@@ -1,0 +1,8 @@
+'<h1>Test IFC Directo - Sin Fragments</h1>
+'<p>Probando carga directa del archivo IFC grande (sin conversión a Fragments)</p>
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Galpon_A (1).ifc
+@{end ifc}
+
+'<p>Este visor usa web-ifc directamente sin conversión previa.</p>

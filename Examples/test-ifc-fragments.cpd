@@ -1,0 +1,23 @@
+'<h1>Test IFC Fragments - Silvia Cedeño</h1>
+'
+'<p>Este test usa ThatOpen Fragments para optimizar la carga.</p>
+'
+'<h2>Método 1: IFC Normal (sin fragmentar)</h2>
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc}
+
+'<h2>Método 2: IFC con Fragments (optimizado)</h2>
+
+@{ifc-fragment}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc-fragment}
+
+'<h2>Comparación de Tiempos</h2>
+'<p>Los comentarios HTML arriba muestran los tiempos de:</p>
+'<ul>
+'<li><b>Fragmentación:</b> Tiempo de conversión IFC → Fragments</li>
+'<li><b>Conversión total:</b> Tiempo proceso completo en C#</li>
+'<li><b>Tiempo carga:</b> Tiempo de carga en el navegador</li>
+'</ul>

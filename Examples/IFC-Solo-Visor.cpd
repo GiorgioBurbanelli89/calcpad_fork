@@ -1,0 +1,156 @@
+"VISOR IFC - SOLO LO ESENCIAL (SIN BOTONES)
+'==========================================
+
+@{code}
+@{html-ifc}
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { margin: 0; background: #1a1a1a; }
+#viewer { width: 100%; height: 500px; }
+canvas { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<div id="viewer">
+    <canvas id="canvas"></canvas>
+</div>
+
+<script src="https://calcpad.ifc/three.min.js"></script>
+<script src="https://calcpad.ifc/OrbitControls.js"></script>
+<script src="https://calcpad.ifc/web-ifc-api-iife.js"></script>
+
+<script>
+(async () => {
+    // 1. ELEMENTOS DOM
+    const canvas = document.getElementById('canvas');
+    const container = document.getElementById('viewer');
+
+    // 2. ESCENA
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1a1a);
+
+    // 3. CÁMARA
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 10000);
+    camera.position.set(20, 20, 20);
+
+    // 4. RENDERER
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+
+    // 5. CONTROLES (rotar con mouse)
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    // 6. LUCES
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const luz = new THREE.DirectionalLight(0xffffff, 0.8);
+    luz.position.set(50, 100, 50);
+    scene.add(luz);
+
+    // 7. GRID
+    scene.add(new THREE.GridHelper(50, 50, 0x444444, 0x333333));
+
+    // 8. CARGAR IFC
+    const ifcApi = new WebIFC.IfcAPI();
+    await ifcApi.Init(p => p.endsWith('.wasm') ? 'https://calcpad.ifc/' + p : p);
+
+    const response = await fetch('https://calcpad.ifc/modelo.ifc');
+    const data = await response.arrayBuffer();
+    const modelID = ifcApi.OpenModel(new Uint8Array(data));
+    const flatMeshes = ifcApi.LoadAllGeometry(modelID);
+
+    // 9. CONVERTIR IFC A THREE.JS
+    const grupo = new THREE.Group();
+
+    for (let i = 0; i < flatMeshes.size(); i++) {
+        const fm = flatMeshes.get(i);
+        for (let j = 0; j < fm.geometries.size(); j++) {
+            const pg = fm.geometries.get(j);
+            const geom = ifcApi.GetGeometry(modelID, pg.geometryExpressID);
+            const verts = ifcApi.GetVertexArray(geom.GetVertexData(), geom.GetVertexDataSize());
+            const indices = ifcApi.GetIndexArray(geom.GetIndexData(), geom.GetIndexDataSize());
+
+            if (!verts.length || !indices.length) continue;
+
+            // Extraer posiciones (cada 6 valores: x,y,z,nx,ny,nz)
+            const positions = new Float32Array(verts.length / 2);
+            for (let k = 0; k < verts.length; k += 6) {
+                const n = (k / 6) * 3;
+                positions[n] = verts[k];
+                positions[n + 1] = verts[k + 1];
+                positions[n + 2] = verts[k + 2];
+            }
+
+            // Crear geometría
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+            geometry.computeVertexNormals();
+
+            // Crear material con color del IFC
+            const material = new THREE.MeshPhongMaterial({
+                color: new THREE.Color(pg.color.x, pg.color.y, pg.color.z),
+                side: THREE.DoubleSide,
+                transparent: pg.color.w < 1,
+                opacity: pg.color.w
+            });
+
+            // Crear mesh y aplicar transformación
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.applyMatrix4(new THREE.Matrix4().fromArray(pg.flatTransformation));
+            grupo.add(mesh);
+        }
+    }
+
+    scene.add(grupo);
+    ifcApi.CloseModel(modelID);
+
+    // 10. CENTRAR VISTA EN EL MODELO
+    const box = new THREE.Box3().setFromObject(grupo);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = Math.max(...box.getSize(new THREE.Vector3()).toArray());
+
+    camera.position.set(center.x + size, center.y + size, center.z + size);
+    controls.target.copy(center);
+    controls.update();
+
+    // 11. LOOP DE ANIMACIÓN
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    animate();
+
+})();
+</script>
+
+</body>
+</html>
+@{end code}
+
+"EXPLICACIÓN:
+'============
+'Línea 1-2: @{code} y @{html-ifc} activan el modo HTML con librerías IFC
+'Línea 5-8: CSS mínimo (fondo negro, tamaño del contenedor)
+'Línea 12-14: HTML mínimo (div contenedor + canvas)
+'Línea 16-18: Cargar las 3 librerías necesarias
+'Línea 21-22: Obtener elementos del DOM
+'Línea 24-25: Crear escena con fondo oscuro
+'Línea 27-29: Crear cámara perspectiva
+'Línea 31-32: Crear renderer WebGL
+'Línea 34-36: Crear controles de órbita (rotar/zoom con mouse)
+'Línea 38-41: Agregar luces (ambiental + direccional)
+'Línea 43: Agregar grid de referencia
+'Línea 45-50: Inicializar web-ifc y cargar archivo
+'Línea 52-80: Convertir geometría IFC a meshes Three.js
+'Línea 82-88: Centrar cámara en el modelo
+'Línea 90-94: Loop de animación (necesario para renderizar)
+
+"CONTROLES:
+'- Click + Arrastrar = Rotar
+'- Scroll = Zoom
+'- Click derecho + Arrastrar = Pan

@@ -1,0 +1,30 @@
+"Ejemplo de Visor IFC en Calcpad"
+'Demostración de integración IFC 3D
+
+'=== Cálculos Estructurales ===
+L = 6 | m
+b = 0.30 | m
+h = 0.50 | m
+q = 15 | kN/m
+
+'Momento máximo
+M_max = q*L^2/8
+
+'Cortante máximo
+V_max = q*L/2
+
+"Visualización 3D del Modelo IFC"
+'Para visualizar un archivo IFC, usa la sintaxis:
+'@{ifc}
+'C:\ruta\al\archivo.ifc
+'@{end ifc}
+
+'NOTA: Reemplaza la ruta con tu archivo IFC
+'O haz clic en el botón IFC en la toolbar para abrir un archivo
+
+'También puedes usar el botón IFC en la toolbar (icono azul a la izquierda de Jupyter)
+'para abrir archivos IFC directamente en el visor 3D
+
+"Resultados"
+M_max = ? | kN·m
+V_max = ? | kN

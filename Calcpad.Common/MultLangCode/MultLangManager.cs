@@ -710,6 +710,10 @@ namespace Calcpad.Common.MultLangCode
             int blockStart = -1;
             var currentBlock = new StringBuilder();
 
+            // Track if we're inside a @{columns} block to preserve nested directives
+            bool insideColumns = false;
+            int columnsDepth = 0;
+
             try
             {
                 var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
@@ -730,7 +734,7 @@ namespace Calcpad.Common.MultLangCode
                         var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
                         var linePreview = lines[i].Length > 50 ? lines[i].Substring(0, 50) : lines[i];
                         File.AppendAllText(debugPath,
-                            $"[{DateTime.Now:HH:mm:ss}] Line {i}: DetectDirective('{linePreview}') returned: found={found}, lang='{langName}', isEnd={isEnd}\n");
+                            $"[{DateTime.Now:HH:mm:ss}] Line {i}: DetectDirective('{linePreview}') returned: found={found}, lang='{langName}', isEnd={isEnd}, insideColumns={insideColumns}\n");
                     }
                     catch { }
                 }
@@ -740,9 +744,64 @@ namespace Calcpad.Common.MultLangCode
                     try
                     {
                         var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
-                        File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Line {i}: Directive found - lang='{langName}', isEnd={isEnd}, currentLang='{currentLanguage}'\n");
+                        File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Line {i}: Directive found - lang='{langName}', isEnd={isEnd}, currentLang='{currentLanguage}', insideColumns={insideColumns}, depth={columnsDepth}\n");
                     }
                     catch { }
+
+                    // Special handling for @{columns} - track depth to preserve nested directives
+                    if (langName.StartsWith("columns", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!isEnd)
+                        {
+                            insideColumns = true;
+                            columnsDepth++;
+
+                            try
+                            {
+                                var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                                File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Entering @{{columns}} block, depth now = {columnsDepth}\n");
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            columnsDepth--;
+                            if (columnsDepth == 0)
+                            {
+                                insideColumns = false;
+                            }
+
+                            try
+                            {
+                                var debugPath = Path.Combine(Path.GetTempPath(), "calcpad-debug.txt");
+                                File.AppendAllText(debugPath, $"[{DateTime.Now:HH:mm:ss}] Exiting @{{columns}} block, depth now = {columnsDepth}\n");
+                            }
+                            catch { }
+                        }
+                    }
+
+                    // If we're inside columns and this is a nested directive (not the columns directive itself), treat as content
+                    if (insideColumns && currentLanguage != null &&
+                        currentLanguage.StartsWith("columns", StringComparison.OrdinalIgnoreCase) &&
+                        !langName.StartsWith("columns", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Add the directive line as content (preserve nested directives)
+                        currentBlock.AppendLine(lines[i]);
+                        continue;
+                    }
+
+                    // If we're inside @{code} or @{ucode} wrapper and this is a nested directive, treat as content
+                    // This allows @{code} and @{ucode} to wrap @{html-ifc} and other blocks
+                    if (currentLanguage != null &&
+                        (currentLanguage.Equals("code", StringComparison.OrdinalIgnoreCase) ||
+                         currentLanguage.Equals("ucode", StringComparison.OrdinalIgnoreCase)) &&
+                        !langName.Equals("code", StringComparison.OrdinalIgnoreCase) &&
+                        !langName.Equals("ucode", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Add the directive line as content (preserve nested directives like @{html-ifc})
+                        currentBlock.AppendLine(lines[i]);
+                        continue;
+                    }
 
                     if (isEnd && currentLanguage == langName)
                     {

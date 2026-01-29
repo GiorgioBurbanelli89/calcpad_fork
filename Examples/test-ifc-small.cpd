@@ -1,0 +1,8 @@
+'<h1>Test IFC Pequeño - Silvia Cedeño</h1>
+'<p>Probando con archivo IFC pequeño para verificar el visor</p>
+
+@{ifc-fragment}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc-fragment}
+
+'<p>Este archivo es de 242 KB, debería cargar rápido.</p>

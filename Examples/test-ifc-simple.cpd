@@ -1,0 +1,9 @@
+'<h1>Test Visor IFC - Silvia Cedeno (242 KB)</h1>
+'
+'<p>Archivo pequeno para verificar que el visor funciona correctamente.</p>
+
+@{ifc}
+C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\Silvia Cedeño.ifc
+@{end ifc}
+
+'<h2>Si ves el modelo 3D arriba, el visor funciona</h2>

@@ -1,0 +1,343 @@
+@{code}
+@{html-ifc}
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Quitar márgenes del body */
+body { margin: 0; background: #1a1a1a; }
+
+/* Contenedor del visor - DEBE tener altura definida */
+#viewer { width: 100%; height: 500px; }
+
+/* Canvas ocupa todo el contenedor */
+canvas { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<!-- Contenedor principal -->
+<div id="viewer">
+    <!-- Canvas donde Three.js dibuja el 3D -->
+    <canvas id="canvas"></canvas>
+</div>
+
+<!-- LIBRERÍA 1: Three.js - Motor de gráficos 3D -->
+<script src="https://calcpad.ifc/three.min.js"></script>
+
+<!-- LIBRERÍA 2: OrbitControls - Permite rotar/zoom con mouse -->
+<script src="https://calcpad.ifc/OrbitControls.js"></script>
+
+<!-- LIBRERÍA 3: web-ifc - Lee y parsea archivos IFC -->
+<script src="https://calcpad.ifc/web-ifc-api-iife.js"></script>
+
+<script>
+// Función autoejecutable async (para poder usar await)
+(async () => {
+
+    // ==========================================
+    // PASO 1: OBTENER ELEMENTOS HTML
+    // ==========================================
+
+    // Obtener el canvas donde se dibujará el 3D
+    const canvas = document.getElementById('canvas');
+
+    // Obtener el contenedor (para saber su tamaño)
+    const container = document.getElementById('viewer');
+
+    // ==========================================
+    // PASO 2: CREAR LA ESCENA
+    // ==========================================
+
+    // La escena es el "mundo 3D" donde ponemos objetos
+    const scene = new THREE.Scene();
+
+    // Color de fondo de la escena (gris oscuro)
+    scene.background = new THREE.Color(0x1a1a1a);
+
+    // ==========================================
+    // PASO 3: CREAR LA CÁMARA
+    // ==========================================
+
+    // PerspectiveCamera simula visión humana (objetos lejanos se ven pequeños)
+    // Parámetros: (ángulo de visión, aspecto, plano cercano, plano lejano)
+    const camera = new THREE.PerspectiveCamera(
+        75,                                              // FOV: campo de visión en grados
+        container.clientWidth / container.clientHeight,  // Aspect ratio (ancho/alto)
+        0.1,                                             // Near: distancia mínima visible
+        10000                                            // Far: distancia máxima visible
+    );
+
+    // Posición inicial de la cámara (x, y, z)
+    camera.position.set(20, 20, 20);
+
+    // ==========================================
+    // PASO 4: CREAR EL RENDERER
+    // ==========================================
+
+    // El renderer dibuja la escena en el canvas
+    const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,    // Canvas donde dibujar
+        antialias: true    // Suavizar bordes (mejor calidad)
+    });
+
+    // Establecer tamaño del renderer igual al contenedor
+    renderer.setSize(container.clientWidth, container.clientHeight);
+
+    // ==========================================
+    // PASO 5: CREAR CONTROLES DE ÓRBITA
+    // ==========================================
+
+    // OrbitControls permite rotar/zoom/pan con el mouse
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    // Damping = suavizado del movimiento
+    controls.enableDamping = true;
+
+    // ==========================================
+    // PASO 6: AGREGAR LUCES
+    // ==========================================
+
+    // Luz ambiental: ilumina todo uniformemente (sin sombras)
+    // Parámetros: (color, intensidad)
+    const luzAmbiental = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(luzAmbiental);
+
+    // Luz direccional: como el sol, viene de una dirección
+    const luzDireccional = new THREE.DirectionalLight(0xffffff, 0.8);
+    luzDireccional.position.set(50, 100, 50);  // Posición de la luz
+    scene.add(luzDireccional);
+
+    // ==========================================
+    // PASO 7: AGREGAR GRID (CUADRÍCULA)
+    // ==========================================
+
+    // GridHelper: cuadrícula en el piso para referencia
+    // Parámetros: (tamaño, divisiones, colorCentral, colorLineas)
+    const grid = new THREE.GridHelper(50, 50, 0x444444, 0x333333);
+    scene.add(grid);
+
+    // ==========================================
+    // PASO 8: INICIALIZAR WEB-IFC
+    // ==========================================
+
+    // Crear instancia de la API de web-ifc
+    const ifcApi = new WebIFC.IfcAPI();
+
+    // Inicializar (necesita saber dónde está el archivo .wasm)
+    await ifcApi.Init(function(path) {
+        // Si pide un archivo .wasm, buscarlo en calcpad.ifc
+        if (path.endsWith('.wasm')) {
+            return 'https://calcpad.ifc/' + path;
+        }
+        return path;
+    });
+
+    // ==========================================
+    // PASO 9: DESCARGAR ARCHIVO IFC
+    // ==========================================
+
+    // URL del archivo IFC (debe estar en resources/ifc/)
+    const urlIfc = 'https://calcpad.ifc/modelo.ifc';
+
+    // Descargar el archivo
+    const response = await fetch(urlIfc);
+
+    // Convertir a ArrayBuffer (datos binarios)
+    const datosIfc = await response.arrayBuffer();
+
+    // ==========================================
+    // PASO 10: ABRIR Y PARSEAR EL IFC
+    // ==========================================
+
+    // Abrir el modelo IFC (retorna un ID)
+    const modelID = ifcApi.OpenModel(new Uint8Array(datosIfc));
+
+    // Cargar toda la geometría del modelo
+    const flatMeshes = ifcApi.LoadAllGeometry(modelID);
+
+    // ==========================================
+    // PASO 11: CREAR GRUPO PARA LOS MESHES
+    // ==========================================
+
+    // Un Group es un contenedor para agrupar objetos
+    const grupo = new THREE.Group();
+
+    // ==========================================
+    // PASO 12: CONVERTIR GEOMETRÍA IFC A THREE.JS
+    // ==========================================
+
+    // Recorrer todos los "flatMesh" del IFC
+    for (let i = 0; i < flatMeshes.size(); i++) {
+
+        // Obtener un flatMesh
+        const flatMesh = flatMeshes.get(i);
+
+        // Cada flatMesh tiene múltiples geometrías
+        for (let j = 0; j < flatMesh.geometries.size(); j++) {
+
+            // Obtener una geometría colocada (placed geometry)
+            const pg = flatMesh.geometries.get(j);
+
+            // Obtener los datos de la geometría
+            const geom = ifcApi.GetGeometry(modelID, pg.geometryExpressID);
+
+            // Obtener array de vértices (posiciones + normales)
+            const vertices = ifcApi.GetVertexArray(
+                geom.GetVertexData(),
+                geom.GetVertexDataSize()
+            );
+
+            // Obtener array de índices (qué vértices forman cada triángulo)
+            const indices = ifcApi.GetIndexArray(
+                geom.GetIndexData(),
+                geom.GetIndexDataSize()
+            );
+
+            // Si no hay datos, saltar
+            if (vertices.length === 0 || indices.length === 0) continue;
+
+            // ==========================================
+            // PASO 13: SEPARAR POSICIONES DE NORMALES
+            // ==========================================
+
+            // Los vértices vienen así: [x,y,z, nx,ny,nz, x,y,z, nx,ny,nz, ...]
+            // Necesitamos separar posiciones (x,y,z) de normales (nx,ny,nz)
+
+            // Array para solo las posiciones
+            const posiciones = new Float32Array(vertices.length / 2);
+
+            // Recorrer de 6 en 6 (cada vértice tiene 6 valores)
+            for (let k = 0; k < vertices.length; k += 6) {
+                // Índice en el array de posiciones
+                const n = (k / 6) * 3;
+
+                // Copiar x, y, z
+                posiciones[n] = vertices[k];         // x
+                posiciones[n + 1] = vertices[k + 1]; // y
+                posiciones[n + 2] = vertices[k + 2]; // z
+            }
+
+            // ==========================================
+            // PASO 14: CREAR BUFFERGEOMETRY
+            // ==========================================
+
+            // BufferGeometry es el formato de Three.js para geometría
+            const geometry = new THREE.BufferGeometry();
+
+            // Agregar atributo de posición
+            geometry.setAttribute(
+                'position',
+                new THREE.BufferAttribute(posiciones, 3)  // 3 valores por vértice (x,y,z)
+            );
+
+            // Agregar índices
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+
+            // Calcular normales automáticamente (para iluminación)
+            geometry.computeVertexNormals();
+
+            // ==========================================
+            // PASO 15: CREAR MATERIAL
+            // ==========================================
+
+            // pg.color tiene el color del elemento IFC (r,g,b,a)
+            const color = new THREE.Color(pg.color.x, pg.color.y, pg.color.z);
+
+            // MeshPhongMaterial responde a la luz
+            const material = new THREE.MeshPhongMaterial({
+                color: color,                    // Color del material
+                side: THREE.DoubleSide,          // Visible desde ambos lados
+                transparent: pg.color.w < 1,     // Transparente si alpha < 1
+                opacity: pg.color.w              // Nivel de opacidad
+            });
+
+            // ==========================================
+            // PASO 16: CREAR MESH Y APLICAR TRANSFORMACIÓN
+            // ==========================================
+
+            // Mesh = Geometría + Material
+            const mesh = new THREE.Mesh(geometry, material);
+
+            // pg.flatTransformation es la matriz 4x4 de transformación
+            const matriz = new THREE.Matrix4().fromArray(pg.flatTransformation);
+
+            // Aplicar la transformación al mesh
+            mesh.applyMatrix4(matriz);
+
+            // Agregar el mesh al grupo
+            grupo.add(mesh);
+        }
+    }
+
+    // ==========================================
+    // PASO 17: AGREGAR GRUPO A LA ESCENA
+    // ==========================================
+
+    scene.add(grupo);
+
+    // ==========================================
+    // PASO 18: CERRAR MODELO IFC (LIBERAR MEMORIA)
+    // ==========================================
+
+    ifcApi.CloseModel(modelID);
+
+    // ==========================================
+    // PASO 19: CALCULAR CENTRO Y TAMAÑO DEL MODELO
+    // ==========================================
+
+    // Box3 calcula el "bounding box" (caja que contiene el objeto)
+    const caja = new THREE.Box3().setFromObject(grupo);
+
+    // Obtener el centro de la caja
+    const centro = caja.getCenter(new THREE.Vector3());
+
+    // Obtener el tamaño de la caja
+    const tamanio = caja.getSize(new THREE.Vector3());
+
+    // Obtener la dimensión más grande
+    const maxDim = Math.max(tamanio.x, tamanio.y, tamanio.z);
+
+    // ==========================================
+    // PASO 20: POSICIONAR CÁMARA
+    // ==========================================
+
+    // Mover cámara para ver todo el modelo
+    camera.position.set(
+        centro.x + maxDim,   // Posición X
+        centro.y + maxDim,   // Posición Y
+        centro.z + maxDim    // Posición Z
+    );
+
+    // Apuntar los controles al centro del modelo
+    controls.target.copy(centro);
+
+    // Actualizar controles
+    controls.update();
+
+    // ==========================================
+    // PASO 21: LOOP DE ANIMACIÓN
+    // ==========================================
+
+    // Esta función se ejecuta ~60 veces por segundo
+    function animate() {
+        // Pedir que se llame de nuevo en el próximo frame
+        requestAnimationFrame(animate);
+
+        // Actualizar controles (necesario para el damping)
+        controls.update();
+
+        // Dibujar la escena
+        renderer.render(scene, camera);
+    }
+
+    // Iniciar el loop
+    animate();
+
+// Fin de la función autoejecutable
+})();
+</script>
+
+</body>
+</html>
+@{end code}

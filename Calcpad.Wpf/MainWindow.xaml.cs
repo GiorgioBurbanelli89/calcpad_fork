@@ -47,7 +47,7 @@ namespace Calcpad.Wpf
                 Name = AppDomain.CurrentDomain.FriendlyName + ".exe";
                 FullName = System.IO.Path.Combine(Path, Name);
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                Title = " Calcpad Fork Branch " + Version[0..(Version.LastIndexOf('.'))];
+                Title = " Hekatan Calc " + Version[0..(Version.LastIndexOf('.'))];
                 DocPath = Path + "doc";
                 if (!Directory.Exists(DocPath))
                     DocPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Calcpad";
@@ -749,6 +749,9 @@ namespace Calcpad.Wpf
             if (r == MessageBoxResult.Cancel)
                 return;
 
+            // Limpiar estado de edición IFC si estaba activo
+            ClearIfcViewerState();
+
             if (_isParsing)
                 _parser.Cancel();
 
@@ -912,32 +915,74 @@ namespace Calcpad.Wpf
 
         private void WriteSettings()
         {
-            WriteRecentFiles();
-            var settings = Properties.Settings.Default;
-            settings.Numbers = Real.IsChecked ?? false ? 'R' : 'C';
-            settings.AutoRun = AutoRunCheckBox.IsChecked ?? false;
-            settings.Angles = Deg.IsChecked ?? false ? 'D' :
-                              Rad.IsChecked ?? false ? 'R' : 'G';
-            settings.Units = UK.IsChecked ?? false ? 'K' : 'S';
-            settings.Equations = Professional.IsChecked ?? false ? 'P' : 'I';
-            settings.Decimals = byte.TryParse(DecimalsTextBox.Text, out byte b) ? b : (byte)2;
-            settings.Substitute = SubstituteCheckBox.IsChecked ?? false;
-            settings.Adaptive = AdaptiveCheckBox.IsChecked ?? false;
-            settings.Shadows = ShadowsCheckBox.IsChecked ?? false;
-            settings.Direction = (byte)LightDirectionComboBox.SelectedIndex;
-            settings.Direction = (byte)LightDirectionComboBox.SelectedIndex;
-            settings.Palette = (byte)ColorScaleComboBox.SelectedIndex;
-            settings.Smooth = SmoothCheckBox.IsChecked ?? false;
-            settings.Browser = (byte)ExternalBrowserComboBox.SelectedIndex;
-            settings.ZeroSmallMatrixElements = ZeroSmallMatrixElementsCheckBox.IsChecked ?? false;
-            settings.MaxOutputCount = int.TryParse(MaxOutputCountTextBox.Text, out int i) ? i : (int)20;
-            settings.Embed = EmbedCheckBox.IsChecked ?? false;  
-            settings.WindowLeft = Left;
-            settings.WindowTop = Top;
-            settings.WindowWidth = Width;
-            settings.WindowHeight = Height;
-            settings.WindowState = (byte)this.WindowState;
-            settings.Save();
+            try
+            {
+                WriteRecentFiles();
+                var settings = Properties.Settings.Default;
+                settings.Numbers = Real.IsChecked ?? false ? 'R' : 'C';
+                settings.AutoRun = AutoRunCheckBox.IsChecked ?? false;
+                settings.Angles = Deg.IsChecked ?? false ? 'D' :
+                                  Rad.IsChecked ?? false ? 'R' : 'G';
+                settings.Units = UK.IsChecked ?? false ? 'K' : 'S';
+                settings.Equations = Professional.IsChecked ?? false ? 'P' : 'I';
+                settings.Decimals = byte.TryParse(DecimalsTextBox.Text, out byte b) ? b : (byte)2;
+                settings.Substitute = SubstituteCheckBox.IsChecked ?? false;
+                settings.Adaptive = AdaptiveCheckBox.IsChecked ?? false;
+                settings.Shadows = ShadowsCheckBox.IsChecked ?? false;
+                settings.Direction = (byte)LightDirectionComboBox.SelectedIndex;
+                settings.Direction = (byte)LightDirectionComboBox.SelectedIndex;
+                settings.Palette = (byte)ColorScaleComboBox.SelectedIndex;
+                settings.Smooth = SmoothCheckBox.IsChecked ?? false;
+                settings.Browser = (byte)ExternalBrowserComboBox.SelectedIndex;
+                settings.ZeroSmallMatrixElements = ZeroSmallMatrixElementsCheckBox.IsChecked ?? false;
+                settings.MaxOutputCount = int.TryParse(MaxOutputCountTextBox.Text, out int i) ? i : (int)20;
+                settings.Embed = EmbedCheckBox.IsChecked ?? false;
+                settings.WindowLeft = Left;
+                settings.WindowTop = Top;
+                settings.WindowWidth = Width;
+                settings.WindowHeight = Height;
+                settings.WindowState = (byte)this.WindowState;
+                settings.Save();
+            }
+            catch (System.Configuration.ConfigurationException ex)
+            {
+                // El archivo de configuración del usuario puede estar corrupto
+                // Intentar resetear la configuración
+                try
+                {
+                    Properties.Settings.Default.Reset();
+                    Properties.Settings.Default.Save();
+                }
+                catch
+                {
+                    // Si aún falla, intentar eliminar el archivo de configuración corrupto
+                    try
+                    {
+                        var configPath = System.Configuration.ConfigurationManager.OpenExeConfiguration(
+                            System.Configuration.ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+                        if (System.IO.File.Exists(configPath))
+                        {
+                            System.IO.File.Delete(configPath);
+                        }
+                    }
+                    catch { }
+                }
+                System.Diagnostics.Debug.WriteLine($"Error al guardar configuración: {ex.Message}");
+            }
+            catch (System.ArgumentException ex)
+            {
+                // Error de parámetro inválido en configuración
+                try
+                {
+                    Properties.Settings.Default.Reset();
+                }
+                catch { }
+                System.Diagnostics.Debug.WriteLine($"Error de configuración: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error inesperado al guardar configuración: {ex.Message}");
+            }
         }
 
 
@@ -1077,8 +1122,8 @@ namespace Calcpad.Wpf
                 }
             };
 
-            var result = (bool)dlg.ShowDialog();
-            if (!result)
+            var result = dlg.ShowDialog();
+            if (result != true)
                 return false;
 
             var fileName = dlg.FileName;
@@ -1168,22 +1213,145 @@ namespace Calcpad.Wpf
                 if (!await GetAndSetInputFieldsAsync())
                     return;
             }
+
+            // Save referenced IFC files alongside the .cpd file
+            string inputText = GetInputText();
+            inputText = SaveReferencedIfcFiles(inputText, fileName);
+
             var isZip = string.Equals(Path.GetExtension(fileName), ".cpdz", StringComparison.OrdinalIgnoreCase);
             if (isZip)
             {
                 if (hasInputFields)
-                    _calcpadProcessor.MacroParser.Parse(InputText, out outputText, null, 0, false);
+                    _calcpadProcessor.MacroParser.Parse(inputText, out outputText, null, 0, false);
 
                 WriteFile(fileName, outputText, true);
                 FileOpen(fileName);
             }
             else
             {
-                WriteFile(fileName, GetInputText());
+                WriteFile(fileName, inputText);
                 CurrentFileName = fileName;
             }
             SaveButton.Tag = null;
             IsSaved = true;
+        }
+
+        /// <summary>
+        /// Save IFC files referenced in the code alongside the .cpd file
+        /// Updates references from https://calcpad.ifc/temp_xxx.ifc to local filenames
+        /// </summary>
+        private string SaveReferencedIfcFiles(string inputText, string cpdFileName)
+        {
+            try
+            {
+                string cpdDirectory = Path.GetDirectoryName(cpdFileName) ?? "";
+                string appIfcPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources", "ifc");
+
+                // Find all IFC file references: https://calcpad.ifc/xxx.ifc
+                var ifcUrlPattern = new System.Text.RegularExpressions.Regex(
+                    @"https://calcpad\.ifc/([^'""\s<>]+\.ifc)",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                var matches = ifcUrlPattern.Matches(inputText);
+                if (matches.Count == 0) return inputText;
+
+                string updatedText = inputText;
+                var copiedFiles = new System.Collections.Generic.HashSet<string>();
+
+                foreach (System.Text.RegularExpressions.Match match in matches)
+                {
+                    string ifcFileName = match.Groups[1].Value;
+                    string sourceFile = Path.Combine(appIfcPath, ifcFileName);
+
+                    if (File.Exists(sourceFile) && !copiedFiles.Contains(ifcFileName))
+                    {
+                        // Determine target filename - use original name or create from temp name
+                        string targetFileName = ifcFileName;
+
+                        // If it's a temp file (temp_xxx.ifc), try to use a cleaner name
+                        if (ifcFileName.StartsWith("temp_", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Keep the temp name but user can rename later
+                            targetFileName = ifcFileName;
+                        }
+
+                        string targetFile = Path.Combine(cpdDirectory, targetFileName);
+
+                        // Copy the IFC file to the same directory as the .cpd
+                        if (!File.Exists(targetFile) || !FilesAreEqual(sourceFile, targetFile))
+                        {
+                            File.Copy(sourceFile, targetFile, true);
+                            System.Diagnostics.Debug.WriteLine($"Copied IFC file: {sourceFile} -> {targetFile}");
+                        }
+
+                        // Update the reference in the text to use relative path
+                        // Keep using https://calcpad.ifc/ but now it will look in the cpd directory too
+                        copiedFiles.Add(ifcFileName);
+                    }
+                }
+
+                return updatedText;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving IFC files: {ex.Message}");
+                return inputText;
+            }
+        }
+
+        /// <summary>
+        /// Compare two files for equality
+        /// </summary>
+        private static bool FilesAreEqual(string file1, string file2)
+        {
+            try
+            {
+                var info1 = new FileInfo(file1);
+                var info2 = new FileInfo(file2);
+                return info1.Length == info2.Length;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Load IFC files from the cpd directory to resources/ifc when opening a file
+        /// This restores IFC files that were saved alongside the .cpd
+        /// </summary>
+        private void LoadReferencedIfcFiles(string cpdFileName)
+        {
+            try
+            {
+                string cpdDirectory = Path.GetDirectoryName(cpdFileName) ?? "";
+                string appIfcPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources", "ifc");
+
+                // Ensure the ifc directory exists
+                if (!Directory.Exists(appIfcPath))
+                    Directory.CreateDirectory(appIfcPath);
+
+                // Find all IFC files in the cpd directory
+                if (!Directory.Exists(cpdDirectory)) return;
+
+                var ifcFiles = Directory.GetFiles(cpdDirectory, "*.ifc", SearchOption.TopDirectoryOnly);
+                foreach (var ifcFile in ifcFiles)
+                {
+                    string fileName = Path.GetFileName(ifcFile);
+                    string targetFile = Path.Combine(appIfcPath, fileName);
+
+                    // Copy if not exists or if different
+                    if (!File.Exists(targetFile) || !FilesAreEqual(ifcFile, targetFile))
+                    {
+                        File.Copy(ifcFile, targetFile, true);
+                        System.Diagnostics.Debug.WriteLine($"Loaded IFC file: {ifcFile} -> {targetFile}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading IFC files: {ex.Message}");
+            }
         }
 
         private void Command_Help(object sender, ExecutedRoutedEventArgs e)
@@ -1283,6 +1451,9 @@ namespace Calcpad.Wpf
 
             var ext = Path.GetExtension(fileName).ToLowerInvariant();
             CurrentFileName = fileName;
+
+            // Copy IFC files from the cpd directory to resources/ifc if they exist
+            LoadReferencedIfcFiles(fileName);
 
             var hasForm = GetInputTextFromFile();
             _parser.ShowWarnings = ext != ".cpdz";
@@ -1637,7 +1808,22 @@ namespace Calcpad.Wpf
 </body>
 </html>";
 
-                        WebViewer.NavigateToString(currentHtml);
+                        // If HTML contains IFC viewer, save to file and navigate via Virtual Host
+                        if (currentHtml.Contains("calcpad.ifc/"))
+                        {
+                            var ifcHtmlPath = System.IO.Path.Combine(AppInfo.Path, "resources", "ifc", "_output.html");
+
+                            // Replace file:// URLs with https://calcpad.local/ Virtual Host URLs
+                            var docUrl = $"file:///{AppInfo.DocPath.Replace("\\", "/")}";
+                            var ifcCurrentHtml = currentHtml.Replace(docUrl, "https://calcpad.local");
+
+                            System.IO.File.WriteAllText(ifcHtmlPath, ifcCurrentHtml, System.Text.Encoding.UTF8);
+                            WebViewer.CoreWebView2.Navigate("https://calcpad.ifc/_output.html");
+                        }
+                        else
+                        {
+                            WebViewer.NavigateToString(currentHtml);
+                        }
                         CalcpadTelemetry.LogEvent("PARTIAL_RESULT", $"Updated OUTPUT with partial result (length: {htmlChunk.Length})");
                     }
                     catch (Exception ex)
@@ -1851,7 +2037,26 @@ namespace Calcpad.Wpf
                     CalcpadTelemetry.LogWebViewNavigation("Final HTML result", htmlResult.Length);
                     CalcpadTelemetry.LogEvent("OUTPUT", "Rendering final HTML to WebViewer", new { HtmlLength = htmlResult.Length, MultilangProcessed = processingResult.MultilangProcessed });
                     CalcpadTelemetry.SaveOutputHtml(htmlResult, "final");
-                    await _wv2Warper.NavigateToStringAsync(htmlResult);
+
+                    // If HTML contains IFC viewer (uses calcpad.ifc virtual host), save to file and navigate
+                    // This is necessary because NavigateToString uses file:// origin which can't access https://calcpad.ifc/
+                    if (htmlResult.Contains("calcpad.ifc/"))
+                    {
+                        var ifcHtmlPath = System.IO.Path.Combine(AppInfo.Path, "resources", "ifc", "_output.html");
+
+                        // Replace file:// URLs with https://calcpad.local/ Virtual Host URLs
+                        // This is necessary because file:// protocol doesn't work from https://calcpad.ifc/ context
+                        var docUrl = $"file:///{AppInfo.DocPath.Replace("\\", "/")}";
+                        var ifcHtmlResult = htmlResult.Replace(docUrl, "https://calcpad.local");
+
+                        System.IO.File.WriteAllText(ifcHtmlPath, ifcHtmlResult, System.Text.Encoding.UTF8);
+                        WebViewer.CoreWebView2.Navigate("https://calcpad.ifc/_output.html");
+                        CalcpadTelemetry.LogEvent("OUTPUT", "Navigated to IFC HTML via Virtual Host");
+                    }
+                    else
+                    {
+                        await _wv2Warper.NavigateToStringAsync(htmlResult);
+                    }
                 }
             }
             catch (Exception e)
@@ -2469,6 +2674,13 @@ namespace Calcpad.Wpf
         const string Tabs = "\t\t\t\t\t\t\t\t\t\t\t\t";
         private string GetInputText()
         {
+            // FIXED: Read from AvalonEdit when active (fixes SaveAs not working)
+            if (_isAvalonEditActive && TextEditor != null && TextEditor.Visibility == Visibility.Visible)
+            {
+                return TextEditor.Text ?? string.Empty;
+            }
+
+            // Fallback to RichTextBox
             _stringBuilder.Clear();
             var b = _document.Blocks.FirstBlock;
             while (b is not null)
@@ -3510,6 +3722,9 @@ namespace Calcpad.Wpf
             {
                 // Close telemetry session
                 CalcpadTelemetry.EndSession();
+
+                // Cleanup Jupyter
+                CleanupJupyterOnExit();
             }
 
             WriteSettings();
@@ -4580,6 +4795,12 @@ namespace Calcpad.Wpf
                 if (_isParsing)
                     Pause();
             }
+            else if (e.Key == Key.F12)
+            {
+                // Cycle through themes with F12
+                Themes.ThemeManager.CycleTheme();
+                UpdateThemeMenuCheckmarks();
+            }
         }
 
         private void Cancel()
@@ -4616,6 +4837,7 @@ namespace Calcpad.Wpf
         {
             _screenScaleFactor = ScreenMetrics.GetWindowsScreenScalingFactor();
             ReadSettings();
+            InitializeTheme(); // Initialize theme from saved settings
             if (Top < 0)
                 Top = 0;
 
@@ -4870,12 +5092,16 @@ namespace Calcpad.Wpf
 
         private void Logo_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            var info = new ProcessStartInfo
+            try
             {
-                FileName = "https://calcpad.eu",
-                UseShellExecute = true
-            };
-            Process.Start(info);
+                var info = new ProcessStartInfo
+                {
+                    FileName = "https://calcpad.eu",
+                    UseShellExecute = true
+                };
+                Process.Start(info);
+            }
+            catch { }
         }
 
         private void PdfButton_Click(object sender, RoutedEventArgs e)
@@ -5087,11 +5313,12 @@ namespace Calcpad.Wpf
             }
         }
 
-        private void WebViewer_PreviewKeyDown(object sender, KeyEventArgs e)
+        private async void WebViewer_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F5)
             {
-                Calculate();
+                // Usar Command_Calculate para soportar modo IFC
+                Command_Calculate(null, null);
                 e.Handled = true;
             }
             else if (e.Key == Key.O && Keyboard.Modifiers == ModifierKeys.Control)
@@ -5207,6 +5434,29 @@ namespace Calcpad.Wpf
                  AppInfo.DocPath,
                 CoreWebView2HostResourceAccessKind.Allow);
 
+            // Map IFC resources to virtual host for WebView2 security
+            // Maps https://calcpad.ifc/ to {AppInfo.Path}/resources/ifc/
+            var ifcResourcePath = System.IO.Path.Combine(AppInfo.Path, "resources", "ifc");
+
+            // Debug: Verify directory exists and contains required files
+            if (!System.IO.Directory.Exists(ifcResourcePath))
+            {
+                System.IO.Directory.CreateDirectory(ifcResourcePath);
+            }
+
+            // Log mapping for debug
+            var debugLog = $"IFC Virtual Host Mapping:\n" +
+                          $"Host: calcpad.ifc\n" +
+                          $"Path: {ifcResourcePath}\n" +
+                          $"Exists: {System.IO.Directory.Exists(ifcResourcePath)}\n" +
+                          $"Files: {string.Join(", ", System.IO.Directory.GetFiles(ifcResourcePath).Select(f => System.IO.Path.GetFileName(f)))}";
+            System.Diagnostics.Debug.WriteLine(debugLog);
+
+            WebViewer.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                "calcpad.ifc",
+                ifcResourcePath,
+                CoreWebView2HostResourceAccessKind.Allow);
+
             WebViewer.CoreWebView2.Settings.AreDevToolsEnabled = true;
             WebViewer.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
             WebViewer.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = true;
@@ -5238,11 +5488,22 @@ namespace Calcpad.Wpf
 
         private void CommentUncomment(bool comment)
         {
+            // Check if using AvalonEdit
+            if (_isAvalonEditActive && TextEditor != null)
+            {
+                CommentUncommentAvalonEdit(comment);
+                return;
+            }
+
             var ss = RichTextBox.Selection.Start;
             var ps = ss.Paragraph;
             var se = RichTextBox.Selection.End;
             var pe = se.Paragraph;
             var lineNumber = GetLineNumber(ps);
+
+            // Detect current language block to use correct comment character
+            string commentChar = DetectCommentCharacter(lineNumber);
+
             bool matches;
             RichTextBox.BeginChange();
             var start = true;
@@ -5252,14 +5513,25 @@ namespace Calcpad.Wpf
                     break;
                 var tr = new TextRange(ps.ContentStart, ps.ContentEnd);
                 var text = tr.Text;
+
+                // Check if line is commented with any known comment character
                 var isComment = text.StartsWith('\'') ||
-                    text.StartsWith('"');
+                    text.StartsWith('"') ||
+                    text.StartsWith("//") ||
+                    text.StartsWith('#');
+
                 if (comment != isComment)
                 {
                     if (comment)
-                        tr.Text = "\'" + text;
+                        tr.Text = commentChar + text;
                     else
-                        tr.Text = text[1..];
+                    {
+                        // Remove the comment character(s)
+                        if (text.StartsWith("//"))
+                            tr.Text = text[2..];
+                        else if (text.StartsWith('\'') || text.StartsWith('"') || text.StartsWith('#'))
+                            tr.Text = text[1..];
+                    }
                 }
                 _highlighter.Defined.Get(tr.Text, lineNumber);
                 _highlighter.Parse(ps, IsComplex, lineNumber, start);
@@ -5275,6 +5547,154 @@ namespace Calcpad.Wpf
             RichTextBox.Focus();
         }
 
+        /// <summary>
+        /// Detect the comment character based on the current language block
+        /// </summary>
+        private string DetectCommentCharacter(int lineNumber)
+        {
+            // Get all text to analyze which block we're in
+            string allText = _isAvalonEditActive && TextEditor != null
+                ? TextEditor.Text
+                : new TextRange(_document.ContentStart, _document.ContentEnd).Text;
+
+            var lines = allText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            if (lineNumber < 0 || lineNumber >= lines.Length)
+                return "'"; // Default to Calcpad
+
+            // Search backwards to find the opening directive
+            string currentLanguage = "calcpad"; // Default
+            for (int i = lineNumber; i >= 0; i--)
+            {
+                var line = lines[i].Trim().ToLowerInvariant();
+
+                // Check for opening directives
+                if (line.StartsWith("@{html-ifc}") || line.StartsWith("@{html}"))
+                    { currentLanguage = "html"; break; }
+                if (line.StartsWith("@{javascript}") || line.StartsWith("@{js}") || line.StartsWith("@{typescript}") || line.StartsWith("@{ts}"))
+                    { currentLanguage = "javascript"; break; }
+                if (line.StartsWith("@{python}") || line.StartsWith("@{py}"))
+                    { currentLanguage = "python"; break; }
+                if (line.StartsWith("@{csharp}") || line.StartsWith("@{cs}") || line.StartsWith("@{c}") || line.StartsWith("@{cpp}"))
+                    { currentLanguage = "csharp"; break; }
+                if (line.StartsWith("@{powershell}") || line.StartsWith("@{ps}"))
+                    { currentLanguage = "powershell"; break; }
+                if (line.StartsWith("@{bash}") || line.StartsWith("@{sh}"))
+                    { currentLanguage = "bash"; break; }
+                if (line.StartsWith("@{sql}"))
+                    { currentLanguage = "sql"; break; }
+                if (line.StartsWith("@{octave}") || line.StartsWith("@{matlab}"))
+                    { currentLanguage = "octave"; break; }
+                if (line.StartsWith("@{r}"))
+                    { currentLanguage = "r"; break; }
+                if (line.StartsWith("@{rust}"))
+                    { currentLanguage = "rust"; break; }
+                if (line.StartsWith("@{go}"))
+                    { currentLanguage = "go"; break; }
+                if (line.StartsWith("@{ucode}") || line.StartsWith("@{code}"))
+                    { currentLanguage = "ucode"; break; }
+
+                // Check for closing directives (means we're outside)
+                if (line.StartsWith("@{end "))
+                    { currentLanguage = "calcpad"; break; }
+            }
+
+            // Return the appropriate comment character
+            return currentLanguage switch
+            {
+                "html" or "javascript" or "csharp" or "cpp" or "c" or "go" or "rust" or "typescript" or "ucode" => "// ",
+                "python" or "bash" or "powershell" or "r" or "octave" => "# ",
+                "sql" => "-- ",
+                _ => "'" // Calcpad default
+            };
+        }
+
+        /// <summary>
+        /// Comment/Uncomment for AvalonEdit
+        /// </summary>
+        private void CommentUncommentAvalonEdit(bool comment)
+        {
+            if (TextEditor == null) return;
+
+            var document = TextEditor.Document;
+            var selection = TextEditor.TextArea.Selection;
+            int startLine, endLine;
+
+            if (selection.IsEmpty)
+            {
+                // No selection, use current line
+                startLine = endLine = TextEditor.TextArea.Caret.Line;
+            }
+            else
+            {
+                startLine = selection.StartPosition.Line;
+                endLine = selection.EndPosition.Line;
+            }
+
+            // Detect comment character based on current position
+            string commentChar = DetectCommentCharacter(startLine - 1); // 0-based for DetectCommentCharacter
+
+            document.BeginUpdate();
+            try
+            {
+                for (int lineNum = startLine; lineNum <= endLine; lineNum++)
+                {
+                    var line = document.GetLineByNumber(lineNum);
+                    string lineText = document.GetText(line.Offset, line.Length);
+                    string trimmedText = lineText.TrimStart();
+
+                    if (comment)
+                    {
+                        // Add comment
+                        int insertOffset = line.Offset + (lineText.Length - trimmedText.Length);
+                        document.Insert(insertOffset, commentChar);
+                    }
+                    else
+                    {
+                        // Remove comment - check for various comment styles
+                        if (trimmedText.StartsWith("// "))
+                        {
+                            int commentStart = line.Offset + lineText.IndexOf("// ");
+                            document.Remove(commentStart, 3);
+                        }
+                        else if (trimmedText.StartsWith("//"))
+                        {
+                            int commentStart = line.Offset + lineText.IndexOf("//");
+                            document.Remove(commentStart, 2);
+                        }
+                        else if (trimmedText.StartsWith("# "))
+                        {
+                            int commentStart = line.Offset + lineText.IndexOf("# ");
+                            document.Remove(commentStart, 2);
+                        }
+                        else if (trimmedText.StartsWith("#"))
+                        {
+                            int commentStart = line.Offset + lineText.IndexOf("#");
+                            document.Remove(commentStart, 1);
+                        }
+                        else if (trimmedText.StartsWith("-- "))
+                        {
+                            int commentStart = line.Offset + lineText.IndexOf("-- ");
+                            document.Remove(commentStart, 3);
+                        }
+                        else if (trimmedText.StartsWith("--"))
+                        {
+                            int commentStart = line.Offset + lineText.IndexOf("--");
+                            document.Remove(commentStart, 2);
+                        }
+                        else if (trimmedText.StartsWith("'"))
+                        {
+                            int commentStart = line.Offset + lineText.IndexOf("'");
+                            document.Remove(commentStart, 1);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                document.EndUpdate();
+            }
+        }
+
         private void CommentMenu_Click(object sender, RoutedEventArgs e) =>
             CommentUncomment(true);
 
@@ -5286,6 +5706,141 @@ namespace Calcpad.Wpf
                 WebViewer_LinkClicked();
             else if (message == "focused")
                 IsWebView2Focused = true;
+            else
+            {
+                // Try to parse as JSON for updateEditor messages
+                try
+                {
+                    var json = System.Text.Json.JsonDocument.Parse(message);
+                    if (json.RootElement.TryGetProperty("type", out var typeElement))
+                    {
+                        var messageType = typeElement.GetString();
+
+                        if (messageType == "updateEditor")
+                        {
+                            if (json.RootElement.TryGetProperty("content", out var contentElement))
+                            {
+                                var code = contentElement.GetString();
+                                if (!string.IsNullOrEmpty(code))
+                                {
+                                    Dispatcher.Invoke(() => UpdateEditorWithConvertedCode(code));
+                                }
+                            }
+                        }
+                        else if (messageType == "updateEditorFull")
+                        {
+                            // Reemplazar TODO el contenido del editor con el HTML completo
+                            if (json.RootElement.TryGetProperty("content", out var contentElement))
+                            {
+                                var fullHtml = contentElement.GetString();
+                                if (!string.IsNullOrEmpty(fullHtml))
+                                {
+                                    Dispatcher.Invoke(() => UpdateEditorFullContent(fullHtml));
+                                }
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Not a JSON message, ignore
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reemplaza TODO el contenido del editor con el HTML completo del visor IFC modificado
+        /// </summary>
+        private void UpdateEditorFullContent(string fullHtml)
+        {
+            try
+            {
+                // Agregar DOCTYPE si no está presente
+                string htmlContent = fullHtml;
+                if (!htmlContent.TrimStart().StartsWith("<!DOCTYPE", StringComparison.OrdinalIgnoreCase))
+                {
+                    htmlContent = "<!DOCTYPE html>\n" + htmlContent;
+                }
+
+                // Actualizar el editor con el HTML completo
+                if (_isAvalonEditActive && TextEditor != null)
+                {
+                    TextEditor.Text = htmlContent;
+                }
+                else
+                {
+                    SetInputText(htmlContent);
+                }
+
+                IsSaved = false;
+                System.Diagnostics.Debug.WriteLine($"[UpdateEditorFullContent] Editor actualizado con {htmlContent.Length} caracteres");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[UpdateEditorFullContent] Error: {ex.Message}");
+                ShowErrorMessage($"Error actualizando editor: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Update the editor with converted code from IFC viewer
+        /// Replaces the current @{ucode} or @{code} block with the new code
+        /// </summary>
+        private void UpdateEditorWithConvertedCode(string newCode)
+        {
+            try
+            {
+                string currentText = _isAvalonEditActive && TextEditor != null
+                    ? TextEditor.Text
+                    : new TextRange(_document.ContentStart, _document.ContentEnd).Text;
+
+                // Find and replace the current @{ucode} or @{code} block
+                var ucodePattern = new System.Text.RegularExpressions.Regex(
+                    @"@\{ucode\}[\s\S]*?@\{end\s+ucode\}",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                var codePattern = new System.Text.RegularExpressions.Regex(
+                    @"@\{code\}[\s\S]*?@\{end\s+code\}",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                string updatedText = currentText;
+                bool replaced = false;
+
+                // Try to replace @{ucode} block first
+                if (ucodePattern.IsMatch(currentText))
+                {
+                    updatedText = ucodePattern.Replace(currentText, newCode, 1);
+                    replaced = true;
+                }
+                // Then try @{code} block
+                else if (codePattern.IsMatch(currentText))
+                {
+                    updatedText = codePattern.Replace(currentText, newCode, 1);
+                    replaced = true;
+                }
+
+                if (replaced)
+                {
+                    if (_isAvalonEditActive && TextEditor != null)
+                    {
+                        TextEditor.Text = updatedText;
+                    }
+                    else
+                    {
+                        SetInputText(updatedText);
+                    }
+                    System.Diagnostics.Debug.WriteLine("Código convertido y actualizado en el editor");
+                }
+                else
+                {
+                    // No block found, copy to clipboard
+                    System.Windows.Clipboard.SetText(newCode);
+                    System.Diagnostics.Debug.WriteLine("Código copiado al portapapeles");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating editor: {ex.Message}");
+            }
         }
 
         private async void WebViewer_LinkClicked()
@@ -5295,7 +5850,31 @@ namespace Calcpad.Wpf
                 return;
 
             if (Uri.IsWellFormedUriString(s, UriKind.Absolute))
-                Execute(ExternalBrowserComboBox.Text.ToLower() + ".exe", s);
+            {
+                // Validar que haya un navegador externo configurado
+                var browser = ExternalBrowserComboBox.Text?.Trim().ToLower();
+                if (!string.IsNullOrEmpty(browser))
+                {
+                    Execute(browser + ".exe", s);
+                }
+                else
+                {
+                    // Usar navegador predeterminado del sistema
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = s,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al abrir navegador:\n{ex.Message}", "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
             else
             {
                 var fileName = s.Replace('/', '\\');
@@ -5317,7 +5896,31 @@ namespace Calcpad.Wpf
                         ext == ".jpeg" ||
                         ext == ".gif" ||
                         ext == ".bmp")
-                        Execute(ExternalBrowserComboBox.Text.ToLower() + ".exe", s);
+                    {
+                        // Validar que haya un navegador externo configurado
+                        var browser = ExternalBrowserComboBox.Text?.Trim().ToLower();
+                        if (!string.IsNullOrEmpty(browser))
+                        {
+                            Execute(browser + ".exe", s);
+                        }
+                        else
+                        {
+                            // Usar navegador predeterminado del sistema
+                            try
+                            {
+                                Process.Start(new ProcessStartInfo
+                                {
+                                    FileName = s,
+                                    UseShellExecute = true
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Error al abrir navegador:\n{ex.Message}", "Error",
+                                    MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                    }
                 }
                 else if (s == "continue")
                     await AutoRun();
@@ -6159,6 +6762,525 @@ namespace Calcpad.Wpf
                 "Importado desde MiniExcel",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+
+        #endregion
+
+        #region Jupyter Integration
+
+        private JupyterIntegration _jupyterIntegration;
+
+        #endregion
+
+        #region IFC Integration
+
+        private string _currentIfcHtmlPath;
+        private string _currentIfcHtmlName;
+        private bool _wasAutoRunEnabled;
+        private bool _isIfcEditMode => !string.IsNullOrEmpty(_currentIfcHtmlPath);
+
+        /// <summary>
+        /// Inicializa la integración de Jupyter
+        /// </summary>
+        private void InitializeJupyterIntegration()
+        {
+            try
+            {
+                _jupyterIntegration = new JupyterIntegration(WebViewer);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al inicializar Jupyter:\n{ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handler: Abrir Jupyter Notebook
+        /// </summary>
+        private async void MenuJupyterOpen_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new OpenFileDialog
+                {
+                    Filter = "Jupyter Notebooks (*.ipynb)|*.ipynb|All files (*.*)|*.*",
+                    Title = "Open Jupyter Notebook"
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    if (_jupyterIntegration == null)
+                        InitializeJupyterIntegration();
+
+                    await _jupyterIntegration.OpenNotebook(dialog.FileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al abrir notebook:\n{ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handler: Iniciar servidor Jupyter
+        /// </summary>
+        private async void MenuJupyterStart_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_jupyterIntegration == null)
+                    InitializeJupyterIntegration();
+
+                await _jupyterIntegration.StartJupyterServer();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al iniciar servidor:\n{ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handler: Actualizar editor desde el visor IFC
+        /// Ejecuta JavaScript en WebView2 para obtener el HTML actualizado y lo pone en AvalonEdit
+        /// </summary>
+        private async void UpdateIfcEditorButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (WebViewer?.CoreWebView2 == null)
+                {
+                    MessageBox.Show("El visor IFC no está activo. Primero abre un archivo IFC.",
+                        "Visor IFC no activo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // Ejecutar JavaScript para capturar el estado y enviar el HTML actualizado
+                string jsCode = @"
+                    (function() {
+                        // Actualizar valores de sliders de transparencia
+                        document.querySelectorAll('.trans-slider').forEach(function(slider) {
+                            slider.setAttribute('value', slider.value);
+                        });
+
+                        // Actualizar estado de checkboxes de filtros
+                        document.querySelectorAll('.filter-cb').forEach(function(cb) {
+                            if (cb.checked) {
+                                cb.setAttribute('checked', 'checked');
+                            } else {
+                                cb.removeAttribute('checked');
+                            }
+                        });
+
+                        // Guardar posición de cámara si existe
+                        var viewerContainer = document.querySelector('.ifc-viewer-container');
+                        if (viewerContainer && typeof camera !== 'undefined' && camera) {
+                            viewerContainer.setAttribute('data-camera-x', camera.position.x.toFixed(2));
+                            viewerContainer.setAttribute('data-camera-y', camera.position.y.toFixed(2));
+                            viewerContainer.setAttribute('data-camera-z', camera.position.z.toFixed(2));
+                            if (typeof controls !== 'undefined' && controls) {
+                                viewerContainer.setAttribute('data-target-x', controls.target.x.toFixed(2));
+                                viewerContainer.setAttribute('data-target-y', controls.target.y.toFixed(2));
+                                viewerContainer.setAttribute('data-target-z', controls.target.z.toFixed(2));
+                            }
+                        }
+
+                        // Guardar nivel actual si existe
+                        if (typeof levelDisplay !== 'undefined' && levelDisplay && typeof nivelActual !== 'undefined') {
+                            levelDisplay.setAttribute('data-nivel-actual', nivelActual);
+                        }
+
+                        // Retornar HTML completo
+                        return document.documentElement.outerHTML;
+                    })();
+                ";
+
+                var result = await WebViewer.CoreWebView2.ExecuteScriptAsync(jsCode);
+
+                // El resultado viene como string JSON escapado
+                if (!string.IsNullOrEmpty(result) && result != "null")
+                {
+                    // Deserializar el string JSON
+                    string htmlContent = System.Text.Json.JsonSerializer.Deserialize<string>(result);
+
+                    if (!string.IsNullOrEmpty(htmlContent))
+                    {
+                        // Agregar DOCTYPE si no está presente
+                        if (!htmlContent.TrimStart().StartsWith("<!DOCTYPE", StringComparison.OrdinalIgnoreCase))
+                        {
+                            htmlContent = "<!DOCTYPE html>\n" + htmlContent;
+                        }
+
+                        // Envolver en @{code}...@{end code} para que Calcpad no intente parsear el HTML como fórmulas
+                        string wrappedContent = $"@{{code}}\r\n@{{html-ifc}}\r\n{htmlContent}\r\n@{{end html-ifc}}\r\n@{{end code}}";
+
+                        // Actualizar el editor
+                        if (_isAvalonEditActive && TextEditor != null)
+                        {
+                            TextEditor.Text = wrappedContent;
+                        }
+                        else
+                        {
+                            SetInputText(wrappedContent);
+                        }
+
+                        IsSaved = false;
+                        System.Diagnostics.Debug.WriteLine($"[UpdateIfcEditorButton_Click] Editor actualizado con {wrappedContent.Length} caracteres");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[UpdateIfcEditorButton_Click] Error: {ex.Message}");
+                MessageBox.Show($"Error actualizando editor: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handler: Abrir archivo IFC en visor 3D
+        /// Genera el HTML completo del visor IFC en el editor para poder editarlo
+        /// El visor se muestra en el output y el código HTML queda disponible para modificar
+        /// </summary>
+        private async void IfcButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new Microsoft.Win32.OpenFileDialog
+                {
+                    Filter = "IFC Files (*.ifc)|*.ifc|All files (*.*)|*.*",
+                    Title = "Abrir archivo IFC"
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    string ifcFilePath = dialog.FileName;
+                    string fileName = System.IO.Path.GetFileName(ifcFilePath);
+
+                    // Preguntar al usuario qué modo desea
+                    var result = MessageBox.Show(
+                        "¿Qué modo de edición desea usar?\n\n" +
+                        "SÍ = @{code} (HTML/JS completo editable)\n" +
+                        "NO = @{ucode} (Directivas simplificadas)",
+                        "Seleccionar modo IFC",
+                        MessageBoxButton.YesNoCancel,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Cancel) return;
+                    bool useCodeMode = (result == MessageBoxResult.Yes);
+
+                    // Copiar el archivo IFC al directorio resources/ifc
+                    string ifcResourcePath = System.IO.Path.Combine(AppInfo.Path, "resources", "ifc");
+                    if (!System.IO.Directory.Exists(ifcResourcePath))
+                    {
+                        System.IO.Directory.CreateDirectory(ifcResourcePath);
+                    }
+                    string tempIfcName = $"temp_{Guid.NewGuid():N}.ifc";
+                    string destIfcPath = System.IO.Path.Combine(ifcResourcePath, tempIfcName);
+                    System.IO.File.Copy(ifcFilePath, destIfcPath, true);
+
+                    string wrappedCode;
+                    if (useCodeMode)
+                    {
+                        // Generar el HTML completo del visor IFC para editar
+                        string viewerHtml = Calcpad.Common.MultLangCode.IfcLanguageHandler.GenerateFileBasedViewer(tempIfcName, fileName);
+                        // @{code}...@{end code} envuelve @{html-ifc} con HTML/JS completo
+                        wrappedCode = $"@{{code}}\r\n@{{html-ifc}}\r\n{viewerHtml}\r\n@{{end html-ifc}}\r\n@{{end code}}";
+                    }
+                    else
+                    {
+                        // @{ucode}...@{end ucode} - visor IFC con todas las directivas
+                        wrappedCode = $@"@{{ucode}}
+@{{visor: https://calcpad.ifc/{tempIfcName}}}
+@{{fondo: #1a1a2e}}
+@{{altura: 600}}
+
+// === Camara y Luces ===
+@{{camara: tipo=perspectiva, pos=50,50,50, target=0,0,0, fov=75}}
+@{{luz: color=#ffffff}}
+@{{luz.ambiente: intensidad=0.5}}
+@{{luz.direccional: intensidad=0.8}}
+
+// === Visualizacion ===
+@{{grid: si, tamano=100, divisiones=20}}
+@{{ejes: si}}
+@{{sombras: si}}
+@{{wireframe: no}}
+@{{opacidad: 1}}
+@{{controles: vistas, zoom, rotacion, color}}
+
+// === Panel VSCode-style (descomenta para activar) ===
+// @{{seleccion: si}}
+// @{{propiedades: si}}
+// @{{arbol: si}}
+
+// === Objetos 3D personalizados (descomenta para agregar) ===
+// @{{cubo: pos=0,5,0, size=10, color=#ff0000}}
+// @{{esfera: pos=20,5,0, radio=5, color=#00ff00}}
+// @{{cilindro: pos=-20,10,0, radio=3, altura=20, color=#0000ff}}
+
+// === Anotaciones (descomenta para agregar) ===
+// @{{marcador: pos=0,15,0, texto=Etiqueta, color=#ffffff}}
+// @{{medida: desde=0,0,0, hasta=20,0,0, color=#ffff00}}
+@{{end ucode}}";
+                    }
+
+                    // Mostrar el código HTML en AvalonEdit para edición
+                    if (_isAvalonEditActive && TextEditor != null)
+                    {
+                        TextEditor.Text = wrappedCode;
+                    }
+                    else
+                    {
+                        _document.Blocks.Clear();
+                        _document.Blocks.Add(new Paragraph(new Run(wrappedCode)));
+                    }
+
+                    // El autorun procesará @{html-ifc} que usa Virtual Host para el visor
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al abrir archivo IFC:\n{ex.Message}\n\nStack: {ex.StackTrace}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Recarga el visor IFC con el HTML editado en el editor
+        /// Se llama cuando presionas F5 mientras editas HTML de IFC
+        /// </summary>
+        private async Task ReloadIfcViewer()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_currentIfcHtmlPath))
+                {
+                    MessageBox.Show("No hay visor IFC activo para recargar.",
+                        "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // Guardar el HTML editado directamente (ya es HTML puro, sin wrapper)
+                string editedHtml = InputText;
+                System.IO.File.WriteAllText(_currentIfcHtmlPath, editedHtml);
+
+                // Recargar en WebView2
+                if (WebViewer.CoreWebView2 == null)
+                {
+                    await InitializeWebViewer();
+                }
+
+                // Navegar de nuevo para forzar recarga
+                WebViewer.CoreWebView2.Navigate($"https://calcpad.ifc/{_currentIfcHtmlName}");
+
+                // Mostrar mensaje de confirmación en la barra de estado si existe
+                Title = $" Calcpad - IFC Viewer recargado";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al recargar visor IFC:\n{ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Limpia la referencia al visor IFC actual (para volver al modo normal)
+        /// Restaura AutoRun si estaba habilitado antes
+        /// </summary>
+        private void ClearIfcViewerState()
+        {
+            if (_isIfcEditMode && _wasAutoRunEnabled)
+            {
+                AutoRunCheckBox.IsChecked = true;
+            }
+            _currentIfcHtmlPath = null;
+            _currentIfcHtmlName = null;
+            _wasAutoRunEnabled = false;
+        }
+
+        /// <summary>
+        /// Handler: Detener servidor Jupyter
+        /// </summary>
+        private void MenuJupyterStop_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_jupyterIntegration == null)
+                {
+                    MessageBox.Show("El servidor no está en ejecución.", "Info",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                _jupyterIntegration.StopJupyterServer();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al detener servidor:\n{ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handler: Mostrar estado de Jupyter
+        /// </summary>
+        private async void MenuJupyterStatus_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_jupyterIntegration == null)
+                    InitializeJupyterIntegration();
+
+                await _jupyterIntegration.ShowStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al obtener estado:\n{ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Limpieza de Jupyter al cerrar ventana
+        /// </summary>
+        private void CleanupJupyterOnExit()
+        {
+            try
+            {
+                _jupyterIntegration?.Dispose();
+            }
+            catch { }
+        }
+
+        #endregion
+
+        #region Theme Management
+
+        /// <summary>
+        /// Applies Hekatan Dark theme (Egyptian Gold on dark background)
+        /// </summary>
+        private void MenuThemeHekatanDark_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyTheme(Themes.ThemeManager.Theme.HekatanDark);
+        }
+
+        /// <summary>
+        /// Applies Hekatan Light theme (Gold accents on light background)
+        /// </summary>
+        private void MenuThemeHekatanLight_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyTheme(Themes.ThemeManager.Theme.HekatanLight);
+        }
+
+        /// <summary>
+        /// Applies Classic theme (Original Calcpad style)
+        /// </summary>
+        private void MenuThemeClassic_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyTheme(Themes.ThemeManager.Theme.Classic);
+        }
+
+        /// <summary>
+        /// Cycles through available themes
+        /// </summary>
+        private void MenuCycleTheme_Click(object sender, RoutedEventArgs e)
+        {
+            Themes.ThemeManager.CycleTheme();
+            UpdateThemeMenuCheckmarks();
+        }
+
+        /// <summary>
+        /// Applies the specified theme and updates UI
+        /// </summary>
+        private void ApplyTheme(Themes.ThemeManager.Theme theme)
+        {
+            // Ensure window is registered
+            Themes.ThemeManager.RegisterWindow(this);
+            Themes.ThemeManager.ApplyTheme(theme);
+            Themes.ThemeManager.SaveThemePreference();
+            UpdateThemeMenuCheckmarks();
+        }
+
+        /// <summary>
+        /// Updates theme menu checkmarks to reflect current theme
+        /// </summary>
+        private void UpdateThemeMenuCheckmarks()
+        {
+            var currentTheme = Themes.ThemeManager.CurrentTheme;
+            MenuThemeHekatanDark.IsChecked = currentTheme == Themes.ThemeManager.Theme.HekatanDark;
+            MenuThemeHekatanLight.IsChecked = currentTheme == Themes.ThemeManager.Theme.HekatanLight;
+            MenuThemeClassic.IsChecked = currentTheme == Themes.ThemeManager.Theme.Classic;
+        }
+
+        /// <summary>
+        /// Initializes theme from saved settings
+        /// </summary>
+        private void InitializeTheme()
+        {
+            // Register this window with the theme manager
+            Themes.ThemeManager.RegisterWindow(this);
+            Themes.ThemeManager.Initialize();
+            UpdateThemeMenuCheckmarks();
+        }
+
+        /// <summary>
+        /// Opens a color picker dialog to choose the title/header color
+        /// </summary>
+        private void MenuChooseTitleColor_Click(object sender, RoutedEventArgs e)
+        {
+            var colorDialog = new System.Windows.Forms.ColorDialog
+            {
+                AllowFullOpen = true,
+                AnyColor = true,
+                FullOpen = true,
+                Color = System.Drawing.Color.FromArgb(
+                    Themes.ThemeManager.GetCurrentPrimaryColor().R,
+                    Themes.ThemeManager.GetCurrentPrimaryColor().G,
+                    Themes.ThemeManager.GetCurrentPrimaryColor().B)
+            };
+
+            // Add some gold/warm presets
+            colorDialog.CustomColors = new int[]
+            {
+                ColorToInt(196, 160, 53),   // #C4A035 - Warm gold
+                ColorToInt(212, 175, 55),   // #D4AF37 - Classic gold
+                ColorToInt(255, 215, 0),    // #FFD700 - Bright gold
+                ColorToInt(184, 150, 12),   // #B8960C - Dark gold
+                ColorToInt(244, 208, 63),   // #F4D03F - Light gold
+                ColorToInt(218, 165, 32),   // #DAA520 - Goldenrod
+                ColorToInt(255, 193, 37),   // #FFC125 - Yellow gold
+                ColorToInt(205, 133, 63),   // #CD853F - Peru/bronze
+                ColorToInt(0, 255, 170),    // #00FFAA - Green accent
+                ColorToInt(0, 212, 170),    // #00D4AA - Teal
+                ColorToInt(70, 130, 180),   // #4682B4 - Steel blue
+                ColorToInt(100, 149, 237),  // #6495ED - Cornflower blue
+                ColorToInt(255, 99, 71),    // #FF6347 - Tomato red
+                ColorToInt(60, 179, 113),   // #3CB371 - Medium sea green
+                ColorToInt(147, 112, 219),  // #9370DB - Medium purple
+                ColorToInt(255, 140, 0),    // #FF8C00 - Dark orange
+            };
+
+            if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var selectedColor = System.Windows.Media.Color.FromRgb(
+                    colorDialog.Color.R,
+                    colorDialog.Color.G,
+                    colorDialog.Color.B);
+
+                Themes.ThemeManager.SetCustomPrimaryColor(selectedColor);
+                Themes.ThemeManager.ApplyTheme(Themes.ThemeManager.CurrentTheme);
+                Themes.ThemeManager.SaveThemePreference();
+            }
+        }
+
+        /// <summary>
+        /// Converts RGB to int for ColorDialog.CustomColors
+        /// </summary>
+        private static int ColorToInt(byte r, byte g, byte b)
+        {
+            return r | (g << 8) | (b << 16);
         }
 
         #endregion

@@ -1,0 +1,96 @@
+'<h1>Test Columns con Parsers Funcionando</h1>
+
+'<h2>Test 1: 3 Columnas - Python, Octave, Rust</h2>
+
+@{columns 3}
+
+@{python}
+# Python
+suma = sum([1,2,3,4,5])
+print(f"Suma: {suma}")
+@{end python}
+
+@{octave}
+% Octave
+v = [1,2,3,4,5];
+fprintf('Suma: %d\n', sum(v));
+@{end octave}
+
+@{rust}
+// Rust
+fn main() {
+    let v = vec![1,2,3,4,5];
+    let suma: i32 = v.iter().sum();
+    println!("Suma: {}", suma);
+}
+@{end rust}
+
+@{end columns}
+
+'<h2>Test 2: 2 Columnas - C++ y JavaScript</h2>
+
+@{columns 2}
+
+@{cpp}
+#include <iostream>
+using namespace std;
+int main() {
+    int nums[] = {10, 20, 30};
+    int suma = 0;
+    for(int n : nums) suma += n;
+    cout << "Suma: " << suma << endl;
+    return 0;
+}
+@{end cpp}
+
+@{js}
+const nums = [10, 20, 30];
+const suma = nums.reduce((a, b) => a + b, 0);
+console.log(`Suma: ${suma}`);
+@{end js}
+
+@{end columns}
+
+'<h2>Test 3: 4 Columnas - Python, C#, Fortran, Lua</h2>
+
+@{columns 4}
+
+@{python}
+x = sum(range(1, 6))
+print(f"S: {x}")
+@{end python}
+
+@{csharp}
+using System;
+using System.Linq;
+class P {
+    static void Main() {
+        var x = Enumerable.Range(1, 5).Sum();
+        Console.WriteLine($"S: {x}");
+    }
+}
+@{end csharp}
+
+@{fortran}
+program s
+    integer :: i, x
+    x = 0
+    do i = 1, 5
+        x = x + i
+    end do
+    print *, 'S:', x
+end program s
+@{end fortran}
+
+@{lua}
+x = 0
+for i = 1, 5 do
+    x = x + i
+end
+print("S: " .. x)
+@{end lua}
+
+@{end columns}
+
+'<h2>Resumen</h2>
+'<p>Si ves todas las columnas alineadas correctamente, @{columns} funciona con múltiples parsers.</p>

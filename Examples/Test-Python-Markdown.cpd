@@ -1,0 +1,17 @@
+@{page markdown}
+
+# Test de Python en Markdown Page Mode
+
+Este archivo prueba que otros lenguajes funcionen
+
+## Código Python
+
+@{python}
+print("Hello from Python")
+x = 5 + 3
+print(f"Result: {x}")
+@{end python}
+
+## Resultado
+
+El código debería ejecutarse arriba.

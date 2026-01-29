@@ -1,0 +1,24 @@
+'<h1>Test @{code} y @{uncode}</h1>
+'<p>Este archivo demuestra las dos formas de definir un visor IFC:</p>
+
+'<h2>Opcion 1: @{uncode} - Sintaxis Simplificada</h2>
+'<p>Usa directivas simples para configurar el visor:</p>
+
+@{html-ifc}
+@{uncode}
+@{visor: fondo=#1a1a2e, altura=500}
+@{camara: tipo=perspectiva, pos=50,50,50}
+@{controles: vistas, zoom, color}
+@{end}
+@{end html-ifc}
+
+'<hr>
+'<h2>Opcion 2: @{code} - Codigo HTML/JS Completo</h2>
+'<p>Para control total, usa codigo HTML/JavaScript directo:</p>
+
+'<p><b>Click derecho</b> en el visor para:</p>
+'<ul>
+'<li>Copiar como @{code}</li>
+'<li>Copiar como @{uncode}</li>
+'<li>Sincronizar al Editor</li>
+'</ul>

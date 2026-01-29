@@ -1,0 +1,84 @@
+"Visor IFC con Objetos Personalizados
+=====================================
+
+Este ejemplo muestra las nuevas directivas avanzadas para el visor IFC.
+
+@{ucode}
+@{fondo: #1a1a2e}
+@{altura: 600}
+
+@{visor: tipo=solido}
+
+@{camara: tipo=perspectiva, pos=50,30,50, target=0,0,0, fov=75}
+
+@{luz: color=#ffffff}
+@{luz.ambiente: intensidad=0.5}
+@{luz.direccional: intensidad=0.8}
+
+@{grid: si, tamano=100, divisiones=20}
+@{ejes: si}
+@{sombras: si}
+@{wireframe: no}
+@{opacidad: 1}
+
+@{controles: vistas, zoom, rotacion, color}
+
+@{cubo: pos=0,5,0, size=10, color=#ff0000}
+@{cubo: pos=20,5,0, size=8, color=#00ff00}
+@{cubo: pos=-20,5,0, size=6, color=#0000ff}
+
+@{esfera: pos=0,5,20, radio=5, color=#ff00ff}
+@{esfera: pos=0,5,-20, radio=4, color=#ffff00}
+
+@{cilindro: pos=30,10,0, radio=3, altura=20, color=#00ffff}
+
+@{plano: pos=0,0,0, ancho=80, alto=80, color=#333333, rotacion=90,0,0}
+
+@{linea: desde=0,0,0, hasta=50,30,0, color=#ffffff, grosor=2}
+@{linea: desde=0,0,0, hasta=-50,30,0, color=#ffff00, grosor=2}
+
+@{marcador: pos=0,15,0, texto=Centro, color=#ffffff, fondo=#000000}
+@{marcador: pos=20,12,0, texto=Cubo Verde, color=#00ff00, fondo=#003300}
+@{marcador: pos=30,25,0, texto=Cilindro, color=#00ffff, fondo=#003333}
+
+@{medida: desde=0,0,0, hasta=20,0,0, color=#ffff00}
+@{medida: desde=0,0,0, hasta=0,10,0, color=#00ff00}
+@{medida: desde=0,0,0, hasta=0,0,20, color=#ff0000}
+@{end ucode}
+
+Directivas Disponibles
+----------------------
+
+**Basicas:**
+- @{fondo: #color} - Color de fondo del visor
+- @{altura: 600} - Altura del visor en pixeles
+- @{visor: tipo=solido} - Tipo de renderizado (solido/wireframe)
+
+**Camara:**
+- @{camara: tipo=perspectiva, pos=x,y,z, target=x,y,z, fov=75}
+
+**Iluminacion:**
+- @{luz: color=#ffffff}
+- @{luz.ambiente: intensidad=0.5}
+- @{luz.direccional: intensidad=0.8}
+
+**Visuales:**
+- @{grid: si, tamano=100, divisiones=20} - Cuadricula del piso
+- @{ejes: si} - Ejes XYZ
+- @{sombras: si} - Sombras
+- @{wireframe: no} - Modo alambre
+- @{opacidad: 0.8} - Transparencia global
+
+**Objetos 3D:**
+- @{cubo: pos=x,y,z, size=10, color=#ff0000}
+- @{esfera: pos=x,y,z, radio=5, color=#00ff00}
+- @{cilindro: pos=x,y,z, radio=3, altura=20, color=#0000ff}
+- @{plano: pos=x,y,z, ancho=50, alto=50, color=#888888, rotacion=90,0,0}
+- @{linea: desde=x,y,z, hasta=x,y,z, color=#ffffff, grosor=2}
+
+**Anotaciones:**
+- @{marcador: pos=x,y,z, texto=Etiqueta, color=#fff, fondo=#000}
+- @{medida: desde=x,y,z, hasta=x,y,z, color=#ffff00}
+
+**Cortes:**
+- @{corte: eje=x, pos=10} - Plano de corte

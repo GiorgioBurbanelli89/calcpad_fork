@@ -1,0 +1,15 @@
+"Test de Visor IFC con bloque activo"
+
+'Este archivo prueba que el HTML generado contenga el visor IFC
+
+L = 6 | m
+M = 10 | kN·m
+
+"Visualización IFC"
+@{ifc}
+C:\modelo_inexistente.ifc
+@{end ifc}
+
+"Resultados"
+L = ? | m
+M = ? | kN·m

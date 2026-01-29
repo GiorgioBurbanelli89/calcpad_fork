@@ -1,0 +1,7 @@
+"Test Mínimo ODE"
+
+'<h3>ODE Simple</h3>
+
+@{symbolic}
+sol = solve_ode(y' - x^2, y, x)
+@{end symbolic}

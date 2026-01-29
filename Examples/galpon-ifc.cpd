@@ -1,0 +1,16 @@
+'<h1>Galpon A - Visor IFC</h1>
+'
+'Modelo 3D del Galpón A cargado desde archivo IFC.
+
+@{ifc}
+C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\Galpon_A (4).ifc
+@{end ifc}
+
+'<h2>Controles del Visor</h2>
+'
+'<ul>
+'<li><b>Rotar:</b> Click izquierdo + arrastrar</li>
+'<li><b>Zoom:</b> Scroll del mouse</li>
+'<li><b>Pan:</b> Click derecho + arrastrar</li>
+'<li><b>Fit to view:</b> Presiona tecla F</li>
+'</ul>

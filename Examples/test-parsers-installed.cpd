@@ -1,0 +1,124 @@
+'<h1>Test Parsers Instalados - Directivas Correctas</h1>
+'<p>Este test usa solo parsers instalados con directivas correctas</p>
+
+'<h2>1. Python</h2>
+@{python}
+import math
+radio = 5
+area = math.pi * radio ** 2
+print(f"Área del círculo: {area:.2f}")
+@{end python}
+
+'<h2>2. Octave</h2>
+@{octave}
+% Matriz simple
+A = [1, 2; 3, 4];
+det_A = det(A);
+fprintf('Determinante: %.2f\n', det_A);
+@{end octave}
+
+'<h2>3. Fortran</h2>
+@{fortran}
+program test_fortran
+    implicit none
+    real :: x, y
+    x = 10.0
+    y = x * 2.0
+    print *, 'Resultado:', y
+end program test_fortran
+@{end fortran}
+
+'<h2>4. C</h2>
+@{c}
+#include <stdio.h>
+int main() {
+    int n = 42;
+    printf("El número es: %d\n", n);
+    return 0;
+}
+@{end c}
+
+'<h2>5. C++</h2>
+@{cpp}
+#include <iostream>
+using namespace std;
+int main() {
+    double pi = 3.14159;
+    cout << "Pi = " << pi << endl;
+    return 0;
+}
+@{end cpp}
+
+'<h2>6. C#</h2>
+@{csharp}
+using System;
+class Program {
+    static void Main() {
+        double resultado = Math.Sqrt(16);
+        Console.WriteLine($"Raíz cuadrada de 16: {resultado}");
+    }
+}
+@{end csharp}
+
+'<h2>7. Rust</h2>
+@{rust}
+fn main() {
+    let x = 10;
+    let y = 20;
+    let suma = x + y;
+    println!("Suma: {}", suma);
+}
+@{end rust}
+
+'<h2>8. JavaScript (Directiva correcta: @{js})</h2>
+@{js}
+// Función simple
+function calcular() {
+    const a = 5;
+    const b = 3;
+    return a * b;
+}
+console.log('Resultado:', calcular());
+@{end js}
+
+'<h2>9. TypeScript (Directiva: @{ts})</h2>
+@{ts}
+function sumar(a: number, b: number): number {
+    return a + b;
+}
+const resultado = sumar(10, 20);
+console.log(`Resultado: ${resultado}`);
+@{end ts}
+
+'<h2>10. PowerShell</h2>
+@{powershell}
+$mensaje = "Hola desde PowerShell"
+Write-Host $mensaje
+$numero = 42
+Write-Host "Número: $numero"
+@{end powershell}
+
+'<h2>11. Lua</h2>
+@{lua}
+-- Cálculo simple
+x = 10
+y = 20
+print("Suma: " .. (x + y))
+@{end lua}
+
+'<h2>12. Markdown</h2>
+@{markdown}
+# Título en Markdown
+
+Este es **texto en negrita** y este es *cursiva*.
+
+- Item 1
+- Item 2
+- Item 3
+
+Código inline: `x = 10`
+@{end markdown}
+
+'<h2>✅ Test Completado</h2>
+'<p>Estos son los parsers que están instalados y funcionan correctamente.</p>
+'<p>Nota: JavaScript usa @{js}, TypeScript usa @{ts} o @{typescript}</p>

@@ -1,0 +1,20 @@
+'<h1>Test Simple - Solo 2 Parsers</h1>
+
+'<h2>1. C++ Test</h2>
+@{cpp}
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "C++ funciona!" << endl;
+    return 0;
+}
+@{end cpp}
+
+'<h2>2. TypeScript Test</h2>
+@{ts}
+const x: number = 42;
+console.log(`TypeScript funciona! x = ${x}`);
+@{end ts}
+
+'<h2>✅ Test Completado</h2>

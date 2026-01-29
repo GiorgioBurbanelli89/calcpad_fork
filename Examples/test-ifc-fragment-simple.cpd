@@ -1,0 +1,7 @@
+'<h1>Test Simple - IFC Fragment</h1>
+
+@{ifc-fragment}
+C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\modelo-test.ifc
+@{end ifc-fragment}
+
+'<p>Test de fragmentación con un solo archivo pequeño</p>

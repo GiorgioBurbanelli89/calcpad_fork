@@ -1,0 +1,33 @@
+'<h1>Test - 4 Columnas con IFC Diferentes</h1>
+'<p>Este test muestra 4 visores IFC con 4 modelos DIFERENTES en 4 columnas</p>
+
+@{columns 4}
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc}
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Galpon_A.ifc
+@{end ifc}
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Galpon_A (1).ifc
+@{end ifc}
+
+@{ifc}
+C:\Users\j-b-j\Downloads\propuesta dos ifc.ifc
+@{end ifc}
+
+@{end columns}
+
+'<hr style="border: 2px solid #2196F3; margin: 30px 0;">
+
+'<h2>Información</h2>
+'<div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+'<p><strong>Test de 4 columnas:</strong> 4 modelos IFC diferentes</p>
+'<p>1. Silvia Cedeño.ifc</p>
+'<p>2. Galpon_A.ifc</p>
+'<p>3. Galpon_A (1).ifc</p>
+'<p>4. propuesta dos ifc.ifc</p>
+'</div>

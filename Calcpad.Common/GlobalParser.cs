@@ -33,70 +33,61 @@ namespace Calcpad.Common
             _tracker?.EnterMethod("GlobalParser", "Process", $"Code length: {code.Length} chars");
 
             // CHECK FOR PAGE MODE: @{page markdown}
-            // This switches the entire page to Markdown mode with Calcpad support
             if (IsMarkdownPageMode(code, out var markdownContent))
             {
-                hasExternalCode = true; // Signal that we handled it externally (return HTML)
+                hasExternalCode = true;
                 return ProcessMarkdownPage(markdownContent, progressCallback);
             }
 
-            // DECISION POINT: Check if there are external code blocks
-            _tracker?.ReportStep("Checking for external language blocks");
-            hasExternalCode = MultLangManager.HasLanguageCode(code);
+            // SIMPLE DECISION: Does code have ANY @{...} blocks?
+            hasExternalCode = HasAnyDirectiveBlocks(code);
+
+            try
+            {
+                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath,
+                    $"[{DateTime.Now:HH:mm:ss}] GlobalParser: hasExternalCode={hasExternalCode}\n");
+            }
+            catch { }
 
             if (hasExternalCode)
             {
-                // Check if there's ALSO Calcpad code (mixed mode)
-                bool hasMixedCode = HasCalcpadCode(code);
-
+                // PATH 1: Has @{...} blocks - MultLangProcessor handles EVERYTHING
+                // Including @{calcpad} blocks if present
+                // Calcpad parser is NOT called automatically
                 try
                 {
                     var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
                     System.IO.File.AppendAllText(debugPath,
-                        $"[{DateTime.Now:HH:mm:ss}] GlobalParser.Process: HasCalcpadCode={hasMixedCode}\n");
+                        $"[{DateTime.Now:HH:mm:ss}] PATH 1: MultLangProcessor handles all @{{}} blocks\n");
                 }
                 catch { }
 
-                if (hasMixedCode)
-                {
-                    // PATH 1A: MIXED MODE - Has external code AND Calcpad code
-                    // Preprocess: Replace external code blocks with Calcpad HTML comments
-                    // Then return for ExpressionParser to process Calcpad code
-                    hasExternalCode = false; // Signal to use ExpressionParser
-
-                    try
-                    {
-                        var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
-                        System.IO.File.AppendAllText(debugPath,
-                            $"[{DateTime.Now:HH:mm:ss}] PATH 1A: MIXED MODE - Setting hasExternalCode=false\n");
-                    }
-                    catch { }
-
-                    return PreprocessMixedCode(code, progressCallback, partialResultCallback);
-                }
-                else
-                {
-                    // PATH 1B: PURE EXTERNAL - Only external code, no Calcpad
-                    // Use MultLangProcessor and return HTML directly
-                    // enableCollapse=false: Simple output without collapse/expand buttons
-
-                    try
-                    {
-                        var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
-                        System.IO.File.AppendAllText(debugPath,
-                            $"[{DateTime.Now:HH:mm:ss}] PATH 1B: PURE EXTERNAL - Processing with MultLangProcessor\n");
-                    }
-                    catch { }
-
-                    return _multLangProcessor.Process(code, returnHtml: true, enableCollapse: false, progressCallback: progressCallback, partialResultCallback: partialResultCallback);
-                }
+                return _multLangProcessor.Process(code, returnHtml: true, enableCollapse: false, progressCallback: progressCallback, partialResultCallback: partialResultCallback);
             }
             else
             {
-                // PATH 2: No external code - return original for Calcpad processing
-                // MultLangProcessor was SKIPPED, ExpressionParser will handle it
+                // PATH 2: No @{...} blocks - Pure Calcpad code
+                // Return original for ExpressionParser to handle
+                try
+                {
+                    var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                    System.IO.File.AppendAllText(debugPath,
+                        $"[{DateTime.Now:HH:mm:ss}] PATH 2: Pure Calcpad - returning for ExpressionParser\n");
+                }
+                catch { }
+
                 return code;
             }
+        }
+
+        /// <summary>
+        /// Check if code has any @{...} directive blocks
+        /// </summary>
+        private bool HasAnyDirectiveBlocks(string code)
+        {
+            // Simple check: does code contain @{ followed by a word and either } or content
+            return System.Text.RegularExpressions.Regex.IsMatch(code, @"@\{[a-zA-Z]");
         }
 
         /// <summary>

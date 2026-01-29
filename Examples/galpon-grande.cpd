@@ -1,0 +1,15 @@
+'<h1>Galpón A - Archivo IFC Grande (212 MB)</h1>
+'
+'Este archivo IFC usa modo EXTERNO (no Base64 embebido).
+
+@{ifc}
+C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\Galpon_A (4).ifc
+@{end ifc}
+
+'<h2>Información</h2>
+'
+'<ul>
+'<li>Tamaño: 212 MB</li>
+'<li>Modo: Archivo externo (fetch)</li>
+'<li>El HTML referencia el archivo .ifc directamente</li>
+'</ul>

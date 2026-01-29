@@ -1,0 +1,6 @@
+'Test de archivo IFC grande con @{ifc}
+'Este test carga Galpon_A.ifc (466 MB) usando archivo externo
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Galpon_A.ifc
+@{end ifc}

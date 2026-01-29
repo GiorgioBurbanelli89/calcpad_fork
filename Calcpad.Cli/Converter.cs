@@ -37,7 +37,8 @@ namespace Calcpad.Cli
                 templatePath = $"{Program.AppPath}doc{Path.DirectorySeparatorChar}template{Program.AddCultureExt("html")}";
             }
 
-            _htmlWorksheet = File.ReadAllText(templatePath).Replace("jquery", appUrl + "jquery");
+            // Replace the Virtual Host URL with actual file:// URL for CLI (no WebView2 Virtual Host)
+            _htmlWorksheet = File.ReadAllText(templatePath).Replace("https://calcpad.local/", appUrl);
             _isSilent = isSilent;
         }
 

@@ -667,7 +667,15 @@ namespace Calcpad.Cli
                     openXmlExpressions = parser.OpenXmlExpressions;
                 }
                 if (ext == ".html" || ext == ".htm")
+                {
                     converter.ToHtml(htmlResult, outFile);
+
+                    // Auto-open with HTTP server if contains IFC
+                    if (!isSilent && ContainsIFC(htmlResult))
+                    {
+                        OpenHtmlWithHttpServer(outFile);
+                    }
+                }
                 else if (ext == ".docx")
                     converter.ToOpenXml(htmlResult, outFile, openXmlExpressions);
                 else if (ext == ".pdf")
@@ -940,6 +948,169 @@ namespace Calcpad.Cli
             catch (Exception Ex)
             {
                 WriteError(Ex.Message, true);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Detecta si el HTML contiene un visor IFC
+        /// </summary>
+        private static bool ContainsIFC(string htmlContent)
+        {
+            return htmlContent != null &&
+                   (htmlContent.Contains("ifc-viewer", StringComparison.OrdinalIgnoreCase) ||
+                    htmlContent.Contains("web-ifc", StringComparison.OrdinalIgnoreCase) ||
+                    htmlContent.Contains("ifc-fragment", StringComparison.OrdinalIgnoreCase) ||
+                    htmlContent.Contains("@thatopen/fragments", StringComparison.OrdinalIgnoreCase) ||
+                    htmlContent.Contains("@{ifc}", StringComparison.OrdinalIgnoreCase) ||
+                    htmlContent.Contains("@{ifc-fragment}", StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Abre el archivo HTML usando un servidor HTTP local (para evitar errores CORS con IFC)
+        /// </summary>
+        private static void OpenHtmlWithHttpServer(string htmlFilePath)
+        {
+            try
+            {
+                var fileName = Path.GetFileName(htmlFilePath);
+                var directory = Path.GetDirectoryName(Path.GetFullPath(htmlFilePath));
+                var port = 8888;
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("=== IFC Viewer - HTTP Server ===");
+                Console.ResetColor();
+                Console.WriteLine($"Detected IFC content. Starting HTTP server...");
+                Console.WriteLine($"Directory: {directory}");
+                Console.WriteLine($"Port: {port}");
+                Console.WriteLine();
+
+                // Check if Node.js/npx is available
+                if (!IsCommandAvailable("node") && !IsCommandAvailable("npx"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Warning: Node.js not found. Cannot start HTTP server.");
+                    Console.WriteLine("Please open the file manually using a web server:");
+                    Console.WriteLine($"  http://localhost:{port}/{fileName}");
+                    Console.ResetColor();
+                    Console.WriteLine();
+                    Console.WriteLine("Or use the script: ver-html.bat " + fileName);
+                    Console.WriteLine();
+                    Console.WriteLine("Install Node.js from: https://nodejs.org/");
+                    Console.WriteLine();
+                    return;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Starting HTTP server on port {port}...");
+                Console.ResetColor();
+
+                // Start HTTP server FIRST using npx http-server
+                var npxCommand = "npx";
+                var serverProcess = new ProcessStartInfo
+                {
+                    FileName = npxCommand,
+                    Arguments = $"--yes http-server \"{directory}\" -p {port} --cors -c-1",
+                    UseShellExecute = true,
+                    WorkingDirectory = directory
+                };
+
+                var process = Process.Start(serverProcess);
+                if (process == null)
+                {
+                    Console.WriteLine("Failed to start HTTP server");
+                    return;
+                }
+
+                // Wait for server to be ready (check with HTTP request)
+                var url = $"http://localhost:{port}/{fileName}";
+                var maxRetries = 10;
+                var serverReady = false;
+
+                for (int i = 0; i < maxRetries; i++)
+                {
+                    Thread.Sleep(1000);
+                    try
+                    {
+                        using var client = new System.Net.Http.HttpClient();
+                        client.Timeout = TimeSpan.FromSeconds(2);
+                        var response = client.GetAsync($"http://localhost:{port}/").Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            serverReady = true;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        // Server not ready yet, continue waiting
+                    }
+                }
+
+                if (!serverReady)
+                {
+                    Console.WriteLine("Warning: Could not verify server is ready, opening browser anyway...");
+                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Opening: {url}");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.WriteLine("Press Ctrl+C to stop the server when done.");
+                Console.WriteLine();
+
+                // NOW open browser after server is ready
+                try
+                {
+                    if (OperatingSystem.IsWindows())
+                        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                    else if (OperatingSystem.IsLinux())
+                        Process.Start("xdg-open", url);
+                    else if (OperatingSystem.IsMacOS())
+                        Process.Start("open", url);
+                }
+                catch
+                {
+                    Console.WriteLine($"Could not open browser automatically. Please open: {url}");
+                }
+
+                // Wait for server process (blocking)
+                process.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Error starting HTTP server: {ex.Message}");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.WriteLine("You can open the file manually using a web server.");
+            }
+        }
+
+        /// <summary>
+        /// Verifica si un comando está disponible en el sistema
+        /// </summary>
+        private static bool IsCommandAvailable(string command)
+        {
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = OperatingSystem.IsWindows() ? "where" : "which",
+                    Arguments = command,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using var process = Process.Start(startInfo);
+                process?.WaitForExit();
+                return process?.ExitCode == 0;
+            }
+            catch
+            {
                 return false;
             }
         }

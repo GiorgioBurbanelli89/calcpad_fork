@@ -80,6 +80,9 @@ namespace Calcpad.Wpf
                 // Sync with MathEditor if in Visual mode
                 SyncAvalonEditToMathEditor();
 
+                // Sync @{code}/@{ucode} with their closing tags
+                SyncAllCodeUcodeClosingTags();
+
                 // AutoRun support - same logic as RichTextBox_TextChanged
                 if (_isTextChangedEnabled && IsAutoRun)
                 {
@@ -152,6 +155,12 @@ namespace Calcpad.Wpf
         {
             if (TextEditor == null) return;
 
+            // Sync @{code}/@{ucode} closing tags when user types '}'
+            if (e.Text == "}")
+            {
+                SyncCodeUcodeClosingTags();
+            }
+
             // Get current context (html, css, ts, etc.)
             string context = GetCurrentBlockContext();
 
@@ -173,6 +182,233 @@ namespace Calcpad.Wpf
                     ShowSnippetAutocomplete(context, wordBeforeCursor);
                 }
             }
+        }
+
+        /// <summary>
+        /// Synchronize @{code}/@{ucode} opening tags with their closing tags when user types '}'.
+        /// </summary>
+        private void SyncCodeUcodeClosingTags()
+        {
+            if (TextEditor == null) return;
+
+            try
+            {
+                string text = TextEditor.Text;
+                int caretPos = TextEditor.CaretOffset;
+
+                // Check if cursor is just after @{code} or @{ucode}
+                string textBeforeCursor = text.Substring(0, Math.Min(caretPos, text.Length));
+
+                // Look for @{code} or @{ucode} ending at cursor position
+                bool justTypedCode = textBeforeCursor.EndsWith("@{code}", StringComparison.OrdinalIgnoreCase);
+                bool justTypedUcode = textBeforeCursor.EndsWith("@{ucode}", StringComparison.OrdinalIgnoreCase);
+
+                if (!justTypedCode && !justTypedUcode)
+                    return;
+
+                string expectedClosing = justTypedCode ? "@{end code}" : "@{end ucode}";
+                string wrongClosing = justTypedCode ? "@{end ucode}" : "@{end code}";
+
+                // Find the corresponding closing tag after cursor
+                string textAfterCursor = text.Substring(caretPos);
+
+                // Look for the wrong closing tag and replace it
+                int wrongClosingIdx = textAfterCursor.IndexOf(wrongClosing, StringComparison.OrdinalIgnoreCase);
+
+                if (wrongClosingIdx >= 0)
+                {
+                    // Found wrong closing tag - replace it
+                    int absolutePosition = caretPos + wrongClosingIdx;
+
+                    // Disable text change events temporarily
+                    _isTextChangedEnabled = false;
+
+                    TextEditor.Document.Replace(absolutePosition, wrongClosing.Length, expectedClosing);
+
+                    _isTextChangedEnabled = true;
+                }
+            }
+            catch
+            {
+                // Ignore errors in sync logic
+            }
+        }
+
+        // Flag to prevent recursive sync
+        private bool _isSyncingCodeUcodeTags = false;
+
+        /// <summary>
+        /// Synchronize @{code}/@{ucode} tags and convert content between formats.
+        /// When user changes @{code} to @{ucode}: convert HTML to directives
+        /// When user changes @{ucode} to @{code}: convert directives to HTML
+        /// </summary>
+        private void SyncAllCodeUcodeClosingTags()
+        {
+            if (TextEditor == null) return;
+            if (_isSyncingCodeUcodeTags) return;
+
+            try
+            {
+                string text = TextEditor.Text;
+                if (string.IsNullOrEmpty(text)) return;
+
+                // Check for @{ucode} with @{end code} (user changed from @{code} to @{ucode})
+                // This means we need to convert HTML content to directives
+                if (text.Contains("@{ucode}", StringComparison.OrdinalIgnoreCase) &&
+                    text.Contains("@{end code}", StringComparison.OrdinalIgnoreCase))
+                {
+                    ConvertCodeToUcode();
+                    return;
+                }
+
+                // Check for @{code} with @{end ucode} (user changed from @{ucode} to @{code})
+                // This means we need to convert directives to HTML
+                if (text.Contains("@{code}", StringComparison.OrdinalIgnoreCase) &&
+                    !text.Contains("@{ucode}", StringComparison.OrdinalIgnoreCase) &&
+                    text.Contains("@{end ucode}", StringComparison.OrdinalIgnoreCase))
+                {
+                    ConvertUcodeToCode();
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"SyncAllCodeUcodeClosingTags error: {ex.Message}");
+                _isSyncingCodeUcodeTags = false;
+            }
+        }
+
+        /// <summary>
+        /// Convert from @{code} format (HTML) to @{ucode} format (directives)
+        /// </summary>
+        private void ConvertCodeToUcode()
+        {
+            if (TextEditor == null) return;
+            _isSyncingCodeUcodeTags = true;
+
+            try
+            {
+                string text = TextEditor.Text;
+
+                // Find the content between @{ucode} and @{end code}
+                int ucodeStart = text.IndexOf("@{ucode}", StringComparison.OrdinalIgnoreCase);
+                int endCodeStart = text.IndexOf("@{end code}", StringComparison.OrdinalIgnoreCase);
+
+                if (ucodeStart < 0 || endCodeStart < 0 || endCodeStart <= ucodeStart) return;
+
+                // Check if there's @{html-ifc} inside
+                int htmlIfcStart = text.IndexOf("@{html-ifc}", StringComparison.OrdinalIgnoreCase);
+                int htmlIfcEnd = text.IndexOf("@{end html-ifc}", StringComparison.OrdinalIgnoreCase);
+
+                string newContent;
+                if (htmlIfcStart >= 0 && htmlIfcEnd >= 0 && htmlIfcStart > ucodeStart && htmlIfcEnd < endCodeStart)
+                {
+                    // Extract content between @{html-ifc} and @{end html-ifc}
+                    int contentStart = htmlIfcStart + "@{html-ifc}".Length;
+                    string htmlContent = text.Substring(contentStart, htmlIfcEnd - contentStart).Trim();
+
+                    // Convert HTML to directives
+                    string directives = ExtractDirectivesFromHtml(htmlContent);
+
+                    // Build new content with directives
+                    newContent = $"@{{ucode}}\r\n@{{html-ifc}}\r\n{directives}\r\n@{{end html-ifc}}\r\n@{{end ucode}}";
+                }
+                else
+                {
+                    // No @{html-ifc}, just fix the closing tag
+                    int contentStart = ucodeStart + "@{ucode}".Length;
+                    string innerContent = text.Substring(contentStart, endCodeStart - contentStart);
+                    newContent = $"@{{ucode}}{innerContent}@{{end ucode}}";
+                }
+
+                // Replace entire block
+                int blockEnd = endCodeStart + "@{end code}".Length;
+                TextEditor.Document.Replace(ucodeStart, blockEnd - ucodeStart, newContent);
+            }
+            finally
+            {
+                _isSyncingCodeUcodeTags = false;
+            }
+        }
+
+        /// <summary>
+        /// Convert from @{ucode} format (directives) to @{code} format (HTML)
+        /// </summary>
+        private void ConvertUcodeToCode()
+        {
+            if (TextEditor == null) return;
+            _isSyncingCodeUcodeTags = true;
+
+            try
+            {
+                string text = TextEditor.Text;
+
+                // Find the content between @{code} and @{end ucode}
+                int codeStart = text.IndexOf("@{code}", StringComparison.OrdinalIgnoreCase);
+                int endUcodeStart = text.IndexOf("@{end ucode}", StringComparison.OrdinalIgnoreCase);
+
+                if (codeStart < 0 || endUcodeStart < 0 || endUcodeStart <= codeStart) return;
+
+                // Check if there's @{html-ifc} inside
+                int htmlIfcStart = text.IndexOf("@{html-ifc}", StringComparison.OrdinalIgnoreCase);
+                int htmlIfcEnd = text.IndexOf("@{end html-ifc}", StringComparison.OrdinalIgnoreCase);
+
+                string newContent;
+                if (htmlIfcStart >= 0 && htmlIfcEnd >= 0 && htmlIfcStart > codeStart && htmlIfcEnd < endUcodeStart)
+                {
+                    // Extract directives between @{html-ifc} and @{end html-ifc}
+                    int contentStart = htmlIfcStart + "@{html-ifc}".Length;
+                    string directivesContent = text.Substring(contentStart, htmlIfcEnd - contentStart).Trim();
+
+                    // Convert directives to HTML
+                    string htmlContent = Calcpad.Common.MultLangCode.IfcLanguageHandler.ConvertDirectivesToHtml(directivesContent);
+
+                    // Build new content with HTML
+                    newContent = $"@{{code}}\r\n@{{html-ifc}}\r\n{htmlContent}\r\n@{{end html-ifc}}\r\n@{{end code}}";
+                }
+                else
+                {
+                    // No @{html-ifc}, just fix the closing tag
+                    int contentStart = codeStart + "@{code}".Length;
+                    string innerContent = text.Substring(contentStart, endUcodeStart - contentStart);
+                    newContent = $"@{{code}}{innerContent}@{{end code}}";
+                }
+
+                // Replace entire block
+                int blockEnd = endUcodeStart + "@{end ucode}".Length;
+                TextEditor.Document.Replace(codeStart, blockEnd - codeStart, newContent);
+            }
+            finally
+            {
+                _isSyncingCodeUcodeTags = false;
+            }
+        }
+
+        /// <summary>
+        /// Extract simplified directives from HTML content
+        /// </summary>
+        private string ExtractDirectivesFromHtml(string html)
+        {
+            var sb = new System.Text.StringBuilder();
+
+            // Extract background color
+            var bgMatch = System.Text.RegularExpressions.Regex.Match(html, @"background:\s*([#\w]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            string fondo = bgMatch.Success ? bgMatch.Groups[1].Value : "#1e1e1e";
+            sb.AppendLine($"@{{fondo: {fondo}}}");
+
+            // Extract height
+            var heightMatch = System.Text.RegularExpressions.Regex.Match(html, @"height:\s*(\d+)px", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            string altura = heightMatch.Success ? heightMatch.Groups[1].Value : "600";
+            sb.AppendLine($"@{{altura: {altura}}}");
+
+            // Extract IFC file URL
+            var ifcMatch = System.Text.RegularExpressions.Regex.Match(html, @"https://calcpad\.ifc/([^'""\s<>]+\.ifc)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (ifcMatch.Success)
+            {
+                sb.AppendLine($"@{{visor: https://calcpad.ifc/{ifcMatch.Groups[1].Value}}}");
+            }
+
+            return sb.ToString().TrimEnd();
         }
 
         /// <summary>
@@ -393,6 +629,22 @@ namespace Calcpad.Wpf
                 // Text paste - let AvalonEdit handle it normally
             }
 
+            // Ctrl+Q - Comment line(s)
+            if (e.Key == Key.Q && isCtrl && !isCtrlShift)
+            {
+                CommentUncomment(true);
+                e.Handled = true;
+                return;
+            }
+
+            // Ctrl+Shift+Q - Uncomment line(s)
+            if (e.Key == Key.Q && isCtrlShift)
+            {
+                CommentUncomment(false);
+                e.Handled = true;
+                return;
+            }
+
             // Delegate other keys to RichTextBox_PreviewKeyDown for compatibility
             RichTextBox_PreviewKeyDown(sender, e);
         }
@@ -410,6 +662,215 @@ namespace Calcpad.Wpf
         private void TextEditor_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             // Delegate to existing RichTextBox_GotKeyboardFocus if it exists
+        }
+
+        // ========== TOOLTIP/HOVER HELP SYSTEM ==========
+        private System.Windows.Controls.ToolTip? _editorToolTip;
+
+        /// <summary>
+        /// Show tooltip when mouse hovers over code elements
+        /// </summary>
+        private void TextEditor_MouseHover(object sender, MouseEventArgs e)
+        {
+            if (TextEditor == null) return;
+
+            var position = TextEditor.GetPositionFromPoint(e.GetPosition(TextEditor));
+            if (position == null) return;
+
+            int offset = TextEditor.Document.GetOffset(position.Value.Line, position.Value.Column);
+            string text = TextEditor.Text;
+
+            // Get the current line
+            var line = TextEditor.Document.GetLineByOffset(offset);
+            string lineText = TextEditor.Document.GetText(line.Offset, line.Length);
+
+            // Find tooltip for the current position
+            string? tooltip = GetTooltipForPosition(lineText, text, offset, line.Offset);
+
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                if (_editorToolTip == null)
+                {
+                    _editorToolTip = new System.Windows.Controls.ToolTip();
+                }
+                _editorToolTip.Content = tooltip;
+                _editorToolTip.IsOpen = true;
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// Hide tooltip when mouse stops hovering
+        /// </summary>
+        private void TextEditor_MouseHoverStopped(object sender, MouseEventArgs e)
+        {
+            if (_editorToolTip != null)
+            {
+                _editorToolTip.IsOpen = false;
+            }
+        }
+
+        /// <summary>
+        /// Get tooltip text based on cursor position and line content
+        /// </summary>
+        private string? GetTooltipForPosition(string lineText, string fullText, int offset, int lineOffset)
+        {
+            string trimmedLine = lineText.Trim();
+
+            // ===== DIRECTIVAS @{} =====
+            if (trimmedLine.StartsWith("@{html-ifc}"))
+                return "📦 VISOR IFC 3D\n\nPermite mostrar modelos IFC en 3D.\nEl contenido puede ser:\n• HTML/JS directo\n• @{ucode}...@{end ucode} con directivas simplificadas\n• Ruta a un archivo .ifc\n\nEjecuta con F5 para ver el modelo.";
+
+            if (trimmedLine.StartsWith("@{end html-ifc}"))
+                return "🔚 FIN DEL BLOQUE IFC\n\nCierra el bloque @{html-ifc}";
+
+            // ===== @{code} y @{ucode} =====
+            if (trimmedLine.StartsWith("@{code}"))
+                return "💻 MODO CÓDIGO\n\nHTML/JavaScript completo editable.\n\nEstructura:\n@{code}\n@{html-ifc}\n<!DOCTYPE html>...\n@{end html-ifc}\n@{end code}\n\nTip: Usa @{ucode} para directivas simplificadas";
+
+            if (trimmedLine.StartsWith("@{end code}"))
+                return "🔚 FIN DEL BLOQUE\n\nCierra @{code}";
+
+            if (trimmedLine.StartsWith("@{ucode}"))
+                return "✨ MODO SIMPLIFICADO\n\nUsa directivas fáciles sin escribir código.\n\nDirectivas disponibles:\n• @{fondo: #1e1e1e}\n• @{altura: 600}\n• @{visor: archivo.ifc}\n\nEstructura:\n@{ucode}\n@{html-ifc}\n@{fondo: #1e1e1e}\n@{end html-ifc}\n@{end ucode}";
+
+            if (trimmedLine.StartsWith("@{end ucode}"))
+                return "🔚 FIN DEL BLOQUE\n\nCierra @{ucode}";
+
+            // ===== Directiva @{visor} =====
+            if (trimmedLine.StartsWith("@{visor"))
+                return "🖼️ CONFIGURACIÓN DEL VISOR\n\nParámetros:\n• fondo = Color de fondo (hex)\n  Ejemplos: #1a1a2e, #ffffff, #000000\n\n• altura = Altura en píxeles\n  Ejemplos: 400, 500, 600, 800\n\n• archivo = Ruta al archivo IFC\n  Ejemplo: C:\\modelo.ifc";
+
+            // ===== Directiva @{camara} =====
+            if (trimmedLine.StartsWith("@{camara"))
+                return "📷 CONFIGURACIÓN DE CÁMARA\n\nParámetros:\n• tipo = Tipo de cámara\n  Opciones: perspectiva, ortografica\n\n• pos = Posición X,Y,Z\n  Ejemplos:\n  50,50,50 (vista diagonal)\n  0,100,0 (vista superior)\n  0,0,100 (vista frontal)\n  100,0,0 (vista lateral)";
+
+            // ===== Directiva @{controles} =====
+            if (trimmedLine.StartsWith("@{controles"))
+                return "🎮 CONTROLES DEL VISOR\n\nOpciones (separadas por coma):\n• vistas - Botones: 3D, Superior, Frontal, Lateral\n• zoom - Slider de zoom\n• rotacion - Slider de rotación\n• color - Selector de color de fondo\n\nEjemplo:\n@{controles: vistas, zoom, color}";
+
+            // ===== Parámetros individuales =====
+            if (trimmedLine.Contains("fondo=") || trimmedLine.Contains("fondo ="))
+                return "🎨 COLOR DE FONDO\n\nFormato: #RRGGBB (hexadecimal)\n\nEjemplos:\n• #1a1a2e - Azul oscuro (default)\n• #ffffff - Blanco\n• #000000 - Negro\n• #2d2d44 - Gris azulado\n• #1e1e1e - Gris oscuro\n• #87ceeb - Azul cielo\n• #2e8b57 - Verde mar\n\n💡 Usa un selector de color online\npara encontrar más colores.";
+
+            if (trimmedLine.Contains("altura=") || trimmedLine.Contains("altura ="))
+                return "📏 ALTURA DEL VISOR\n\nValor en píxeles.\n\nEjemplos:\n• 400 - Pequeño\n• 500 - Mediano\n• 600 - Standard (default)\n• 800 - Grande\n• 100vh - Pantalla completa";
+
+            if (trimmedLine.Contains("pos=") || trimmedLine.Contains("pos ="))
+                return "📍 POSICIÓN DE CÁMARA\n\nFormato: X,Y,Z (coordenadas)\n\nEjemplos:\n• 50,50,50 - Vista diagonal (default)\n• 0,100,0 - Vista superior (planta)\n• 0,0,100 - Vista frontal (elevación)\n• 100,0,0 - Vista lateral (corte)\n• 0,50,100 - Vista frontal elevada\n\n💡 Y es la altura (arriba/abajo)\nX y Z son horizontal.";
+
+            if (trimmedLine.Contains("tipo=") || trimmedLine.Contains("tipo ="))
+                return "📷 TIPO DE CÁMARA\n\nOpciones:\n• perspectiva - Vista realista con\n  profundidad (objetos lejanos más pequeños)\n\n• ortografica - Vista técnica sin\n  perspectiva (para planos y dibujos)";
+
+            if (trimmedLine.Contains("archivo=") || trimmedLine.Contains("archivo ="))
+                return "📁 ARCHIVO IFC\n\nRuta completa al archivo .ifc\n\nEjemplos:\n• C:\\Users\\nombre\\modelo.ifc\n• C:\\Proyectos\\edificio.ifc\n\n💡 Arrastra un archivo IFC\nal editor para obtener la ruta.";
+
+            if (trimmedLine.StartsWith("@{ifc-create}"))
+                return "🏗️ CREAR GEOMETRÍA IFC\n\nPermite crear elementos IFC programáticamente.\nUsa comandos como:\n• BEAM x1,y1,z1 -> x2,y2,z2\n• COLUMN x,y,z height\n• SLAB points...";
+
+            if (trimmedLine.StartsWith("@{html}"))
+                return "🌐 BLOQUE HTML\n\nInserta HTML directo en la salida.\nNota: Usa NavigateToString (file:// origin)";
+
+            if (trimmedLine.StartsWith("@{python}"))
+                return "🐍 CÓDIGO PYTHON\n\nEjecuta código Python.\nRequiere Python instalado en el sistema.";
+
+            if (trimmedLine.StartsWith("@{markdown}") || trimmedLine.StartsWith("@{md}"))
+                return "📝 MARKDOWN\n\nFormatea texto usando Markdown.\nSoporta: **negrita**, *cursiva*, listas, etc.";
+
+            // ===== COMENTARIOS HTML CON AYUDA =====
+            // Colores de fondo
+            if (lineText.Contains("COLOR DE FONDO DE LA PAGINA"))
+                return "🎨 COLOR DE FONDO\n\nCambia el color de fondo de toda la página.\nEjemplos:\n• #1e1e1e (gris oscuro)\n• #ffffff (blanco)\n• #000000 (negro)";
+
+            if (lineText.Contains("COLOR DE FONDO DE LA ESCENA 3D"))
+                return "🎨 COLOR DE ESCENA 3D\n\nCambia el fondo del visor 3D.\nUsa formato hex: 0xRRGGBB\nEjemplos:\n• 0x1e1e1e (gris oscuro)\n• 0xffffff (blanco)\n• 0x87ceeb (azul cielo)";
+
+            if (lineText.Contains("scene.background"))
+                return "🎨 FONDO DE ESCENA\n\nThree.js Color para el fondo 3D.\nnew THREE.Color(0xRRGGBB)\n\nCambia 0x1e1e1e por otro color.";
+
+            // Iluminación
+            if (lineText.Contains("LUZ AMBIENTAL"))
+                return "💡 LUZ AMBIENTAL\n\nIlumina todo uniformemente.\nAmbientLight(color, intensidad)\n• color: 0xffffff (blanco)\n• intensidad: 0.0 a 1.0";
+
+            if (lineText.Contains("LUZ DIRECCIONAL"))
+                return "☀️ LUZ DIRECCIONAL\n\nComo el sol, crea sombras.\nDirectionalLight(color, intensidad)\nPosición: dirLight.position.set(x, y, z)";
+
+            if (lineText.Contains("AmbientLight"))
+                return "💡 THREE.AmbientLight\n\nLuz que ilumina todo por igual.\nParámetros: (color, intensidad)\n• intensidad 0.5 = 50%";
+
+            if (lineText.Contains("DirectionalLight"))
+                return "☀️ THREE.DirectionalLight\n\nLuz direccional (como el sol).\nParámetros: (color, intensidad)\nUsa .position.set(x,y,z) para orientarla.";
+
+            // Grid
+            if (lineText.Contains("GRID") || lineText.Contains("CUADRICULA"))
+                return "📐 CUADRÍCULA (GRID)\n\nMuestra una cuadrícula en el suelo.\nGridHelper(tamaño, divisiones, colorPrincipal, colorSecundario)\n\nPara quitar: comenta o elimina estas líneas.";
+
+            if (lineText.Contains("GridHelper"))
+                return "📐 THREE.GridHelper\n\nCrea una cuadrícula.\nParámetros:\n• tamaño: 100\n• divisiones: 100\n• colorLineasPrincipales: 0x444444\n• colorLineasSecundarias: 0x333333";
+
+            // Material y colores
+            if (lineText.Contains("MATERIAL Y COLOR"))
+                return "🎨 MATERIAL DE ELEMENTOS\n\nControla cómo se ven los objetos 3D.\nPuedes cambiar:\n• color: Color del objeto\n• wireframe: Ver solo líneas\n• shininess: Brillo (0-100)";
+
+            if (lineText.Contains("MeshPhongMaterial"))
+                return "🎨 THREE.MeshPhongMaterial\n\nMaterial con iluminación Phong.\nOpciones:\n• color: color base\n• wireframe: true/false\n• flatShading: true/false\n• shininess: 0-100\n• transparent/opacity";
+
+            if (lineText.Contains("wireframe: true"))
+                return "🔲 MODO WIREFRAME\n\nMuestra solo las líneas/aristas.\nDescomenta para activar.";
+
+            // Cámara
+            if (lineText.Contains("CONFIGURACION DE CAMARA") || lineText.Contains("PerspectiveCamera"))
+                return "📷 CÁMARA\n\nPerspectiveCamera(fov, aspect, near, far)\n• fov: ángulo de visión (75°)\n• near: distancia mínima (0.1)\n• far: distancia máxima (10000)";
+
+            if (lineText.Contains("camera.position.set"))
+                return "📷 POSICIÓN DE CÁMARA\n\ncamera.position.set(x, y, z)\nCoordenadas donde se ubica la cámara.";
+
+            // Controles
+            if (lineText.Contains("OrbitControls"))
+                return "🎮 CONTROLES DE ÓRBITA\n\nPermite rotar, hacer zoom y pan.\n• Click + arrastrar: Rotar\n• Scroll: Zoom\n• Click derecho + arrastrar: Pan";
+
+            if (lineText.Contains("enableDamping"))
+                return "🎮 SUAVIZADO\n\nenableDamping: Activa suavizado de movimiento.\ndampingFactor: Intensidad (0.05 = suave)";
+
+            // Spinner y progreso
+            if (lineText.Contains("COLOR DEL SPINNER"))
+                return "🔄 COLOR DEL SPINNER\n\nCambia border-top-color para cambiar\nel color del indicador de carga.\nEjemplo: #0078d4 (azul)";
+
+            if (lineText.Contains("COLOR DE LA BARRA DE PROGRESO"))
+                return "📊 BARRA DE PROGRESO\n\nCambia background para cambiar\nel color de la barra de carga.\nEjemplo: #0078d4 (azul)";
+
+            // Teclas
+            if (lineText.Contains("TECLA F") || lineText.Contains("Fit to view"))
+                return "⌨️ TECLA F\n\nPresiona F para centrar la vista\nen el modelo (Fit to View).";
+
+            // Eventos
+            if (lineText.Contains("LOOP DE ANIMACION") || lineText.Contains("requestAnimationFrame"))
+                return "🔄 LOOP DE ANIMACIÓN\n\nSe ejecuta ~60 veces por segundo.\nActualiza controles y renderiza la escena.";
+
+            if (lineText.Contains("resize"))
+                return "📐 EVENTO RESIZE\n\nAjusta la cámara y el renderer\ncuando cambia el tamaño de la ventana.";
+
+            // Scripts
+            if (lineText.Contains("three.min.js"))
+                return "📦 THREE.JS\n\nBiblioteca de gráficos 3D.\nVersión incluida localmente.";
+
+            if (lineText.Contains("OrbitControls.js"))
+                return "📦 ORBIT CONTROLS\n\nExtensión de Three.js para\ncontroles de cámara interactivos.";
+
+            if (lineText.Contains("web-ifc"))
+                return "📦 WEB-IFC\n\nBiblioteca para parsear archivos IFC.\nIncluye archivo WASM para rendimiento.";
+
+            // Calcpad específico
+            if (trimmedLine.StartsWith("#if"))
+                return "🔀 CONDICIONAL\n\nEjecuta código si la condición es verdadera.\n#if condición\n  código\n#else\n  alternativa\n#end if";
+
+            if (trimmedLine.StartsWith("#for"))
+                return "🔁 BUCLE FOR\n\nRepite código N veces.\n#for i = inicio : fin\n  código con $i\n#next";
+
+            if (trimmedLine.StartsWith("#while"))
+                return "🔁 BUCLE WHILE\n\nRepite mientras condición sea verdadera.\n#while condición\n  código\n#loop";
+
+            return null;
         }
 
         /// <summary>
@@ -476,6 +937,8 @@ namespace Calcpad.Wpf
                 var bodyStack = new Stack<int>();
                 var scriptStack = new Stack<int>();
                 var styleStack = new Stack<int>();
+                // Stack for JavaScript/TypeScript blocks with braces: if, for, while, function, etc.
+                var jsBraceStack = new Stack<(int line, string type)>();
 
                 // Iterate through document lines using AvalonEdit's line system
                 for (int lineNumber = 1; lineNumber <= document.LineCount; lineNumber++)
@@ -710,6 +1173,73 @@ namespace Calcpad.Wpf
                                 StartOffset = startDocLine.Offset,
                                 EndOffset = documentLine.EndOffset,
                                 Name = "▼ <style> ..."
+                            });
+                        }
+                    }
+
+                    // JavaScript/TypeScript blocks: if, for, while, function, try, catch, else, switch, class
+                    // Detect opening brace at end of line: "if (...) {" or "function foo() {"
+                    if (lineText.TrimEnd().EndsWith("{"))
+                    {
+                        string blockType = null;
+                        var trimmed = lineText.TrimStart();
+
+                        // Check for common JS block patterns
+                        if (trimmed.StartsWith("if ") || trimmed.StartsWith("if("))
+                            blockType = "if";
+                        else if (trimmed.StartsWith("else if ") || trimmed.StartsWith("else if("))
+                            blockType = "else if";
+                        else if (trimmed.StartsWith("else ") || trimmed.StartsWith("else{") || trimmed == "else {")
+                            blockType = "else";
+                        else if (trimmed.StartsWith("for ") || trimmed.StartsWith("for("))
+                            blockType = "for";
+                        else if (trimmed.StartsWith("while ") || trimmed.StartsWith("while("))
+                            blockType = "while";
+                        else if (trimmed.StartsWith("function ") || trimmed.StartsWith("function("))
+                            blockType = "function";
+                        else if (trimmed.StartsWith("async function"))
+                            blockType = "async function";
+                        else if (trimmed.Contains("=> {"))
+                            blockType = "arrow function";
+                        else if (trimmed.StartsWith("try ") || trimmed.StartsWith("try{") || trimmed == "try {")
+                            blockType = "try";
+                        else if (trimmed.StartsWith("catch ") || trimmed.StartsWith("catch("))
+                            blockType = "catch";
+                        else if (trimmed.StartsWith("finally ") || trimmed.StartsWith("finally{") || trimmed == "finally {")
+                            blockType = "finally";
+                        else if (trimmed.StartsWith("switch ") || trimmed.StartsWith("switch("))
+                            blockType = "switch";
+                        else if (trimmed.StartsWith("class "))
+                            blockType = "class";
+                        else if (trimmed.StartsWith("constructor(") || trimmed.StartsWith("constructor ("))
+                            blockType = "constructor";
+                        else if (trimmed.StartsWith("do ") || trimmed.StartsWith("do{") || trimmed == "do {")
+                            blockType = "do";
+                        // Method definitions in objects/classes
+                        else if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^\w+\s*\([^)]*\)\s*\{"))
+                            blockType = "method";
+
+                        if (blockType != null)
+                        {
+                            jsBraceStack.Push((lineNumber, blockType));
+                        }
+                    }
+                    // Detect closing brace on its own line or with minimal content
+                    else if (lineText.Trim() == "}" || lineText.Trim() == "};" ||
+                             lineText.Trim() == "});" || lineText.Trim() == "})," ||
+                             lineText.Trim().StartsWith("} else") ||
+                             lineText.Trim().StartsWith("} catch") ||
+                             lineText.Trim().StartsWith("} finally"))
+                    {
+                        if (jsBraceStack.Count > 0)
+                        {
+                            var (startLine, blockType) = jsBraceStack.Pop();
+                            var startDocLine = document.GetLineByNumber(startLine);
+                            foldings.Add(new NewFolding
+                            {
+                                StartOffset = startDocLine.Offset,
+                                EndOffset = documentLine.EndOffset,
+                                Name = $"▼ {blockType} {{...}}"
                             });
                         }
                     }

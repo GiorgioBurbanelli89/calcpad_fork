@@ -1,0 +1,35 @@
+'<h1>Test - 4 Columnas con IFC Fragment</h1>
+'<p>Este test muestra 4 visores IFC usando @{ifc-fragment} en 4 columnas</p>
+'<p><strong>IFC Fragment</strong> es optimizado para archivos grandes (>500 MB)</p>
+
+@{columns 4}
+
+@{ifc-fragment}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc-fragment}
+
+@{ifc-fragment}
+C:\Users\j-b-j\Downloads\Galpon_A.ifc
+@{end ifc-fragment}
+
+@{ifc-fragment}
+C:\Users\j-b-j\Downloads\Galpon_A (1).ifc
+@{end ifc-fragment}
+
+@{ifc-fragment}
+C:\Users\j-b-j\Downloads\propuesta dos ifc.ifc
+@{end ifc-fragment}
+
+@{end columns}
+
+'<hr style="border: 2px solid #2196F3; margin: 30px 0;">
+
+'<h2>Información</h2>
+'<div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+'<p><strong>Test de 4 columnas con IFC Fragment:</strong></p>
+'<p>✅ 1. Silvia Cedeño.ifc - Usando ThatOpen Fragments</p>
+'<p>✅ 2. Galpon_A.ifc - Usando ThatOpen Fragments</p>
+'<p>✅ 3. Galpon_A (1).ifc - Usando ThatOpen Fragments</p>
+'<p>✅ 4. propuesta dos ifc.ifc - Usando ThatOpen Fragments</p>
+'<p><em>Los archivos grandes se fragmentan automáticamente para carga rápida</em></p>
+'</div>

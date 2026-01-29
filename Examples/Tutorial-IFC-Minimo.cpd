@@ -1,0 +1,441 @@
+"TUTORIAL: Visor IFC Mínimo desde Cero
+'========================================
+'Este archivo enseña lo MÍNIMO necesario para cargar un IFC en Calcpad.
+'Escrito en AvalonEdit, sin usar el botón IFC.
+
+"1. ESTRUCTURA BÁSICA
+'Para mostrar HTML personalizado en el output usamos:
+'  @{code} - indica que es código (no ecuaciones)
+'  @{html-ifc} - indica que es HTML con visor IFC (carga librerías automáticamente)
+
+"2. LIBRERÍAS NECESARIAS
+'Three.js - Motor 3D (renderizado)
+'web-ifc - Parser de archivos IFC
+'OrbitControls - Controles de cámara
+
+"3. CÓDIGO MÍNIMO
+'A continuación el visor más simple posible:
+
+@{code}
+@{html-ifc}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Visor IFC Mínimo</title>
+    <style>
+        /* ESTILOS MÍNIMOS */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Contenedor del visor - DEBE tener tamaño definido */
+        #viewer {
+            width: 100%;
+            height: 500px;
+            position: relative;
+        }
+
+        /* Canvas donde se dibuja el 3D */
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Panel de controles - TUS BOTONES PERSONALIZADOS */
+        #controles {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+
+        /* Estilo de botones */
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn:hover { background: #2980b9; }
+        .btn.active { background: #27ae60; }
+
+        /* Info del modelo */
+        #info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        /* Mensaje de carga */
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div id="viewer">
+        <!-- Canvas para Three.js -->
+        <canvas id="canvas3d"></canvas>
+
+        <!-- TUS BOTONES PERSONALIZADOS -->
+        <div id="controles">
+            <div style="margin-bottom: 8px; font-weight: bold; color: #3498db;">
+                Mis Controles
+            </div>
+            <button class="btn" id="btn-fit">Centrar Vista</button>
+            <button class="btn" id="btn-top">Vista Superior</button>
+            <button class="btn" id="btn-front">Vista Frontal</button>
+            <button class="btn" id="btn-grid">Toggle Grid</button>
+            <br><br>
+            <button class="btn" id="btn-wire">Wireframe</button>
+            <button class="btn" id="btn-color">Cambiar Color</button>
+        </div>
+
+        <!-- INFO -->
+        <div id="info">
+            <div>Elementos: <span id="count">0</span></div>
+            <div>Controles: Click+Arrastrar=Rotar, Scroll=Zoom</div>
+        </div>
+
+        <!-- LOADING -->
+        <div id="loading">
+            <div style="font-size: 24px;">⏳</div>
+            <div id="status">Cargando...</div>
+        </div>
+    </div>
+
+    <!-- LIBRERÍAS (se cargan desde https://calcpad.ifc/) -->
+    <script src="https://calcpad.ifc/three.min.js"></script>
+    <script src="https://calcpad.ifc/OrbitControls.js"></script>
+    <script src="https://calcpad.ifc/web-ifc-api-iife.js"></script>
+
+    <script>
+    // ============================================================
+    // CÓDIGO JAVASCRIPT MÍNIMO PARA CARGAR UN IFC
+    // ============================================================
+
+    (async function() {
+        // 1. OBTENER ELEMENTOS DEL DOM
+        const canvas = document.getElementById('canvas3d');
+        const container = document.getElementById('viewer');
+        const loading = document.getElementById('loading');
+        const status = document.getElementById('status');
+        const countEl = document.getElementById('count');
+
+        // 2. CREAR ESCENA THREE.JS (mínimo necesario)
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+
+        // 3. CREAR CÁMARA
+        const camera = new THREE.PerspectiveCamera(
+            75,  // Campo de visión (grados)
+            container.clientWidth / container.clientHeight,  // Aspecto
+            0.1,   // Near clipping
+            10000  // Far clipping
+        );
+        camera.position.set(20, 20, 20);
+
+        // 4. CREAR RENDERER
+        const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true
+        });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        // 5. CREAR CONTROLES DE ÓRBITA (para rotar con mouse)
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // 6. AGREGAR LUCES (mínimo: ambiental + direccional)
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(50, 100, 50);
+        scene.add(dirLight);
+
+        // 7. AGREGAR GRID (opcional pero útil)
+        const grid = new THREE.GridHelper(50, 50, 0x444444, 0x333333);
+        scene.add(grid);
+
+        // 8. GRUPO PARA LOS MESHES DEL IFC
+        const ifcMeshes = new THREE.Group();
+        scene.add(ifcMeshes);
+
+        // Variables para almacenar info del modelo
+        let modelCenter = new THREE.Vector3();
+        let modelSize = 1;
+        let allMeshes = [];
+        let wireframeMode = false;
+
+        // ============================================================
+        // 9. CARGAR ARCHIVO IFC
+        // ============================================================
+
+        status.textContent = 'Inicializando web-ifc...';
+
+        try {
+            // Inicializar la API de web-ifc
+            const ifcApi = new WebIFC.IfcAPI();
+
+            // Configurar ruta del archivo WASM
+            await ifcApi.Init(function(path) {
+                if (path.endsWith('.wasm')) {
+                    return 'https://calcpad.ifc/' + path;
+                }
+                return path;
+            });
+
+            status.textContent = 'Descargando archivo IFC...';
+
+            // IMPORTANTE: Cambiar esta URL por tu archivo IFC
+            // Opciones:
+            // 1. Archivo en la carpeta resources/ifc: 'https://calcpad.ifc/tu_archivo.ifc'
+            // 2. Archivo local (copiar a resources/ifc primero)
+            const ifcUrl = 'https://calcpad.ifc/modelo.ifc';
+
+            const response = await fetch(ifcUrl);
+            if (!response.ok) {
+                throw new Error('No se pudo cargar el archivo IFC: ' + response.status);
+            }
+
+            status.textContent = 'Parseando IFC...';
+            const ifcData = await response.arrayBuffer();
+
+            // Abrir el modelo IFC
+            const modelID = ifcApi.OpenModel(new Uint8Array(ifcData));
+
+            status.textContent = 'Generando geometría 3D...';
+
+            // Cargar toda la geometría
+            const flatMeshes = ifcApi.LoadAllGeometry(modelID);
+
+            // ============================================================
+            // 10. CONVERTIR GEOMETRÍA IFC A MESHES DE THREE.JS
+            // ============================================================
+
+            for (let i = 0; i < flatMeshes.size(); i++) {
+                const flatMesh = flatMeshes.get(i);
+                const placedGeometries = flatMesh.geometries;
+
+                for (let j = 0; j < placedGeometries.size(); j++) {
+                    const pg = placedGeometries.get(j);
+                    const geom = ifcApi.GetGeometry(modelID, pg.geometryExpressID);
+
+                    // Obtener vértices e índices
+                    const verts = ifcApi.GetVertexArray(
+                        geom.GetVertexData(),
+                        geom.GetVertexDataSize()
+                    );
+                    const indices = ifcApi.GetIndexArray(
+                        geom.GetIndexData(),
+                        geom.GetIndexDataSize()
+                    );
+
+                    if (verts.length === 0 || indices.length === 0) continue;
+
+                    // Separar posiciones y normales (vienen intercalados)
+                    // Formato: [x,y,z, nx,ny,nz, x,y,z, nx,ny,nz, ...]
+                    const positions = new Float32Array(verts.length / 2);
+                    const normals = new Float32Array(verts.length / 2);
+
+                    for (let k = 0; k < verts.length; k += 6) {
+                        const idx = (k / 6) * 3;
+                        // Posición
+                        positions[idx] = verts[k];
+                        positions[idx + 1] = verts[k + 1];
+                        positions[idx + 2] = verts[k + 2];
+                        // Normal
+                        normals[idx] = verts[k + 3];
+                        normals[idx + 1] = verts[k + 4];
+                        normals[idx + 2] = verts[k + 5];
+                    }
+
+                    // Crear BufferGeometry
+                    const bufferGeom = new THREE.BufferGeometry();
+                    bufferGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                    bufferGeom.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+                    bufferGeom.setIndex(new THREE.BufferAttribute(indices, 1));
+
+                    // Crear Material con el color del IFC
+                    const color = new THREE.Color(pg.color.x, pg.color.y, pg.color.z);
+                    const material = new THREE.MeshPhongMaterial({
+                        color: color,
+                        side: THREE.DoubleSide,
+                        transparent: pg.color.w < 1,
+                        opacity: pg.color.w
+                    });
+
+                    // Crear Mesh
+                    const mesh = new THREE.Mesh(bufferGeom, material);
+
+                    // Aplicar transformación
+                    const matrix = new THREE.Matrix4().fromArray(pg.flatTransformation);
+                    mesh.applyMatrix4(matrix);
+
+                    // Agregar al grupo
+                    ifcMeshes.add(mesh);
+                    allMeshes.push(mesh);
+                }
+            }
+
+            // Cerrar modelo (liberar memoria)
+            ifcApi.CloseModel(modelID);
+
+            // ============================================================
+            // 11. AJUSTAR VISTA AL MODELO
+            // ============================================================
+
+            const box = new THREE.Box3().setFromObject(ifcMeshes);
+            modelCenter = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            modelSize = Math.max(size.x, size.y, size.z);
+
+            // Posicionar cámara
+            camera.position.set(
+                modelCenter.x + modelSize,
+                modelCenter.y + modelSize,
+                modelCenter.z + modelSize
+            );
+            controls.target.copy(modelCenter);
+            controls.update();
+
+            // Ajustar grid al tamaño del modelo
+            grid.scale.set(modelSize / 25, 1, modelSize / 25);
+            grid.position.y = box.min.y;
+
+            // Mostrar info
+            countEl.textContent = allMeshes.length;
+            loading.style.display = 'none';
+
+            console.log('IFC cargado:', allMeshes.length, 'meshes');
+
+        } catch (error) {
+            console.error('Error:', error);
+            status.textContent = 'Error: ' + error.message;
+            status.style.color = '#e74c3c';
+        }
+
+        // ============================================================
+        // 12. FUNCIONES PARA TUS BOTONES
+        // ============================================================
+
+        function fitView() {
+            camera.position.set(
+                modelCenter.x + modelSize,
+                modelCenter.y + modelSize,
+                modelCenter.z + modelSize
+            );
+            controls.target.copy(modelCenter);
+            controls.update();
+        }
+
+        function topView() {
+            camera.position.set(modelCenter.x, modelCenter.y + modelSize * 2, modelCenter.z);
+            camera.up.set(0, 0, -1);
+            controls.target.copy(modelCenter);
+            controls.update();
+        }
+
+        function frontView() {
+            camera.position.set(modelCenter.x, modelCenter.y, modelCenter.z + modelSize * 2);
+            camera.up.set(0, 1, 0);
+            controls.target.copy(modelCenter);
+            controls.update();
+        }
+
+        function toggleGrid() {
+            grid.visible = !grid.visible;
+        }
+
+        function toggleWireframe() {
+            wireframeMode = !wireframeMode;
+            allMeshes.forEach(mesh => {
+                mesh.material.wireframe = wireframeMode;
+            });
+        }
+
+        function randomColor() {
+            const color = Math.random() * 0xffffff;
+            allMeshes.forEach(mesh => {
+                mesh.material.color.setHex(color);
+            });
+        }
+
+        // ============================================================
+        // 13. CONECTAR BOTONES A FUNCIONES
+        // ============================================================
+
+        document.getElementById('btn-fit').addEventListener('click', fitView);
+        document.getElementById('btn-top').addEventListener('click', topView);
+        document.getElementById('btn-front').addEventListener('click', frontView);
+        document.getElementById('btn-grid').addEventListener('click', toggleGrid);
+        document.getElementById('btn-wire').addEventListener('click', toggleWireframe);
+        document.getElementById('btn-color').addEventListener('click', randomColor);
+
+        // ============================================================
+        // 14. LOOP DE ANIMACIÓN (necesario para que se dibuje)
+        // ============================================================
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ============================================================
+        // 15. MANEJAR REDIMENSIONADO DE VENTANA
+        // ============================================================
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+    })();
+    </script>
+</body>
+</html>
+@{end code}
+
+"RESUMEN DE LO MÍNIMO NECESARIO:
+'================================
+'1. Contenedor HTML con tamaño definido (<div> con width/height)
+'2. Canvas para Three.js (<canvas>)
+'3. Librerías: three.min.js, OrbitControls.js, web-ifc-api-iife.js
+'4. Scene, Camera, Renderer, Controls
+'5. Luces (AmbientLight + DirectionalLight)
+'6. Código para cargar IFC con WebIFC.IfcAPI()
+'7. Convertir geometría IFC a BufferGeometry de Three.js
+'8. Loop de animación con requestAnimationFrame
+
+"PARA AGREGAR MÁS BOTONES:
+'1. Agregar el HTML del botón en el div #controles
+'2. Crear la función JavaScript que hace la acción
+'3. Conectar con addEventListener('click', tuFuncion)
+
+"ARCHIVOS IFC:
+'Coloca tu archivo .ifc en: Calcpad.Wpf/bin/Release/net10.0-windows/resources/ifc/
+'Luego úsalo con: https://calcpad.ifc/tu_archivo.ifc

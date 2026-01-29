@@ -1,0 +1,36 @@
+'<h1>Galpón A - Formato Optimizado CPDIFC</h1>
+'
+'<p><b>Archivo optimizado:</b> 216 MB (reducción 80% desde 1.1 GB original)</p>
+'
+'<h2>Especificaciones del Modelo</h2>
+'<ul>
+'<li><b>IFC Original:</b> 1,094 MB (1.1 GB)</li>
+'<li><b>CPDIFC Optimizado:</b> 216 MB (80.3% reducción)</li>
+'<li><b>Meshes:</b> 10,056</li>
+'<li><b>Vértices:</b> 9,113,669</li>
+'<li><b>Triángulos:</b> 3,850,239</li>
+'<li><b>Tiempo de carga:</b> ~10-15 segundos (vs minutos con IFC)</li>
+'</ul>
+'
+'<h2>Modelo 3D (Cargando...)</h2>
+'<div style="border: 2px solid #4fc3f7; border-radius: 8px; padding: 20px; background: #f5f5f5;">
+'<iframe src="../Calcpad.Wpf/tools/optimized-viewer.html?file=../Examples/Galpon_A_1100MB.cpdifc"
+'        style="width: 100%; height: 600px; border: none; border-radius: 4px;"></iframe>
+'</div>
+'
+'<h2>Ventajas del Formato Optimizado</h2>
+'<ul>
+'<li>✅ <b>5x más pequeño:</b> 216 MB vs 1,094 MB</li>
+'<li>✅ <b>5x más rápido:</b> 10-15 seg vs 5-10 minutos</li>
+'<li>✅ <b>Menor uso de memoria</b></li>
+'<li>✅ <b>Carga progresiva</b> con barra de progreso</li>
+'<li>✅ <b>Compatible con navegadores</b> (no crashes)</li>
+'</ul>
+'
+'<h2>Controles del Visor</h2>
+'<ul>
+'<li><b>Rotar:</b> Click izquierdo + Arrastrar</li>
+'<li><b>Zoom:</b> Scroll del mouse</li>
+'<li><b>Pan:</b> Click derecho + Arrastrar</li>
+'<li><b>Ajustar vista:</b> Tecla F</li>
+'</ul>

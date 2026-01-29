@@ -1,0 +1,23 @@
+@{page markdown}
+
+# Test de Visor IFC con archivo real
+
+Este archivo usa un archivo IFC de prueba real
+
+$$
+L = 6 | m
+M = 10 | kN·m
+$$
+
+## Visualización IFC con Three.js
+
+@{ifc}
+C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\modelo-test.ifc
+@{end ifc}
+
+## Resultados
+
+$$
+L = ? | m
+M = ? | kN·m
+$$

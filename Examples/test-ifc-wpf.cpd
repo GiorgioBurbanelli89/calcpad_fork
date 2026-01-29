@@ -1,0 +1,16 @@
+'<h1>Test IFC Viewer en Hekatan Calc WPF</h1>
+'
+'Este es un test del visor IFC integrado en Hekatan Calc.
+
+@{ifc}
+C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\Silvia Cedeño.ifc
+@{end ifc}
+
+'El modelo deberia aparecer arriba con controles de navegacion.
+'
+'<b>Controles:</b>
+'<ul>
+'<li>Click + Arrastrar: Rotar</li>
+'<li>Scroll: Zoom</li>
+'<li>Click derecho + Arrastrar: Pan</li>
+'</ul>

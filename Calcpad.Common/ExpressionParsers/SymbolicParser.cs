@@ -724,12 +724,23 @@ namespace Calcpad.Common.ExpressionParsers
                         result = "Tipo de ODE no soportado aún";
                     }
 
-                    // Formatear la solución como HTML con etiquetas de Calcpad
+                    // Formatear la ecuación original
+                    string displayEquation = equation;
+                    if (!displayEquation.Contains("="))
+                        displayEquation += " = 0";
+
+                    // Reemplazar y' y y'' con notación Unicode
+                    displayEquation = displayEquation.Replace(function + "''", function + "″");
+                    displayEquation = displayEquation.Replace(function + "'", function + "′");
+
+                    var formattedEquation = FormatMathExpression(displayEquation);
+
+                    // Formatear la solución
                     var formattedResult = FormatMathExpression(result);
                     var formattedVarName = $"<var>{varName}</var>";
 
-                    // Retornar como HTML literal con span class="eq" (formato de Calcpad)
-                    return $"'<p><span class=\"eq\">{formattedVarName} = {formattedResult}</span></p>";
+                    // Retornar ecuación Y solución
+                    return $"'<p><b>Ecuación:</b> <span class=\"eq\">{formattedEquation}</span></p>\n'<p><b>Solución:</b> <span class=\"eq\">{formattedVarName} = {formattedResult}</span></p>";
                 }
                 catch (Exception ex)
                 {
@@ -1043,12 +1054,18 @@ namespace Calcpad.Common.ExpressionParsers
 
         /// <summary>
         /// Formatea una expresión matemática como HTML siguiendo exactamente el formato de Calcpad.
-        /// Variables: <var>, Funciones: <b>, Exponentes: <sup>, Números y operadores: texto plano
+        /// Variables: <var>, Funciones: <b>, Exponentes: <sup>, Fracciones: <span class="dvc">, Números y operadores: texto plano
         /// </summary>
-        private string FormatMathExpression(string expr)
+        private string FormatMathExpression(string expr, bool processFractions = true)
         {
             if (string.IsNullOrEmpty(expr))
                 return expr;
+
+            // Si procesamos fracciones, primero detectarlas y procesarlas recursivamente
+            if (processFractions)
+            {
+                expr = ProcessFractions(expr);
+            }
 
             // Funciones matemáticas que usan <b> en Calcpad
             var mathFunctions = new[] { "sin", "cos", "tan", "log", "ln", "exp", "sqrt", "abs", "csc", "sec", "cot" };
@@ -1059,6 +1076,47 @@ namespace Calcpad.Common.ExpressionParsers
             while (i < expr.Length)
             {
                 var c = expr[i];
+
+                // Si encontramos HTML (de fracciones ya formateadas), copiarlo tal cual
+                if (c == '<')
+                {
+                    // Extraer el nombre de la etiqueta
+                    var tagStart = i;
+                    i++;
+                    var tagName = new StringBuilder();
+                    while (i < expr.Length && (char.IsLetterOrDigit(expr[i]) || expr[i] == '/'))
+                    {
+                        if (expr[i] != '/')
+                            tagName.Append(expr[i]);
+                        i++;
+                    }
+
+                    // Copiar hasta el cierre de la etiqueta de apertura
+                    while (i < expr.Length && expr[i] != '>')
+                        i++;
+
+                    if (i < expr.Length)
+                        i++; // Saltar >
+
+                    // Si es una etiqueta con cierre (var, span, b, sup), buscar el cierre
+                    var tag = tagName.ToString();
+                    if (tag == "var" || tag == "span" || tag == "b" || tag == "sup")
+                    {
+                        var closeTag = $"</{tag}>";
+                        var closeIndex = expr.IndexOf(closeTag, i);
+                        if (closeIndex != -1)
+                        {
+                            // Copiar todo desde tagStart hasta después del cierre
+                            result.Append(expr.Substring(tagStart, closeIndex + closeTag.Length - tagStart));
+                            i = closeIndex + closeTag.Length;
+                            continue;
+                        }
+                    }
+
+                    // Si no encontramos cierre o es auto-cerrada, copiar lo que tenemos
+                    result.Append(expr.Substring(tagStart, i - tagStart));
+                    continue;
+                }
 
                 // Letras: variables o funciones
                 if (char.IsLetter(c))
@@ -1148,6 +1206,178 @@ namespace Calcpad.Common.ExpressionParsers
             }
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Detecta y procesa fracciones, formateando numerador y denominador recursivamente
+        /// </summary>
+        private string ProcessFractions(string expr)
+        {
+            var result = new StringBuilder();
+            var i = 0;
+
+            while (i < expr.Length)
+            {
+                // Buscar el operador /
+                var divIndex = expr.IndexOf('/', i);
+                if (divIndex == -1)
+                {
+                    // No hay más divisiones, agregar el resto
+                    result.Append(expr.Substring(i));
+                    break;
+                }
+
+                // Encontrar el numerador (hacia atrás desde /)
+                int numStart = FindNumeratorStart(expr, divIndex);
+
+                // Agregar todo antes del numerador
+                result.Append(expr.Substring(i, numStart - i));
+
+                // Encontrar el denominador (hacia adelante desde /)
+                int denEnd = FindDenominatorEnd(expr, divIndex + 1);
+
+                // Extraer numerador y denominador
+                string numerator = expr.Substring(numStart, divIndex - numStart).Trim();
+                string denominator = expr.Substring(divIndex + 1, denEnd - divIndex - 1).Trim();
+
+                // Formatear numerador y denominador recursivamente (sin procesar más fracciones)
+                string formattedNum = FormatMathExpression(numerator, false);
+                string formattedDen = FormatMathExpression(denominator, false);
+
+                // Formatear como fracción de Calcpad
+                result.Append($"<span class=\"dvc\">{formattedNum}<span class=\"dvl\"></span>{formattedDen}</span>");
+
+                i = denEnd;
+            }
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// Encuentra el inicio del numerador retrocediendo desde la división
+        /// </summary>
+        private int FindNumeratorStart(string expr, int divIndex)
+        {
+            int parenCount = 0;
+            int i = divIndex - 1;
+
+            // Saltar espacios
+            while (i >= 0 && char.IsWhiteSpace(expr[i]))
+                i--;
+
+            // Si termina en ), buscar el ( correspondiente
+            if (i >= 0 && expr[i] == ')')
+            {
+                parenCount = 1;
+                i--;
+                while (i >= 0 && parenCount > 0)
+                {
+                    if (expr[i] == ')') parenCount++;
+                    if (expr[i] == '(') parenCount--;
+                    i--;
+                }
+                // Ahora i está antes del (
+                // Verificar si hay algo antes (como una función o variable)
+                while (i >= 0 && (char.IsLetterOrDigit(expr[i]) || expr[i] == '_'))
+                    i--;
+
+                return i + 1;
+            }
+
+            // Buscar hacia atrás hasta encontrar un operador de baja precedencia o inicio
+            while (i >= 0)
+            {
+                var c = expr[i];
+
+                // Operadores de baja precedencia terminan el numerador
+                if (c == '+' || c == '-' || c == '=' || c == '<' || c == '>' || c == ',')
+                {
+                    // Si es - al inicio o después de (, es signo negativo, no operador
+                    if (c == '-' && (i == 0 || expr[i - 1] == '(' || expr[i - 1] == ','))
+                    {
+                        i--;
+                        continue;
+                    }
+                    return i + 1;
+                }
+
+                // Paréntesis de apertura termina el numerador
+                if (c == '(' && parenCount == 0)
+                {
+                    return i + 1;
+                }
+
+                if (c == ')')
+                    parenCount++;
+                if (c == '(')
+                    parenCount--;
+
+                i--;
+            }
+
+            return 0; // Inicio de la expresión
+        }
+
+        /// <summary>
+        /// Encuentra el final del denominador avanzando desde después de la división
+        /// </summary>
+        private int FindDenominatorEnd(string expr, int start)
+        {
+            int i = start;
+            int parenCount = 0;
+
+            // Saltar espacios
+            while (i < expr.Length && char.IsWhiteSpace(expr[i]))
+                i++;
+
+            // Si empieza con (, buscar el ) correspondiente
+            if (i < expr.Length && expr[i] == '(')
+            {
+                parenCount = 1;
+                i++;
+                while (i < expr.Length && parenCount > 0)
+                {
+                    if (expr[i] == '(') parenCount++;
+                    if (expr[i] == ')') parenCount--;
+                    i++;
+                }
+                return i;
+            }
+
+            // Buscar hacia adelante hasta encontrar un operador de baja precedencia
+            while (i < expr.Length)
+            {
+                var c = expr[i];
+
+                // Operadores de baja precedencia terminan el denominador
+                if (c == '+' || c == '-' || c == '=' || c == '<' || c == '>' || c == ',' || c == ')')
+                {
+                    // Si es - al inicio, es signo negativo
+                    if (c == '-' && i == start)
+                    {
+                        i++;
+                        continue;
+                    }
+                    return i;
+                }
+
+                // Espacios después de un número/variable pueden terminar el denominador
+                if (char.IsWhiteSpace(c))
+                {
+                    // Mirar adelante para ver si sigue otro término
+                    int j = i + 1;
+                    while (j < expr.Length && char.IsWhiteSpace(expr[j]))
+                        j++;
+
+                    if (j < expr.Length && (expr[j] == '+' || expr[j] == '-' || expr[j] == '=' ||
+                        expr[j] == '*' || expr[j] == '(' || expr[j] == ')'))
+                        return i;
+                }
+
+                i++;
+            }
+
+            return expr.Length; // Final de la expresión
         }
     }
 }

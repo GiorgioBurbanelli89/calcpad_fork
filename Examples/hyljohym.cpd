@@ -1,0 +1,1655 @@
+"IFC Viewer - Modelo Analitico Completo
+@{html-ifc}
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>IFC + Modelo Analitico</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            user-select: none;
+        }
+        #container { width: 100%; height: 100%; position: relative; }
+        canvas { width: 100%; height: 100%; display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+
+        .toolbar {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            display: flex;
+            gap: 2px;
+            background: rgba(0,0,0,0.92);
+            padding: 4px 6px;
+            border-radius: 6px;
+            z-index: 100;
+            flex-wrap: wrap;
+            max-width: calc(100% - 16px);
+        }
+        .toolbar button {
+            background: #2d2d44;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 9px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+        }
+        .toolbar button:hover { background: #3d3d5c; border-color: #0078d4; }
+        .toolbar button.active { background: #0078d4; }
+        .toolbar button.auto-mode { background: #27ae60; border-color: #27ae60; }
+        .toolbar button.auto-mode:hover { background: #2ecc71; }
+        .toolbar button.join-mode { background: #9b59b6; border-color: #9b59b6; }
+        .toolbar button.join-mode:hover { background: #8e44ad; }
+        .toolbar button.cut-active { background: #e74c3c; }
+        .toolbar button.transparent-mode { background: #9b59b6; border-color: #9b59b6; }
+        .toolbar button.transparent-mode:hover { background: #8e44ad; }
+        .toolbar button.hidden-mode { background: #7f8c8d; }
+        .toolbar-sep { width: 1px; background: #444; margin: 0 2px; }
+
+        .panel {
+            position: absolute;
+            background: rgba(10,10,20,0.95);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            z-index: 100;
+            border: 1px solid #333;
+        }
+        .panel h4 { color: #0078d4; margin-bottom: 8px; font-size: 11px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .panel h4.green { color: #27ae60; }
+        .panel h4.red { color: #e74c3c; }
+        .panel h4.purple { color: #9b59b6; }
+        .panel label { display: block; color: #888; margin: 6px 0 2px; font-size: 9px; }
+        .panel input, .panel select {
+            width: 100%;
+            padding: 4px 6px;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+        .panel input[type="range"] { padding: 0; }
+        .panel button {
+            width: 100%;
+            padding: 6px;
+            margin-top: 8px;
+            background: #0078d4;
+            border: none;
+            color: #fff;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        .panel button.green { background: #27ae60; }
+        .panel button.purple { background: #9b59b6; }
+        .panel button.red { background: #c0392b; }
+        .panel button.gray { background: #555; }
+        .panel button:disabled { background: #444; cursor: not-allowed; opacity: 0.6; }
+
+        .element-panel {
+            top: 45px;
+            left: 10px;
+            width: 220px;
+            display: none;
+        }
+        .element-panel.visible { display: block; }
+        .element-type {
+            display: inline-block;
+            background: #27ae60;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            margin-bottom: 5px;
+        }
+        .element-dims {
+            background: #1a1a2e;
+            padding: 6px;
+            border-radius: 3px;
+            margin: 6px 0;
+        }
+        .dim-row { display: flex; justify-content: space-between; padding: 2px 0; }
+        .dim-row .lbl { color: #888; }
+        .dim-row .val { color: #fff; font-family: monospace; }
+        .auto-hint {
+            background: #27ae60;
+            color: #fff;
+            padding: 6px;
+            border-radius: 3px;
+            text-align: center;
+            margin-top: 8px;
+            font-size: 9px;
+        }
+
+        .model-panel {
+            top: 45px;
+            right: 10px;
+            width: 220px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            display: none;
+        }
+        .model-panel.visible { display: block; }
+        .model-stats {
+            background: #1a1a2e;
+            padding: 6px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+        }
+        .stat-row { display: flex; justify-content: space-between; }
+        .stat-row .lbl { color: #888; }
+        .stat-row .val { color: #27ae60; font-weight: bold; }
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px;
+            background: #222;
+            border-radius: 3px;
+            margin: 2px 0;
+            cursor: pointer;
+            font-size: 9px;
+            border: 2px solid transparent;
+        }
+        .member-item:hover { background: #333; }
+        .member-item.selected { border-color: #f1c40f; background: #333; }
+        .member-color { width: 8px; height: 8px; border-radius: 2px; }
+        .member-info { flex: 1; }
+        .member-hide { background: #3498db; border: none; color: #fff; width: 14px; height: 14px; border-radius: 2px; cursor: pointer; font-size: 8px; margin-right: 2px; }
+        .member-del { background: #c0392b; border: none; color: #fff; width: 14px; height: 14px; border-radius: 2px; cursor: pointer; font-size: 9px; }
+
+        .join-panel {
+            bottom: 120px;
+            left: 10px;
+            width: 200px;
+            display: none;
+        }
+        .join-panel.visible { display: block; }
+        .selected-list {
+            max-height: 100px;
+            overflow-y: auto;
+            background: #1a1a2e;
+            padding: 6px;
+            border-radius: 3px;
+            margin: 6px 0;
+        }
+        .selected-item {
+            padding: 2px 4px;
+            margin: 2px 0;
+            background: #333;
+            border-radius: 2px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .cut-panel {
+            bottom: 60px;
+            right: 10px;
+            width: 200px;
+            display: none;
+        }
+        .cut-panel.visible { display: block; }
+        .cut-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0;
+        }
+        .cut-row label { min-width: 25px; color: #888; margin: 0; }
+        .cut-row input[type="range"] { flex: 1; }
+        .cut-row .val { min-width: 50px; text-align: right; font-family: monospace; font-size: 9px; }
+        .cut-row input[type="checkbox"] { width: auto; }
+        .cut-indicator {
+            background: #e74c3c;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 9px;
+            margin-top: 6px;
+        }
+
+        .info-panel { bottom: 10px; left: 10px; }
+        .info-panel strong { color: #0078d4; font-size: 11px; }
+
+        .coords-display {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 9px;
+        }
+
+        .mode-indicator {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #27ae60;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 10px;
+            display: none;
+            z-index: 100;
+            animation: pulse 1.5s infinite;
+        }
+        .mode-indicator.visible { display: block; }
+        .mode-indicator.join { background: #9b59b6; }
+
+        .loading {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26,26,46,0.97);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        .spinner { width: 40px; height: 40px; border: 3px solid #333; border-top-color: #0078d4; border-radius: 50%; animation: spin 1s linear infinite; }
+        .progress { width: 180px; height: 4px; background: #333; border-radius: 2px; margin-top: 12px; }
+        .progress-fill { height: 100%; background: #0078d4; width: 0%; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+
+        <div class="toolbar">
+            <button id="btn-3d" class="active" title="Vista 3D (1)">3D</button>
+            <button id="btn-top" title="Vista Planta (2)">P</button>
+            <button id="btn-front" title="Vista Frontal (3)">F</button>
+            <button id="btn-right" title="Vista Lateral (4)">L</button>
+            <div class="toolbar-sep"></div>
+            <button id="btn-auto-all" title="Generar modelo analitico automatico para todo">AutoAll</button>
+            <button id="btn-auto" title="Auto Analitico elemento a elemento (A)">Auto</button>
+            <button id="btn-join" title="Modo Unir elementos (J)">Unir</button>
+            <button id="btn-model" title="Panel Modelo">Mod</button>
+            <div class="toolbar-sep"></div>
+            <button id="btn-cut" title="Corte (C)">Corte</button>
+            <button id="btn-transparent" title="Transparente (T)">Trans</button>
+            <button id="btn-hide-physical" title="Fisico (P)">Fis</button>
+            <button id="btn-hide-analytic" title="Analitico (L)">Ana</button>
+            <div class="toolbar-sep"></div>
+            <button id="btn-export" title="Exportar JSON">Exp</button>
+            <button id="btn-fit" title="Ajustar vista (F)">Fit</button>
+        </div>
+
+        <div id="mode-indicator" class="mode-indicator">
+            MODO AUTO: Click en elemento para crear eje centroidal
+        </div>
+
+        <div id="element-panel" class="panel element-panel">
+            <h4 class="green">Elemento Seleccionado</h4>
+            <div id="element-content">
+                <p style="color:#666">Activa Auto y click en un elemento</p>
+            </div>
+        </div>
+
+        <div id="join-panel" class="panel join-panel">
+            <h4 class="purple">Unir Elementos</h4>
+            <p style="color:#888;margin-bottom:6px">Click en frames del modelo analitico para seleccionar. Luego presiona "Unir" para fusionarlos.</p>
+            <div class="selected-list" id="selected-list">
+                <p style="color:#555">Ninguno seleccionado</p>
+            </div>
+            <div style="display:flex;gap:4px">
+                <button id="btn-do-join" class="purple" disabled>Unir (<span id="join-count">0</span>)</button>
+                <button id="btn-clear-selection" class="gray">Limpiar</button>
+            </div>
+            <p style="color:#666;font-size:8px;margin-top:6px">DELETE: eliminar seleccionados</p>
+        </div>
+
+        <div id="model-panel" class="panel model-panel">
+            <h4 class="green">Modelo Analitico</h4>
+            <div class="model-stats">
+                <div class="stat-row"><span class="lbl">Miembros:</span><span class="val" id="stat-members">0</span></div>
+                <div class="stat-row"><span class="lbl">Nodos:</span><span class="val" id="stat-nodes">0</span></div>
+                <div class="stat-row"><span class="lbl">Long. total:</span><span class="val" id="stat-length">0.00 m</span></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:6px">
+                <label style="display:flex;align-items:center;gap:3px;margin:0;font-size:9px">
+                    <input type="checkbox" id="show-physical" checked style="width:auto"> Fisico
+                </label>
+                <label style="display:flex;align-items:center;gap:3px;margin:0;font-size:9px">
+                    <input type="checkbox" id="show-analytic" checked style="width:auto"> Analitico
+                </label>
+            </div>
+            <label>Tolerancia snap (m):</label>
+            <input type="number" id="snap-tolerance" value="0.15" step="0.01" min="0.01" max="1">
+            <label>Miembros:</label>
+            <div id="members-list" style="max-height:200px;overflow-y:auto"></div>
+            <button id="btn-clear" class="red">Limpiar Todo</button>
+        </div>
+
+        <div id="cut-panel" class="panel cut-panel">
+            <h4 class="red">Plano de Corte</h4>
+            <div class="cut-row">
+                <input type="checkbox" id="cut-x-enable" style="width:auto">
+                <label>X:</label>
+                <input type="range" id="cut-x" min="0" max="100" value="100">
+                <span class="val" id="cut-x-val">--</span>
+            </div>
+            <div class="cut-row">
+                <input type="checkbox" id="cut-y-enable" style="width:auto">
+                <label>Y:</label>
+                <input type="range" id="cut-y" min="0" max="100" value="100">
+                <span class="val" id="cut-y-val">--</span>
+            </div>
+            <div class="cut-row">
+                <input type="checkbox" id="cut-z-enable" style="width:auto">
+                <label>Z:</label>
+                <input type="range" id="cut-z" min="0" max="100" value="100">
+                <span class="val" id="cut-z-val">--</span>
+            </div>
+            <div class="cut-indicator" id="cut-indicator">Sin corte activo</div>
+            <button id="btn-reset-cut" class="gray">Resetear Cortes</button>
+        </div>
+
+        <div class="panel info-panel">
+            <strong>IFC Analitico</strong>
+            <div id="stats"></div>
+            <div style="color:#555;margin-top:5px;font-size:8px">
+                Scroll: Zoom | 1-4: Vistas | F: Fit<br>
+                A: Auto | J: Unir | T: Trans | Delete: Eliminar<br>
+                Ctrl+Z: Deshacer
+            </div>
+        </div>
+
+        <div class="coords-display">
+            X: <span id="coord-x">0.00</span> |
+            Y: <span id="coord-y">0.00</span> |
+            Z: <span id="coord-z">0.00</span>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <div class="progress"><div class="progress-fill" id="progress"></div></div>
+            <p style="margin-top:12px;color:#888;font-size:11px" id="status">Cargando...</p>
+        </div>
+    </div>
+
+    <script src="https://calcpad.ifc/three.min.js"></script>
+    <script src="https://calcpad.ifc/OrbitControls.js"></script>
+    <script src="https://calcpad.ifc/web-ifc-api-iife.js"></script>
+    <script>
+    (async function() {
+        var canvas = document.getElementById('canvas');
+        var container = document.getElementById('container');
+        var loading = document.getElementById('loading');
+
+        var scene, camera, orthoCamera, activeCamera, renderer, controls;
+        var allMeshes, analyticGroup, cutPlaneHelpers;
+        var bbox, center, maxDim;
+        var currentView = '3d';
+
+        var autoMode = false;
+        var joinMode = false;
+        var physicalTransparent = false;
+        var physicalVisible = true;
+        var analyticVisible = true;
+
+        var model = { members: [], nodes: [], nextId: 1, nextNodeId: 1 };
+        var colors = { beam: 0xe74c3c, column: 0x2ecc71, brace: 0xf39c12, slab: 0x3498db };
+
+        // Para modo unir
+        var selectedMembers = [];
+
+        // Clasificacion de elementos IFC
+        var ifcElements = { columns: [], beams: [], slabs: [], walls: [], others: [] };
+
+        var undoStack = [];
+        var MAX_UNDO = 50;
+
+        function updateProgress(msg, pct) {
+            document.getElementById('status').textContent = msg;
+            document.getElementById('progress').style.width = pct + '%';
+        }
+
+        function getSnapTolerance() {
+            return parseFloat(document.getElementById('snap-tolerance').value) || 0.15;
+        }
+
+        try {
+            updateProgress('Inicializando...', 10);
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 10000);
+            camera.position.set(50, 50, 50);
+
+            var aspect = container.clientWidth / container.clientHeight;
+            orthoCamera = new THREE.OrthographicCamera(-50 * aspect, 50 * aspect, 50, -50, 0.1, 10000);
+
+            activeCamera = camera;
+
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.localClippingEnabled = true;
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.8;
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            var light = new THREE.DirectionalLight(0xffffff, 0.8);
+            light.position.set(50, 100, 50);
+            scene.add(light);
+
+            scene.add(new THREE.GridHelper(200, 200, 0x333333, 0x222222));
+
+            analyticGroup = new THREE.Group();
+            scene.add(analyticGroup);
+
+            cutPlaneHelpers = new THREE.Group();
+            scene.add(cutPlaneHelpers);
+
+            updateProgress('Descargando IFC...', 20);
+            var response = await fetch('https://calcpad.ifc/temp_a7ce813c013e4fc48bd57558ccf7ebd6.ifc');
+            if (!response.ok) throw new Error('Error: ' + response.status);
+
+            updateProgress('Leyendo...', 40);
+            var ifcData = await response.arrayBuffer();
+
+            updateProgress('Inicializando web-ifc...', 50);
+            var ifcApi = new WebIFC.IfcAPI();
+            await ifcApi.Init(function(p) { return p.endsWith('.wasm') ? 'https://calcpad.ifc/' + p : p; });
+
+            updateProgress('Parseando...', 60);
+            var modelID = ifcApi.OpenModel(new Uint8Array(ifcData));
+
+            updateProgress('Generando geometria...', 70);
+            var flatMeshes = ifcApi.LoadAllGeometry(modelID);
+
+            // Obtener tipos de elementos
+            var elementTypes = {};
+            try {
+                // IFCCOLUMN = 765
+                var columns = ifcApi.GetLineIDsWithType(modelID, 765);
+                for (var c = 0; c < columns.size(); c++) elementTypes[columns.get(c)] = 'column';
+
+                // IFCBEAM = 753
+                var beams = ifcApi.GetLineIDsWithType(modelID, 753);
+                for (var b = 0; b < beams.size(); b++) elementTypes[beams.get(b)] = 'beam';
+
+                // IFCSLAB = 1529
+                var slabs = ifcApi.GetLineIDsWithType(modelID, 1529);
+                for (var s = 0; s < slabs.size(); s++) elementTypes[slabs.get(s)] = 'slab';
+
+                // IFCWALL = 2391
+                var walls = ifcApi.GetLineIDsWithType(modelID, 2391);
+                for (var w = 0; w < walls.size(); w++) elementTypes[walls.get(w)] = 'wall';
+            } catch(e) {
+                console.log('No se pudieron obtener tipos IFC:', e);
+            }
+
+            updateProgress('Construyendo...', 80);
+            allMeshes = new THREE.Group();
+            var meshCount = 0;
+
+            for (var i = 0; i < flatMeshes.size(); i++) {
+                var fm = flatMeshes.get(i);
+                var geoms = fm.geometries;
+                var expressID = fm.expressID;
+                var ifcType = elementTypes[expressID] || 'other';
+
+                for (var j = 0; j < geoms.size(); j++) {
+                    var pg = geoms.get(j);
+                    var geom = ifcApi.GetGeometry(modelID, pg.geometryExpressID);
+                    var verts = ifcApi.GetVertexArray(geom.GetVertexData(), geom.GetVertexDataSize());
+                    var indices = ifcApi.GetIndexArray(geom.GetIndexData(), geom.GetIndexDataSize());
+
+                    if (verts.length === 0 || indices.length === 0) continue;
+
+                    var positions = new Float32Array(verts.length / 2);
+                    var normals = new Float32Array(verts.length / 2);
+
+                    for (var k = 0; k < verts.length; k += 6) {
+                        var idx = (k / 6) * 3;
+                        positions[idx] = verts[k];
+                        positions[idx + 1] = verts[k + 1];
+                        positions[idx + 2] = verts[k + 2];
+                        normals[idx] = verts[k + 3];
+                        normals[idx + 1] = verts[k + 4];
+                        normals[idx + 2] = verts[k + 5];
+                    }
+
+                    var bufGeom = new THREE.BufferGeometry();
+                    bufGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                    bufGeom.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+                    bufGeom.setIndex(new THREE.BufferAttribute(indices, 1));
+
+                    var color = new THREE.Color(pg.color.x, pg.color.y, pg.color.z);
+                    var mat = new THREE.MeshPhongMaterial({
+                        color: color, side: THREE.DoubleSide,
+                        transparent: true, opacity: pg.color.w,
+                        clippingPlanes: []
+                    });
+
+                    var mesh = new THREE.Mesh(bufGeom, mat);
+                    mesh.userData.expressID = expressID;
+                    mesh.userData.ifcType = ifcType;
+                    mesh.userData.originalColor = color.clone();
+                    mesh.userData.originalOpacity = pg.color.w;
+                    mesh.applyMatrix4(new THREE.Matrix4().fromArray(pg.flatTransformation));
+                    allMeshes.add(mesh);
+                    meshCount++;
+
+                    // Clasificar para modelo analitico
+                    if (ifcType === 'column') ifcElements.columns.push(mesh);
+                    else if (ifcType === 'beam') ifcElements.beams.push(mesh);
+                    else if (ifcType === 'slab') ifcElements.slabs.push(mesh);
+                    else if (ifcType === 'wall') ifcElements.walls.push(mesh);
+                    else ifcElements.others.push(mesh);
+                }
+            }
+
+            scene.add(allMeshes);
+            ifcApi.CloseModel(modelID);
+
+            updateProgress('Ajustando...', 90);
+            bbox = new THREE.Box3().setFromObject(allMeshes);
+            center = bbox.getCenter(new THREE.Vector3());
+            var size = bbox.getSize(new THREE.Vector3());
+            maxDim = Math.max(size.x, size.y, size.z);
+
+            camera.position.set(center.x + maxDim, center.y + maxDim * 0.7, center.z + maxDim);
+            controls.target.copy(center);
+            controls.update();
+
+            setupCutSliders();
+
+            loading.style.display = 'none';
+            document.getElementById('stats').innerHTML = '<br>' + meshCount + ' elementos' +
+                '<br><span style="color:#2ecc71">' + ifcElements.columns.length + ' columnas</span>' +
+                '<br><span style="color:#e74c3c">' + ifcElements.beams.length + ' vigas</span>' +
+                '<br><span style="color:#3498db">' + ifcElements.slabs.length + ' losas</span>';
+
+            // ============================================
+            // FUNCIONES PRINCIPALES
+            // ============================================
+
+            function setupCutSliders() {
+                var sliders = ['x', 'y', 'z'];
+                sliders.forEach(function(axis) {
+                    var slider = document.getElementById('cut-' + axis);
+                    var min = bbox.min[axis];
+                    var max = bbox.max[axis];
+                    slider.min = min.toFixed(2);
+                    slider.max = max.toFixed(2);
+                    slider.value = max.toFixed(2);
+                    slider.step = ((max - min) / 100).toFixed(3);
+                });
+            }
+
+            function updateCutPlanes() {
+                var activeClipPlanes = [];
+
+                while (cutPlaneHelpers.children.length) {
+                    cutPlaneHelpers.remove(cutPlaneHelpers.children[0]);
+                }
+
+                ['x', 'y', 'z'].forEach(function(axis) {
+                    var enabled = document.getElementById('cut-' + axis + '-enable').checked;
+                    var value = parseFloat(document.getElementById('cut-' + axis).value);
+                    var valEl = document.getElementById('cut-' + axis + '-val');
+
+                    if (enabled) {
+                        valEl.textContent = value.toFixed(2) + 'm';
+
+                        var normal;
+                        if (axis === 'x') normal = new THREE.Vector3(-1, 0, 0);
+                        else if (axis === 'y') normal = new THREE.Vector3(0, -1, 0);
+                        else normal = new THREE.Vector3(0, 0, -1);
+
+                        var plane = new THREE.Plane(normal, value);
+                        activeClipPlanes.push(plane);
+
+                        var helperSize = maxDim * 2;
+                        var helperGeom = new THREE.PlaneGeometry(helperSize, helperSize);
+                        var helperMat = new THREE.MeshBasicMaterial({
+                            color: axis === 'x' ? 0xe74c3c : axis === 'y' ? 0x2ecc71 : 0x3498db,
+                            transparent: true,
+                            opacity: 0.15,
+                            side: THREE.DoubleSide,
+                            depthWrite: false
+                        });
+                        var helper = new THREE.Mesh(helperGeom, helperMat);
+
+                        if (axis === 'x') {
+                            helper.position.set(value, center.y, center.z);
+                            helper.rotation.y = Math.PI / 2;
+                        } else if (axis === 'y') {
+                            helper.position.set(center.x, value, center.z);
+                            helper.rotation.x = -Math.PI / 2;
+                        } else {
+                            helper.position.set(center.x, center.y, value);
+                        }
+
+                        cutPlaneHelpers.add(helper);
+
+                    } else {
+                        valEl.textContent = '--';
+                    }
+                });
+
+                allMeshes.traverse(function(obj) {
+                    if (obj.isMesh && obj.material) {
+                        obj.material.clippingPlanes = activeClipPlanes;
+                        obj.material.needsUpdate = true;
+                    }
+                });
+
+                var indicator = document.getElementById('cut-indicator');
+                if (activeClipPlanes.length > 0) {
+                    var axes = [];
+                    if (document.getElementById('cut-x-enable').checked) axes.push('X=' + parseFloat(document.getElementById('cut-x').value).toFixed(1));
+                    if (document.getElementById('cut-y-enable').checked) axes.push('Y=' + parseFloat(document.getElementById('cut-y').value).toFixed(1));
+                    if (document.getElementById('cut-z-enable').checked) axes.push('Z=' + parseFloat(document.getElementById('cut-z').value).toFixed(1));
+                    indicator.textContent = 'Cortando: ' + axes.join(', ');
+                    indicator.style.background = '#e74c3c';
+                } else {
+                    indicator.textContent = 'Sin corte activo';
+                    indicator.style.background = '#555';
+                }
+            }
+
+            function togglePhysicalTransparency() {
+                physicalTransparent = !physicalTransparent;
+                var btn = document.getElementById('btn-transparent');
+                btn.classList.toggle('transparent-mode', physicalTransparent);
+
+                allMeshes.traverse(function(obj) {
+                    if (obj.isMesh && obj.material) {
+                        if (physicalTransparent) {
+                            obj.material.transparent = true;
+                            obj.material.opacity = 0.25;
+                            obj.material.depthWrite = false;
+                        } else {
+                            obj.material.transparent = obj.userData.originalOpacity < 1;
+                            obj.material.opacity = obj.userData.originalOpacity;
+                            obj.material.depthWrite = true;
+                        }
+                        obj.material.needsUpdate = true;
+                    }
+                });
+            }
+
+            function togglePhysicalVisibility() {
+                physicalVisible = !physicalVisible;
+                var btn = document.getElementById('btn-hide-physical');
+                btn.classList.toggle('hidden-mode', !physicalVisible);
+                allMeshes.visible = physicalVisible;
+                document.getElementById('show-physical').checked = physicalVisible;
+            }
+
+            function toggleAnalyticVisibility() {
+                analyticVisible = !analyticVisible;
+                var btn = document.getElementById('btn-hide-analytic');
+                btn.classList.toggle('hidden-mode', !analyticVisible);
+                analyticGroup.visible = analyticVisible;
+                document.getElementById('show-analytic').checked = analyticVisible;
+            }
+
+            function toggleAutoMode() {
+                autoMode = !autoMode;
+                if (autoMode && joinMode) toggleJoinMode();
+
+                document.getElementById('btn-auto').classList.toggle('auto-mode', autoMode);
+                var indicator = document.getElementById('mode-indicator');
+                indicator.classList.toggle('visible', autoMode);
+                indicator.classList.remove('join');
+                indicator.textContent = 'MODO AUTO: Click en elemento para crear eje centroidal';
+
+                if (!autoMode) {
+                    deselectAll();
+                }
+            }
+
+            function toggleJoinMode() {
+                joinMode = !joinMode;
+                if (joinMode && autoMode) toggleAutoMode();
+
+                document.getElementById('btn-join').classList.toggle('join-mode', joinMode);
+                document.getElementById('join-panel').classList.toggle('visible', joinMode);
+                var indicator = document.getElementById('mode-indicator');
+                indicator.classList.toggle('visible', joinMode);
+                indicator.classList.toggle('join', joinMode);
+                indicator.textContent = 'MODO UNIR: Click en frames para seleccionar y unir';
+
+                if (!joinMode) {
+                    clearMemberSelection();
+                }
+            }
+
+            function deselectAll() {
+                allMeshes.traverse(function(obj) {
+                    if (obj.isMesh && obj.userData.originalColor) {
+                        obj.material.color.copy(obj.userData.originalColor);
+                        obj.material.emissive.setHex(0x000000);
+                    }
+                });
+                document.getElementById('element-panel').classList.remove('visible');
+            }
+
+            // ============================================
+            // MODELO ANALITICO - LOGICA PRINCIPAL
+            // ============================================
+
+            // Encontrar todas las losas para determinar niveles
+            function getSlabLevels() {
+                var levels = [];
+                ifcElements.slabs.forEach(function(slab) {
+                    var slabBox = new THREE.Box3().setFromObject(slab);
+                    // La cara superior de la losa es donde conectan las columnas
+                    levels.push({
+                        yTop: slabBox.max.y,
+                        yBottom: slabBox.min.y,
+                        box: slabBox
+                    });
+                });
+                // Ordenar por altura
+                levels.sort(function(a, b) { return a.yTop - b.yTop; });
+                return levels;
+            }
+
+            // Encontrar el nivel de losa mas cercano a una coordenada Y
+            function findNearestSlabLevel(y, levels, tolerance) {
+                tolerance = tolerance || 0.3;
+                var best = null;
+                var bestDist = Infinity;
+
+                for (var i = 0; i < levels.length; i++) {
+                    var distTop = Math.abs(y - levels[i].yTop);
+                    var distBottom = Math.abs(y - levels[i].yBottom);
+
+                    if (distTop < bestDist && distTop < tolerance) {
+                        bestDist = distTop;
+                        best = { y: levels[i].yTop, type: 'top', level: levels[i] };
+                    }
+                    if (distBottom < bestDist && distBottom < tolerance) {
+                        bestDist = distBottom;
+                        best = { y: levels[i].yBottom, type: 'bottom', level: levels[i] };
+                    }
+                }
+                return best;
+            }
+
+            // Calcular eje centroidal de un elemento con snap a niveles de losa
+            function calculateCentroidalAxis(mesh, slabLevels) {
+                var meshBox = new THREE.Box3().setFromObject(mesh);
+                var meshCenter = meshBox.getCenter(new THREE.Vector3());
+                var meshSize = meshBox.getSize(new THREE.Vector3());
+                var meshMin = meshBox.min;
+                var meshMax = meshBox.max;
+
+                var type = mesh.userData.ifcType || 'beam';
+                var axisDir = 'x';
+                var startPoint, endPoint;
+
+                // Determinar tipo por geometria si no viene del IFC
+                if (type === 'other') {
+                    if (meshSize.y > meshSize.x * 1.5 && meshSize.y > meshSize.z * 1.5) {
+                        type = 'column';
+                    } else {
+                        type = 'beam';
+                    }
+                }
+
+                if (type === 'column') {
+                    axisDir = 'y';
+                    // Para columnas: el nodo inferior va en la cara superior de la losa inferior
+                    // y el nodo superior va en la cara superior de la losa superior
+
+                    var bottomLevel = findNearestSlabLevel(meshMin.y, slabLevels, 0.5);
+                    var topLevel = findNearestSlabLevel(meshMax.y, slabLevels, 0.5);
+
+                    var startY = meshMin.y;
+                    var endY = meshMax.y;
+
+                    // Snap a cara superior de losa (donde conectan vigas)
+                    if (bottomLevel) {
+                        startY = bottomLevel.y;
+                    }
+                    if (topLevel) {
+                        endY = topLevel.y;
+                    }
+
+                    startPoint = new THREE.Vector3(meshCenter.x, startY, meshCenter.z);
+                    endPoint = new THREE.Vector3(meshCenter.x, endY, meshCenter.z);
+
+                } else if (type === 'beam') {
+                    // Para vigas: usar el centroide en Y (mitad de la altura de la viga)
+                    // pero snap horizontal a los centroides de columnas
+
+                    if (meshSize.x > meshSize.z) {
+                        axisDir = 'x';
+                        startPoint = new THREE.Vector3(meshMin.x, meshCenter.y, meshCenter.z);
+                        endPoint = new THREE.Vector3(meshMax.x, meshCenter.y, meshCenter.z);
+                    } else {
+                        axisDir = 'z';
+                        startPoint = new THREE.Vector3(meshCenter.x, meshCenter.y, meshMin.z);
+                        endPoint = new THREE.Vector3(meshCenter.x, meshCenter.y, meshMax.z);
+                    }
+
+                    // Snap Y al nivel de losa mas cercano
+                    var levelForBeam = findNearestSlabLevel(meshCenter.y, slabLevels, 0.5);
+                    if (levelForBeam) {
+                        startPoint.y = levelForBeam.y;
+                        endPoint.y = levelForBeam.y;
+                    }
+                }
+
+                return {
+                    type: type,
+                    axisDir: axisDir,
+                    startPoint: startPoint,
+                    endPoint: endPoint,
+                    size: meshSize,
+                    center: meshCenter
+                };
+            }
+
+            // Generar modelo analitico automatico para TODOS los elementos
+            function generateAutoAnalyticModel() {
+                saveUndoState();
+                clearModel();
+
+                var slabLevels = getSlabLevels();
+                var snapTol = getSnapTolerance();
+
+                console.log('Generando modelo analitico automatico...');
+                console.log('Niveles de losa encontrados:', slabLevels.length);
+
+                // Primero crear ejes para COLUMNAS (definen nodos principales)
+                var columnAxes = [];
+                ifcElements.columns.forEach(function(col, idx) {
+                    var axis = calculateCentroidalAxis(col, slabLevels);
+                    axis.mesh = col;
+                    axis.index = idx;
+                    columnAxes.push(axis);
+                });
+
+                // Crear miembros de columnas
+                columnAxes.forEach(function(axis, idx) {
+                    var name = 'C-' + String(idx + 1).padStart(2, '0');
+                    var section = (axis.size.x * 100).toFixed(0) + 'x' + (axis.size.z * 100).toFixed(0);
+                    createSingleMemberDirect(name, 'column', section, axis.startPoint, axis.endPoint);
+                });
+
+                // Ahora crear ejes para VIGAS con snap a nodos existentes
+                ifcElements.beams.forEach(function(beam, idx) {
+                    var axis = calculateCentroidalAxis(beam, slabLevels);
+
+                    // Snap puntos a nodos existentes
+                    var snappedStart = snapToExistingNode(axis.startPoint, snapTol);
+                    var snappedEnd = snapToExistingNode(axis.endPoint, snapTol);
+
+                    var name = 'V-' + String(idx + 1).padStart(2, '0');
+                    var section = (axis.size.z * 100).toFixed(0) + 'x' + (axis.size.y * 100).toFixed(0);
+                    createSingleMemberDirect(name, 'beam', section, snappedStart, snappedEnd);
+                });
+
+                console.log('Modelo analitico generado:', model.members.length, 'miembros,', model.nodes.length, 'nodos');
+                updateModelPanel();
+            }
+
+            // Snap un punto a un nodo existente si esta dentro de tolerancia
+            function snapToExistingNode(point, tolerance) {
+                for (var i = 0; i < model.nodes.length; i++) {
+                    var dist = model.nodes[i].pos.distanceTo(point);
+                    if (dist < tolerance) {
+                        return model.nodes[i].pos.clone();
+                    }
+                }
+                return point.clone();
+            }
+
+            function handleClick(e) {
+                var rect = canvas.getBoundingClientRect();
+                var mouse = new THREE.Vector2(
+                    ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                    -((e.clientY - rect.top) / rect.height) * 2 + 1
+                );
+
+                var raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(mouse, activeCamera);
+
+                if (joinMode) {
+                    // En modo unir, buscar miembros del modelo analitico
+                    var analyticIntersects = raycaster.intersectObjects(analyticGroup.children, true);
+                    if (analyticIntersects.length > 0) {
+                        var clickedObj = analyticIntersects[0].object;
+                        // Encontrar el grupo padre (miembro)
+                        var memberGroup = clickedObj;
+                        while (memberGroup.parent && memberGroup.parent !== analyticGroup) {
+                            memberGroup = memberGroup.parent;
+                        }
+
+                        // Encontrar el miembro correspondiente
+                        var memberIdx = model.members.findIndex(function(m) { return m.group === memberGroup; });
+                        if (memberIdx >= 0) {
+                            toggleMemberSelection(memberIdx);
+                        }
+                    }
+                    return;
+                }
+
+                var intersects = raycaster.intersectObjects(allMeshes.children, true);
+
+                if (intersects.length > 0 && autoMode) {
+                    var mesh = intersects[0].object;
+                    selectAndCreateAnalytic(mesh);
+                }
+            }
+
+            function selectAndCreateAnalytic(mesh) {
+                deselectAll();
+                mesh.material.emissive.setHex(0x224422);
+
+                var slabLevels = getSlabLevels();
+                var axis = calculateCentroidalAxis(mesh, slabLevels);
+
+                var length = axis.startPoint.distanceTo(axis.endPoint);
+
+                var prefix = axis.type === 'column' ? 'C' : 'V';
+                var name = prefix + '-' + String(model.nextId).padStart(2, '0');
+                var sectionStr = axis.type === 'column'
+                    ? (axis.size.x * 100).toFixed(0) + 'x' + (axis.size.z * 100).toFixed(0)
+                    : (axis.size.z * 100).toFixed(0) + 'x' + (axis.size.y * 100).toFixed(0);
+
+                document.getElementById('element-content').innerHTML =
+                    '<span class="element-type">' + axis.type.toUpperCase() + '</span>' +
+                    '<div style="font-size:12px;font-weight:600;margin:5px 0">' + name + '</div>' +
+                    '<div class="element-dims">' +
+                        '<div class="dim-row"><span class="lbl">Largo:</span><span class="val">' + axis.size.x.toFixed(3) + ' m</span></div>' +
+                        '<div class="dim-row"><span class="lbl">Alto:</span><span class="val">' + axis.size.y.toFixed(3) + ' m</span></div>' +
+                        '<div class="dim-row"><span class="lbl">Ancho:</span><span class="val">' + axis.size.z.toFixed(3) + ' m</span></div>' +
+                        '<div class="dim-row"><span class="lbl">Eje:</span><span class="val">' + axis.axisDir.toUpperCase() + ' (centroide)</span></div>' +
+                        '<div class="dim-row"><span class="lbl">Longitud:</span><span class="val">' + length.toFixed(3) + ' m</span></div>' +
+                        '<div class="dim-row"><span class="lbl">Seccion:</span><span class="val">' + sectionStr + '</span></div>' +
+                    '</div>' +
+                    '<div class="auto-hint">Eje centroidal creado automaticamente</div>';
+
+                document.getElementById('element-panel').classList.add('visible');
+
+                // Snap a nodos existentes
+                var snapTol = getSnapTolerance();
+                var snappedStart = snapToExistingNode(axis.startPoint, snapTol);
+                var snappedEnd = snapToExistingNode(axis.endPoint, snapTol);
+
+                saveUndoState();
+                createSingleMemberDirect(name, axis.type, sectionStr, snappedStart, snappedEnd);
+            }
+
+            // ============================================
+            // SELECCION Y UNION DE MIEMBROS
+            // ============================================
+
+            function toggleMemberSelection(idx) {
+                var member = model.members[idx];
+                var selIdx = selectedMembers.indexOf(idx);
+
+                if (selIdx >= 0) {
+                    // Deseleccionar
+                    selectedMembers.splice(selIdx, 1);
+                    highlightMember(member, false);
+                } else {
+                    // Seleccionar
+                    selectedMembers.push(idx);
+                    highlightMember(member, true);
+                }
+
+                updateSelectionUI();
+            }
+
+            function highlightMember(member, selected) {
+                if (!member.group) return;
+                member.group.traverse(function(obj) {
+                    if (obj.isMesh && obj.geometry.type === 'CylinderGeometry') {
+                        if (selected) {
+                            obj.material.color.setHex(0xf1c40f);
+                        } else {
+                            obj.material.color.setHex(member.color);
+                        }
+                    }
+                });
+            }
+
+            function clearMemberSelection() {
+                selectedMembers.forEach(function(idx) {
+                    if (model.members[idx]) {
+                        highlightMember(model.members[idx], false);
+                    }
+                });
+                selectedMembers = [];
+                updateSelectionUI();
+            }
+
+            function updateSelectionUI() {
+                var list = document.getElementById('selected-list');
+                var btn = document.getElementById('btn-do-join');
+                var countSpan = document.getElementById('join-count');
+
+                countSpan.textContent = selectedMembers.length;
+                btn.disabled = selectedMembers.length < 2;
+
+                if (selectedMembers.length === 0) {
+                    list.innerHTML = '<p style="color:#555">Ninguno seleccionado</p>';
+                } else {
+                    var html = '';
+                    selectedMembers.forEach(function(idx) {
+                        var m = model.members[idx];
+                        if (m) {
+                            html += '<div class="selected-item"><span>' + m.name + '</span><span>' + m.length.toFixed(2) + 'm</span></div>';
+                        }
+                    });
+                    list.innerHTML = html;
+                }
+
+                // Actualizar lista de miembros en panel
+                updateModelPanel();
+            }
+
+            // UNIR miembros seleccionados en uno solo
+            function joinSelectedMembers() {
+                if (selectedMembers.length < 2) return;
+
+                saveUndoState();
+
+                // Ordenar por indice descendente para eliminar correctamente
+                var sortedIndices = selectedMembers.slice().sort(function(a, b) { return a - b; });
+
+                // Recolectar todos los nodos de los miembros
+                var allNodeIds = [];
+                var memberType = model.members[sortedIndices[0]].type;
+                var memberSection = model.members[sortedIndices[0]].section;
+                var baseName = model.members[sortedIndices[0]].name.replace(/-\d+$/, '');
+
+                sortedIndices.forEach(function(idx) {
+                    var m = model.members[idx];
+                    if (allNodeIds.indexOf(m.node1) < 0) allNodeIds.push(m.node1);
+                    if (allNodeIds.indexOf(m.node2) < 0) allNodeIds.push(m.node2);
+                });
+
+                // Encontrar los nodos extremos (los que solo aparecen una vez)
+                var nodeAppearances = {};
+                sortedIndices.forEach(function(idx) {
+                    var m = model.members[idx];
+                    nodeAppearances[m.node1] = (nodeAppearances[m.node1] || 0) + 1;
+                    nodeAppearances[m.node2] = (nodeAppearances[m.node2] || 0) + 1;
+                });
+
+                var extremeNodes = [];
+                for (var nid in nodeAppearances) {
+                    if (nodeAppearances[nid] === 1) {
+                        extremeNodes.push(parseInt(nid));
+                    }
+                }
+
+                if (extremeNodes.length !== 2) {
+                    console.log('No se pueden unir: no forman una linea continua');
+                    alert('Los elementos seleccionados no forman una linea continua');
+                    return;
+                }
+
+                var node1 = model.nodes.find(function(n) { return n.id === extremeNodes[0]; });
+                var node2 = model.nodes.find(function(n) { return n.id === extremeNodes[1]; });
+
+                if (!node1 || !node2) return;
+
+                // Eliminar miembros seleccionados (en orden descendente)
+                var toRemove = sortedIndices.slice().sort(function(a, b) { return b - a; });
+                toRemove.forEach(function(idx) {
+                    var m = model.members[idx];
+                    if (m.group) analyticGroup.remove(m.group);
+                    model.members.splice(idx, 1);
+                });
+
+                // Crear nuevo miembro unido
+                var newName = baseName + '-U';
+                createSingleMemberDirect(newName, memberType, memberSection, node1.pos, node2.pos);
+
+                // Limpiar nodos huerfanos
+                cleanOrphanNodes();
+
+                selectedMembers = [];
+                updateSelectionUI();
+                updateModelPanel();
+
+                console.log('Miembros unidos en:', newName);
+            }
+
+            // Eliminar miembros seleccionados
+            function deleteSelectedMembers() {
+                if (selectedMembers.length === 0) return;
+
+                saveUndoState();
+
+                // Eliminar en orden descendente
+                var toRemove = selectedMembers.slice().sort(function(a, b) { return b - a; });
+                toRemove.forEach(function(idx) {
+                    var m = model.members[idx];
+                    if (m && m.group) {
+                        analyticGroup.remove(m.group);
+                        model.members.splice(idx, 1);
+                    }
+                });
+
+                cleanOrphanNodes();
+                selectedMembers = [];
+                updateSelectionUI();
+                updateModelPanel();
+            }
+
+            function cleanOrphanNodes() {
+                model.nodes = model.nodes.filter(function(n) {
+                    // Verificar si algun miembro usa este nodo
+                    return model.members.some(function(m) {
+                        return m.node1 === n.id || m.node2 === n.id;
+                    });
+                });
+            }
+
+            // ============================================
+            // UNDO / MIEMBROS / NODOS
+            // ============================================
+
+            function saveUndoState() {
+                var state = {
+                    members: model.members.map(function(m) {
+                        return {
+                            id: m.id, name: m.name, type: m.type, section: m.section,
+                            length: m.length, node1: m.node1, node2: m.node2, color: m.color
+                        };
+                    }),
+                    nodes: model.nodes.map(function(n) {
+                        return {
+                            id: n.id, x: n.pos.x, y: n.pos.y, z: n.pos.z, members: n.members.slice()
+                        };
+                    }),
+                    nextId: model.nextId,
+                    nextNodeId: model.nextNodeId
+                };
+                undoStack.push(state);
+                if (undoStack.length > MAX_UNDO) undoStack.shift();
+            }
+
+            function undo() {
+                if (undoStack.length === 0) {
+                    console.log('Nada que deshacer');
+                    return;
+                }
+
+                var state = undoStack.pop();
+
+                while (analyticGroup.children.length) {
+                    analyticGroup.remove(analyticGroup.children[0]);
+                }
+
+                model.nodes = state.nodes.map(function(n) {
+                    return {
+                        id: n.id,
+                        pos: new THREE.Vector3(n.x, n.y, n.z),
+                        members: n.members.slice()
+                    };
+                });
+
+                model.members = [];
+                state.members.forEach(function(m) {
+                    var node1 = model.nodes.find(function(n) { return n.id === m.node1; });
+                    var node2 = model.nodes.find(function(n) { return n.id === m.node2; });
+                    if (!node1 || !node2) return;
+
+                    var p1 = node1.pos;
+                    var p2 = node2.pos;
+                    var length = p1.distanceTo(p2);
+
+                    var tubeGeom = new THREE.CylinderGeometry(0.06, 0.06, length, 8);
+                    var tubeMat = new THREE.MeshBasicMaterial({ color: m.color });
+                    var tube = new THREE.Mesh(tubeGeom, tubeMat);
+
+                    var mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                    tube.position.copy(mid);
+
+                    var dir = new THREE.Vector3().subVectors(p2, p1).normalize();
+                    tube.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+
+                    var nodeMat = new THREE.MeshBasicMaterial({ color: 0xf1c40f });
+                    var nodeGeom = new THREE.SphereGeometry(0.1, 12, 12);
+                    var s1 = new THREE.Mesh(nodeGeom, nodeMat);
+                    s1.position.copy(p1);
+                    var s2 = new THREE.Mesh(nodeGeom, nodeMat);
+                    s2.position.copy(p2);
+
+                    var group = new THREE.Group();
+                    group.add(tube, s1, s2);
+                    analyticGroup.add(group);
+
+                    model.members.push({
+                        id: m.id, name: m.name, type: m.type, section: m.section,
+                        length: m.length, node1: m.node1, node2: m.node2,
+                        color: m.color, group: group
+                    });
+                });
+
+                model.nextId = state.nextId;
+                model.nextNodeId = state.nextNodeId;
+                selectedMembers = [];
+                updateSelectionUI();
+                updateModelPanel();
+                console.log('Deshacer completado. Quedan', undoStack.length, 'estados');
+            }
+
+            function createSingleMemberDirect(name, type, section, p1, p2) {
+                var color = colors[type] || 0xffffff;
+                var length = p1.distanceTo(p2);
+
+                if (length < 0.01) return;
+
+                var node1 = findOrCreateNode(p1);
+                var node2 = findOrCreateNode(p2);
+
+                var tubeGeom = new THREE.CylinderGeometry(0.06, 0.06, length, 8);
+                var tubeMat = new THREE.MeshBasicMaterial({ color: color });
+                var tube = new THREE.Mesh(tubeGeom, tubeMat);
+
+                var mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                tube.position.copy(mid);
+
+                var dir = new THREE.Vector3().subVectors(p2, p1).normalize();
+                tube.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+
+                var nodeMat = new THREE.MeshBasicMaterial({ color: 0xf1c40f });
+                var nodeGeom = new THREE.SphereGeometry(0.1, 12, 12);
+                var s1 = new THREE.Mesh(nodeGeom, nodeMat);
+                s1.position.copy(p1);
+                var s2 = new THREE.Mesh(nodeGeom, nodeMat);
+                s2.position.copy(p2);
+
+                var group = new THREE.Group();
+                group.add(tube, s1, s2);
+                analyticGroup.add(group);
+
+                var member = {
+                    id: model.nextId++,
+                    name: name, type: type, section: section, length: length,
+                    node1: node1.id, node2: node2.id,
+                    color: color, group: group
+                };
+                model.members.push(member);
+                node1.members.push(member.id);
+                node2.members.push(member.id);
+
+                updateModelPanel();
+            }
+
+            function findOrCreateNode(pos, tol) {
+                tol = tol || getSnapTolerance();
+                for (var i = 0; i < model.nodes.length; i++) {
+                    if (model.nodes[i].pos.distanceTo(pos) < tol) return model.nodes[i];
+                }
+                var node = { id: model.nextNodeId++, pos: pos.clone(), members: [] };
+                model.nodes.push(node);
+                return node;
+            }
+
+            function updateModelPanel() {
+                document.getElementById('stat-members').textContent = model.members.length;
+                document.getElementById('stat-nodes').textContent = model.nodes.length;
+                var total = 0;
+                for (var i = 0; i < model.members.length; i++) {
+                    total += model.members[i].length;
+                }
+                document.getElementById('stat-length').textContent = total.toFixed(2) + ' m';
+
+                var list = document.getElementById('members-list');
+                list.innerHTML = '';
+                model.members.forEach(function(m, idx) {
+                    var isSelected = selectedMembers.indexOf(idx) >= 0;
+                    var item = document.createElement('div');
+                    item.className = 'member-item' + (m.hidden ? ' hidden' : '') + (isSelected ? ' selected' : '');
+                    var colorHex = m.color.toString(16).padStart(6, '0');
+                    var opac = m.hidden ? 0.3 : 1;
+                    item.innerHTML =
+                        '<div class="member-color" style="background:#' + colorHex + ';opacity:' + opac + '"></div>' +
+                        '<div class="member-info" style="opacity:' + (m.hidden ? 0.5 : 1) + '">' + m.name + ' | ' + m.section + ' | ' + m.length.toFixed(2) + 'm</div>' +
+                        '<button class="member-hide" data-i="' + idx + '" title="Ocultar/Mostrar">' + (m.hidden ? 'O' : 'H') + '</button>' +
+                        '<button class="member-del" data-i="' + idx + '" title="Eliminar">x</button>';
+
+                    item.onclick = function(e) {
+                        if (e.target.tagName !== 'BUTTON' && joinMode) {
+                            toggleMemberSelection(idx);
+                        }
+                    };
+                    item.querySelector('.member-hide').onclick = function(e) {
+                        e.stopPropagation();
+                        toggleMemberVisibility(idx);
+                    };
+                    item.querySelector('.member-del').onclick = function(e) {
+                        e.stopPropagation();
+                        deleteMember(idx);
+                    };
+                    list.appendChild(item);
+                });
+            }
+
+            function deleteMember(i) {
+                saveUndoState();
+                var m = model.members[i];
+                analyticGroup.remove(m.group);
+                model.members.splice(i, 1);
+                cleanOrphanNodes();
+
+                // Actualizar seleccion
+                selectedMembers = selectedMembers.filter(function(idx) { return idx !== i; })
+                    .map(function(idx) { return idx > i ? idx - 1 : idx; });
+
+                updateSelectionUI();
+                updateModelPanel();
+            }
+
+            function toggleMemberVisibility(i) {
+                var m = model.members[i];
+                if (m.group) {
+                    m.hidden = !m.hidden;
+                    m.group.visible = !m.hidden;
+                    updateModelPanel();
+                }
+            }
+
+            function clearModel() {
+                while (analyticGroup.children.length) analyticGroup.remove(analyticGroup.children[0]);
+                model = { members: [], nodes: [], nextId: 1, nextNodeId: 1 };
+                selectedMembers = [];
+                updateSelectionUI();
+                updateModelPanel();
+            }
+
+            // ============================================
+            // VISTAS Y CONTROLES
+            // ============================================
+
+            function setView(v) {
+                currentView = v;
+                document.querySelectorAll('.toolbar button').forEach(function(b) {
+                    if (['btn-3d','btn-top','btn-front','btn-right'].indexOf(b.id) >= 0) {
+                        b.classList.remove('active');
+                    }
+                });
+
+                var d = maxDim * 1.5;
+
+                if (v === '3d') {
+                    document.getElementById('btn-3d').classList.add('active');
+                    activeCamera = camera;
+                    controls.object = camera;
+                    camera.position.set(center.x + maxDim, center.y + maxDim * 0.7, center.z + maxDim);
+                    controls.enableRotate = true;
+                } else {
+                    var orthoSize = maxDim * 1.2;
+                    updateOrthoSize(orthoSize);
+
+                    activeCamera = orthoCamera;
+                    controls.object = orthoCamera;
+                    controls.enableRotate = false;
+
+                    if (v === 'top') {
+                        document.getElementById('btn-top').classList.add('active');
+                        orthoCamera.position.set(center.x, center.y + d, center.z);
+                        orthoCamera.up.set(0, 0, -1);
+                    } else if (v === 'front') {
+                        document.getElementById('btn-front').classList.add('active');
+                        orthoCamera.position.set(center.x, center.y, center.z + d);
+                        orthoCamera.up.set(0, 1, 0);
+                    } else if (v === 'right') {
+                        document.getElementById('btn-right').classList.add('active');
+                        orthoCamera.position.set(center.x + d, center.y, center.z);
+                        orthoCamera.up.set(0, 1, 0);
+                    }
+                }
+
+                controls.target.copy(center);
+                controls.update();
+
+                if (autoMode) document.getElementById('btn-auto').classList.add('auto-mode');
+                if (joinMode) document.getElementById('btn-join').classList.add('join-mode');
+            }
+
+            function updateOrthoSize(size) {
+                var asp = container.clientWidth / container.clientHeight;
+                orthoCamera.left = -size * asp;
+                orthoCamera.right = size * asp;
+                orthoCamera.top = size;
+                orthoCamera.bottom = -size;
+                orthoCamera.updateProjectionMatrix();
+            }
+
+            function handleWheel(e) {
+                if (activeCamera === orthoCamera) {
+                    e.preventDefault();
+                    var zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+                    var newLeft = orthoCamera.left * zoomFactor;
+                    var newRight = orthoCamera.right * zoomFactor;
+                    var newTop = orthoCamera.top * zoomFactor;
+                    var newBottom = orthoCamera.bottom * zoomFactor;
+
+                    var minSize = 1;
+                    var maxSize = maxDim * 5;
+                    var currentSize = (newRight - newLeft) / 2;
+
+                    if (currentSize > minSize && currentSize < maxSize) {
+                        orthoCamera.left = newLeft;
+                        orthoCamera.right = newRight;
+                        orthoCamera.top = newTop;
+                        orthoCamera.bottom = newBottom;
+                        orthoCamera.updateProjectionMatrix();
+                    }
+                }
+            }
+
+            function exportModel() {
+                var data = {
+                    nodes: model.nodes.map(function(n) { return { id: n.id, x: n.pos.x, y: n.pos.y, z: n.pos.z }; }),
+                    members: model.members.map(function(m) {
+                        return {
+                            id: m.id, name: m.name, type: m.type, section: m.section,
+                            node1: m.node1, node2: m.node2, length: m.length
+                        };
+                    })
+                };
+                var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'modelo_analitico.json';
+                a.click();
+            }
+
+            // ============================================
+            // EVENT LISTENERS
+            // ============================================
+
+            canvas.addEventListener('click', handleClick);
+            canvas.addEventListener('wheel', handleWheel, { passive: false });
+
+            canvas.addEventListener('mousemove', function(e) {
+                var rect = canvas.getBoundingClientRect();
+                var mouse = new THREE.Vector2(
+                    ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                    -((e.clientY - rect.top) / rect.height) * 2 + 1
+                );
+
+                var raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(mouse, activeCamera);
+
+                var plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+                var pt = new THREE.Vector3();
+                raycaster.ray.intersectPlane(plane, pt);
+
+                if (pt) {
+                    document.getElementById('coord-x').textContent = pt.x.toFixed(2);
+                    document.getElementById('coord-y').textContent = pt.y.toFixed(2);
+                    document.getElementById('coord-z').textContent = pt.z.toFixed(2);
+                }
+            });
+
+            document.getElementById('btn-3d').onclick = function() { setView('3d'); };
+            document.getElementById('btn-top').onclick = function() { setView('top'); };
+            document.getElementById('btn-front').onclick = function() { setView('front'); };
+            document.getElementById('btn-right').onclick = function() { setView('right'); };
+
+            document.getElementById('btn-auto').onclick = toggleAutoMode;
+            document.getElementById('btn-join').onclick = toggleJoinMode;
+            document.getElementById('btn-auto-all').onclick = generateAutoAnalyticModel;
+
+            document.getElementById('btn-do-join').onclick = joinSelectedMembers;
+            document.getElementById('btn-clear-selection').onclick = clearMemberSelection;
+
+            document.getElementById('btn-model').onclick = function() {
+                this.classList.toggle('active');
+                document.getElementById('model-panel').classList.toggle('visible');
+            };
+
+            document.getElementById('btn-cut').onclick = function() {
+                this.classList.toggle('cut-active');
+                document.getElementById('cut-panel').classList.toggle('visible');
+            };
+
+            document.getElementById('btn-fit').onclick = function() {
+                if (currentView === '3d') {
+                    camera.position.set(center.x + maxDim, center.y + maxDim * 0.7, center.z + maxDim);
+                } else {
+                    updateOrthoSize(maxDim * 1.2);
+                }
+                controls.target.copy(center);
+                controls.update();
+            };
+
+            document.getElementById('btn-export').onclick = exportModel;
+            document.getElementById('btn-clear').onclick = clearModel;
+
+            document.getElementById('btn-transparent').onclick = togglePhysicalTransparency;
+            document.getElementById('btn-hide-physical').onclick = togglePhysicalVisibility;
+            document.getElementById('btn-hide-analytic').onclick = toggleAnalyticVisibility;
+
+            ['x', 'y', 'z'].forEach(function(axis) {
+                document.getElementById('cut-' + axis).oninput = updateCutPlanes;
+                document.getElementById('cut-' + axis + '-enable').onchange = updateCutPlanes;
+            });
+
+            document.getElementById('btn-reset-cut').onclick = function() {
+                ['x', 'y', 'z'].forEach(function(axis) {
+                    document.getElementById('cut-' + axis + '-enable').checked = false;
+                    document.getElementById('cut-' + axis).value = document.getElementById('cut-' + axis).max;
+                });
+                updateCutPlanes();
+            };
+
+            document.getElementById('show-physical').onchange = function(e) {
+                physicalVisible = e.target.checked;
+                allMeshes.visible = physicalVisible;
+                document.getElementById('btn-hide-physical').classList.toggle('hidden-mode', !physicalVisible);
+            };
+            document.getElementById('show-analytic').onchange = function(e) {
+                analyticVisible = e.target.checked;
+                analyticGroup.visible = analyticVisible;
+                document.getElementById('btn-hide-analytic').classList.toggle('hidden-mode', !analyticVisible);
+            };
+
+            document.addEventListener('keydown', function(e) {
+                switch(e.key) {
+                    case '1': setView('3d'); break;
+                    case '2': setView('top'); break;
+                    case '3': setView('front'); break;
+                    case '4': setView('right'); break;
+                    case 'f': case 'F':
+                        document.getElementById('btn-fit').click();
+                        break;
+                    case 'a': case 'A':
+                        if (!e.ctrlKey) toggleAutoMode();
+                        break;
+                    case 'j': case 'J':
+                        toggleJoinMode();
+                        break;
+                    case 't': case 'T':
+                        togglePhysicalTransparency();
+                        break;
+                    case 'p': case 'P':
+                        togglePhysicalVisibility();
+                        break;
+                    case 'l': case 'L':
+                        toggleAnalyticVisibility();
+                        break;
+                    case 'Delete':
+                        if (joinMode && selectedMembers.length > 0) {
+                            deleteSelectedMembers();
+                        }
+                        break;
+                    case 'Escape':
+                        if (autoMode) toggleAutoMode();
+                        if (joinMode) toggleJoinMode();
+                        deselectAll();
+                        clearMemberSelection();
+                        break;
+                    case 'z': case 'Z':
+                        if (e.ctrlKey) {
+                            e.preventDefault();
+                            undo();
+                        }
+                        break;
+                }
+            });
+
+            window.addEventListener('resize', function() {
+                var asp = container.clientWidth / container.clientHeight;
+                camera.aspect = asp;
+                camera.updateProjectionMatrix();
+
+                var orthoWidth = orthoCamera.right - orthoCamera.left;
+                var orthoHeight = orthoWidth / asp;
+                orthoCamera.top = orthoHeight / 2;
+                orthoCamera.bottom = -orthoHeight / 2;
+                orthoCamera.updateProjectionMatrix();
+
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, activeCamera);
+            }
+            animate();
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('status').textContent = 'Error: ' + err.message;
+            document.getElementById('status').style.color = '#ff6b6b';
+        }
+    })();
+    </script>
+</body>
+</html>
+@{end html-ifc}

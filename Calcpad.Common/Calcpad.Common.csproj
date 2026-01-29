@@ -25,8 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- MultLangConfig.json as external file - edit without recompiling -->
-    <Content Include="MultLangCode\MultLangConfig.json">
+    <!-- MultLangConfig.json from project root - SINGLE SOURCE OF TRUTH -->
+    <Content Include="..\MultLangConfig.json">
+      <Link>MultLangCode\MultLangConfig.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

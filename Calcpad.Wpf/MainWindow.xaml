@@ -5,12 +5,12 @@
     xmlns:mathEditor="clr-namespace:Calcpad.Wpf.MathEditor"
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="Calcpad.Wpf.MainWindow"
-    Title=" Calcpad Fork Branch 1.0.0"
+    Title=" Hekatan Calc 1.0.0"
     Height="800"
     Width="1200"
     WindowStartupLocation="CenterScreen"
     Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
-    Icon="Resources/calcpad.ico"
+    Icon="Resources/hekatan.ico"
     HorizontalContentAlignment="Center"
     WindowStyle="ThreeDBorderWindow" 
     Closing="Window_Closing"
@@ -20,6 +20,9 @@
     Activated="Window_Activated" 
     ContentRendered="Window_ContentRendered">
     <Window.Resources>
+        <Style x:Key="GoldMenuItem" TargetType="{x:Type MenuItem}">
+            <Setter Property="Foreground" Value="#D4AF37"/>
+        </Style>
         <Style TargetType="{x:Type Button}">
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
@@ -209,8 +212,8 @@
             <RowDefinition Height="50"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Menu x:Name="MainMenu" VerticalAlignment="Top" Margin="2,2,2,0" Background="{x:Null}" Height="18">
-            <MenuItem Header="{x:Static wpf:MainWindowResources.File}">
+        <Menu x:Name="MainMenu" VerticalAlignment="Top" Margin="2,2,2,0" Background="{x:Null}" Height="18" Foreground="#D4AF37">
+            <MenuItem Header="{x:Static wpf:MainWindowResources.File}" Style="{StaticResource GoldMenuItem}">
                 <MenuItem Command="ApplicationCommands.New" 
                           Header="{x:Static wpf:MainWindowResources.New}"/>
                 <MenuItem Command="ApplicationCommands.Open" 
@@ -227,7 +230,7 @@
                 <MenuItem Command="ApplicationCommands.Close" 
                           Header="{x:Static wpf:MainWindowResources.Exit}"/>
             </MenuItem>
-            <MenuItem x:Name="MenuEdit" 
+            <MenuItem x:Name="MenuEdit" Style="{StaticResource GoldMenuItem}"
                       Header="{x:Static wpf:MainWindowResources.Edit}">
                 <MenuItem Command="ApplicationCommands.Find" 
                           Header="{x:Static wpf:MainWindowResources.Find}"/>
@@ -256,7 +259,7 @@
                 <MenuItem Command="ApplicationCommands.SelectAll" 
                           Header="{x:Static wpf:MainWindowResources.Select_All}"/>
             </MenuItem>
-            <MenuItem x:Name="MenuInsert" 
+            <MenuItem x:Name="MenuInsert" Style="{StaticResource GoldMenuItem}"
                       Header="{x:Static wpf:MainWindowResources.Insert}">
                 <MenuItem Header="{x:Static wpf:ConstantsResources.Constants_Header}">
                     <MenuItem Click="Button_Click" Tag="π" Icon="  π" 
@@ -1695,7 +1698,7 @@
                               ToolTip="{x:Static wpf:MainWindowResources.SetAngleGrades}"/>
                 </MenuItem>
             </MenuItem>
-            <MenuItem x:Name="MenuOutput" 
+            <MenuItem x:Name="MenuOutput" Style="{StaticResource GoldMenuItem}"
                       Header="{x:Static wpf:MainWindowResources.Output}">
                 <MenuItem x:Name="MenuWebForm" Command="{StaticResource WebFormCommand}" 
                           Header="{x:Static wpf:MainWindowResources.InputForm}" InputGestureText="F4"/>
@@ -1714,7 +1717,7 @@
                 <MenuItem Click="PdfButton_Click" 
                           Header="{x:Static wpf:MainWindowResources.SaveAsPDF}"/>
             </MenuItem>
-            <MenuItem Header="MultilangCode">
+            <MenuItem Header="MultilangCode" Style="{StaticResource GoldMenuItem}">
                 <MenuItem Header="Python" x:Name="MenuPython">
                     <MenuItem Header="Configure Path..." Click="ConfigurePythonPath_Click"/>
                     <Separator/>
@@ -1789,10 +1792,45 @@
                     <MenuItem Header="Insert @{markdown} directive" Click="InsertMarkdownDirective_Click"/>
                 </MenuItem>
                 <Separator/>
+                <MenuItem Header="Jupyter Notebook" x:Name="MenuJupyter">
+                    <MenuItem x:Name="MenuJupyterOpen"
+                              Header="Open Jupyter Notebook (.ipynb)..."
+                              Click="MenuJupyterOpen_Click"
+                              ToolTip="Abre archivos .ipynb en Jupyter"/>
+                    <Separator/>
+                    <MenuItem x:Name="MenuJupyterStart"
+                              Header="Start Jupyter Server"
+                              Click="MenuJupyterStart_Click"
+                              ToolTip="Inicia el servidor Jupyter local"/>
+                    <MenuItem x:Name="MenuJupyterStop"
+                              Header="Stop Jupyter Server"
+                              Click="MenuJupyterStop_Click"
+                              ToolTip="Detiene el servidor Jupyter"/>
+                    <Separator/>
+                    <MenuItem x:Name="MenuJupyterStatus"
+                              Header="Jupyter Status..."
+                              Click="MenuJupyterStatus_Click"
+                              ToolTip="Muestra el estado de Jupyter"/>
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="MathCAD - Math Editor..." Click="OpenMathEditor_Click"/>
                 <MenuItem Header="Math Editor Test Window..." Click="OpenMathEditorTest_Click"/>
             </MenuItem>
-            <MenuItem Command="ApplicationCommands.Help"
+            <MenuItem x:Name="MenuView" Header="View" Style="{StaticResource GoldMenuItem}">
+                <MenuItem Header="Theme">
+                    <MenuItem x:Name="MenuThemeHekatanDark" Header="Hekatan Dark (Egyptian Gold)"
+                              Click="MenuThemeHekatanDark_Click" IsCheckable="True"/>
+                    <MenuItem x:Name="MenuThemeHekatanLight" Header="Hekatan Light (Gold Accent)"
+                              Click="MenuThemeHekatanLight_Click" IsCheckable="True"/>
+                    <MenuItem x:Name="MenuThemeClassic" Header="Classic (Original)"
+                              Click="MenuThemeClassic_Click" IsCheckable="True" IsChecked="True"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Choose Title Color..." Click="MenuChooseTitleColor_Click"/>
+                <Separator/>
+                <MenuItem Header="Cycle Theme (F12)" Click="MenuCycleTheme_Click" InputGestureText="F12"/>
+            </MenuItem>
+            <MenuItem Command="ApplicationCommands.Help" Style="{StaticResource GoldMenuItem}"
                       Header="{x:Static wpf:MainWindowResources.Help}"/>
         </Menu>
         <Button Grid.Row="0" x:Name="NewButton" HorizontalAlignment="Left" Height="24" VerticalAlignment="Top" Width="24"
@@ -1862,10 +1900,10 @@
                 ToolTip="{x:Static wpf:MainWindowResources.FindAndReplace}">
             <Image Source="Resources/search.png" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Center"/>
         </Button>
-        <Button Grid.Row="0" Click="ImageButton_Click" x:Name="ImageButton" 
-                HorizontalAlignment="Left" VerticalAlignment="Top" 
-                Height="24" Width="24" Margin="244,24,0,0" 
-                Focusable="false" IsTabStop="false" 
+        <Button Grid.Row="0" Click="ImageButton_Click" x:Name="ImageButton"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Height="24" Width="24" Margin="244,24,0,0"
+                Focusable="false" IsTabStop="false"
                 Background="{x:Null}" BorderBrush="{x:Null}"
                 ToolTip="{x:Static wpf:MainWindowResources.InsertImage}">
             <Image Source="Resources/image.png" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Center"/>
@@ -1873,17 +1911,17 @@
         <Button Grid.Row="0" Click="KeyPadButton_Click" x:Name="KeyPadButton" Tag="F"
                 VerticalAlignment="Top" HorizontalAlignment="Left"
                 Height="24" Width="24" Margin="298,24,0,0"
-                Focusable="false" IsTabStop="false" 
+                Focusable="false" IsTabStop="false"
                 Background="AliceBlue" BorderBrush="SteelBlue"
                 ToolTip="{x:Static wpf:MainWindowResources.ShowHideKeypad}">
             <Image Source="Resources/calc.png" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
         </Button>
         <Button Grid.Row="0" x:Name="HelpButton" HorizontalAlignment="Left" VerticalAlignment="Top"
-                Height="24" Width="24" Margin="325,24,0,0"
+                Height="26" Width="26" Margin="156,24,0,0"
                 Command="ApplicationCommands.Help" Focusable="false"  IsTabStop="false"
                 Background="{x:Null}" BorderBrush="{x:Null}"
                 ToolTip="{x:Static wpf:MainWindowResources.ShowHelp}">
-            <Image Source="Resources/help.png" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <Image Source="Resources/help.png" Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Button>
         <TextBlock Grid.Row="0" TextWrapping="Wrap" FontSize="11.5" Margin="0,6,146,0" Height="16" 
             VerticalAlignment="Top"  HorizontalAlignment="Right" Width="110" Foreground="#DA000000"
@@ -1963,11 +2001,42 @@
                 ToolTip="{x:Static wpf:MainWindowResources.SaveAsPDF}">
             <Image Source="Resources\pdf.png" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="center"/>
         </Button>
-        <Canvas Grid.Row="0" Margin="0,24,0,0" HorizontalAlignment="Center" Width="250" Height="24" VerticalAlignment="Top">
+        <Canvas Grid.Row="0" Margin="0,24,0,0" HorizontalAlignment="Center" Width="340" Height="24" VerticalAlignment="Top">
+            <!-- Update IFC Editor Button -->
+            <Button Click="UpdateIfcEditorButton_Click" x:Name="UpdateIfcEditorButton" Height="24" Width="24"
+                VerticalAlignment="Center" HorizontalAlignment="Left"
+                Focusable="false" IsTabStop="false"
+                Background="{x:Null}" BorderBrush="{x:Null}" Canvas.Left="0" Canvas.Top="0"
+                ToolTip="Actualizar Editor desde Visor IFC (sincroniza cambios del visor al código)">
+                <Grid>
+                    <Image Source="Resources/IFC.png" Width="22" Height="22" VerticalAlignment="Center"
+                        HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Text="↻" FontSize="10" FontWeight="Bold" Foreground="Orange"
+                        VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-2,-2"/>
+                </Grid>
+            </Button>
+            <!-- IFC Viewer Button -->
+            <Button Click="IfcButton_Click" x:Name="IfcButton" Height="24" Width="24"
+                VerticalAlignment="Center" HorizontalAlignment="Left"
+                Focusable="false" IsTabStop="false"
+                Background="{x:Null}" BorderBrush="{x:Null}" Canvas.Left="27" Canvas.Top="0"
+                ToolTip="Open IFC 3D Viewer">
+                <Image Source="Resources/IFC.png" Width="22" Height="22" VerticalAlignment="Center"
+                    HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Button>
+            <!-- Jupyter Server Button -->
+            <Button Click="MenuJupyterStart_Click" x:Name="JupyterButton" Height="24" Width="24"
+                VerticalAlignment="Center" HorizontalAlignment="Left"
+                Focusable="false" IsTabStop="false"
+                Background="{x:Null}" BorderBrush="{x:Null}" Canvas.Left="54" Canvas.Top="0"
+                ToolTip="Start Jupyter Server">
+                <Image Source="Resources/Jupyter.png" Width="22" Height="22" VerticalAlignment="Center"
+                    HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Button>
             <Button Click="WebFormButton_Click" x:Name="WebFormButton" Tag="F" Height="24"  Width="24"
                 VerticalAlignment="Center" HorizontalAlignment="Left"
                 Focusable="false" IsTabStop="false"
-                Background="{x:Null}" BorderBrush="{x:Null}" Canvas.Left="53"
+                Background="{x:Null}" BorderBrush="{x:Null}" Canvas.Left="81"
                 ToolTip="{x:Static wpf:MainWindowResources.Compile_to_input_form_F4}">
                 <Image Source="Resources/form.png" Width="20" Height="20" VerticalAlignment="Center"
                     HorizontalAlignment="Center"/>
@@ -1975,7 +2044,7 @@
             <Button Click="CalcButton_Click" x:Name="CalcButton" Tag="F" Height="24"  Width="24"
                 VerticalAlignment="Center" HorizontalAlignment="Left"
                 Focusable="false" IsTabStop="false" Background="{x:Null}"
-                Canvas.Left="79" BorderBrush="{x:Null}"
+                Canvas.Left="107" BorderBrush="{x:Null}"
                 ToolTip="{x:Static wpf:MainWindowResources.RunAndDisplayOutput}">
                 <Image Source="Resources/play.png" Width="20" Height="20" VerticalAlignment="Center"
                     HorizontalAlignment="Center"/>
@@ -1983,21 +2052,21 @@
             <CheckBox x:Name="AutoRunCheckBox" Content=" AutoRun" IsChecked="True"
                       TabIndex="6" Padding="0"  FontSize="12.5"
                       Width="75" HorizontalAlignment="Left" Height="16"
-                      Canvas.Left="107" Canvas.Top="5" VerticalAlignment="Center"
+                      Canvas.Left="135" Canvas.Top="5" VerticalAlignment="Center"
                       Checked="AutoRunCheckBox_Checked" Unchecked="AutoRunCheckBox_Unchecked"
                       ToolTip="{x:Static wpf:MainWindowResources.RefreshResultsAfterEachEdit}" FontFamily="Roboto" />
             <Button Click="ToggleModeButton_Click" x:Name="ToggleModeButton"
                     Height="20" Width="60" VerticalAlignment="Center"
                     HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
-                    Canvas.Left="185" Canvas.Top="2" Background="#667eea"
+                    Canvas.Left="213" Canvas.Top="2" Background="#667eea"
                     Foreground="White" FontSize="9" FontWeight="Bold"
-                    Content="mathCAD" Padding="2"
-                    ToolTip="Toggle Code/mathCAD Mode (Ctrl+M)"/>
+                    Content="MathCanvas" Padding="2"
+                    ToolTip="Toggle Code/MathCanvas Mode (Ctrl+M)"/>
             <!-- Mathcad Prime Button with dropdown menu -->
             <Button x:Name="MathcadBtn" Click="MathcadBtn_Click"
                     Height="24" Width="24" VerticalAlignment="Center"
                     HorizontalAlignment="Left" Focusable="false" IsTabStop="false"
-                    Canvas.Left="250" Canvas.Top="0" Background="{x:Null}" BorderBrush="{x:Null}"
+                    Canvas.Left="278" Canvas.Top="0" Background="{x:Null}" BorderBrush="{x:Null}"
                     ToolTip="Mathcad Prime (.mcdx)">
                 <Button.ContextMenu>
                     <ContextMenu>
@@ -2428,14 +2497,14 @@
                 <ComboBoxItem Width="70" Content="Opera" HorizontalAlignment="Left"/>
                 <ComboBoxItem Width="70" Content="IExplore" HorizontalAlignment="Left"/>
             </ComboBox>
-            <Image x:Name="Logo" 
-                   Source="Resources/logo.png" 
-                   Height="16"
-                   Width="2000" 
-                   VerticalAlignment="Top" 
-                   HorizontalAlignment="Right" 
-                   Margin="0,0,4,0" 
-                   Cursor="Hand" 
+            <Image x:Name="Logo"
+                   Source="Resources/hekatan-logo.png"
+                   Height="20"
+                   Width="20"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,4,0"
+                   Cursor="Hand"
                    MouseUp="Logo_MouseUp"/>
         </StatusBar>
         <Grid x:Name="FramesGrid" Margin="0,1,0,35" Grid.Row="1">
@@ -2701,7 +2770,9 @@
                                           PreviewKeyDown="TextEditor_PreviewKeyDown"
                                           PreviewMouseWheel="TextEditor_PreviewMouseWheel"
                                           SizeChanged="TextEditor_SizeChanged"
-                                          GotKeyboardFocus="TextEditor_GotKeyboardFocus"/>
+                                          GotKeyboardFocus="TextEditor_GotKeyboardFocus"
+                                          MouseHover="TextEditor_MouseHover"
+                                          MouseHoverStopped="TextEditor_MouseHoverStopped"/>
                     <mathEditor:MathEditorControl x:Name="MathEditorControl"
                                                    Grid.Row="0"
                                                    Margin="5,33,5,24"

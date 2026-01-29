@@ -1,0 +1,105 @@
+'<h1>Test Final - Parsers Funcionando Correctamente</h1>
+'<p>Este test incluye solo los parsers que funcionan correctamente en CLI</p>
+
+'<h2>1. Python</h2>
+@{python}
+import math
+print(f"Python ✓ - Pi = {math.pi:.4f}")
+@{end python}
+
+'<h2>2. Octave</h2>
+@{octave}
+fprintf('Octave ✓ - sqrt(2) = %.4f\n', sqrt(2));
+@{end octave}
+
+'<h2>3. Fortran</h2>
+@{fortran}
+program test
+    print *, 'Fortran ✓ - 2+2 =', 2+2
+end program test
+@{end fortran}
+
+'<h2>4. C</h2>
+@{c}
+#include <stdio.h>
+int main() {
+    printf("C ✓ - 10 * 3 = %d\n", 10 * 3);
+    return 0;
+}
+@{end c}
+
+'<h2>5. C++</h2>
+@{cpp}
+#include <iostream>
+using namespace std;
+int main() {
+    cout << "C++ ✓ - 5 + 7 = " << (5 + 7) << endl;
+    return 0;
+}
+@{end cpp}
+
+'<h2>6. C#</h2>
+@{csharp}
+using System;
+class Test {
+    static void Main() {
+        Console.WriteLine($"C# ✓ - sqrt(25) = {Math.Sqrt(25)}");
+    }
+}
+@{end csharp}
+
+'<h2>7. Rust</h2>
+@{rust}
+fn main() {
+    println!("Rust ✓ - 100 / 4 = {}", 100 / 4);
+}
+@{end rust}
+
+'<h2>8. JavaScript (directiva correcta: @{js})</h2>
+@{js}
+const x = 15;
+const y = 3;
+console.log(`JavaScript ✓ - ${x} * ${y} = ${x * y}`);
+@{end js}
+
+'<h2>9. PowerShell</h2>
+@{powershell}
+Write-Host "PowerShell ✓ - 2^10 = $([Math]::Pow(2,10))"
+@{end powershell}
+
+'<h2>10. Lua</h2>
+@{lua}
+print("Lua ✓ - 7 * 6 = " .. (7 * 6))
+@{end lua}
+
+'<h2>11. Markdown</h2>
+@{markdown}
+### Markdown ✓
+
+Este es un **test** de *markdown*.
+
+- Lista item 1
+- Lista item 2
+
+Código: `x = 42`
+@{end markdown}
+
+'<hr style="border: 2px solid #4caf50; margin: 30px 0;">
+'<h2>✅ RESUMEN</h2>
+'<div style="background: #e8f5e9; padding: 20px; border-radius: 8px;">
+'<p><strong>Parsers funcionando correctamente: 11</strong></p>
+'<ul>
+'<li>✅ Python</li>
+'<li>✅ Octave</li>
+'<li>✅ Fortran</li>
+'<li>✅ C</li>
+'<li>✅ C++</li>
+'<li>✅ C#</li>
+'<li>✅ Rust</li>
+'<li>✅ JavaScript (usar @{js})</li>
+'<li>✅ PowerShell</li>
+'<li>✅ Lua</li>
+'<li>✅ Markdown</li>
+'</ul>
+'<p><strong>Nota:</strong> TypeScript requiere configuración adicional de npm en el sistema.</p>
+'</div>

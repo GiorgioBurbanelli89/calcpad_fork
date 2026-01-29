@@ -1,0 +1,31 @@
+@{page markdown}
+
+# Visualización de Modelo IFC - Silvia Cedeño
+
+Este archivo visualiza el modelo IFC usando Three.js y web-ifc desde CDN.
+
+$$
+'Cálculos de ejemplo
+L = 6 | m
+b = 0.30 | m
+h = 0.50 | m
+q = 15 | kN/m
+$$
+
+## Modelo 3D IFC
+
+@{ifc}
+C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\Silvia Cedeño.ifc
+@{end ifc}
+
+## Resultados
+
+$$
+M_max = q*L^2/8
+V_max = q*L/2
+$$
+
+$$
+M_max = ? | kN·m
+V_max = ? | kN
+$$

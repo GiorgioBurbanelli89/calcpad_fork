@@ -6,17 +6,18 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <UseWPF>true</UseWPF>
     <StartupObject>Calcpad.Wpf.App</StartupObject>
-    <ApplicationIcon>resources\calcpad.ico</ApplicationIcon>
+    <ApplicationIcon>resources\hekatan.ico</ApplicationIcon>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Nedelcho Ganchovski</Authors>
     <RootNamespace>Calcpad.Wpf</RootNamespace>
     <Platforms>AnyCPU</Platforms>
 		<Version>1.0.3</Version>
-		<Authors>Calcpad Fork Contributors</Authors>
-		<Company>Calcpad Fork Project</Company>
-    <PackageId>CalcpadFork</PackageId>
-    <Product>Calcpad Fork</Product>
-    <AssemblyName>Calcpad</AssemblyName>
+		<Authors>Hekatan Calc Contributors</Authors>
+		<Company>Hekatan Project</Company>
+    <PackageId>HekatanCalc</PackageId>
+    <Product>Hekatan Calc</Product>
+    <Description>The Magic of Calculation - Engineering Calculation Platform</Description>
+    <AssemblyName>HekatanCalc</AssemblyName>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
@@ -42,9 +43,13 @@
     <ProjectReference Include="..\Calcpad.Common\Calcpad.Common.csproj" />
   </ItemGroup>
 
+  <!-- Theme files are automatically included by SDK -->
+
   <ItemGroup>
     <Resource Include="resources\calc.png" />
-    <Resource Include="resources\Calcpad.ico" />
+    <Resource Include="resources\hekatan.ico" />
+    <Resource Include="resources\hekatan-logo.png" />
+    <Resource Include="resources\hekatan-logo.svg" />
     <Resource Include="resources\copy.png" />
     <Resource Include="resources\find.png" />
     <Resource Include="resources\form.png" />
@@ -66,6 +71,32 @@
     <Resource Include="resources\Smath.png" />
     <Resource Include="resources\Excel.png" />
     <Resource Include="resources\MSWord.png" />
+    <Resource Include="resources\Jupyter.png" />
+    <Resource Include="resources\IFC.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- IFC Viewer JavaScript and WASM files -->
+    <Content Include="resources\ifc\three.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\ifc\OrbitControls.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\ifc\web-ifc-api-iife.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\ifc\web-ifc.wasm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\ifc\web-ifc-mt.wasm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Copy shared tools directory from project root -->
+    <Content Include="..\tools\**\*">
+      <Link>tools\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

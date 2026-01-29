@@ -1,0 +1,31 @@
+'<h1>Test - 4 Columnas con IFC Viewers</h1>
+'<p>Este test muestra 4 visores IFC en 4 columnas simultáneas</p>
+
+@{columns 4}
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc}
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc}
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc}
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc}
+
+@{end columns}
+
+'<hr style="border: 2px solid #2196F3; margin: 30px 0;">
+
+'<h2>Información</h2>
+'<div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+'<p><strong>Test de rendimiento:</strong> 4 visores IFC cargando simultáneamente</p>
+'<p>Cada visor usa Three.js + web-ifc para renderizar el modelo 3D</p>
+'<p>Archivo de prueba: Silvia Cedeño.ifc</p>
+'</div>

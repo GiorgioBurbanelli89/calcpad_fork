@@ -1,0 +1,29 @@
+"IFC Viewer CDN Test"
+'Test de integración IFC con CDN (unpkg.com)
+
+'=== Cálculos estructurales ===
+L = 6 | m
+b = 0.30 | m
+h = 0.50 | m
+q = 15 | kN/m
+
+'Momento máximo
+M_max = q*L^2/8
+
+'Cortante máximo
+V_max = q*L/2
+
+"Visualización 3D - Visor IFC"
+'El visor IFC carga Three.js y web-ifc desde CDN
+'Esto permite que el HTML generado funcione standalone sin archivos locales
+
+'Para probar, reemplaza con la ruta a tu archivo IFC:
+'@{ifc}
+'C:\ruta\a\tu\archivo.ifc
+'@{end ifc}
+
+'O usa el botón IFC en la toolbar (icono azul, a la izquierda de Jupyter)
+
+"Resultados"
+M_max = ? | kN·m
+V_max = ? | kN

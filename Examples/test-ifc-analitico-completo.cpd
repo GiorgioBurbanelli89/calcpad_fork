@@ -1,0 +1,1455 @@
+"IFC Viewer - Modelo Analítico Completo con Corte Visual
+@{html-ifc}
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>IFC + Modelo Analítico + Corte</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            user-select: none;
+        }
+        #container { width: 100%; height: 100%; position: relative; }
+        canvas { width: 100%; height: 100%; display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+
+        .toolbar {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            display: flex;
+            gap: 2px;
+            background: rgba(0,0,0,0.92);
+            padding: 4px 6px;
+            border-radius: 6px;
+            z-index: 100;
+            flex-wrap: wrap;
+            max-width: calc(100% - 16px);
+        }
+        .toolbar button {
+            background: #2d2d44;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 9px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+        }
+        .toolbar button:hover { background: #3d3d5c; border-color: #0078d4; }
+        .toolbar button.active { background: #0078d4; }
+        .toolbar button.auto-mode { background: #27ae60; border-color: #27ae60; }
+        .toolbar button.auto-mode:hover { background: #2ecc71; }
+        .toolbar button.cut-active { background: #e74c3c; }
+        .toolbar button.transparent-mode { background: #9b59b6; border-color: #9b59b6; }
+        .toolbar button.transparent-mode:hover { background: #8e44ad; }
+        .toolbar button.hidden-mode { background: #7f8c8d; }
+        .toolbar button.icon-only { padding: 4px 6px; }
+        .toolbar button.icon-only .icon { margin: 0; }
+        .toolbar-sep { width: 1px; background: #444; margin: 0 2px; }
+        .toolbar .icon { font-size: 11px; }
+
+        .panel {
+            position: absolute;
+            background: rgba(10,10,20,0.95);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            z-index: 100;
+            border: 1px solid #333;
+        }
+        .panel h4 { color: #0078d4; margin-bottom: 8px; font-size: 11px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .panel h4.green { color: #27ae60; }
+        .panel h4.red { color: #e74c3c; }
+        .panel label { display: block; color: #888; margin: 6px 0 2px; font-size: 9px; }
+        .panel input, .panel select {
+            width: 100%;
+            padding: 4px 6px;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+        .panel input[type="range"] { padding: 0; }
+        .panel button {
+            width: 100%;
+            padding: 6px;
+            margin-top: 8px;
+            background: #0078d4;
+            border: none;
+            color: #fff;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        .panel button.green { background: #27ae60; }
+        .panel button.red { background: #c0392b; }
+        .panel button.gray { background: #555; }
+
+        /* Element panel */
+        .element-panel {
+            top: 45px;
+            left: 10px;
+            width: 220px;
+            display: none;
+        }
+        .element-panel.visible { display: block; }
+        .element-type {
+            display: inline-block;
+            background: #27ae60;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            margin-bottom: 5px;
+        }
+        .element-dims {
+            background: #1a1a2e;
+            padding: 6px;
+            border-radius: 3px;
+            margin: 6px 0;
+        }
+        .dim-row { display: flex; justify-content: space-between; padding: 2px 0; }
+        .dim-row .lbl { color: #888; }
+        .dim-row .val { color: #fff; font-family: monospace; }
+        .auto-hint {
+            background: #27ae60;
+            color: #fff;
+            padding: 6px;
+            border-radius: 3px;
+            text-align: center;
+            margin-top: 8px;
+            font-size: 9px;
+        }
+
+        /* Model panel */
+        .model-panel {
+            top: 45px;
+            right: 10px;
+            width: 200px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            display: none;
+        }
+        .model-panel.visible { display: block; }
+        .model-stats {
+            background: #1a1a2e;
+            padding: 6px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+        }
+        .stat-row { display: flex; justify-content: space-between; }
+        .stat-row .lbl { color: #888; }
+        .stat-row .val { color: #27ae60; font-weight: bold; }
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px;
+            background: #222;
+            border-radius: 3px;
+            margin: 2px 0;
+            cursor: pointer;
+            font-size: 9px;
+        }
+        .member-item:hover { background: #333; }
+        .member-color { width: 8px; height: 8px; border-radius: 2px; }
+        .member-info { flex: 1; }
+        .member-hide { background: #3498db; border: none; color: #fff; width: 14px; height: 14px; border-radius: 2px; cursor: pointer; font-size: 8px; margin-right: 2px; }
+        .member-del { background: #c0392b; border: none; color: #fff; width: 14px; height: 14px; border-radius: 2px; cursor: pointer; font-size: 9px; }
+
+        /* Cut panel */
+        .cut-panel {
+            bottom: 60px;
+            right: 10px;
+            width: 200px;
+            display: none;
+        }
+        .cut-panel.visible { display: block; }
+        .cut-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0;
+        }
+        .cut-row label { min-width: 25px; color: #888; margin: 0; }
+        .cut-row input[type="range"] { flex: 1; }
+        .cut-row .val { min-width: 50px; text-align: right; font-family: monospace; font-size: 9px; }
+        .cut-row input[type="checkbox"] { width: auto; }
+        .cut-indicator {
+            background: #e74c3c;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 9px;
+            margin-top: 6px;
+        }
+
+        /* Info */
+        .info-panel { bottom: 10px; left: 10px; }
+        .info-panel strong { color: #0078d4; font-size: 11px; }
+
+        /* Coords */
+        .coords-display {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 9px;
+        }
+
+        /* Mode indicator */
+        .mode-indicator {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #27ae60;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 10px;
+            display: none;
+            z-index: 100;
+            animation: pulse 1.5s infinite;
+        }
+        .mode-indicator.visible { display: block; }
+
+        /* Loading */
+        .loading {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26,26,46,0.97);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        .spinner { width: 40px; height: 40px; border: 3px solid #333; border-top-color: #0078d4; border-radius: 50%; animation: spin 1s linear infinite; }
+        .progress { width: 180px; height: 4px; background: #333; border-radius: 2px; margin-top: 12px; }
+        .progress-fill { height: 100%; background: #0078d4; width: 0%; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button id="btn-3d" class="active" title="Vista 3D (1)">3D</button>
+            <button id="btn-top" title="Vista Planta (2)">⬆</button>
+            <button id="btn-front" title="Vista Frontal (3)">◀</button>
+            <button id="btn-right" title="Vista Lateral (4)">▶</button>
+            <div class="toolbar-sep"></div>
+            <button id="btn-auto" title="Auto Analítico (A)">⚡Auto</button>
+            <button id="btn-manual" title="Manual">✏️</button>
+            <button id="btn-model" title="Panel Modelo">📊</button>
+            <div class="toolbar-sep"></div>
+            <button id="btn-cut" title="Corte (C)">✂️</button>
+            <button id="btn-transparent" title="Transparente (T)">👁️</button>
+            <button id="btn-hide-physical" title="Físico (P)">🏠</button>
+            <button id="btn-hide-analytic" title="Analítico (L)">📐</button>
+            <div class="toolbar-sep"></div>
+            <button id="btn-export" title="Exportar JSON">💾</button>
+            <button id="btn-save-html" title="Guardar HTML actual">📄HTML</button>
+            <button id="btn-fit" title="Ajustar vista (F)">⊞</button>
+        </div>
+
+        <!-- Mode indicator -->
+        <div id="mode-indicator" class="mode-indicator">
+            MODO AUTO: Click en elemento para crear eje centroidal
+        </div>
+
+        <!-- Element panel -->
+        <div id="element-panel" class="panel element-panel">
+            <h4 class="green">Elemento Seleccionado</h4>
+            <div id="element-content">
+                <p style="color:#666">Activa "Auto Analítico" y click en un elemento</p>
+            </div>
+        </div>
+
+        <!-- Model panel -->
+        <div id="model-panel" class="panel model-panel">
+            <h4 class="green">Modelo Analítico</h4>
+            <div class="model-stats">
+                <div class="stat-row"><span class="lbl">Miembros:</span><span class="val" id="stat-members">0</span></div>
+                <div class="stat-row"><span class="lbl">Nodos:</span><span class="val" id="stat-nodes">0</span></div>
+                <div class="stat-row"><span class="lbl">Long. total:</span><span class="val" id="stat-length">0.00 m</span></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:6px">
+                <label style="display:flex;align-items:center;gap:3px;margin:0;font-size:9px">
+                    <input type="checkbox" id="show-physical" checked style="width:auto"> Físico
+                </label>
+                <label style="display:flex;align-items:center;gap:3px;margin:0;font-size:9px">
+                    <input type="checkbox" id="show-analytic" checked style="width:auto"> Analítico
+                </label>
+            </div>
+            <label>Miembros:</label>
+            <div id="members-list" style="max-height:200px;overflow-y:auto"></div>
+            <button id="btn-clear" class="red">Limpiar Todo</button>
+        </div>
+
+        <!-- Cut panel -->
+        <div id="cut-panel" class="panel cut-panel">
+            <h4 class="red">Plano de Corte</h4>
+            <div class="cut-row">
+                <input type="checkbox" id="cut-x-enable" style="width:auto">
+                <label>X:</label>
+                <input type="range" id="cut-x" min="0" max="100" value="100">
+                <span class="val" id="cut-x-val">--</span>
+            </div>
+            <div class="cut-row">
+                <input type="checkbox" id="cut-y-enable" style="width:auto">
+                <label>Y:</label>
+                <input type="range" id="cut-y" min="0" max="100" value="100">
+                <span class="val" id="cut-y-val">--</span>
+            </div>
+            <div class="cut-row">
+                <input type="checkbox" id="cut-z-enable" style="width:auto">
+                <label>Z:</label>
+                <input type="range" id="cut-z" min="0" max="100" value="100">
+                <span class="val" id="cut-z-val">--</span>
+            </div>
+            <div class="cut-indicator" id="cut-indicator">Sin corte activo</div>
+            <button id="btn-reset-cut" class="gray">Resetear Cortes</button>
+        </div>
+
+        <!-- Info -->
+        <div class="panel info-panel">
+            <strong>IFC Analítico</strong>
+            <div id="stats"></div>
+            <div style="color:#555;margin-top:5px;font-size:8px">
+                Scroll: Zoom | 1-4: Vistas | F: Fit<br>
+                T: Transparente | P: Físico | L: Analítico<br>
+                Ctrl+Z: Deshacer
+            </div>
+        </div>
+
+        <!-- Coords -->
+        <div class="coords-display">
+            X: <span id="coord-x">0.00</span> |
+            Y: <span id="coord-y">0.00</span> |
+            Z: <span id="coord-z">0.00</span>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <div class="progress"><div class="progress-fill" id="progress"></div></div>
+            <p style="margin-top:12px;color:#888;font-size:11px" id="status">Cargando...</p>
+        </div>
+    </div>
+
+    <script src="https://calcpad.ifc/three.min.js"></script>
+    <script src="https://calcpad.ifc/OrbitControls.js"></script>
+    <script src="https://calcpad.ifc/web-ifc-api-iife.js"></script>
+    <script>
+    (async function() {
+        const canvas = document.getElementById('canvas');
+        const container = document.getElementById('container');
+        const loading = document.getElementById('loading');
+
+        let scene, camera, orthoCamera, activeCamera, renderer, controls;
+        let allMeshes, analyticGroup, cutPlaneHelpers;
+        let bbox, center, maxDim;
+        let currentView = '3d';
+
+        // Modes
+        let autoMode = false;
+        let manualMode = false;
+        let manualStep = 0;
+        let manualPoint1 = null;
+
+        // Visibility states
+        let physicalTransparent = false;
+        let physicalVisible = true;
+        let analyticVisible = true;
+
+        // Model
+        let model = { members: [], nodes: [], nextId: 1, nextNodeId: 1 };
+        const colors = { beam: 0xe74c3c, column: 0x2ecc71, brace: 0xf39c12 };
+
+        // Undo history
+        let undoStack = [];
+        const MAX_UNDO = 50;
+
+        // Cut planes
+        let cutPlanes = { x: null, y: null, z: null };
+        let cutHelpers = { x: null, y: null, z: null };
+
+        function updateProgress(msg, pct) {
+            document.getElementById('status').textContent = msg;
+            document.getElementById('progress').style.width = pct + '%';
+        }
+
+        try {
+            updateProgress('Inicializando...', 10);
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+
+            // Perspective camera
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 10000);
+            camera.position.set(50, 50, 50);
+
+            // Orthographic camera
+            const aspect = container.clientWidth / container.clientHeight;
+            orthoCamera = new THREE.OrthographicCamera(-50 * aspect, 50 * aspect, 50, -50, 0.1, 10000);
+
+            activeCamera = camera;
+
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.localClippingEnabled = true;
+
+            // Controls - works with active camera
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.8;
+
+            // Lights
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const light = new THREE.DirectionalLight(0xffffff, 0.8);
+            light.position.set(50, 100, 50);
+            scene.add(light);
+
+            // Grid
+            scene.add(new THREE.GridHelper(200, 200, 0x333333, 0x222222));
+
+            // Analytic group
+            analyticGroup = new THREE.Group();
+            scene.add(analyticGroup);
+
+            // Cut plane helpers group
+            cutPlaneHelpers = new THREE.Group();
+            scene.add(cutPlaneHelpers);
+
+            // Load IFC
+            updateProgress('Descargando IFC...', 20);
+            const response = await fetch('https://calcpad.ifc/temp_a7ce813c013e4fc48bd57558ccf7ebd6.ifc');
+            if (!response.ok) throw new Error('Error: ' + response.status);
+
+            updateProgress('Leyendo...', 40);
+            const ifcData = await response.arrayBuffer();
+
+            updateProgress('Inicializando web-ifc...', 50);
+            const ifcApi = new WebIFC.IfcAPI();
+            await ifcApi.Init(p => p.endsWith('.wasm') ? 'https://calcpad.ifc/' + p : p);
+
+            updateProgress('Parseando...', 60);
+            const modelID = ifcApi.OpenModel(new Uint8Array(ifcData));
+
+            updateProgress('Generando geometría...', 70);
+            const flatMeshes = ifcApi.LoadAllGeometry(modelID);
+
+            updateProgress('Construyendo...', 80);
+            allMeshes = new THREE.Group();
+            let meshCount = 0;
+
+            for (let i = 0; i < flatMeshes.size(); i++) {
+                const fm = flatMeshes.get(i);
+                const geoms = fm.geometries;
+
+                for (let j = 0; j < geoms.size(); j++) {
+                    const pg = geoms.get(j);
+                    const geom = ifcApi.GetGeometry(modelID, pg.geometryExpressID);
+                    const verts = ifcApi.GetVertexArray(geom.GetVertexData(), geom.GetVertexDataSize());
+                    const indices = ifcApi.GetIndexArray(geom.GetIndexData(), geom.GetIndexDataSize());
+
+                    if (verts.length === 0 || indices.length === 0) continue;
+
+                    const positions = new Float32Array(verts.length / 2);
+                    const normals = new Float32Array(verts.length / 2);
+
+                    for (let k = 0; k < verts.length; k += 6) {
+                        const idx = (k / 6) * 3;
+                        positions[idx] = verts[k];
+                        positions[idx + 1] = verts[k + 1];
+                        positions[idx + 2] = verts[k + 2];
+                        normals[idx] = verts[k + 3];
+                        normals[idx + 1] = verts[k + 4];
+                        normals[idx + 2] = verts[k + 5];
+                    }
+
+                    const bufGeom = new THREE.BufferGeometry();
+                    bufGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                    bufGeom.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+                    bufGeom.setIndex(new THREE.BufferAttribute(indices, 1));
+
+                    const color = new THREE.Color(pg.color.x, pg.color.y, pg.color.z);
+                    const mat = new THREE.MeshPhongMaterial({
+                        color, side: THREE.DoubleSide,
+                        transparent: true, opacity: pg.color.w,
+                        clippingPlanes: []
+                    });
+
+                    const mesh = new THREE.Mesh(bufGeom, mat);
+                    mesh.userData.expressID = fm.expressID;
+                    mesh.userData.originalColor = color.clone();
+                    mesh.userData.originalOpacity = pg.color.w;
+                    mesh.applyMatrix4(new THREE.Matrix4().fromArray(pg.flatTransformation));
+                    allMeshes.add(mesh);
+                    meshCount++;
+                }
+            }
+
+            scene.add(allMeshes);
+            ifcApi.CloseModel(modelID);
+
+            // Adjust view
+            updateProgress('Ajustando...', 90);
+            bbox = new THREE.Box3().setFromObject(allMeshes);
+            center = bbox.getCenter(new THREE.Vector3());
+            const size = bbox.getSize(new THREE.Vector3());
+            maxDim = Math.max(size.x, size.y, size.z);
+
+            camera.position.set(center.x + maxDim, center.y + maxDim * 0.7, center.z + maxDim);
+            controls.target.copy(center);
+            controls.update();
+
+            // Setup cut sliders
+            setupCutSliders();
+
+            loading.style.display = 'none';
+            document.getElementById('stats').innerHTML = '<br>' + meshCount + ' elementos';
+
+            // ========== CUT PLANES ==========
+            function setupCutSliders() {
+                const sliders = ['x', 'y', 'z'];
+                sliders.forEach(axis => {
+                    const slider = document.getElementById('cut-' + axis);
+                    const min = bbox.min[axis];
+                    const max = bbox.max[axis];
+                    slider.min = min.toFixed(2);
+                    slider.max = max.toFixed(2);
+                    slider.value = max.toFixed(2);
+                    slider.step = ((max - min) / 100).toFixed(3);
+                });
+            }
+
+            function updateCutPlanes() {
+                const activeClipPlanes = [];
+
+                // Clear old helpers
+                while (cutPlaneHelpers.children.length) {
+                    cutPlaneHelpers.remove(cutPlaneHelpers.children[0]);
+                }
+
+                ['x', 'y', 'z'].forEach(axis => {
+                    const enabled = document.getElementById('cut-' + axis + '-enable').checked;
+                    const value = parseFloat(document.getElementById('cut-' + axis).value);
+                    const valEl = document.getElementById('cut-' + axis + '-val');
+
+                    if (enabled) {
+                        valEl.textContent = value.toFixed(2) + 'm';
+
+                        // Create clipping plane
+                        let normal;
+                        if (axis === 'x') normal = new THREE.Vector3(-1, 0, 0);
+                        else if (axis === 'y') normal = new THREE.Vector3(0, -1, 0);
+                        else normal = new THREE.Vector3(0, 0, -1);
+
+                        const plane = new THREE.Plane(normal, value);
+                        activeClipPlanes.push(plane);
+
+                        // Create visual helper plane
+                        const helperSize = maxDim * 2;
+                        const helperGeom = new THREE.PlaneGeometry(helperSize, helperSize);
+                        const helperMat = new THREE.MeshBasicMaterial({
+                            color: axis === 'x' ? 0xe74c3c : axis === 'y' ? 0x2ecc71 : 0x3498db,
+                            transparent: true,
+                            opacity: 0.15,
+                            side: THREE.DoubleSide,
+                            depthWrite: false
+                        });
+                        const helper = new THREE.Mesh(helperGeom, helperMat);
+
+                        // Position and rotate helper
+                        if (axis === 'x') {
+                            helper.position.set(value, center.y, center.z);
+                            helper.rotation.y = Math.PI / 2;
+                        } else if (axis === 'y') {
+                            helper.position.set(center.x, value, center.z);
+                            helper.rotation.x = -Math.PI / 2;
+                        } else {
+                            helper.position.set(center.x, center.y, value);
+                        }
+
+                        cutPlaneHelpers.add(helper);
+
+                        // Add edge lines for reference
+                        const edgeGeom = new THREE.EdgesGeometry(helperGeom);
+                        const edgeMat = new THREE.LineBasicMaterial({
+                            color: axis === 'x' ? 0xe74c3c : axis === 'y' ? 0x2ecc71 : 0x3498db,
+                            linewidth: 2
+                        });
+                        const edges = new THREE.LineSegments(edgeGeom, edgeMat);
+                        edges.position.copy(helper.position);
+                        edges.rotation.copy(helper.rotation);
+                        cutPlaneHelpers.add(edges);
+
+                        // Add dashed line showing cut position
+                        const linePoints = [];
+                        if (axis === 'x') {
+                            linePoints.push(new THREE.Vector3(value, bbox.min.y - 5, center.z));
+                            linePoints.push(new THREE.Vector3(value, bbox.max.y + 5, center.z));
+                        } else if (axis === 'y') {
+                            linePoints.push(new THREE.Vector3(center.x, value, bbox.min.z - 5));
+                            linePoints.push(new THREE.Vector3(center.x, value, bbox.max.z + 5));
+                        } else {
+                            linePoints.push(new THREE.Vector3(bbox.min.x - 5, center.y, value));
+                            linePoints.push(new THREE.Vector3(bbox.max.x + 5, center.y, value));
+                        }
+                        const lineGeom = new THREE.BufferGeometry().setFromPoints(linePoints);
+                        const lineMat = new THREE.LineDashedMaterial({
+                            color: 0xffffff,
+                            dashSize: 1,
+                            gapSize: 0.5
+                        });
+                        const line = new THREE.Line(lineGeom, lineMat);
+                        line.computeLineDistances();
+                        cutPlaneHelpers.add(line);
+
+                    } else {
+                        valEl.textContent = '--';
+                    }
+                });
+
+                // Apply to all meshes
+                allMeshes.traverse(obj => {
+                    if (obj.isMesh && obj.material) {
+                        obj.material.clippingPlanes = activeClipPlanes;
+                        obj.material.needsUpdate = true;
+                    }
+                });
+
+                // Update indicator
+                const indicator = document.getElementById('cut-indicator');
+                if (activeClipPlanes.length > 0) {
+                    const axes = [];
+                    if (document.getElementById('cut-x-enable').checked) axes.push('X=' + parseFloat(document.getElementById('cut-x').value).toFixed(1));
+                    if (document.getElementById('cut-y-enable').checked) axes.push('Y=' + parseFloat(document.getElementById('cut-y').value).toFixed(1));
+                    if (document.getElementById('cut-z-enable').checked) axes.push('Z=' + parseFloat(document.getElementById('cut-z').value).toFixed(1));
+                    indicator.textContent = 'Cortando: ' + axes.join(', ');
+                    indicator.style.background = '#e74c3c';
+                } else {
+                    indicator.textContent = 'Sin corte activo';
+                    indicator.style.background = '#555';
+                }
+            }
+
+            // ========== VISIBILITY CONTROLS ==========
+            function togglePhysicalTransparency() {
+                physicalTransparent = !physicalTransparent;
+                const btn = document.getElementById('btn-transparent');
+                btn.classList.toggle('transparent-mode', physicalTransparent);
+
+                allMeshes.traverse(obj => {
+                    if (obj.isMesh && obj.material) {
+                        if (physicalTransparent) {
+                            obj.material.transparent = true;
+                            obj.material.opacity = 0.25;
+                            obj.material.depthWrite = false;
+                        } else {
+                            obj.material.transparent = obj.userData.originalOpacity < 1;
+                            obj.material.opacity = obj.userData.originalOpacity;
+                            obj.material.depthWrite = true;
+                        }
+                        obj.material.needsUpdate = true;
+                    }
+                });
+            }
+
+            function togglePhysicalVisibility() {
+                physicalVisible = !physicalVisible;
+                const btn = document.getElementById('btn-hide-physical');
+                btn.classList.toggle('hidden-mode', !physicalVisible);
+                allMeshes.visible = physicalVisible;
+
+                // Sync with model panel checkbox
+                document.getElementById('show-physical').checked = physicalVisible;
+            }
+
+            function toggleAnalyticVisibility() {
+                analyticVisible = !analyticVisible;
+                const btn = document.getElementById('btn-hide-analytic');
+                btn.classList.toggle('hidden-mode', !analyticVisible);
+                analyticGroup.visible = analyticVisible;
+
+                // Sync with model panel checkbox
+                document.getElementById('show-analytic').checked = analyticVisible;
+            }
+
+            // ========== AUTO ANALYTIC MODE ==========
+            function toggleAutoMode() {
+                autoMode = !autoMode;
+                manualMode = false;
+                document.getElementById('btn-auto').classList.toggle('auto-mode', autoMode);
+                document.getElementById('btn-manual').classList.remove('active');
+                document.getElementById('mode-indicator').classList.toggle('visible', autoMode);
+
+                if (!autoMode) {
+                    deselectAll();
+                }
+            }
+
+            function toggleManualMode() {
+                manualMode = !manualMode;
+                autoMode = false;
+                manualStep = 0;
+                manualPoint1 = null;
+                document.getElementById('btn-manual').classList.toggle('active', manualMode);
+                document.getElementById('btn-auto').classList.remove('auto-mode');
+                document.getElementById('mode-indicator').classList.remove('visible');
+            }
+
+            function deselectAll() {
+                allMeshes.traverse(obj => {
+                    if (obj.isMesh && obj.userData.originalColor) {
+                        obj.material.color.copy(obj.userData.originalColor);
+                        obj.material.emissive.setHex(0x000000);
+                    }
+                });
+                document.getElementById('element-panel').classList.remove('visible');
+            }
+
+            function handleClick(e) {
+                const rect = canvas.getBoundingClientRect();
+                const mouse = new THREE.Vector2(
+                    ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                    -((e.clientY - rect.top) / rect.height) * 2 + 1
+                );
+
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(mouse, activeCamera);
+
+                const intersects = raycaster.intersectObjects(allMeshes.children, true);
+
+                if (intersects.length > 0 && autoMode) {
+                    const mesh = intersects[0].object;
+                    selectAndCreateAnalytic(mesh);
+                }
+            }
+
+            function selectAndCreateAnalytic(mesh) {
+                // Highlight
+                deselectAll();
+                mesh.material.emissive.setHex(0x224422);
+
+                // Get bounding box
+                const meshBox = new THREE.Box3().setFromObject(mesh);
+                const meshCenter = meshBox.getCenter(new THREE.Vector3());
+                const meshSize = meshBox.getSize(new THREE.Vector3());
+                const meshMin = meshBox.min;
+                const meshMax = meshBox.max;
+
+                // Determine type and axis
+                let type = 'beam';
+                let axisDir = 'x';
+                let startPoint, endPoint;
+
+                if (meshSize.y > meshSize.x * 1.5 && meshSize.y > meshSize.z * 1.5) {
+                    // Vertical - Column
+                    type = 'column';
+                    axisDir = 'y';
+                    startPoint = new THREE.Vector3(meshCenter.x, meshMin.y, meshCenter.z);
+                    endPoint = new THREE.Vector3(meshCenter.x, meshMax.y, meshCenter.z);
+                } else if (meshSize.x > meshSize.z) {
+                    // Horizontal along X - Beam
+                    type = 'beam';
+                    axisDir = 'x';
+                    startPoint = new THREE.Vector3(meshMin.x, meshCenter.y, meshCenter.z);
+                    endPoint = new THREE.Vector3(meshMax.x, meshCenter.y, meshCenter.z);
+                } else {
+                    // Horizontal along Z - Beam
+                    type = 'beam';
+                    axisDir = 'z';
+                    startPoint = new THREE.Vector3(meshCenter.x, meshCenter.y, meshMin.z);
+                    endPoint = new THREE.Vector3(meshCenter.x, meshCenter.y, meshMax.z);
+                }
+
+                const length = startPoint.distanceTo(endPoint);
+
+                // Show element info
+                const prefix = type === 'column' ? 'C' : 'V';
+                const name = prefix + '-' + String(model.nextId).padStart(2, '0');
+                const sectionStr = type === 'column'
+                    ? (meshSize.x * 100).toFixed(0) + 'x' + (meshSize.z * 100).toFixed(0)
+                    : (meshSize.z * 100).toFixed(0) + 'x' + (meshSize.y * 100).toFixed(0);
+
+                document.getElementById('element-content').innerHTML = `
+                    <span class="element-type">${type.toUpperCase()}</span>
+                    <div style="font-size:12px;font-weight:600;margin:5px 0">${name}</div>
+                    <div class="element-dims">
+                        <div class="dim-row"><span class="lbl">Largo:</span><span class="val">${meshSize.x.toFixed(3)} m</span></div>
+                        <div class="dim-row"><span class="lbl">Alto:</span><span class="val">${meshSize.y.toFixed(3)} m</span></div>
+                        <div class="dim-row"><span class="lbl">Ancho:</span><span class="val">${meshSize.z.toFixed(3)} m</span></div>
+                        <div class="dim-row"><span class="lbl">Eje:</span><span class="val">${axisDir.toUpperCase()} (centroide)</span></div>
+                        <div class="dim-row"><span class="lbl">Longitud:</span><span class="val">${length.toFixed(3)} m</span></div>
+                        <div class="dim-row"><span class="lbl">Sección:</span><span class="val">${sectionStr}</span></div>
+                    </div>
+                    <div class="auto-hint">Eje centroidal creado automáticamente</div>
+                `;
+                document.getElementById('element-panel').classList.add('visible');
+
+                // Create analytic line with collision detection
+                createAnalyticMemberWithCollisions(name, type, sectionStr, startPoint, endPoint);
+            }
+
+            // ========== UNDO SYSTEM ==========
+            function saveUndoState() {
+                const state = {
+                    members: model.members.map(m => ({
+                        id: m.id, name: m.name, type: m.type, section: m.section,
+                        length: m.length, node1: m.node1, node2: m.node2, color: m.color
+                    })),
+                    nodes: model.nodes.map(n => ({
+                        id: n.id, x: n.pos.x, y: n.pos.y, z: n.pos.z, members: [...n.members]
+                    })),
+                    nextId: model.nextId,
+                    nextNodeId: model.nextNodeId
+                };
+                undoStack.push(state);
+                if (undoStack.length > MAX_UNDO) undoStack.shift();
+            }
+
+            function undo() {
+                if (undoStack.length === 0) {
+                    console.log('Nada que deshacer');
+                    return;
+                }
+
+                const state = undoStack.pop();
+
+                // Clear current visual
+                while (analyticGroup.children.length) {
+                    analyticGroup.remove(analyticGroup.children[0]);
+                }
+
+                // Restore nodes
+                model.nodes = state.nodes.map(n => ({
+                    id: n.id,
+                    pos: new THREE.Vector3(n.x, n.y, n.z),
+                    members: [...n.members]
+                }));
+
+                // Restore members with visual
+                model.members = [];
+                state.members.forEach(m => {
+                    const node1 = model.nodes.find(n => n.id === m.node1);
+                    const node2 = model.nodes.find(n => n.id === m.node2);
+                    if (!node1 || !node2) return;
+
+                    const p1 = node1.pos;
+                    const p2 = node2.pos;
+                    const length = p1.distanceTo(p2);
+
+                    // Create visual
+                    const tubeGeom = new THREE.CylinderGeometry(0.06, 0.06, length, 8);
+                    const tubeMat = new THREE.MeshBasicMaterial({ color: m.color });
+                    const tube = new THREE.Mesh(tubeGeom, tubeMat);
+
+                    const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                    tube.position.copy(mid);
+
+                    const dir = new THREE.Vector3().subVectors(p2, p1).normalize();
+                    tube.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+
+                    const nodeMat = new THREE.MeshBasicMaterial({ color: 0xf1c40f });
+                    const nodeGeom = new THREE.SphereGeometry(0.1, 12, 12);
+                    const s1 = new THREE.Mesh(nodeGeom, nodeMat);
+                    s1.position.copy(p1);
+                    const s2 = new THREE.Mesh(nodeGeom, nodeMat);
+                    s2.position.copy(p2);
+
+                    const group = new THREE.Group();
+                    group.add(tube, s1, s2);
+                    analyticGroup.add(group);
+
+                    model.members.push({
+                        id: m.id, name: m.name, type: m.type, section: m.section,
+                        length: m.length, node1: m.node1, node2: m.node2,
+                        color: m.color, group
+                    });
+                });
+
+                model.nextId = state.nextId;
+                model.nextNodeId = state.nextNodeId;
+                updateModelPanel();
+                console.log('Deshacer completado. Quedan', undoStack.length, 'estados');
+            }
+
+            // ========== COLLISION DETECTION ==========
+            function findCollisionPoints(p1, p2, excludeMeshes = []) {
+                // Find where this line intersects with other elements
+                const collisions = [];
+                const dir = new THREE.Vector3().subVectors(p2, p1).normalize();
+                const totalLength = p1.distanceTo(p2);
+
+                allMeshes.traverse(obj => {
+                    if (!obj.isMesh || excludeMeshes.includes(obj)) return;
+
+                    const meshBox = new THREE.Box3().setFromObject(obj);
+                    const meshCenter = meshBox.getCenter(new THREE.Vector3());
+
+                    // Check if line passes near this mesh
+                    const toMesh = new THREE.Vector3().subVectors(meshCenter, p1);
+                    const projection = toMesh.dot(dir);
+
+                    if (projection > 0.1 && projection < totalLength - 0.1) {
+                        // Point along the line closest to mesh center
+                        const closestPoint = new THREE.Vector3().copy(p1).addScaledVector(dir, projection);
+                        const distance = closestPoint.distanceTo(meshCenter);
+
+                        // Check if it's close enough (within mesh bounds)
+                        const meshSize = meshBox.getSize(new THREE.Vector3());
+                        const threshold = Math.max(meshSize.x, meshSize.z) * 0.6;
+
+                        if (distance < threshold) {
+                            collisions.push({
+                                point: closestPoint.clone(),
+                                t: projection / totalLength,
+                                mesh: obj
+                            });
+                        }
+                    }
+                });
+
+                // Sort by distance along line
+                collisions.sort((a, b) => a.t - b.t);
+                return collisions;
+            }
+
+            function createAnalyticMemberWithCollisions(name, type, section, p1, p2) {
+                saveUndoState();
+
+                // Find collision points
+                const collisions = findCollisionPoints(p1, p2);
+
+                if (collisions.length === 0) {
+                    // No collisions - create single member
+                    createSingleMember(name, type, section, p1, p2);
+                } else {
+                    // Create segments between collision points
+                    const points = [p1, ...collisions.map(c => c.point), p2];
+                    const baseName = name.replace(/-\d+$/, '');
+
+                    for (let i = 0; i < points.length - 1; i++) {
+                        const segName = baseName + '-' + (i + 1);
+                        createSingleMember(segName, type, section, points[i], points[i + 1]);
+                    }
+
+                    console.log(`Línea dividida en ${points.length - 1} segmentos por ${collisions.length} colisiones`);
+                }
+            }
+
+            function createSingleMember(name, type, section, p1, p2) {
+                const color = colors[type] || 0xffffff;
+                const length = p1.distanceTo(p2);
+
+                if (length < 0.01) return; // Skip tiny segments
+
+                // Find or create nodes
+                const node1 = findOrCreateNode(p1);
+                const node2 = findOrCreateNode(p2);
+
+                // Create tube
+                const tubeGeom = new THREE.CylinderGeometry(0.06, 0.06, length, 8);
+                const tubeMat = new THREE.MeshBasicMaterial({ color });
+                const tube = new THREE.Mesh(tubeGeom, tubeMat);
+
+                const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                tube.position.copy(mid);
+
+                const dir = new THREE.Vector3().subVectors(p2, p1).normalize();
+                tube.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+
+                // Node spheres
+                const nodeMat = new THREE.MeshBasicMaterial({ color: 0xf1c40f });
+                const nodeGeom = new THREE.SphereGeometry(0.1, 12, 12);
+                const s1 = new THREE.Mesh(nodeGeom, nodeMat);
+                s1.position.copy(p1);
+                const s2 = new THREE.Mesh(nodeGeom, nodeMat);
+                s2.position.copy(p2);
+
+                const group = new THREE.Group();
+                group.add(tube, s1, s2);
+                analyticGroup.add(group);
+
+                // Store
+                const member = {
+                    id: model.nextId++,
+                    name, type, section, length,
+                    node1: node1.id, node2: node2.id,
+                    color, group
+                };
+                model.members.push(member);
+                node1.members.push(member.id);
+                node2.members.push(member.id);
+
+                updateModelPanel();
+            }
+
+            // Legacy function for compatibility
+            function createAnalyticMember(name, type, section, p1, p2) {
+                createAnalyticMemberWithCollisions(name, type, section, p1, p2);
+            }
+
+            function findOrCreateNode(pos, tol = 0.05) {
+                for (const n of model.nodes) {
+                    if (n.pos.distanceTo(pos) < tol) return n;
+                }
+                const node = { id: model.nextNodeId++, pos: pos.clone(), members: [] };
+                model.nodes.push(node);
+                return node;
+            }
+
+            function updateModelPanel() {
+                document.getElementById('stat-members').textContent = model.members.length;
+                document.getElementById('stat-nodes').textContent = model.nodes.length;
+                const total = model.members.reduce((s, m) => s + m.length, 0);
+                document.getElementById('stat-length').textContent = total.toFixed(2) + ' m';
+
+                const list = document.getElementById('members-list');
+                list.innerHTML = '';
+                model.members.forEach((m, i) => {
+                    const item = document.createElement('div');
+                    item.className = 'member-item' + (m.hidden ? ' hidden' : '');
+                    item.innerHTML = `
+                        <div class="member-color" style="background:#${m.color.toString(16).padStart(6,'0')};opacity:${m.hidden ? 0.3 : 1}"></div>
+                        <div class="member-info" style="opacity:${m.hidden ? 0.5 : 1}">${m.name} | ${m.section} | ${m.length.toFixed(2)}m</div>
+                        <button class="member-hide" data-i="${i}" title="Ocultar/Mostrar">${m.hidden ? '👁️' : '◉'}</button>
+                        <button class="member-del" data-i="${i}" title="Eliminar">×</button>
+                    `;
+                    item.querySelector('.member-hide').onclick = (e) => {
+                        e.stopPropagation();
+                        toggleMemberVisibility(i);
+                    };
+                    item.querySelector('.member-del').onclick = (e) => {
+                        e.stopPropagation();
+                        deleteMember(i);
+                    };
+                    list.appendChild(item);
+                });
+            }
+
+            function deleteMember(i) {
+                saveUndoState();
+                const m = model.members[i];
+                analyticGroup.remove(m.group);
+                model.members.splice(i, 1);
+                model.nodes = model.nodes.filter(n => {
+                    n.members = n.members.filter(id => model.members.some(mm => mm.id === id));
+                    return n.members.length > 0;
+                });
+                updateModelPanel();
+            }
+
+            function toggleMemberVisibility(i) {
+                const m = model.members[i];
+                if (m.group) {
+                    m.hidden = !m.hidden;
+                    m.group.visible = !m.hidden;
+                    updateModelPanel();
+                }
+            }
+
+            function clearModel() {
+                while (analyticGroup.children.length) analyticGroup.remove(analyticGroup.children[0]);
+                model = { members: [], nodes: [], nextId: 1, nextNodeId: 1 };
+                updateModelPanel();
+            }
+
+            // ========== VIEWS ==========
+            function setView(v) {
+                currentView = v;
+                document.querySelectorAll('.toolbar button').forEach(b => {
+                    if (['btn-3d','btn-top','btn-front','btn-right'].includes(b.id)) {
+                        b.classList.remove('active');
+                    }
+                });
+
+                const d = maxDim * 1.5;
+
+                if (v === '3d') {
+                    document.getElementById('btn-3d').classList.add('active');
+                    activeCamera = camera;
+                    controls.object = camera;
+                    camera.position.set(center.x + maxDim, center.y + maxDim * 0.7, center.z + maxDim);
+                    controls.enableRotate = true;
+                } else {
+                    const orthoSize = maxDim * 1.2;
+                    updateOrthoSize(orthoSize);
+
+                    activeCamera = orthoCamera;
+                    controls.object = orthoCamera;
+                    controls.enableRotate = false;
+
+                    if (v === 'top') {
+                        document.getElementById('btn-top').classList.add('active');
+                        orthoCamera.position.set(center.x, center.y + d, center.z);
+                        orthoCamera.up.set(0, 0, -1);
+                    } else if (v === 'front') {
+                        document.getElementById('btn-front').classList.add('active');
+                        orthoCamera.position.set(center.x, center.y, center.z + d);
+                        orthoCamera.up.set(0, 1, 0);
+                    } else if (v === 'right') {
+                        document.getElementById('btn-right').classList.add('active');
+                        orthoCamera.position.set(center.x + d, center.y, center.z);
+                        orthoCamera.up.set(0, 1, 0);
+                    }
+                }
+
+                controls.target.copy(center);
+                controls.update();
+
+                // Restore button states
+                if (autoMode) document.getElementById('btn-auto').classList.add('auto-mode');
+                if (manualMode) document.getElementById('btn-manual').classList.add('active');
+            }
+
+            function updateOrthoSize(size) {
+                const aspect = container.clientWidth / container.clientHeight;
+                orthoCamera.left = -size * aspect;
+                orthoCamera.right = size * aspect;
+                orthoCamera.top = size;
+                orthoCamera.bottom = -size;
+                orthoCamera.updateProjectionMatrix();
+            }
+
+            // Custom zoom for ortho camera
+            function handleWheel(e) {
+                if (activeCamera === orthoCamera) {
+                    e.preventDefault();
+                    const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+                    const newLeft = orthoCamera.left * zoomFactor;
+                    const newRight = orthoCamera.right * zoomFactor;
+                    const newTop = orthoCamera.top * zoomFactor;
+                    const newBottom = orthoCamera.bottom * zoomFactor;
+
+                    // Limit zoom
+                    const minSize = 1;
+                    const maxSize = maxDim * 5;
+                    const currentSize = (newRight - newLeft) / 2;
+
+                    if (currentSize > minSize && currentSize < maxSize) {
+                        orthoCamera.left = newLeft;
+                        orthoCamera.right = newRight;
+                        orthoCamera.top = newTop;
+                        orthoCamera.bottom = newBottom;
+                        orthoCamera.updateProjectionMatrix();
+                    }
+                }
+            }
+
+            // ========== EXPORT ==========
+            function exportModel() {
+                const data = {
+                    nodes: model.nodes.map(n => ({ id: n.id, x: n.pos.x, y: n.pos.y, z: n.pos.z })),
+                    members: model.members.map(m => ({
+                        id: m.id, name: m.name, type: m.type, section: m.section,
+                        node1: m.node1, node2: m.node2, length: m.length
+                    }))
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'modelo_analitico.json';
+                a.click();
+            }
+
+            // ========== SAVE HTML ==========
+            function saveCurrentHTML() {
+                // Capturar el estado actual del modelo analítico
+                const modelData = {
+                    nodes: model.nodes.map(n => ({ id: n.id, x: n.pos.x, y: n.pos.y, z: n.pos.z })),
+                    members: model.members.map(m => ({
+                        id: m.id, name: m.name, type: m.type, section: m.section,
+                        node1: m.node1, node2: m.node2, length: m.length, color: m.color
+                    })),
+                    nextId: model.nextId,
+                    nextNodeId: model.nextNodeId
+                };
+
+                // Obtener el HTML original y agregar los datos del modelo
+                const originalHTML = document.documentElement.outerHTML;
+
+                // Insertar los datos guardados justo después de la inicialización del modelo
+                const savedDataScript = `
+        // ====== MODELO ANALÍTICO GUARDADO ======
+        const savedAnalyticModel = ${JSON.stringify(modelData, null, 8)};
+
+        // Función para restaurar el modelo guardado
+        function restoreSavedModel() {
+            if (!savedAnalyticModel || savedAnalyticModel.members.length === 0) return;
+
+            // Restaurar nodos
+            savedAnalyticModel.nodes.forEach(n => {
+                model.nodes.push({
+                    id: n.id,
+                    pos: new THREE.Vector3(n.x, n.y, n.z),
+                    members: []
+                });
+            });
+
+            // Restaurar miembros
+            savedAnalyticModel.members.forEach(m => {
+                const node1 = model.nodes.find(n => n.id === m.node1);
+                const node2 = model.nodes.find(n => n.id === m.node2);
+                if (!node1 || !node2) return;
+
+                const p1 = node1.pos;
+                const p2 = node2.pos;
+                const length = p1.distanceTo(p2);
+                const color = m.color;
+
+                // Crear geometría visual
+                const tubeGeom = new THREE.CylinderGeometry(0.06, 0.06, length, 8);
+                const tubeMat = new THREE.MeshBasicMaterial({ color });
+                const tube = new THREE.Mesh(tubeGeom, tubeMat);
+
+                const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                tube.position.copy(mid);
+
+                const dir = new THREE.Vector3().subVectors(p2, p1).normalize();
+                tube.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+
+                // Nodos visuales
+                const nodeMat = new THREE.MeshBasicMaterial({ color: 0xf1c40f });
+                const nodeGeom = new THREE.SphereGeometry(0.1, 12, 12);
+                const s1 = new THREE.Mesh(nodeGeom, nodeMat);
+                s1.position.copy(p1);
+                const s2 = new THREE.Mesh(nodeGeom, nodeMat);
+                s2.position.copy(p2);
+
+                const group = new THREE.Group();
+                group.add(tube, s1, s2);
+                analyticGroup.add(group);
+
+                // Agregar al modelo
+                const member = {
+                    id: m.id,
+                    name: m.name,
+                    type: m.type,
+                    section: m.section,
+                    length: m.length,
+                    node1: m.node1,
+                    node2: m.node2,
+                    color: m.color,
+                    group: group
+                };
+                model.members.push(member);
+                node1.members.push(m.id);
+                node2.members.push(m.id);
+            });
+
+            model.nextId = savedAnalyticModel.nextId;
+            model.nextNodeId = savedAnalyticModel.nextNodeId;
+            updateModelPanel();
+            console.log('Modelo analítico restaurado:', model.members.length, 'miembros');
+        }
+        // ====== FIN MODELO GUARDADO ======`;
+
+                // Crear el código fuente para Calcpad con @{html-ifc}
+                const calcpadSource = `"IFC Viewer - Modelo Analítico (con ${model.members.length} miembros guardados)
+@{html-ifc}
+${originalHTML.replace('</script>', savedDataScript + '\n\n            // Restaurar modelo al cargar\n            setTimeout(restoreSavedModel, 100);\n\n        </script>')}
+@{end html-ifc}
+`;
+
+                // Copiar al portapapeles
+                navigator.clipboard.writeText(calcpadSource).then(() => {
+                    alert('Codigo copiado al portapapeles. Pega en AvalonEdit con Ctrl+V.');
+                }).catch(err => {
+                    // Fallback: descargar como archivo
+                    console.error('No se pudo copiar:', err);
+                    const blob = new Blob([calcpadSource], { type: 'text/plain' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'ifc_analitico_' + new Date().toISOString().slice(0,10) + '.cpd';
+                    a.click();
+                    alert('Archivo .cpd descargado. Abrelo en Calcpad.');
+                });
+
+                console.log('Modelo guardado:', modelData);
+            }
+
+            // ========== EVENTS ==========
+            canvas.addEventListener('click', handleClick);
+            canvas.addEventListener('wheel', handleWheel, { passive: false });
+
+            // Mouse tracking
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouse = new THREE.Vector2(
+                    ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                    -((e.clientY - rect.top) / rect.height) * 2 + 1
+                );
+
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(mouse, activeCamera);
+
+                const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+                const pt = new THREE.Vector3();
+                raycaster.ray.intersectPlane(plane, pt);
+
+                if (pt) {
+                    document.getElementById('coord-x').textContent = pt.x.toFixed(2);
+                    document.getElementById('coord-y').textContent = pt.y.toFixed(2);
+                    document.getElementById('coord-z').textContent = pt.z.toFixed(2);
+                }
+            });
+
+            document.getElementById('btn-3d').onclick = () => setView('3d');
+            document.getElementById('btn-top').onclick = () => setView('top');
+            document.getElementById('btn-front').onclick = () => setView('front');
+            document.getElementById('btn-right').onclick = () => setView('right');
+
+            document.getElementById('btn-auto').onclick = toggleAutoMode;
+            document.getElementById('btn-manual').onclick = toggleManualMode;
+
+            document.getElementById('btn-model').onclick = function() {
+                this.classList.toggle('active');
+                document.getElementById('model-panel').classList.toggle('visible');
+            };
+
+            document.getElementById('btn-cut').onclick = function() {
+                this.classList.toggle('cut-active');
+                document.getElementById('cut-panel').classList.toggle('visible');
+            };
+
+            document.getElementById('btn-fit').onclick = () => {
+                if (currentView === '3d') {
+                    camera.position.set(center.x + maxDim, center.y + maxDim * 0.7, center.z + maxDim);
+                } else {
+                    updateOrthoSize(maxDim * 1.2);
+                }
+                controls.target.copy(center);
+                controls.update();
+            };
+
+            document.getElementById('btn-export').onclick = exportModel;
+            document.getElementById('btn-save-html').onclick = saveCurrentHTML;
+            document.getElementById('btn-clear').onclick = clearModel;
+
+            // Visibility buttons
+            document.getElementById('btn-transparent').onclick = togglePhysicalTransparency;
+            document.getElementById('btn-hide-physical').onclick = togglePhysicalVisibility;
+            document.getElementById('btn-hide-analytic').onclick = toggleAnalyticVisibility;
+
+            // Cut controls
+            ['x', 'y', 'z'].forEach(axis => {
+                document.getElementById('cut-' + axis).oninput = updateCutPlanes;
+                document.getElementById('cut-' + axis + '-enable').onchange = updateCutPlanes;
+            });
+
+            document.getElementById('btn-reset-cut').onclick = () => {
+                ['x', 'y', 'z'].forEach(axis => {
+                    document.getElementById('cut-' + axis + '-enable').checked = false;
+                    document.getElementById('cut-' + axis).value = document.getElementById('cut-' + axis).max;
+                });
+                updateCutPlanes();
+            };
+
+            // Visibility - sync checkboxes with toolbar buttons
+            document.getElementById('show-physical').onchange = (e) => {
+                physicalVisible = e.target.checked;
+                allMeshes.visible = physicalVisible;
+                document.getElementById('btn-hide-physical').classList.toggle('hidden-mode', !physicalVisible);
+            };
+            document.getElementById('show-analytic').onchange = (e) => {
+                analyticVisible = e.target.checked;
+                analyticGroup.visible = analyticVisible;
+                document.getElementById('btn-hide-analytic').classList.toggle('hidden-mode', !analyticVisible);
+            };
+
+            // Keyboard
+            document.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case '1': setView('3d'); break;
+                    case '2': setView('top'); break;
+                    case '3': setView('front'); break;
+                    case '4': setView('right'); break;
+                    case 'f': case 'F':
+                        document.getElementById('btn-fit').click();
+                        break;
+                    case 'a': case 'A':
+                        toggleAutoMode();
+                        break;
+                    case 't': case 'T':
+                        togglePhysicalTransparency();
+                        break;
+                    case 'p': case 'P':
+                        togglePhysicalVisibility();
+                        break;
+                    case 'l': case 'L':
+                        toggleAnalyticVisibility();
+                        break;
+                    case 'Escape':
+                        if (autoMode) toggleAutoMode();
+                        deselectAll();
+                        break;
+                    case 'z': case 'Z':
+                        if (e.ctrlKey) {
+                            e.preventDefault();
+                            undo();
+                        }
+                        break;
+                }
+            });
+
+            // Resize
+            window.addEventListener('resize', () => {
+                const aspect = container.clientWidth / container.clientHeight;
+                camera.aspect = aspect;
+                camera.updateProjectionMatrix();
+
+                // Maintain ortho aspect
+                const orthoWidth = orthoCamera.right - orthoCamera.left;
+                const orthoHeight = orthoWidth / aspect;
+                orthoCamera.top = orthoHeight / 2;
+                orthoCamera.bottom = -orthoHeight / 2;
+                orthoCamera.updateProjectionMatrix();
+
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, activeCamera);
+            }
+            animate();
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('status').textContent = 'Error: ' + err.message;
+            document.getElementById('status').style.color = '#ff6b6b';
+        }
+    })();
+    </script>
+</body>
+</html>
+@{end html-ifc}

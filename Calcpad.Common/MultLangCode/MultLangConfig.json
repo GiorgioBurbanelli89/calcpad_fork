@@ -293,7 +293,7 @@
       "runArgs": ""
     },
     "typescript": {
-      "command": "C:/Program Files/nodejs/node.exe",
+      "command": "tsx",
       "extension": ".ts",
       "directive": "@{typescript}",
       "endDirective": "@{end typescript}",
@@ -302,7 +302,7 @@
       "builtins": ["console", "Array", "Object", "String", "Number", "Boolean", "Math", "Date", "JSON", "Promise", "Map", "Set", "Error", "parseInt", "parseFloat", "isNaN", "isFinite"],
       "requiresCompilation": false,
       "compileArgs": "",
-      "runArgs": "\"C:/Users/j-b-j/AppData/Roaming/npm/node_modules/tsx/dist/cli.mjs\" \"{file}\""
+      "runArgs": ""
     },
     "javascript": {
       "command": "node",
@@ -343,7 +343,7 @@
       "description": "Imagen embebida en Base64 - Formato: @{image [formato] [encoding]}"
     },
     "ts": {
-      "command": "C:/Program Files/nodejs/node.exe",
+      "command": "tsx",
       "extension": ".ts",
       "directive": "@{ts}",
       "endDirective": "@{end ts}",
@@ -352,7 +352,7 @@
       "builtins": ["console", "log", "error", "warn", "JSON", "parse", "stringify", "Array", "Object", "String", "Number", "Boolean"],
       "requiresCompilation": false,
       "compileArgs": "",
-      "runArgs": "\"C:/Users/j-b-j/AppData/Roaming/npm/node_modules/tsx/dist/cli.mjs\" \"{file}\""
+      "runArgs": ""
     },
     "go": {
       "command": "go",
@@ -515,6 +515,97 @@
       "compileArgs": "",
       "runArgs": "",
       "description": "Mathcad Syntax Parser - Traduce expresiones con sintaxis Mathcad a Calcpad"
+    },
+    "ifc": {
+      "command": "",
+      "extension": ".ifc",
+      "directive": "@{ifc}",
+      "endDirective": "@{end ifc}",
+      "commentPrefix": "",
+      "keywords": [],
+      "builtins": [],
+      "requiresCompilation": false,
+      "compileArgs": "",
+      "runArgs": "",
+      "description": "IFC 3D Viewer - Visualiza modelos IFC en 3D usando Three.js y web-ifc. Sintaxis: @{ifc}path/to/file.ifc@{end ifc} o @{ifc base64}...@{end ifc}"
+    },
+    "html-ifc": {
+      "command": "",
+      "extension": ".ifc",
+      "directive": "@{html-ifc}",
+      "endDirective": "@{end html-ifc}",
+      "commentPrefix": "",
+      "keywords": [],
+      "builtins": [],
+      "requiresCompilation": false,
+      "compileArgs": "",
+      "runArgs": "",
+      "description": "IFC 3D Viewer Inline - Visor IFC embebido directamente en el output de Calcpad. Sintaxis: @{html-ifc}path/to/file.ifc@{end html-ifc}"
+    },
+    "code": {
+      "command": "",
+      "extension": "",
+      "directive": "@{code}",
+      "endDirective": "@{end code}",
+      "commentPrefix": "",
+      "keywords": [],
+      "builtins": [],
+      "requiresCompilation": false,
+      "compileArgs": "",
+      "runArgs": "",
+      "description": "Wrapper para modo código HTML/JS completo - indica que el contenido interno es código editable"
+    },
+    "ucode": {
+      "command": "",
+      "extension": "",
+      "directive": "@{ucode}",
+      "endDirective": "@{end ucode}",
+      "commentPrefix": "",
+      "keywords": [],
+      "builtins": [],
+      "requiresCompilation": false,
+      "compileArgs": "",
+      "runArgs": "",
+      "description": "Wrapper para modo directivas simplificadas - indica que el contenido interno son directivas @{fondo}, @{altura}, @{visor}"
+    },
+    "calcpad": {
+      "command": "",
+      "extension": ".cpd",
+      "directive": "@{calcpad}",
+      "endDirective": "@{end calcpad}",
+      "commentPrefix": "'",
+      "keywords": ["if", "else", "end if", "#if", "#else", "#end if", "#repeat", "#loop", "#break", "#val", "#equ", "#show", "#hide", "#pre", "#post", "#deg", "#rad", "#round"],
+      "builtins": ["sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "log", "ln", "exp", "sqrt", "abs", "sign", "floor", "ceil", "round", "min", "max", "sum", "product", "if", "switch"],
+      "requiresCompilation": false,
+      "compileArgs": "",
+      "runArgs": "",
+      "description": "Bloque explicito de Calcpad - codigo matematico que sera procesado por ExpressionParser"
+    },
+    "ifc-create": {
+      "command": "",
+      "extension": ".ifc",
+      "directive": "@{ifc-create}",
+      "endDirective": "@{end ifc-create}",
+      "commentPrefix": "//",
+      "keywords": ["POINT", "LINE", "WALL", "BEAM", "COLUMN", "SLAB", "SET", "PUNTO", "LINEA", "MURO", "PARED", "VIGA", "COLUMNA", "LOSA", "PLACA"],
+      "builtins": ["to", "a", "height", "thickness", "section", "PROJECT", "AUTHOR"],
+      "requiresCompilation": false,
+      "compileArgs": "",
+      "runArgs": "",
+      "description": "IFC Creator - Crea geometría IFC desde comandos simples. Sintaxis: WALL w1 = (0,0,0) to (10,0,0) height=3 thickness=0.3"
+    },
+    "ifc-fragment": {
+      "command": "",
+      "extension": ".frag",
+      "directive": "@{ifc-fragment}",
+      "endDirective": "@{end ifc-fragment}",
+      "commentPrefix": "",
+      "keywords": [],
+      "builtins": [],
+      "requiresCompilation": false,
+      "compileArgs": "",
+      "runArgs": "",
+      "description": "IFC Fragments Viewer - Carga optimizada de IFC usando ThatOpen Fragments. Muestra tiempo de fragmentación + tiempo de carga. Sintaxis: @{ifc-fragment}path/to/file.ifc@{end ifc-fragment}"
     }
   },
   "settings": {

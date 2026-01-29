@@ -1,0 +1,17 @@
+'<h1>Test IFC Viewer en Calcpad CLI</h1>
+'
+'Este es un test del visor IFC integrado en Calcpad.
+
+@{ifc}
+C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\Silvia Cedeño.ifc
+@{end ifc}
+
+'El modelo debería aparecer arriba con controles de navegación.
+'
+'<b>Controles:</b>
+'<ul>
+'<li>Click + Arrastrar: Rotar</li>
+'<li>Scroll: Zoom</li>
+'<li>Click derecho + Arrastrar: Pan</li>
+'<li>F: Fit to view</li>
+'</ul>

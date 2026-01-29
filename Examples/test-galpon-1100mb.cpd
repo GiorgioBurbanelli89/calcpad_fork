@@ -1,0 +1,20 @@
+'<h1>Galpón A - Modelo Completo (1.1 GB Original)</h1>
+'
+'<p>Este es el archivo IFC más grande del proyecto.</p>
+'
+'<h2>Especificaciones</h2>
+'<ul>
+'<li><b>Tamaño original:</b> 1,094 MB (1.1 GB)</li>
+'<li><b>Meshes:</b> 10,056</li>
+'<li><b>Vértices:</b> 9,113,669</li>
+'<li><b>Triángulos:</b> 3,850,239</li>
+'</ul>
+'
+'<h2>Modelo 3D Optimizado</h2>
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Galpon_A (1).ifc
+@{end ifc}
+
+'<h3>Información Técnica</h3>
+'<p>El modelo se carga usando el formato optimizado .cpdifc que reduce el tamaño en 80%.</p>

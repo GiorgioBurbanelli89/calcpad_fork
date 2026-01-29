@@ -1,0 +1,198 @@
+'<h1>Test Exhaustivo - Todos los Parsers CLI</h1>
+'<p>Este test verifica TODOS los parsers disponibles en CLI</p>
+
+'<h2>1. Python</h2>
+@{python}
+# Cálculo de área
+radio = 5
+area = 3.14159 * radio ** 2
+print(f"Área del círculo: {area:.2f}")
+@{end python}
+
+'<h2>2. Octave</h2>
+@{octave}
+% Matriz simple
+A = [1, 2; 3, 4];
+det_A = det(A);
+disp(['Determinante: ', num2str(det_A)]);
+@{end octave}
+
+'<h2>3. Fortran</h2>
+@{fortran}
+program test_fortran
+    implicit none
+    real :: x, y
+    x = 10.0
+    y = x * 2.0
+    print *, 'Resultado:', y
+end program test_fortran
+@{end fortran}
+
+'<h2>4. C</h2>
+@{c}
+#include <stdio.h>
+int main() {
+    int n = 42;
+    printf("El número es: %d\n", n);
+    return 0;
+}
+@{end c}
+
+'<h2>5. C++ </h2>
+@{cpp}
+#include <iostream>
+using namespace std;
+int main() {
+    double pi = 3.14159;
+    cout << "Pi = " << pi << endl;
+    return 0;
+}
+@{end cpp}
+
+'<h2>6. C#</h2>
+@{csharp}
+using System;
+class Program {
+    static void Main() {
+        double resultado = Math.Sqrt(16);
+        Console.WriteLine($"Raíz cuadrada de 16: {resultado}");
+    }
+}
+@{end csharp}
+
+'<h2>7. Rust</h2>
+@{rust}
+fn main() {
+    let x = 10;
+    let y = 20;
+    let suma = x + y;
+    println!("Suma: {}", suma);
+}
+@{end rust}
+
+'<h2>8. JavaScript</h2>
+@{javascript}
+// Función simple
+function calcular() {
+    const a = 5;
+    const b = 3;
+    return a * b;
+}
+console.log('Resultado:', calcular());
+@{end javascript}
+
+'<h2>9. TypeScript</h2>
+@{typescript}
+function sumar(a: number, b: number): number {
+    return a + b;
+}
+const resultado = sumar(10, 20);
+console.log(`Resultado: ${resultado}`);
+@{end typescript}
+
+'<h2>10. Go</h2>
+@{go}
+package main
+import "fmt"
+func main() {
+    x := 42
+    fmt.Printf("Valor: %d\n", x)
+}
+@{end go}
+
+'<h2>11. R</h2>
+@{r}
+# Vector simple
+x <- c(1, 2, 3, 4, 5)
+media <- mean(x)
+cat("Media:", media, "\n")
+@{end r}
+
+'<h2>12. Julia</h2>
+@{julia}
+# Cálculo simple
+x = 10
+y = 20
+resultado = x + y
+println("Resultado: $resultado")
+@{end julia}
+
+'<h2>13. Bash</h2>
+@{bash}
+#!/bin/bash
+echo "Test desde Bash"
+x=100
+echo "Valor de x: $x"
+@{end bash}
+
+'<h2>14. PowerShell</h2>
+@{powershell}
+# Script PowerShell
+$mensaje = "Hola desde PowerShell"
+Write-Host $mensaje
+$numero = 42
+Write-Host "Número: $numero"
+@{end powershell}
+
+'<h2>15. Lua</h2>
+@{lua}
+-- Cálculo simple
+x = 10
+y = 20
+print("Suma: " .. (x + y))
+@{end lua}
+
+'<h2>16. Perl</h2>
+@{perl}
+# Script Perl
+my $x = 42;
+my $y = 10;
+print "Resultado: " . ($x + $y) . "\n";
+@{end perl}
+
+'<h2>17. Ruby</h2>
+@{ruby}
+# Script Ruby
+x = 10
+y = 20
+puts "Suma: #{x + y}"
+@{end ruby}
+
+'<h2>18. PHP</h2>
+@{php}
+<?php
+$x = 10;
+$y = 20;
+echo "Suma: " . ($x + $y) . "\n";
+?>
+@{end php}
+
+'<h2>19. Haskell</h2>
+@{haskell}
+main :: IO ()
+main = do
+    let x = 10
+    let y = 20
+    putStrLn $ "Suma: " ++ show (x + y)
+@{end haskell}
+
+'<h2>20. Markdown</h2>
+@{markdown}
+# Título en Markdown
+Este es un **texto en negrita** y este es *cursiva*.
+
+- Item 1
+- Item 2
+- Item 3
+@{end markdown}
+
+'<h2>21. LaTeX</h2>
+@{latex}
+\documentclass{article}
+\begin{document}
+La fórmula de Euler: $e^{i\pi} + 1 = 0$
+\end{document}
+@{end latex}
+
+'<h2>✅ Test Completado</h2>
+'<p>Si ves todos los bloques de código arriba, todos los parsers funcionan correctamente.</p>

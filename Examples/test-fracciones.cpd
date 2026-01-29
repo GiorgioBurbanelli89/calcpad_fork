@@ -1,0 +1,10 @@
+"Test de Fracciones"
+
+a = 1
+b = 2
+c = a/b
+
+x = 5
+y = x^2/4
+
+z = (1 + 2)/(3 + 4)

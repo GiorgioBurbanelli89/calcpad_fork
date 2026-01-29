@@ -1,0 +1,8 @@
+'<h1>Test - Un Solo IFC Fragment</h1>
+'<p>Probando con el archivo IFC mas pesado: Galpon_A (1).ifc</p>
+
+@{ifc-fragment}
+C:\Users\j-b-j\Downloads\Galpon_A (1).ifc
+@{end ifc-fragment}
+
+'<p>Si se muestra correctamente, el visor funciona.</p>

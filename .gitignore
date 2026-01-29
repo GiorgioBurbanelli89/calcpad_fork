@@ -5,23 +5,37 @@
 **/Release/
 **/.vs/
 
+# Node.js
+**/node_modules/
+package-lock.json
+
 # Compiled binaries
 *.dll
 *.exe
 *.pdb
+*.wasm
 
 # Temporary files
 *.tmp
 *_wpftmp.csproj
 *.user
 *.suo
+tmpclaude-*
 
 # Logs
 *.log
-*.txt
-*.output
 
 # Windows
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+nul
+
+# SAP2000 files
+*.Y$$
+*.$2k
+
+# Large/generated files
+*.pdf
+*.chm
+awatif-2.0.0/

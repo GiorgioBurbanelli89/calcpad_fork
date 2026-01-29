@@ -1,0 +1,286 @@
+'<h1>🚀 MEGA TEST - IFC + Columns + Múltiples Parsers</h1>
+'<p>Este test mezcla TODO: IFC, @{columns}, y múltiples lenguajes de programación</p>
+
+'<h2>Parte 1: Cálculos Previos en Columnas</h2>
+
+@{columns 3}
+
+'<div style="background: #e1f5fe; padding: 10px; border-radius: 8px;">
+'<h3>📐 Python - Geometría</h3>
+@{python}
+import math
+
+# Dimensiones de la estructura
+ancho = 6.0  # metros
+largo = 4.0  # metros
+altura = 3.0 # metros
+
+# Cálculos
+area_piso = ancho * largo
+volumen = area_piso * altura
+perimetro = 2 * (ancho + largo)
+
+print(f"📏 Ancho: {ancho} m")
+print(f"📏 Largo: {largo} m")
+print(f"📐 Área piso: {area_piso} m²")
+print(f"📦 Volumen: {volumen} m³")
+print(f"⭕ Perímetro: {perimetro} m")
+@{end python}
+'</div>
+
+'<div style="background: #f3e5f5; padding: 10px; border-radius: 8px;">
+'<h3>🔢 Octave - Matriz Rigidez</h3>
+@{octave}
+% Matriz de rigidez simplificada
+E = 210000;  % MPa (acero)
+A = 0.01;    % m²
+L = 3.0;     % m
+
+k = (E * A) / L;
+
+fprintf('🔩 Módulo E: %.0f MPa\n', E);
+fprintf('📏 Área: %.4f m²\n', A);
+fprintf('📐 Longitud: %.1f m\n', L);
+fprintf('⚡ Rigidez k: %.2f kN/m\n', k);
+@{end octave}
+'</div>
+
+'<div style="background: #fff3e0; padding: 10px; border-radius: 8px;">
+'<h3>⚙️ Rust - Cargas</h3>
+@{rust}
+fn main() {
+    // Cargas estructurales
+    let carga_muerta = 2.5;  // kN/m²
+    let carga_viva = 3.0;    // kN/m²
+    let area = 24.0;         // m²
+
+    let total_muerta = carga_muerta * area;
+    let total_viva = carga_viva * area;
+    let total = total_muerta + total_viva;
+
+    println!("💀 Carga muerta: {:.1} kN", total_muerta);
+    println!("👥 Carga viva: {:.1} kN", total_viva);
+    println!("⚖️  Carga total: {:.1} kN", total);
+}
+@{end rust}
+'</div>
+
+@{end columns}
+
+'<hr style="border: 2px solid #2196F3; margin: 30px 0;">
+
+'<h2>Parte 2: Modelo 3D IFC - Losa Rectangular 6x4m</h2>
+'<p>Visualización del modelo estructural en IFC (Silvia Cedeño.ifc)</p>
+
+@{ifc}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc}
+
+'<hr style="border: 2px solid #2196F3; margin: 30px 0;">
+
+'<h2>Parte 3: Análisis Comparativo en Columnas</h2>
+
+@{columns 2}
+
+'<div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+'<h3>🔬 C++ - Análisis FEM Simplificado</h3>
+@{cpp}
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main() {
+    // Parámetros del elemento
+    double E = 210000.0;  // MPa
+    double I = 0.0001;    // m⁴
+    double L = 3.0;       // m
+
+    // Rigidez a flexión
+    double k = (12.0 * E * I) / pow(L, 3);
+
+    cout << "🔧 ANÁLISIS FEM" << endl;
+    cout << "===============" << endl;
+    cout << "E = " << E << " MPa" << endl;
+    cout << "I = " << I << " m⁴" << endl;
+    cout << "L = " << L << " m" << endl;
+    cout << "k = " << k << " kN/m" << endl;
+
+    return 0;
+}
+@{end cpp}
+'</div>
+
+'<div style="background: #fce4ec; padding: 15px; border-radius: 8px;">
+'<h3>📊 JavaScript - Resultados Finales</h3>
+@{javascript}
+// Resumen de resultados
+const datos = {
+    area: 24.0,          // m²
+    volumen: 72.0,       // m³
+    carga_total: 132.0,  // kN
+    rigidez: 70000.0     // kN/m
+};
+
+console.log("📈 RESUMEN DE RESULTADOS");
+console.log("========================");
+console.log(`📐 Área: ${datos.area} m²`);
+console.log(`📦 Volumen: ${datos.volumen} m³`);
+console.log(`⚖️  Carga Total: ${datos.carga_total} kN`);
+console.log(`⚡ Rigidez: ${datos.rigidez} kN/m`);
+
+// Factor de seguridad
+const factor_seguridad = 1.5;
+const carga_diseño = datos.carga_total * factor_seguridad;
+console.log(`🛡️  Carga de diseño: ${carga_diseño} kN`);
+@{end javascript}
+'</div>
+
+@{end columns}
+
+'<hr style="border: 2px solid #ff9800; margin: 30px 0;">
+
+'<h2>Parte 4: Comparación Métodos - 4 Columnas</h2>
+
+@{columns 4}
+
+'<div style="background: #bbdefb; padding: 10px;">
+'<h4>Python</h4>
+@{python}
+# Método 1
+def calcular(x):
+    return x ** 2
+
+resultado = calcular(10)
+print(f"R: {resultado}")
+@{end python}
+'</div>
+
+'<div style="background: #c5e1a5; padding: 10px;">
+'<h4>C#</h4>
+@{csharp}
+using System;
+class Calc {
+    static void Main() {
+        double x = 10;
+        double r = x * x;
+        Console.WriteLine($"R: {r}");
+    }
+}
+@{end csharp}
+'</div>
+
+'<div style="background: #ffe0b2; padding: 10px;">
+'<h4>Fortran</h4>
+@{fortran}
+program calc
+    real :: x, r
+    x = 10.0
+    r = x * x
+    print *, 'R:', r
+end program calc
+@{end fortran}
+'</div>
+
+'<div style="background: #f8bbd0; padding: 10px;">
+'<h4>Julia</h4>
+@{julia}
+# Método 4
+x = 10
+r = x^2
+println("R: $r")
+@{end julia}
+'</div>
+
+@{end columns}
+
+'<hr style="border: 2px solid #4caf50; margin: 30px 0;">
+
+'<h2>Parte 5: IFC Fragment Optimizado + Markdown</h2>
+
+@{columns 2}
+
+@{markdown}
+### 📋 Especificaciones Técnicas
+
+**Datos del Proyecto:**
+- Estructura: Losa rectangular
+- Dimensiones: 6.0 x 4.0 x 0.25 m
+- Material: Concreto f'c = 210 kg/cm²
+- Acero: fy = 4200 kg/cm²
+
+**Cargas Consideradas:**
+1. Peso propio
+2. Carga muerta adicional
+3. Carga viva
+4. Factores de seguridad
+
+**Normativa:**
+- ACI 318-19
+- E.060 Concreto Armado (Perú)
+@{end markdown}
+
+'<div style="padding: 10px;">
+'<h3>🎯 Modelo IFC Optimizado (Fragments)</h3>
+'<p>Carga optimizada usando ThatOpen Fragments:</p>
+
+@{ifc-fragment}
+C:\Users\j-b-j\Downloads\Silvia Cedeño.ifc
+@{end ifc-fragment}
+
+'</div>
+
+@{end columns}
+
+'<hr style="border: 2px solid #9c27b0; margin: 30px 0;">
+
+'<h2>Parte 6: Scripts de Sistema - 3 Columnas</h2>
+
+@{columns 3}
+
+@{bash}
+#!/bin/bash
+echo "🐧 Linux Check"
+echo "=============="
+echo "Procesadores:"
+nproc
+echo "Memoria libre:"
+free -h | grep Mem
+@{end bash}
+
+@{powershell}
+# Windows Check
+Write-Host "🪟 Windows Info" -ForegroundColor Cyan
+Write-Host "==============="
+$cpu = Get-WmiObject Win32_Processor
+Write-Host "CPU: $($cpu.Name)"
+$ram = Get-WmiObject Win32_ComputerSystem
+Write-Host "RAM: $([math]::Round($ram.TotalPhysicalMemory/1GB, 2)) GB"
+@{end powershell}
+
+@{lua}
+-- Verificación Lua
+print("🌙 Lua Check")
+print("============")
+print("Versión: " .. _VERSION)
+print("Sistema operativo detectado")
+@{end lua}
+
+@{end columns}
+
+'<hr style="border: 3px solid #f44336; margin: 40px 0;">
+
+'<h2>✅ MEGA TEST COMPLETADO</h2>
+
+'<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; text-align: center;">
+'<h3 style="color: white; margin: 0;">🎉 Test Exhaustivo Finalizado</h3>
+'<p style="font-size: 18px; margin: 10px 0;">Si ves TODOS los elementos arriba correctamente:</p>
+'<ul style="list-style: none; padding: 0; font-size: 16px;">
+'<li>✅ Múltiples parsers funcionan</li>
+'<li>✅ @{columns} funciona con parsers mezclados</li>
+'<li>✅ IFC se visualiza correctamente</li>
+'<li>✅ IFC Fragment está implementado</li>
+'<li>✅ El servidor HTTP se abre automáticamente</li>
+'<li>✅ NO hay errores CORS</li>
+'</ul>
+'<p style="font-size: 20px; margin: 20px 0;"><strong>🚀 TODO FUNCIONA PERFECTAMENTE 🚀</strong></p>
+'</div>

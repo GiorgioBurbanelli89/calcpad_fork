@@ -1,0 +1,145 @@
+"VISOR IFC ULTRA MÍNIMO
+'======================
+'Solo lo esencial para cargar un IFC
+
+@{code}
+@{html-ifc}
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { margin: 0; background: #222; }
+#v { width: 100%; height: 500px; }
+#c { width: 100%; height: 100%; }
+#b { position: absolute; top: 10px; left: 10px; z-index: 10; }
+.btn { background: #3498db; color: white; border: none; padding: 8px 12px; margin: 2px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="v">
+    <canvas id="c"></canvas>
+    <div id="b">
+        <button class="btn" onclick="fit()">Fit</button>
+        <button class="btn" onclick="top_()">Top</button>
+        <button class="btn" onclick="front()">Front</button>
+    </div>
+</div>
+
+<script src="https://calcpad.ifc/three.min.js"></script>
+<script src="https://calcpad.ifc/OrbitControls.js"></script>
+<script src="https://calcpad.ifc/web-ifc-api-iife.js"></script>
+
+<script>
+// Variables globales
+let camera, controls, scene, center, size;
+
+(async () => {
+    // Setup Three.js
+    const canvas = document.getElementById('c');
+    const container = document.getElementById('v');
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x222222);
+
+    camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 10000);
+    camera.position.set(20, 20, 20);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const light = new THREE.DirectionalLight(0xffffff, 0.8);
+    light.position.set(50, 100, 50);
+    scene.add(light);
+
+    scene.add(new THREE.GridHelper(50, 50));
+
+    // Cargar IFC
+    const ifcApi = new WebIFC.IfcAPI();
+    await ifcApi.Init(p => p.endsWith('.wasm') ? 'https://calcpad.ifc/' + p : p);
+
+    // CAMBIAR ESTA URL POR TU ARCHIVO IFC
+    const res = await fetch('https://calcpad.ifc/modelo.ifc');
+    const data = await res.arrayBuffer();
+    const modelID = ifcApi.OpenModel(new Uint8Array(data));
+    const meshes = ifcApi.LoadAllGeometry(modelID);
+
+    const group = new THREE.Group();
+
+    for (let i = 0; i < meshes.size(); i++) {
+        const fm = meshes.get(i);
+        for (let j = 0; j < fm.geometries.size(); j++) {
+            const pg = fm.geometries.get(j);
+            const g = ifcApi.GetGeometry(modelID, pg.geometryExpressID);
+            const v = ifcApi.GetVertexArray(g.GetVertexData(), g.GetVertexDataSize());
+            const idx = ifcApi.GetIndexArray(g.GetIndexData(), g.GetIndexDataSize());
+            if (!v.length || !idx.length) continue;
+
+            const pos = new Float32Array(v.length / 2);
+            for (let k = 0; k < v.length; k += 6) {
+                const n = (k / 6) * 3;
+                pos[n] = v[k]; pos[n+1] = v[k+1]; pos[n+2] = v[k+2];
+            }
+
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            geo.setIndex(new THREE.BufferAttribute(idx, 1));
+            geo.computeVertexNormals();
+
+            const mat = new THREE.MeshPhongMaterial({
+                color: new THREE.Color(pg.color.x, pg.color.y, pg.color.z),
+                side: THREE.DoubleSide,
+                transparent: pg.color.w < 1,
+                opacity: pg.color.w
+            });
+
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.applyMatrix4(new THREE.Matrix4().fromArray(pg.flatTransformation));
+            group.add(mesh);
+        }
+    }
+
+    scene.add(group);
+    ifcApi.CloseModel(modelID);
+
+    // Ajustar vista
+    const box = new THREE.Box3().setFromObject(group);
+    center = box.getCenter(new THREE.Vector3());
+    size = Math.max(...box.getSize(new THREE.Vector3()).toArray());
+    fit();
+
+    // Render loop
+    (function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+    })();
+})();
+
+// Funciones para botones
+function fit() {
+    camera.position.set(center.x + size, center.y + size, center.z + size);
+    controls.target.copy(center);
+    controls.update();
+}
+
+function top_() {
+    camera.position.set(center.x, center.y + size * 2, center.z);
+    camera.up.set(0, 0, -1);
+    controls.target.copy(center);
+    controls.update();
+}
+
+function front() {
+    camera.position.set(center.x, center.y, center.z + size * 2);
+    camera.up.set(0, 1, 0);
+    controls.target.copy(center);
+    controls.update();
+}
+</script>
+</body>
+</html>
+@{end code}

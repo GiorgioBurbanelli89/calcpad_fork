@@ -53,6 +53,9 @@ namespace Calcpad.Common.MultLangCode
         /// <returns>Code with language blocks replaced by output and variable assignments</returns>
         public string Process(string code, Dictionary<string, object>? variables = null, bool returnHtml = true, bool enableCollapse = true, Action<string>? progressCallback = null, Action<string>? partialResultCallback = null)
         {
+            // Reset IFC import map flag for new document
+            IfcLanguageHandler.ResetImportMapFlag();
+
             try
             {
                 var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
@@ -115,8 +118,74 @@ namespace Calcpad.Common.MultLangCode
                     string output;
                     var extractedVars = new List<(string name, string value)>();
 
+                    // Special handling for @{code} and @{ucode} wrappers
+                    // @{code}...@{end code} wraps @{html-ifc} blocks with full HTML/JS code
+                    // @{ucode}...@{end ucode} wraps @{html-ifc} blocks with simplified directives OR direct IFC directives
+                    if (language.Equals("code", StringComparison.OrdinalIgnoreCase) ||
+                        language.Equals("ucode", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing {language.ToUpper()} wrapper block\n");
+                        }
+                        catch { }
+
+                        string innerContent = block.Code ?? "";
+
+                        // @{ucode} ALWAYS processes IFC directives directly
+                        // Remove any @{html-ifc} wrapper if present (user error)
+                        if (language.Equals("ucode", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Strip @{html-ifc}...@{end html-ifc} wrapper if present
+                            innerContent = System.Text.RegularExpressions.Regex.Replace(
+                                innerContent,
+                                @"@\{html-ifc\}\s*\r?\n?",
+                                "",
+                                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                            innerContent = System.Text.RegularExpressions.Regex.Replace(
+                                innerContent,
+                                @"\s*@\{end\s+html-ifc\}",
+                                "",
+                                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                            try
+                            {
+                                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                                System.IO.File.AppendAllText(debugPath,
+                                    $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing UCODE - cleaned content:\n{innerContent.Substring(0, Math.Min(200, innerContent.Length))}\n");
+                            }
+                            catch { }
+
+                            // Process directly as IFC viewer with simplified directives
+                            output = IfcLanguageHandler.GenerateInlineViewerHtml(innerContent, "@{ucode}");
+                        }
+                        else
+                        {
+                            // @{code} wrapper - process inner content recursively
+                            output = Process(innerContent, variables, returnHtml, enableCollapse, progressCallback, partialResultCallback);
+                        }
+                    }
+                    // Special handling for @{calcpad} - explicit Calcpad math blocks
+                    // Generates a marker that will be processed by ExpressionParser later
+                    else if (language.Equals("calcpad", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing CALCPAD block\n");
+                        }
+                        catch { }
+
+                        // Encode Calcpad code as base64 marker for later processing
+                        string calcpadCode = block.Code ?? "";
+                        string base64Code = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(calcpadCode));
+                        output = $"<!--CALCPAD_INLINE:{base64Code}-->";
+                    }
                     // Special handling for mcdx - convert Mathcad Prime file to Calcpad
-                    if (language.Equals("mcdx", StringComparison.OrdinalIgnoreCase))
+                    else if (language.Equals("mcdx", StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
@@ -142,6 +211,79 @@ namespace Calcpad.Common.MultLangCode
                         catch { }
 
                         output = ProcessImageBlock(block.Code, block.StartDirective);
+                    }
+                    // Special handling for IFC - 3D viewer with Three.js and web-ifc
+                    // Supports: @{ifc}path/to/file.ifc@{end ifc} or @{ifc base64}...@{end ifc}
+                    // Also supports: @{ifc-fragment} for ThatOpen Fragments optimization
+                    // NOTE: html-ifc is handled separately below (uses GenerateInlineViewerHtml)
+                    else if (language.Equals("ifc", StringComparison.OrdinalIgnoreCase) ||
+                             language.Equals("ifc-fragment", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing IFC block, directive='{block.StartDirective}'\n");
+                        }
+                        catch { }
+
+                        // Detect if running in WPF context and use Virtual Host URLs
+                        var isWpf = AppDomain.CurrentDomain.FriendlyName.Contains("Calcpad.exe") ||
+                                    AppDomain.CurrentDomain.FriendlyName.Contains("Calcpad.Wpf");
+
+                        string wasmPath;
+                        string outputDirectory = null;
+
+                        // Use current working directory for output (where HTML will be generated)
+                        // This ensures fragment files are placed next to the HTML for HTTP server access
+                        outputDirectory = System.IO.Directory.GetCurrentDirectory();
+
+                        // Verify IFC file exists
+                        var ifcFilePath = block.Code?.Trim();
+                        if (string.IsNullOrEmpty(ifcFilePath) || !System.IO.File.Exists(ifcFilePath))
+                        {
+                            // IFC file not found, will be handled by ProcessIfcBlock
+                        }
+
+                        if (isWpf)
+                        {
+                            // WPF: Use Virtual Host (mapped in MainWindow.xaml.cs InitializeWebViewer)
+                            // https://calcpad.ifc/ifc/ maps to {AppInfo.Path}/resources/ifc/
+                            wasmPath = "https://calcpad.ifc/ifc";
+
+                            try
+                            {
+                                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                                System.IO.File.AppendAllText(debugPath,
+                                    $"[{DateTime.Now:HH:mm:ss}] IFC: Detected WPF context\n" +
+                                    $"[{DateTime.Now:HH:mm:ss}] IFC: AppDomain.FriendlyName = '{AppDomain.CurrentDomain.FriendlyName}'\n" +
+                                    $"[{DateTime.Now:HH:mm:ss}] IFC: Using Virtual Host wasmPath = '{wasmPath}'\n");
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            // CLI: Use local libs to avoid CDN Tracking Prevention issues in Edge
+                            wasmPath = "./libs";
+
+                            // Copy libs to output directory if needed
+                            if (!string.IsNullOrEmpty(outputDirectory))
+                            {
+                                CopyIfcLibsToDirectory(outputDirectory);
+                            }
+
+                            try
+                            {
+                                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                                System.IO.File.AppendAllText(debugPath,
+                                    $"[{DateTime.Now:HH:mm:ss}] IFC: Detected CLI context\n" +
+                                    $"[{DateTime.Now:HH:mm:ss}] IFC: wasmPath = '{wasmPath}' (local libs)\n" +
+                                    $"[{DateTime.Now:HH:mm:ss}] IFC: outputDirectory = '{outputDirectory}'\n");
+                            }
+                            catch { }
+                        }
+
+                        output = IfcLanguageHandler.ProcessIfcBlock(block.Code, block.StartDirective, wasmPath, outputDirectory);
                     }
                     // Special handling for markdown - render to HTML
                     // Supports: @{calcpad:expr}, $varName for variable values, keywords #val, #nosub, etc.
@@ -197,7 +339,42 @@ namespace Calcpad.Common.MultLangCode
                     //         @{end columns}
                     else if (language.StartsWith("columns", StringComparison.OrdinalIgnoreCase))
                     {
-                        output = ProcessColumnsBlock(language, block.Code, variables, progressCallback);
+                        // Pass block.StartDirective to preserve parameters like "@{columns 4}"
+                        output = ProcessColumnsBlock(block.StartDirective, block.Code, variables, progressCallback);
+                    }
+                    // Special handling for html-ifc - inline IFC viewer embedded in output
+                    // Syntax: @{html-ifc}path/to/file.ifc@{end html-ifc}
+                    // This renders directly in the WebView2 output panel using Virtual Host
+                    else if (language.Equals("html-ifc", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing HTML-IFC block, directive='{block.StartDirective}'\n");
+                        }
+                        catch { }
+
+                        // html-ifc always uses Virtual Host URLs for WebView2 rendering
+                        // This allows the IFC viewer to work directly in the Calcpad output panel
+                        output = IfcLanguageHandler.GenerateInlineViewerHtml(block.Code?.Trim() ?? "", block.StartDirective);
+                    }
+                    // Special handling for ifc-create - create IFC geometry from commands
+                    // Syntax: @{ifc-create}
+                    //         WALL w1 = (0,0,0) to (10,0,0) height=3 thickness=0.3
+                    //         BEAM b1 = (0,0,3) to (10,0,3) section=0.3x0.5
+                    //         @{end ifc-create}
+                    else if (language.Equals("ifc-create", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                            System.IO.File.AppendAllText(debugPath,
+                                $"[{DateTime.Now:HH:mm:ss}] MultLangProcessor: Processing IFC-CREATE block\n");
+                        }
+                        catch { }
+
+                        output = ProcessIfcCreateBlock(block.Code ?? "", block.StartDirective);
                     }
                     // C#, XAML, WPF, CSS, HTML, three, vite always execute (handled specially in LanguageExecutor)
                     // Extract base language name for checking (e.g., "vite C:/path" -> "vite")
@@ -3069,15 +3246,45 @@ namespace Calcpad.Common.MultLangCode
         {
             try
             {
-                // Parse number of columns from directive "columns N" or just "columns"
+                // DEBUG: Log the content received
+                try
+                {
+                    var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-columns-debug.txt");
+                    System.IO.File.AppendAllText(logPath,
+                        $"\n[{DateTime.Now:HH:mm:ss}] === ProcessColumnsBlock START ===\n");
+                    System.IO.File.AppendAllText(logPath,
+                        $"[{DateTime.Now:HH:mm:ss}] Directive: '{directive}'\n");
+                    System.IO.File.AppendAllText(logPath,
+                        $"[{DateTime.Now:HH:mm:ss}] Content length: {content.Length}\n");
+                    System.IO.File.AppendAllText(logPath,
+                        $"[{DateTime.Now:HH:mm:ss}] Content lines: {content.Split('\n').Length}\n");
+                    var contentPreview = content.Length > 500 ? content.Substring(0, 500) : content;
+                    System.IO.File.AppendAllText(logPath,
+                        $"[{DateTime.Now:HH:mm:ss}] Content preview:\n{contentPreview}\n...\n");
+                }
+                catch { }
+
+                // Parse number of columns from directive "@{columns N}" or "columns N" or just "columns"
                 int numColumns = 2; // Default
-                var parts = directive.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                // Extract number from directive (handle both "@{columns 4}" and "columns 4")
+                var directiveText = directive.Trim().TrimStart('@', '{').TrimEnd('}');
+                var parts = directiveText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length >= 2 && int.TryParse(parts[1], out int n) && n >= 2 && n <= 4)
                 {
                     numColumns = n;
                 }
 
+                // DEBUG: Log parsed numColumns
+                try
+                {
+                    var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-columns-debug.txt");
+                    System.IO.File.AppendAllText(logPath,
+                        $"[{DateTime.Now:HH:mm:ss}] Parsed numColumns = {numColumns} from directive '{directive}' (directiveText='{directiveText}')\n");
+                }
+                catch { }
+
                 // Split content by @{column} separator or by ---  (on its own line)
+                // OR automatically distribute code blocks if no separators
                 var columnContents = new List<string>();
 
                 // Try splitting by "---" on its own line first (common pattern)
@@ -3108,10 +3315,76 @@ namespace Calcpad.Common.MultLangCode
                     columnContents.Add(currentColumn.ToString());
                 }
 
-                // If no separators found, treat as single column
-                if (columnContents.Count == 0)
+                // If no separators found, try to auto-distribute code blocks
+                if (columnContents.Count == 0 || (columnContents.Count == 1 && !foundSeparator))
                 {
-                    columnContents.Add(content);
+                    // Extract code blocks from content and distribute them across columns
+                    var codeBlocks = MultLangManager.ExtractCodeBlocks(content);
+                    var allBlocks = new List<(int startLine, int endLine, string language, string code, string directive)>();
+
+                    foreach (var (lang, blocks) in codeBlocks)
+                    {
+                        foreach (var block in blocks)
+                        {
+                            allBlocks.Add((block.StartLine, block.EndLine, block.Language, block.Code, block.StartDirective));
+                        }
+                    }
+
+                    // Sort by start line to maintain order
+                    allBlocks = allBlocks.OrderBy(b => b.startLine).ToList();
+
+                    // DEBUG: Log how many blocks found and numColumns value
+                    try
+                    {
+                        var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-columns-debug.txt");
+                        System.IO.File.AppendAllText(logPath,
+                            $"[{DateTime.Now:HH:mm:ss}] === DISTRIBUTION DEBUG ===\n");
+                        System.IO.File.AppendAllText(logPath,
+                            $"[{DateTime.Now:HH:mm:ss}] numColumns = {numColumns}\n");
+                        System.IO.File.AppendAllText(logPath,
+                            $"[{DateTime.Now:HH:mm:ss}] allBlocks.Count = {allBlocks.Count}\n");
+                        foreach (var block in allBlocks)
+                        {
+                            System.IO.File.AppendAllText(logPath,
+                                $"[{DateTime.Now:HH:mm:ss}]   - Block: {block.language} (line {block.startLine})\n");
+                        }
+                    }
+                    catch { }
+
+                    if (allBlocks.Count > 0)
+                    {
+                        // Distribute blocks across columns
+                        columnContents.Clear();
+                        for (int i = 0; i < numColumns; i++)
+                        {
+                            columnContents.Add("");
+                        }
+
+                        for (int i = 0; i < allBlocks.Count; i++)
+                        {
+                            var block = allBlocks[i];
+                            int columnIndex = i % numColumns;
+
+                            // DEBUG: Log distribution
+                            try
+                            {
+                                var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-columns-debug.txt");
+                                System.IO.File.AppendAllText(logPath,
+                                    $"[{DateTime.Now:HH:mm:ss}] Block {i} ({block.language}) -> Column {columnIndex}\n");
+                            }
+                            catch { }
+
+                            // Reconstruct the directive block
+                            var blockContent = $"{block.directive}\n{block.code}\n@{{end {block.language}}}";
+                            columnContents[columnIndex] += blockContent + "\n\n";
+                        }
+                    }
+                    else
+                    {
+                        // No code blocks found, treat as single column
+                        columnContents.Clear();
+                        columnContents.Add(content);
+                    }
                 }
 
                 // Calculate column width
@@ -3179,6 +3452,150 @@ namespace Calcpad.Common.MultLangCode
             catch (Exception ex)
             {
                 return $"<p style='color:red;'>Error en @{{columns}}: {ex.Message}</p>";
+            }
+        }
+
+        /// <summary>
+        /// Process IFC creation block - creates IFC geometry from commands
+        /// </summary>
+        private string ProcessIfcCreateBlock(string content, string directive)
+        {
+            try
+            {
+                var creator = new IfcCreator();
+                var ifcContent = creator.ProcessCommands(content);
+
+                // Check for errors
+                if (ifcContent.StartsWith("ERRORS:"))
+                {
+                    var errors = ifcContent.Replace("ERRORS:", "").Trim();
+                    return $"<div style='color: red; padding: 10px; border: 1px solid red; margin: 10px 0; font-family: monospace; white-space: pre-wrap;'>Errores en IFC-CREATE:\n{System.Web.HttpUtility.HtmlEncode(errors)}</div>";
+                }
+
+                // Save IFC file to temp directory
+                var tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad_ifc");
+                if (!System.IO.Directory.Exists(tempDir))
+                {
+                    System.IO.Directory.CreateDirectory(tempDir);
+                }
+
+                var ifcFileName = $"created_{Guid.NewGuid():N}.ifc";
+                var ifcFilePath = System.IO.Path.Combine(tempDir, ifcFileName);
+                System.IO.File.WriteAllText(ifcFilePath, ifcContent);
+
+                // Also copy to resources/ifc for WebView2 access
+                var appPath = AppDomain.CurrentDomain.BaseDirectory;
+                var ifcResourcePath = System.IO.Path.Combine(appPath, "resources", "ifc");
+                if (!System.IO.Directory.Exists(ifcResourcePath))
+                {
+                    System.IO.Directory.CreateDirectory(ifcResourcePath);
+                }
+                var resourceIfcPath = System.IO.Path.Combine(ifcResourcePath, ifcFileName);
+                System.IO.File.WriteAllText(resourceIfcPath, ifcContent);
+
+                // Generate inline viewer using Virtual Host URL
+                var viewerHtml = IfcLanguageHandler.GenerateInlineViewerHtml(resourceIfcPath, directive);
+
+                // Add download link for the IFC file
+                var downloadHtml = $@"
+<div style='margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 5px;'>
+    <strong>IFC Creado:</strong> {ifcFileName}<br>
+    <a href='file:///{ifcFilePath.Replace('\\', '/')}' style='color: #0078d4;' download>Descargar archivo IFC</a>
+    <span style='color: #666; font-size: 11px;'> | Guardado en: {ifcFilePath}</span>
+</div>";
+
+                return downloadHtml + viewerHtml;
+            }
+            catch (Exception ex)
+            {
+                return $"<div style='color: red; padding: 10px; border: 1px solid red; margin: 10px 0;'>Error en @{{ifc-create}}: {ex.Message}</div>";
+            }
+        }
+
+        /// <summary>
+        /// Copy IFC viewer libraries to target directory for CLI usage
+        /// This avoids CDN issues with Edge Tracking Prevention
+        /// </summary>
+        private void CopyIfcLibsToDirectory(string targetDirectory)
+        {
+            try
+            {
+                var libsDir = System.IO.Path.Combine(targetDirectory, "libs");
+                if (!System.IO.Directory.Exists(libsDir))
+                {
+                    System.IO.Directory.CreateDirectory(libsDir);
+                }
+
+                // List of required files for IFC viewer
+                var requiredFiles = new[]
+                {
+                    "three.module.js",
+                    "OrbitControls.js",
+                    "web-ifc-api-iife.js",
+                    "web-ifc.wasm"
+                };
+
+                // Try to find source libs directory
+                string sourceLibsDir = null;
+
+                // First check in Examples/libs (development)
+                var examplesLibs = System.IO.Path.Combine(
+                    System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "",
+                    "..", "..", "..", "..", "Examples", "libs");
+                if (System.IO.Directory.Exists(examplesLibs))
+                {
+                    sourceLibsDir = System.IO.Path.GetFullPath(examplesLibs);
+                }
+
+                // Try other common locations
+                if (sourceLibsDir == null)
+                {
+                    var possiblePaths = new[]
+                    {
+                        @"C:\Users\j-b-j\Documents\Calcpad-7.5.7\Examples\libs",
+                        System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                            "Documents", "Calcpad-7.5.7", "Examples", "libs")
+                    };
+
+                    foreach (var path in possiblePaths)
+                    {
+                        if (System.IO.Directory.Exists(path))
+                        {
+                            sourceLibsDir = path;
+                            break;
+                        }
+                    }
+                }
+
+                if (sourceLibsDir == null)
+                {
+                    var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                    System.IO.File.AppendAllText(debugPath,
+                        $"[{DateTime.Now:HH:mm:ss}] CopyIfcLibs: Source libs directory not found\n");
+                    return;
+                }
+
+                // Copy each required file
+                foreach (var fileName in requiredFiles)
+                {
+                    var sourceFile = System.IO.Path.Combine(sourceLibsDir, fileName);
+                    var destFile = System.IO.Path.Combine(libsDir, fileName);
+
+                    if (System.IO.File.Exists(sourceFile) && !System.IO.File.Exists(destFile))
+                    {
+                        System.IO.File.Copy(sourceFile, destFile);
+                    }
+                }
+
+                var debugPath2 = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath2,
+                    $"[{DateTime.Now:HH:mm:ss}] CopyIfcLibs: Copied libs to '{libsDir}'\n");
+            }
+            catch (Exception ex)
+            {
+                var debugPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "calcpad-debug.txt");
+                System.IO.File.AppendAllText(debugPath,
+                    $"[{DateTime.Now:HH:mm:ss}] CopyIfcLibs ERROR: {ex.Message}\n");
             }
         }
     }
