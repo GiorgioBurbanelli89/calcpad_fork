@@ -1,7 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,7 +18,7 @@ namespace Calcpad.Wpf
     public class JupyterIntegration
     {
         private Process _jupyterProcess;
-        private int _port = 8888;
+        private int _port;
         private string _token;
         private WebView2 _webView;
         private bool _isRunning = false;
@@ -35,6 +37,28 @@ namespace Calcpad.Wpf
         public JupyterIntegration(WebView2 webView)
         {
             _webView = webView ?? throw new ArgumentNullException(nameof(webView));
+        }
+
+        /// <summary>
+        /// Encuentra un puerto TCP libre
+        /// </summary>
+        private static int FindFreePort()
+        {
+            var listener = new TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            return port;
+        }
+
+        /// <summary>
+        /// Navega el WebView2 a la URL de Jupyter
+        /// </summary>
+        public async Task NavigateToJupyter()
+        {
+            if (!_isRunning || _webView == null) return;
+            await _webView.EnsureCoreWebView2Async();
+            _webView.CoreWebView2.Navigate($"http://localhost:{_port}/?token={_token}");
         }
 
         /// <summary>
@@ -100,9 +124,9 @@ namespace Calcpad.Wpf
 
             if (_isRunning)
             {
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Ya está corriendo\n");
-                MessageBox.Show("El servidor Jupyter ya está en ejecución.", "Info",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Ya está corriendo, re-navegando...\n");
+                // Re-navegar al WebView2 en lugar de solo mostrar mensaje
+                await NavigateToJupyter();
                 return true;
             }
 
@@ -134,17 +158,20 @@ namespace Calcpad.Wpf
 
                 // Generar token fijo para esta sesión
                 _token = Guid.NewGuid().ToString("N");
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Token generado: {_token}\n");
+
+                // Encontrar puerto libre para evitar conflictos
+                _port = FindFreePort();
+                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Puerto libre: {_port}, Token: {_token}\n");
 
                 progressWindow.UpdateMessage($"Iniciando servidor Jupyter... ({stopwatch.ElapsedMilliseconds} ms)");
 
-                // Iniciar servidor Jupyter con token explícito
+                // Iniciar servidor Jupyter con token y puerto explícitos
                 _jupyterProcess = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "python",
-                        Arguments = $"-m jupyter notebook --no-browser --port={_port} --NotebookApp.token=\"{_token}\"",
+                        Arguments = $"-m jupyter notebook --no-browser --port={_port} --ServerApp.token=\"{_token}\" --NotebookApp.token=\"{_token}\"",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -153,16 +180,15 @@ namespace Calcpad.Wpf
                     }
                 };
 
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Iniciando proceso jupyter con token...\n");
+                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Iniciando proceso jupyter...\n");
                 _jupyterProcess.Start();
 
-                // Iniciar captura de output para logging (opcional, solo para debug)
+                // Capturar output y detectar puerto real desde stderr
+                int detectedPort = _port;
                 _jupyterProcess.OutputDataReceived += (sender, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data))
-                    {
                         File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] STDOUT: {e.Data}\n");
-                    }
                 };
 
                 _jupyterProcess.ErrorDataReceived += (sender, e) =>
@@ -170,6 +196,10 @@ namespace Calcpad.Wpf
                     if (!string.IsNullOrEmpty(e.Data))
                     {
                         File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] STDERR: {e.Data}\n");
+                        // Detectar si Jupyter cambió de puerto
+                        var portMatch = Regex.Match(e.Data, @"http://localhost:(\d+)/");
+                        if (portMatch.Success)
+                            detectedPort = int.Parse(portMatch.Groups[1].Value);
                     }
                 };
 
@@ -185,13 +215,15 @@ namespace Calcpad.Wpf
                 {
                     for (int i = 0; i < 60; i++) // 60 × 500ms = 30 segundos max
                     {
+                        // Intentar con el puerto detectado (puede cambiar si el original estaba ocupado)
                         try
                         {
-                            var response = await httpClient.GetAsync($"http://localhost:{_port}/api?token={_token}");
+                            var response = await httpClient.GetAsync($"http://localhost:{detectedPort}/api?token={_token}");
                             if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
                             {
+                                _port = detectedPort; // Actualizar al puerto real
                                 serverReady = true;
-                                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Servidor respondió OK (intento {i + 1})\n");
+                                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Servidor respondió OK en puerto {_port} (intento {i + 1})\n");
                                 break;
                             }
                         }
@@ -212,7 +244,7 @@ namespace Calcpad.Wpf
                     return false;
                 }
 
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Servidor listo!\n");
+                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Servidor listo en puerto {_port}!\n");
 
                 _isRunning = true;
                 File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Inicializando WebView2...\n");
@@ -227,16 +259,16 @@ namespace Calcpad.Wpf
                 _webView.CoreWebView2.NewWindowRequested += (sender, args) =>
                 {
                     File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] NewWindow interceptado: {args.Uri}\n");
-                    args.Handled = true; // Evitar que se abra en navegador externo
-                    _webView.CoreWebView2.Navigate(args.Uri); // Navegar en el mismo WebView2
+                    args.Handled = true;
+                    _webView.CoreWebView2.Navigate(args.Uri);
                 };
 
                 _webView.CoreWebView2.Navigate($"http://localhost:{_port}/?token={_token}");
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Navegación iniciada\n");
+                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Navegación iniciada a puerto {_port}\n");
 
                 stopwatch.Stop();
                 progressWindow.UpdateMessage($"Completado! ({stopwatch.ElapsedMilliseconds} ms)");
-                await Task.Delay(500); // Mostrar mensaje final brevemente
+                await Task.Delay(500);
                 progressWindow.Close();
 
                 MessageBox.Show($"Servidor Jupyter iniciado en {stopwatch.ElapsedMilliseconds} ms.\n\nDirectorio: {workDir}\nURL: http://localhost:{_port}",
@@ -363,12 +395,9 @@ namespace Calcpad.Wpf
                     var started = await StartJupyterServer(notebookDir);
                     if (!started)
                         return false;
-
-                    // Esperar a que el servidor esté listo
-                    await Task.Delay(3000);
                 }
 
-                // Navegar al notebook (ahora solo usa el nombre porque el servidor está en el directorio correcto)
+                // Navegar al notebook
                 string url = $"http://localhost:{_port}/notebooks/{fileName}?token={_token}";
 
                 await _webView.EnsureCoreWebView2Async();
@@ -433,83 +462,6 @@ namespace Calcpad.Wpf
                 MessageBox.Show($"Error en modo solo lectura:\n{ex.Message}", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
-            }
-        }
-
-        /// <summary>
-        /// Extrae el token del output de Jupyter
-        /// </summary>
-        private async Task<string> ParseJupyterToken(Process process)
-        {
-            // DEBUG LOG
-            string logFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents", "Calcpad-7.5.7", "Calcpad.Wpf", "DebugLogs", "jupyter-debug.log");
-
-            try
-            {
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] ParseJupyterToken INICIO\n");
-
-                string token = null;
-                bool tokenFound = false;
-
-                // Handler para stdout
-                process.OutputDataReceived += (sender, e) =>
-                {
-                    if (!string.IsNullOrEmpty(e.Data))
-                    {
-                        File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] STDOUT: {e.Data}\n");
-
-                        var match = Regex.Match(e.Data, @"token=([a-f0-9]+)");
-                        if (match.Success && !tokenFound)
-                        {
-                            token = match.Groups[1].Value;
-                            tokenFound = true;
-                            File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] TOKEN ENCONTRADO: {token}\n");
-                        }
-                    }
-                };
-
-                // Handler para stderr
-                process.ErrorDataReceived += (sender, e) =>
-                {
-                    if (!string.IsNullOrEmpty(e.Data))
-                    {
-                        File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] STDERR: {e.Data}\n");
-
-                        var match = Regex.Match(e.Data, @"token=([a-f0-9]+)");
-                        if (match.Success && !tokenFound)
-                        {
-                            token = match.Groups[1].Value;
-                            tokenFound = true;
-                            File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] TOKEN ENCONTRADO (stderr): {token}\n");
-                        }
-                    }
-                };
-
-                // Comenzar a leer de forma asíncrona
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Esperando token (max 30 seg)...\n");
-
-                // Esperar hasta 30 segundos para el token
-                for (int i = 0; i < 300; i++) // 300 * 100ms = 30 segundos
-                {
-                    if (tokenFound)
-                    {
-                        File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Token recibido después de {i * 100}ms\n");
-                        return token;
-                    }
-
-                    await Task.Delay(100);
-                }
-
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] TIMEOUT: No se recibió token en 30 seg\n");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] EXCEPTION en ParseJupyterToken: {ex.Message}\n{ex.StackTrace}\n");
-                return null;
             }
         }
 

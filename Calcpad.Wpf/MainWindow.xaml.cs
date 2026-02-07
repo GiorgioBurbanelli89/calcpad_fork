@@ -5648,6 +5648,35 @@ namespace Calcpad.Wpf
                 Command_Open(this, null);
                 e.Handled = true;
             }
+            else if (e.Key == Key.L && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                // Ctrl+L: Dump WebView2 HTML to log.html for debugging
+                await DumpWebViewToLogHtml();
+                e.Handled = true;
+            }
+        }
+
+        private async System.Threading.Tasks.Task DumpWebViewToLogHtml()
+        {
+            try
+            {
+                if (WebViewer.CoreWebView2 == null) return;
+                var html = await WebViewer.CoreWebView2.ExecuteScriptAsync("document.documentElement.outerHTML");
+                // Result comes as JSON string, unescape it
+                html = System.Text.Json.JsonSerializer.Deserialize<string>(html);
+                var logPath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    "Documents", "Calcpad-7.5.7", "Calcpad.Wpf", "DebugLogs", "log.html");
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath));
+                System.IO.File.WriteAllText(logPath, html);
+                // Open in default browser
+                Process.Start(new ProcessStartInfo { FileName = logPath, UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error dumping log.html:\n{ex.Message}", "Debug",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void AutoRunCheckBox_Checked(object sender, RoutedEventArgs e)
