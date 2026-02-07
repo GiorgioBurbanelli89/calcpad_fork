@@ -5630,6 +5630,11 @@ namespace Calcpad.Wpf
             }
         }
 
+        private void WebViewer_GotFocus(object sender, RoutedEventArgs e)
+        {
+            IsWebView2Focused = true;
+        }
+
         private async void WebViewer_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F5)
