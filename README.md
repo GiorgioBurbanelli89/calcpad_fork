@@ -2,7 +2,7 @@
 
 > ☥ **The Magic of Calculation** - Multi-language engineering calculator with symbolic math
 
-[![Version](https://img.shields.io/badge/version-1.0.7-gold.svg)](https://github.com/GiorgioBurbanelli89/hekatan)
+[![Version](https://img.shields.io/badge/version-1.0.0-gold.svg)](https://github.com/GiorgioBurbanelli89/hekatan)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Fork](https://img.shields.io/badge/fork%20of-Calcpad-green.svg)](https://github.com/Proektsoftbg/Calcpad)
@@ -40,7 +40,7 @@ Hekatan Calc is organized into independent modules:
 
 ---
 
-## 🌟 New Features (v1.0.7)
+## 🌟 New Features (v1.0.0)
 
 ### ☥ Hekatan Visual Theme
 - Egyptian gold & turquoise color scheme
