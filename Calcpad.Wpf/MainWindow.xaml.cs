@@ -308,7 +308,9 @@ namespace Calcpad.Wpf
             _isTextChangedEnabled = false;
             IsSaved = true;
             _findReplace.RichTextBox = RichTextBox;
+            _findReplace.TextEditor = TextEditor;
             _findReplace.WebViewer = WebViewer;
+            _findReplace.IsAvalonEditActive = _isAvalonEditActive;
             _findReplace.BeginSearch += FindReplace_BeginSearch;
             _findReplace.EndSearch += FindReplace_EndSearch;
             _findReplace.EndReplace += FindReplace_EndReplace;
@@ -853,9 +855,24 @@ namespace Calcpad.Wpf
             EmbedCheckBox.IsChecked = settings.Embed;
             if (settings.WindowLeft > 0) Left = settings.WindowLeft;
             if (settings.WindowTop > 0) Top = settings.WindowTop;
-            if (settings.WindowWidth > 0) Width = settings.WindowWidth;
-            if (settings.WindowHeight > 0) Height = settings.WindowHeight;
-            this.WindowState = (WindowState)settings.WindowState;
+
+            // Validate window size - ensure minimum reasonable size (400x300)
+            const double MIN_WIDTH = 800;
+            const double MIN_HEIGHT = 600;
+            if (settings.WindowWidth >= MIN_WIDTH)
+                Width = settings.WindowWidth;
+            else
+                Width = 1200; // Default width
+            if (settings.WindowHeight >= MIN_HEIGHT)
+                Height = settings.WindowHeight;
+            else
+                Height = 800; // Default height
+
+            // Validate WindowState (0=Normal, 1=Minimized, 2=Maximized)
+            if (settings.WindowState >= 0 && settings.WindowState <= 2)
+                this.WindowState = (WindowState)settings.WindowState;
+            else
+                this.WindowState = WindowState.Normal;
 
             ExpressionParser.IsUs = US.IsChecked ?? false;
             var math = _parser.Settings.Math;
@@ -1415,12 +1432,24 @@ namespace Calcpad.Wpf
             else
                 _findReplace.Mode = mode;
 
-            string s = _isWebView2Focused ?
-                await _wv2Warper.GetSelectedTextAsync() :
-                RichTextBox.Selection.Text;
+            // Actualizar el estado de AvalonEdit activo
+            _findReplace.IsAvalonEditActive = _isAvalonEditActive;
+
+            // Obtener texto seleccionado según el editor activo
+            string s;
+            if (_isWebView2Focused)
+                s = await _wv2Warper.GetSelectedTextAsync();
+            else if (_isAvalonEditActive && TextEditor != null)
+                s = TextEditor.SelectedText;
+            else
+                s = RichTextBox.Selection.Text;
 
             if (!(string.IsNullOrEmpty(s) || s.Contains(Environment.NewLine)))
                 _findReplace.SearchString = s;
+
+            // Inicializar posición de búsqueda en AvalonEdit
+            if (_isAvalonEditActive && TextEditor != null)
+                _findReplace.InitPosition();
 
             if (_findReplaceWindow is null || !_findReplaceWindow.IsVisible)
                 _findReplaceWindow = new()
@@ -1442,21 +1471,40 @@ namespace Calcpad.Wpf
 
         private void FileOpen(string fileName)
         {
-            if (_isParsing)
-                _parser.Cancel();
+            try
+            {
+                if (_isParsing)
+                    _parser.Cancel();
 
-            // Clear previous output when opening new file
-            _wv2Warper.NavigateToBlank();
-            IsCalculated = false;
+                // Clear previous output when opening new file
+                _wv2Warper.NavigateToBlank();
+                IsCalculated = false;
 
-            var ext = Path.GetExtension(fileName).ToLowerInvariant();
-            CurrentFileName = fileName;
+                var ext = Path.GetExtension(fileName).ToLowerInvariant();
+                CurrentFileName = fileName;
 
-            // Copy IFC files from the cpd directory to resources/ifc if they exist
-            LoadReferencedIfcFiles(fileName);
+                // Copy IFC files from the cpd directory to resources/ifc if they exist
+                try
+                {
+                    LoadReferencedIfcFiles(fileName);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[FileOpen] Error loading IFC files: {ex.Message}");
+                    // Continue loading the file even if IFC loading fails
+                }
 
-            var hasForm = GetInputTextFromFile();
-            _parser.ShowWarnings = ext != ".cpdz";
+                var hasForm = GetInputTextFromFile();
+                if (!hasForm && string.IsNullOrEmpty(InputText))
+                {
+                    // File loading failed or was cancelled
+                    System.Diagnostics.Debug.WriteLine("[FileOpen] File loading failed or cancelled");
+                    ShowHelp();
+                    return;
+                }
+
+                _parser.ShowWarnings = ext != ".cpdz";
+
             if (ext == ".cpdz")
             {
                 if (IsWebForm)
@@ -1509,6 +1557,27 @@ namespace Calcpad.Wpf
             {
                 IsSaved = true;
                 AddRecentFile(CurrentFileName);
+            }
+            }
+            catch (OutOfMemoryException)
+            {
+                MessageBox.Show(
+                    "El archivo es demasiado grande para abrirlo.\n" +
+                    "Por favor, divídalo en archivos más pequeños.",
+                    "Error de memoria",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                ShowHelp();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[FileOpen] Error: {ex.Message}\n{ex.StackTrace}");
+                MessageBox.Show(
+                    $"Error al abrir el archivo:\n{ex.Message}",
+                    "Hekatan Calc",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                ShowHelp();
             }
         }
 
@@ -2280,6 +2349,35 @@ namespace Calcpad.Wpf
             }
         }
 
+        private static async Task<string> ReadTextFromFileAsync(string fileName)
+        {
+            try
+            {
+                if (string.Equals(Path.GetExtension(fileName), ".cpdz", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (Zip.IsComposite(fileName))
+                        return Zip.DecompressWithImages(fileName);
+
+                    var f = new FileInfo(fileName)
+                    {
+                        IsReadOnly = false
+                    };
+                    using var fs = f.OpenRead();
+                    return Zip.DecompressToString(fs);
+                }
+                else
+                {
+                    using var sr = new StreamReader(fileName, Encoding.UTF8);
+                    return await sr.ReadToEndAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex.Message);
+                return string.Empty;
+            }
+        }
+
         private static SpanLineEnumerator ReadLines(string fileName)
         {
             var lines = new SpanLineEnumerator();
@@ -2450,60 +2548,261 @@ namespace Calcpad.Wpf
 
         /// <summary>
         /// Fast file loading for AvalonEdit - bypasses RichTextBox completely
-        /// ASYNC version - loads immediately without blocking
+        /// Supports large files with wait cursor
         /// </summary>
         private bool GetInputTextFromFile_AvalonEdit()
         {
-            // Read file content directly as string
-            var fileContent = ReadTextFromFile(CurrentFileName);
-            System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEdit] File: {CurrentFileName}, Content length: {fileContent?.Length ?? 0}");
-            System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEdit] First 100 chars: {(fileContent?.Length > 0 ? fileContent.Substring(0, Math.Min(100, fileContent.Length)) : "EMPTY")}");
+            bool hasForm = false;
+            string fileContent = string.Empty;
 
-            var hasForm = false;
+            try
+            {
+                // Read file content directly as string
+                fileContent = ReadTextFromFile(CurrentFileName);
+                System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEdit] File: {CurrentFileName}, Content length: {fileContent?.Length ?? 0}");
 
-            // Quick scan for input fields without processing every line
-            hasForm = fileContent.Contains('\v') || fileContent.Contains("? {");
+                if (string.IsNullOrEmpty(fileContent))
+                {
+                    System.Diagnostics.Debug.WriteLine("[GetInputTextFromFile_AvalonEdit] File is empty or null");
+                    return false;
+                }
 
-            // Load directly to AvalonEdit ASYNCHRONOUSLY to avoid blocking UI
-            _isSyncingEditors = true;
-            _isTextChangedEnabled = false;
+                hasForm = fileContent.Contains('\v') || fileContent.Contains("? {");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEdit] Error reading file: {ex.Message}");
+                MessageBox.Show($"Error al leer el archivo:\n{ex.Message}", "Hekatan Calc", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
 
-            // Use Dispatcher.InvokeAsync to load text without blocking
-            Dispatcher.InvokeAsync(() =>
+            // Check file size for optimizations
+            var isLargeFile = fileContent.Length > 50_000; // > 50KB
+            var isVeryLargeFile = fileContent.Length > 150_000; // > 150KB
+            var isExtremelyLargeFile = fileContent.Length > 400_000; // > 400KB - handle with extra care
+
+            // Show wait cursor for large files
+            if (isLargeFile)
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+            }
+
+            // For extremely large files, show a warning and give option to cancel
+            if (isExtremelyLargeFile)
+            {
+                var result = MessageBox.Show(
+                    $"El archivo tiene {fileContent.Length / 1024} KB y puede tardar en cargar.\n" +
+                    "Se desactivarán algunas funciones de edición para mejorar el rendimiento.\n\n" +
+                    "¿Desea continuar?",
+                    "Archivo muy grande",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+                if (result == MessageBoxResult.No)
+                {
+                    Mouse.OverrideCursor = null;
+                    return false;
+                }
+            }
+
+            try
+            {
+                _isSyncingEditors = true;
+                _isTextChangedEnabled = false;
+
+                // For large files, disable highlighting and folding during load
+                var transformers = TextEditor?.TextArea?.TextView?.LineTransformers;
+                CalcpadHighlighter highlighter = null;
+
+                if (transformers != null)
+                {
+                    highlighter = transformers.FirstOrDefault(t => t is CalcpadHighlighter) as CalcpadHighlighter;
+
+                    if (isLargeFile && highlighter != null)
+                        transformers.Remove(highlighter);
+                }
+
+                if (isLargeFile && _foldingManager != null)
+                {
+                    try
+                    {
+                        ICSharpCode.AvalonEdit.Folding.FoldingManager.Uninstall(_foldingManager);
+                    }
+                    catch { /* Ignore folding errors */ }
+                    _foldingManager = null;
+                }
+
+                // Load text with BeginUpdate/EndUpdate to minimize UI updates
+                if (TextEditor?.Document != null)
+                {
+                    TextEditor.Document.BeginUpdate();
+                    try
+                    {
+                        TextEditor.Document.Text = fileContent;
+                    }
+                    finally
+                    {
+                        TextEditor.Document.EndUpdate();
+                    }
+                }
+
+                // Re-enable features for large (but not very large) files
+                if (transformers != null && isLargeFile && !isVeryLargeFile)
+                {
+                    // Re-add highlighter
+                    if (highlighter != null && !transformers.Contains(highlighter))
+                        transformers.Add(highlighter);
+
+                    // Re-install folding
+                    if (_foldingManager == null && TextEditor?.TextArea != null)
+                        _foldingManager = ICSharpCode.AvalonEdit.Folding.FoldingManager.Install(TextEditor.TextArea);
+
+                    UpdateFoldingsInternal();
+                }
+                // For very large files, leave features disabled
+
+                TextEditor?.TextArea?.TextView?.Redraw();
+            }
+            catch (OutOfMemoryException)
+            {
+                MessageBox.Show(
+                    "El archivo es demasiado grande para cargarlo.\n" +
+                    "Por favor, divídalo en archivos más pequeños.",
+                    "Error de memoria",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEdit] Error loading to editor: {ex.Message}");
+                MessageBox.Show($"Error al cargar el archivo en el editor:\n{ex.Message}", "Hekatan Calc", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+            finally
+            {
+                _isSyncingEditors = false;
+                _isTextChangedEnabled = true;
+                if (isLargeFile)
+                    Mouse.OverrideCursor = null;
+            }
+
+            _undoMan.Reset();
+            return hasForm;
+        }
+
+        private async Task GetInputTextFromFile_AvalonEditAsync()
+        {
+            var fileName = CurrentFileName;
+            System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEditAsync] Starting async load: {fileName}");
+
+            // Check file size to determine if we need special handling for large files
+            var fileInfo = new FileInfo(fileName);
+            var isLargeFile = fileInfo.Exists && fileInfo.Length > 50_000; // > 50KB = large file
+            var isVeryLargeFile = fileInfo.Exists && fileInfo.Length > 150_000; // > 150KB = very large (NO highlighting)
+
+            // Read file asynchronously in background thread FIRST
+            string fileContent = await Task.Run(() => ReadTextFromFile(fileName));
+
+            System.Diagnostics.Debug.WriteLine($"[GetInputTextFromFile_AvalonEditAsync] File read: {fileContent?.Length ?? 0} chars, isLarge: {isLargeFile}, isVeryLarge: {isVeryLargeFile}");
+
+            // Quick scan for input fields
+            var hasForm = fileContent.Contains('\v') || fileContent.Contains("? {");
+
+            // Load to AvalonEdit on UI thread with optimizations
+            System.Diagnostics.Debug.WriteLine("[DIAG] Starting Dispatcher.InvokeAsync for text load...");
+            var loadStopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    // OPTIMIZATION: Temporarily remove syntax highlighter to speed up text loading
+                    System.Diagnostics.Debug.WriteLine("[DIAG] Inside Dispatcher - setting flags");
+                    _isSyncingEditors = true;
+                    _isTextChangedEnabled = false;
+
+                    // OPTIMIZATION: For large files, disable ALL visual features during load
                     var transformers = TextEditor.TextArea.TextView.LineTransformers;
                     var highlighter = transformers.FirstOrDefault(t => t is CalcpadHighlighter);
-                    if (highlighter != null)
-                        transformers.Remove(highlighter);
+                    System.Diagnostics.Debug.WriteLine($"[DIAG] Highlighter found: {highlighter != null}");
 
-                    // Load text - this is now async and won't block
-                    TextEditor.Text = fileContent;
-
-                    // Re-add highlighter after text is loaded
-                    if (highlighter != null)
-                        transformers.Add(highlighter);
-
-                    // Force a redraw to apply highlighting (async)
-                    Dispatcher.InvokeAsync(() =>
+                    // Remove highlighter for large files
+                    if (isLargeFile && highlighter != null)
                     {
+                        transformers.Remove(highlighter);
+                        System.Diagnostics.Debug.WriteLine("[DIAG] Highlighter removed for large file");
+                    }
+
+                    // Uninstall folding for large files
+                    if (isLargeFile && _foldingManager != null)
+                    {
+                        ICSharpCode.AvalonEdit.Folding.FoldingManager.Uninstall(_foldingManager);
+                        _foldingManager = null;
+                        System.Diagnostics.Debug.WriteLine("[DIAG] Folding manager uninstalled");
+                    }
+
+                    // CRITICAL: Use Document.BeginUpdate/EndUpdate to batch all changes
+                    System.Diagnostics.Debug.WriteLine("[DIAG] Starting Document.BeginUpdate...");
+                    TextEditor.Document.BeginUpdate();
+                    try
+                    {
+                        // Clear and replace in one operation
+                        System.Diagnostics.Debug.WriteLine($"[DIAG] Setting Document.Text ({fileContent.Length} chars)...");
+                        TextEditor.Document.Text = fileContent;
+                        System.Diagnostics.Debug.WriteLine("[DIAG] Document.Text set successfully");
+                    }
+                    finally
+                    {
+                        System.Diagnostics.Debug.WriteLine("[DIAG] Calling Document.EndUpdate...");
+                        TextEditor.Document.EndUpdate();
+                        System.Diagnostics.Debug.WriteLine("[DIAG] Document.EndUpdate completed");
+                    }
+
+                    // For very large files, don't re-enable features automatically
+                    // User can manually enable them or wait for gradual enabling
+                    if (isVeryLargeFile)
+                    {
+                        System.Diagnostics.Debug.WriteLine("[GetInputTextFromFile_AvalonEditAsync] Very large file - features disabled");
+                        // Don't re-enable highlighter or folding for very large files
+                        // User experience is better with plain text than with frozen UI
+                    }
+                    else if (isLargeFile)
+                    {
+                        // For large (but not very large) files, re-enable after delay
+                        Dispatcher.InvokeAsync(async () =>
+                        {
+                            // Wait a bit for UI to settle
+                            await Task.Delay(500);
+
+                            // Re-add highlighter
+                            if (highlighter != null && !transformers.Contains(highlighter))
+                                transformers.Add(highlighter);
+
+                            // Re-install folding
+                            if (_foldingManager == null)
+                            {
+                                _foldingManager = ICSharpCode.AvalonEdit.Folding.FoldingManager.Install(TextEditor.TextArea);
+                            }
+
+                            UpdateFoldingsInternal();
+                            TextEditor.TextArea.TextView.Redraw();
+                            System.Diagnostics.Debug.WriteLine("[GetInputTextFromFile_AvalonEditAsync] Large file features re-enabled");
+                        }, System.Windows.Threading.DispatcherPriority.Background);
+                    }
+                    else
+                    {
+                        // Normal file - apply features immediately
                         TextEditor.TextArea.TextView.Redraw();
                         UpdateFoldingsInternal();
-                    }, System.Windows.Threading.DispatcherPriority.Background);
+                    }
                 }
                 finally
                 {
                     _isSyncingEditors = false;
                     _isTextChangedEnabled = true;
                 }
-            }, System.Windows.Threading.DispatcherPriority.Render); // Use Render priority for immediate display
+            }, System.Windows.Threading.DispatcherPriority.Render);
 
-            // Reset undo immediately
-            _undoMan.Reset();
-
-            return hasForm;
+            // Reset undo
+            await Dispatcher.InvokeAsync(() => _undoMan.Reset());
         }
 
         /// <summary>
@@ -3674,41 +3973,50 @@ namespace Calcpad.Wpf
 
         private void TryOpenOnStartup()
         {
-            var args = Environment.GetCommandLineArgs();
-            var n = args.Length;
-            if (n > 1)
+            try
             {
-                var s = string.Join(" ", args, 1, n - 1);
-                if (File.Exists(s))
+                var args = Environment.GetCommandLineArgs();
+                var n = args.Length;
+                if (n > 1)
                 {
-                    var ex = Path.GetExtension(s).ToLowerInvariant();
-                    if (ex == ".cpd" || ex == ".cpdz")
+                    var s = string.Join(" ", args, 1, n - 1);
+                    if (File.Exists(s))
                     {
-                        _parser.ShowWarnings = ex != ".cpdz";
-                        CurrentFileName = s;
-                        var hasForm = GetInputTextFromFile() || ex == ".cpdz";
-                        SetButton(WebFormButton, false);
-                        if (hasForm)
+                        var ex = Path.GetExtension(s).ToLowerInvariant();
+                        if (ex == ".cpd" || ex == ".cpdz")
                         {
-                            RunWebForm();
-                            _mustPromptUnlock = true;
-                            if (ex == ".cpdz")
-                                WebFormButton.Visibility = Visibility.Hidden;
+                            _parser.ShowWarnings = ex != ".cpdz";
+                            CurrentFileName = s;
+                            var hasForm = GetInputTextFromFile() || ex == ".cpdz";
+                            SetButton(WebFormButton, false);
+                            if (hasForm)
+                            {
+                                RunWebForm();
+                                _mustPromptUnlock = true;
+                                if (ex == ".cpdz")
+                                    WebFormButton.Visibility = Visibility.Hidden;
+                            }
+                            else
+                            {
+                                ForceHighlight();
+                                IsCalculated = true;
+                                _wv2Warper.NavigateToBlank();
+                                Dispatcher.InvokeAsync(() => CalculateAsync(), DispatcherPriority.ApplicationIdle);
+                            }
+                            AddRecentFile(CurrentFileName);
+                            return;
                         }
-                        else
-                        {
-                            ForceHighlight();
-                            IsCalculated = true;
-                            _wv2Warper.NavigateToBlank();
-                            Dispatcher.InvokeAsync(() => CalculateAsync(), DispatcherPriority.ApplicationIdle);
-                        }
-                        AddRecentFile(CurrentFileName);
-                        return;
                     }
                 }
+                ShowHelp();
+                DispatchLineNumbers();
             }
-            ShowHelp();
-            DispatchLineNumbers();
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[TryOpenOnStartup] Error: {ex.Message}");
+                ShowHelp();
+                DispatchLineNumbers();
+            }
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -5412,11 +5720,23 @@ namespace Calcpad.Wpf
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            await InitializeWebViewer();
-            TryOpenOnStartup();
-            TryRestoreState();
-            RichTextBox.Focus();
-            Keyboard.Focus(RichTextBox);
+            try
+            {
+                await InitializeWebViewer();
+                TryOpenOnStartup();
+                TryRestoreState();
+                RichTextBox.Focus();
+                Keyboard.Focus(RichTextBox);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Window_ContentRendered] Error: {ex.Message}\n{ex.StackTrace}");
+                MessageBox.Show(
+                    $"Error durante la inicialización:\n{ex.Message}",
+                    "Hekatan Calc",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         private async Task InitializeWebViewer()
@@ -6265,6 +6585,7 @@ namespace Calcpad.Wpf
                     TextEditor.Visibility = Visibility.Collapsed;
                     RichTextBox.Visibility = Visibility.Visible;
                     _isAvalonEditActive = false;
+                    _findReplace.IsAvalonEditActive = false;
                     EditorToggleButton.ToolTip = "Switch to AvalonEdit (Advanced Editor)";
                     RichTextBox.Focus();
                 }
@@ -6275,6 +6596,7 @@ namespace Calcpad.Wpf
                     RichTextBox.Visibility = Visibility.Collapsed;
                     TextEditor.Visibility = Visibility.Visible;
                     _isAvalonEditActive = true;
+                    _findReplace.IsAvalonEditActive = true;
                     EditorToggleButton.ToolTip = "Switch to RichTextBox (Classic Editor)";
                     TextEditor.Focus();
                 }
@@ -6957,73 +7279,44 @@ namespace Calcpad.Wpf
                 {
                     string ifcFilePath = dialog.FileName;
                     string fileName = System.IO.Path.GetFileName(ifcFilePath);
+                    long fileSizeMB = new System.IO.FileInfo(ifcFilePath).Length / (1024 * 1024);
 
                     // Preguntar al usuario qué modo desea
                     var result = MessageBox.Show(
-                        "¿Qué modo de edición desea usar?\n\n" +
-                        "SÍ = @{code} (HTML/JS completo editable)\n" +
-                        "NO = @{ucode} (Directivas simplificadas)",
-                        "Seleccionar modo IFC",
+                        $"Archivo: {fileName} ({fileSizeMB} MB)\n\n" +
+                        "¿Qué modo de carga desea usar?\n\n" +
+                        "SÍ = EMBEBIDO (IFC dentro del HTML, sin copiar archivos)\n" +
+                        "NO = REFERENCIA (copia IFC a resources/ifc)",
+                        "Modo de carga IFC",
                         MessageBoxButton.YesNoCancel,
                         MessageBoxImage.Question);
 
                     if (result == MessageBoxResult.Cancel) return;
-                    bool useCodeMode = (result == MessageBoxResult.Yes);
-
-                    // Copiar el archivo IFC al directorio resources/ifc
-                    string ifcResourcePath = System.IO.Path.Combine(AppInfo.Path, "resources", "ifc");
-                    if (!System.IO.Directory.Exists(ifcResourcePath))
-                    {
-                        System.IO.Directory.CreateDirectory(ifcResourcePath);
-                    }
-                    string tempIfcName = $"temp_{Guid.NewGuid():N}.ifc";
-                    string destIfcPath = System.IO.Path.Combine(ifcResourcePath, tempIfcName);
-                    System.IO.File.Copy(ifcFilePath, destIfcPath, true);
+                    bool useEmbeddedMode = (result == MessageBoxResult.Yes);
 
                     string wrappedCode;
-                    if (useCodeMode)
+
+                    if (useEmbeddedMode)
                     {
-                        // Generar el HTML completo del visor IFC para editar
-                        string viewerHtml = Calcpad.Common.MultLangCode.IfcLanguageHandler.GenerateFileBasedViewer(tempIfcName, fileName);
-                        // @{code}...@{end code} envuelve @{html-ifc} con HTML/JS completo
-                        wrappedCode = $"@{{code}}\r\n@{{html-ifc}}\r\n{viewerHtml}\r\n@{{end html-ifc}}\r\n@{{end code}}";
+                        // NUEVO: Modo embebido - IFC como Base64 dentro del HTML
+                        // No necesita copiar archivos, funciona desde cualquier ubicación
+                        string viewerHtml = Calcpad.Common.MultLangCode.IfcLanguageHandler.GenerateEmbeddedViewer(ifcFilePath, fileName);
+                        wrappedCode = $"@{{code}}\r\n@{{html-ifc}}\r\n{viewerHtml}\r\n@{{end code}}";
                     }
                     else
                     {
-                        // @{ucode}...@{end ucode} - visor IFC con todas las directivas
-                        wrappedCode = $@"@{{ucode}}
-@{{visor: https://calcpad.ifc/{tempIfcName}}}
-@{{fondo: #1a1a2e}}
-@{{altura: 600}}
+                        // Modo tradicional: copiar archivo a resources/ifc
+                        string ifcResourcePath = System.IO.Path.Combine(AppInfo.Path, "resources", "ifc");
+                        if (!System.IO.Directory.Exists(ifcResourcePath))
+                        {
+                            System.IO.Directory.CreateDirectory(ifcResourcePath);
+                        }
+                        string tempIfcName = $"temp_{Guid.NewGuid():N}.ifc";
+                        string destIfcPath = System.IO.Path.Combine(ifcResourcePath, tempIfcName);
+                        System.IO.File.Copy(ifcFilePath, destIfcPath, true);
 
-// === Camara y Luces ===
-@{{camara: tipo=perspectiva, pos=50,50,50, target=0,0,0, fov=75}}
-@{{luz: color=#ffffff}}
-@{{luz.ambiente: intensidad=0.5}}
-@{{luz.direccional: intensidad=0.8}}
-
-// === Visualizacion ===
-@{{grid: si, tamano=100, divisiones=20}}
-@{{ejes: si}}
-@{{sombras: si}}
-@{{wireframe: no}}
-@{{opacidad: 1}}
-@{{controles: vistas, zoom, rotacion, color}}
-
-// === Panel VSCode-style (descomenta para activar) ===
-// @{{seleccion: si}}
-// @{{propiedades: si}}
-// @{{arbol: si}}
-
-// === Objetos 3D personalizados (descomenta para agregar) ===
-// @{{cubo: pos=0,5,0, size=10, color=#ff0000}}
-// @{{esfera: pos=20,5,0, radio=5, color=#00ff00}}
-// @{{cilindro: pos=-20,10,0, radio=3, altura=20, color=#0000ff}}
-
-// === Anotaciones (descomenta para agregar) ===
-// @{{marcador: pos=0,15,0, texto=Etiqueta, color=#ffffff}}
-// @{{medida: desde=0,0,0, hasta=20,0,0, color=#ffff00}}
-@{{end ucode}}";
+                        string viewerHtml = Calcpad.Common.MultLangCode.IfcLanguageHandler.GenerateSimpleViewer(tempIfcName, fileName);
+                        wrappedCode = $"@{{code}}\r\n@{{html-ifc}}\r\n{viewerHtml}\r\n@{{end code}}";
                     }
 
                     // Mostrar el código HTML en AvalonEdit para edición

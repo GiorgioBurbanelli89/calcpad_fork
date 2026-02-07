@@ -1,27 +1,27 @@
-; Inno Setup Script para Calcpad Fork WPF
+; Inno Setup Script para Hekatan Calc
 ; Genera un instalador setup.exe con todo incluido
 
-#define MyAppName "Calcpad Fork"
-#define MyAppVersion "1.0.5"
-#define MyAppPublisher "Calcpad Fork Project"
-#define MyAppURL "https://github.com/GiorgioBurbanelli89/calcpad_fork"
-#define MyAppExeName "Calcpad.exe"
+#define MyAppName "Hekatan Calc"
+#define MyAppVersion "1.0.7"
+#define MyAppPublisher "Hekatan Project"
+#define MyAppURL "https://github.com/GiorgioBurbanelli89/hekatan"
+#define MyAppExeName "HekatanCalc.exe"
 
 [Setup]
 ; Información de la aplicación
-AppId={{A7C8E3F2-5B4D-4C6E-8F1A-2D9B7E4C6A5F}
+AppId={{B8D9F4G3-6C5E-5D7F-9G2B-3E0C8F5D7B6G}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\CalcpadFork
-DefaultGroupName=Calcpad Fork
+DefaultDirName={autopf}\HekatanCalc
+DefaultGroupName=Hekatan Calc
 AllowNoIcons=yes
 LicenseFile=LICENSE
 OutputDir=.\Installer
-OutputBaseFilename=CalcpadFork-Setup-{#MyAppVersion}
+OutputBaseFilename=HekatanCalc-Setup-{#MyAppVersion}
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -37,11 +37,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
-Name: "fileassoc"; Description: "Asociar archivos .cpd con {#MyAppName}"; GroupDescription: "Asociaciones de archivos:"
+Name: "fileassoc"; Description: "Asociar archivos .cpd con Hekatan Calc"; GroupDescription: "Asociaciones de archivos:"
 
 [Files]
-; Ejecutable principal de Calcpad.Wpf y todas sus dependencias
-Source: "Calcpad.Wpf\bin\Release\net10.0-windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+; Ejecutable principal - EXCLUYENDO runtimes de Linux/OSX para reducir tamaño
+; (de 229MB a ~100MB)
+Source: "Calcpad.Wpf\bin\Release\net10.0-windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Excludes: "runtimes\linux*,runtimes\osx*,runtimes\linux-*,*.dylib,tools\node_modules\three\examples\*,tools\node_modules\web-ifc\web-ifc-api-node.js,*.ifc"
 
 ; Configuración de lenguajes externos actualizada (CSS, HTML, TypeScript, etc.)
 Source: "Calcpad.Common\MultLangCode\MultLangConfig.json"; DestDir: "{app}"; Flags: ignoreversion
@@ -62,8 +63,25 @@ Source: "Examples\Demo_Generar_y_Guardar_Archivos.cpd"; DestDir: "{app}\Examples
 Source: "Examples\Test_TypeScript_@ts.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "Examples\TypeScript_en_Calcpad.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
 
-; Otros ejemplos existentes
-Source: "Examples\*"; DestDir: "{app}\Examples"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
+; Otros ejemplos existentes - SOLO archivos pequeños (NO incluir *.ifc, *.py, etc.)
+Source: "Examples\*.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
+; Excluir HTML temporales de prueba - solo incluir visores IFC esenciales
+Source: "Examples\visor ifc.html"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "Examples\IFC-Viewer-Standalone.html"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
+
+; Incluir subcarpetas de ejemplos importantes (sin archivos temporales)
+Source: "Examples\Mathematics\*"; DestDir: "{app}\Examples\Mathematics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__"
+Source: "Examples\Mechanics\*"; DestDir: "{app}\Examples\Mechanics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__"
+Source: "Examples\Physics\*"; DestDir: "{app}\Examples\Physics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__"
+Source: "Examples\Binario IFC\*"; DestDir: "{app}\Examples\Binario IFC"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
+; Incluir libs necesarios para IFC (web-ifc, three.js)
+Source: "Examples\libs\*"; DestDir: "{app}\Examples\libs"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
+
+; ===== ARCHIVOS EXCLUIDOS DEL INSTALADOR =====
+; NO incluir: *.ifc (archivos 3D gigantes hasta 1.1GB)
+; NO incluir: *.EDB, *.$et, *.sdb (modelos ETABS/SAP2000)
+; NO incluir: *.py (scripts Python de desarrollo)
+; NO incluir: temp_*.html, test-*.html (archivos de prueba temporales)
 
 ; Documentación general
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme skipifsourcedoesntexist
@@ -104,10 +122,10 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Fil
 
 [Registry]
 ; Asociación de archivos .cpd
-Root: HKA; Subkey: "Software\Classes\.cpd"; ValueType: string; ValueName: ""; ValueData: "CalcpadFile"; Flags: uninsdeletevalue; Tasks: fileassoc
-Root: HKA; Subkey: "Software\Classes\CalcpadFile"; ValueType: string; ValueName: ""; ValueData: "Calcpad File"; Flags: uninsdeletekey; Tasks: fileassoc
-Root: HKA; Subkey: "Software\Classes\CalcpadFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: fileassoc
-Root: HKA; Subkey: "Software\Classes\CalcpadFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: fileassoc
+Root: HKA; Subkey: "Software\Classes\.cpd"; ValueType: string; ValueName: ""; ValueData: "HekatanCalcFile"; Flags: uninsdeletevalue; Tasks: fileassoc
+Root: HKA; Subkey: "Software\Classes\HekatanCalcFile"; ValueType: string; ValueName: ""; ValueData: "Hekatan Calc File"; Flags: uninsdeletekey; Tasks: fileassoc
+Root: HKA; Subkey: "Software\Classes\HekatanCalcFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: fileassoc
+Root: HKA; Subkey: "Software\Classes\HekatanCalcFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: fileassoc
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

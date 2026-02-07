@@ -501,6 +501,394 @@ namespace Calcpad.Common.MultLangCode
         }
 
         /// <summary>
+        /// Generate SIMPLE HTML viewer (minimal code, like Visor IFC.cpd)
+        /// Clean code without toolbars, panels, or extra features
+        /// Uses virtual host for all resources: https://calcpad.ifc/
+        /// </summary>
+        /// <param name="ifcFileName">Name of the IFC file in the virtual host directory</param>
+        /// <param name="displayName">Display name for the file</param>
+        public static string GenerateSimpleViewer(string ifcFileName, string displayName)
+        {
+            return $@"<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {{ margin: 0; background: #1a1a1a; }}
+#viewer {{ width: 100%; height: 500px; }}
+canvas {{ width: 100%; height: 100%; }}
+.loading {{ position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #4fc3f7; font-family: Arial; text-align: center; }}
+.loading .spinner {{ border: 3px solid #333; border-top: 3px solid #4fc3f7; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }}
+@keyframes spin {{ 0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }} }}
+</style>
+</head>
+<body>
+
+<div id=""viewer"">
+    <canvas id=""canvas""></canvas>
+    <div class=""loading"" id=""loading"">
+        <div class=""spinner""></div>
+        <div id=""status"">Detectando entorno...</div>
+    </div>
+</div>
+
+<script>
+// Detectar si estamos en WPF (virtual host) o CLI (localhost/CDN)
+const isWpf = window.location.hostname === 'calcpad.ifc';
+
+// URLs de librerias segun el entorno
+const libs = {{
+    three: isWpf ? 'https://calcpad.ifc/three.min.js' : 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js',
+    orbit: isWpf ? 'https://calcpad.ifc/OrbitControls.js' : 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js',
+    webifc: isWpf ? 'https://calcpad.ifc/web-ifc-api-iife.js' : 'https://cdn.jsdelivr.net/npm/web-ifc@0.0.66/web-ifc-api-iife.js'
+}};
+
+// Cargar script dinamicamente
+function loadScript(url) {{
+    return new Promise((resolve, reject) => {{
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    }});
+}}
+
+// Iniciar carga
+(async () => {{
+    const loading = document.getElementById('loading');
+    const status = document.getElementById('status');
+
+    try {{
+        status.textContent = 'Cargando Three.js (' + (isWpf ? 'WPF' : 'CDN') + ')...';
+        await loadScript(libs.three);
+
+        status.textContent = 'Cargando OrbitControls...';
+        await loadScript(libs.orbit);
+
+        status.textContent = 'Cargando web-ifc...';
+        await loadScript(libs.webifc);
+
+        // ============ VISOR IFC ============
+        const canvas = document.getElementById('canvas');
+        const container = document.getElementById('viewer');
+
+        // ESCENA
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+
+        // CAMARA
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 10000);
+        camera.position.set(20, 20, 20);
+
+        // RENDERER
+        const renderer = new THREE.WebGLRenderer({{ canvas, antialias: true }});
+        renderer.setSize(container.clientWidth, container.clientHeight);
+
+        // CONTROLES
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // LUCES
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const luz = new THREE.DirectionalLight(0xffffff, 0.8);
+        luz.position.set(50, 100, 50);
+        scene.add(luz);
+
+        // GRID
+        scene.add(new THREE.GridHelper(50, 50, 0x444444, 0x333333));
+
+        // CARGAR IFC
+        status.textContent = 'Inicializando web-ifc...';
+        const ifcApi = new WebIFC.IfcAPI();
+
+        // Configurar WASM segun entorno
+        if (isWpf) {{
+            await ifcApi.Init(p => p.endsWith('.wasm') ? 'https://calcpad.ifc/' + p : p);
+        }} else {{
+            await ifcApi.Init();
+        }}
+
+        status.textContent = 'Cargando modelo IFC...';
+        // URL del modelo segun entorno
+        const ifcUrl = isWpf ? 'https://calcpad.ifc/{ifcFileName}' : '{ifcFileName}';
+        const response = await fetch(ifcUrl);
+
+        if (!response.ok) {{
+            throw new Error('No se encontro el archivo IFC (' + response.status + ')');
+        }}
+
+        const data = await response.arrayBuffer();
+        const modelID = ifcApi.OpenModel(new Uint8Array(data));
+        const flatMeshes = ifcApi.LoadAllGeometry(modelID);
+
+        // CONVERTIR IFC A THREE.JS
+        status.textContent = 'Procesando geometria...';
+        const grupo = new THREE.Group();
+
+        for (let i = 0; i < flatMeshes.size(); i++) {{
+            const fm = flatMeshes.get(i);
+            for (let j = 0; j < fm.geometries.size(); j++) {{
+                const pg = fm.geometries.get(j);
+                const geom = ifcApi.GetGeometry(modelID, pg.geometryExpressID);
+                const verts = ifcApi.GetVertexArray(geom.GetVertexData(), geom.GetVertexDataSize());
+                const indices = ifcApi.GetIndexArray(geom.GetIndexData(), geom.GetIndexDataSize());
+
+                if (!verts.length || !indices.length) continue;
+
+                const positions = new Float32Array(verts.length / 2);
+                for (let k = 0; k < verts.length; k += 6) {{
+                    const n = (k / 6) * 3;
+                    positions[n] = verts[k];
+                    positions[n + 1] = verts[k + 1];
+                    positions[n + 2] = verts[k + 2];
+                }}
+
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+                geometry.computeVertexNormals();
+
+                const material = new THREE.MeshPhongMaterial({{
+                    color: new THREE.Color(pg.color.x, pg.color.y, pg.color.z),
+                    side: THREE.DoubleSide,
+                    transparent: pg.color.w < 1,
+                    opacity: pg.color.w
+                }});
+
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.applyMatrix4(new THREE.Matrix4().fromArray(pg.flatTransformation));
+                grupo.add(mesh);
+            }}
+        }}
+
+        scene.add(grupo);
+        ifcApi.CloseModel(modelID);
+
+        // CENTRAR VISTA
+        const box = new THREE.Box3().setFromObject(grupo);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = Math.max(...box.getSize(new THREE.Vector3()).toArray());
+
+        camera.position.set(center.x + size, center.y + size, center.z + size);
+        controls.target.copy(center);
+        controls.update();
+
+        loading.style.display = 'none';
+
+        // ANIMACION
+        function animate() {{
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }}
+        animate();
+
+    }} catch (error) {{
+        loading.innerHTML = '<div style=""color: #e74c3c;"">Error: ' + error.message + '</div>' +
+            '<div style=""color: #888; font-size: 12px; margin-top: 10px;"">' +
+            'Entorno: ' + (isWpf ? 'WPF (Virtual Host)' : 'CLI (CDN)') + '<br>' +
+            'Coloca el archivo IFC en el mismo directorio.</div>';
+    }}
+}})();
+</script>
+
+</body>
+</html>";
+        }
+
+        /// <summary>
+        /// Generate HTML viewer with EMBEDDED IFC data (Base64)
+        /// This allows loading IFC files from ANY location without copying them
+        /// The IFC file is read as bytes and embedded directly in the HTML
+        /// </summary>
+        /// <param name="ifcFilePath">Full path to the IFC file</param>
+        /// <param name="displayName">Display name for the file</param>
+        public static string GenerateEmbeddedViewer(string ifcFilePath, string displayName)
+        {
+            // Read IFC file and convert to Base64
+            byte[] ifcBytes = File.ReadAllBytes(ifcFilePath);
+            string ifcBase64 = Convert.ToBase64String(ifcBytes);
+            long fileSizeMB = ifcBytes.Length / (1024 * 1024);
+
+            return $@"<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {{ margin: 0; background: #1a1a1a; }}
+#viewer {{ width: 100%; height: 500px; }}
+canvas {{ width: 100%; height: 100%; }}
+.loading {{ position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #4fc3f7; font-family: Arial; text-align: center; }}
+.loading .spinner {{ border: 3px solid #333; border-top: 3px solid #4fc3f7; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }}
+@keyframes spin {{ 0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }} }}
+.info {{ position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; font-family: Arial; font-size: 12px; color: #888; }}
+</style>
+</head>
+<body>
+
+<div id=""viewer"">
+    <canvas id=""canvas""></canvas>
+    <div class=""loading"" id=""loading"">
+        <div class=""spinner""></div>
+        <div id=""status"">Cargando...</div>
+    </div>
+    <div class=""info"">
+        <div style=""color: #4fc3f7; font-weight: bold;"">{displayName}</div>
+        <div>Tamaño: {fileSizeMB} MB (embebido)</div>
+    </div>
+</div>
+
+<script>
+// IFC embebido como Base64 - NO necesita copiar archivos
+const ifcBase64 = '{ifcBase64}';
+
+// Detectar entorno
+const isWpf = window.location.hostname === 'calcpad.ifc';
+
+// URLs de librerias
+const libs = {{
+    three: isWpf ? 'https://calcpad.ifc/three.min.js' : 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js',
+    orbit: isWpf ? 'https://calcpad.ifc/OrbitControls.js' : 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js',
+    webifc: isWpf ? 'https://calcpad.ifc/web-ifc-api-iife.js' : 'https://cdn.jsdelivr.net/npm/web-ifc@0.0.66/web-ifc-api-iife.js'
+}};
+
+function loadScript(url) {{
+    return new Promise((resolve, reject) => {{
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    }});
+}}
+
+// Convertir Base64 a ArrayBuffer
+function base64ToArrayBuffer(base64) {{
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {{
+        bytes[i] = binaryString.charCodeAt(i);
+    }}
+    return bytes;
+}}
+
+(async () => {{
+    const status = document.getElementById('status');
+    const loading = document.getElementById('loading');
+
+    try {{
+        status.textContent = 'Cargando Three.js...';
+        await loadScript(libs.three);
+        await loadScript(libs.orbit);
+
+        status.textContent = 'Cargando web-ifc...';
+        await loadScript(libs.webifc);
+
+        const canvas = document.getElementById('canvas');
+        const container = document.getElementById('viewer');
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 10000);
+        camera.position.set(20, 20, 20);
+
+        const renderer = new THREE.WebGLRenderer({{ canvas, antialias: true }});
+        renderer.setSize(container.clientWidth, container.clientHeight);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const luz = new THREE.DirectionalLight(0xffffff, 0.8);
+        luz.position.set(50, 100, 50);
+        scene.add(luz);
+        scene.add(new THREE.GridHelper(50, 50, 0x444444, 0x333333));
+
+        status.textContent = 'Inicializando web-ifc...';
+        const ifcApi = new WebIFC.IfcAPI();
+        if (isWpf) {{
+            await ifcApi.Init(p => p.endsWith('.wasm') ? 'https://calcpad.ifc/' + p : p);
+        }} else {{
+            await ifcApi.Init();
+        }}
+
+        status.textContent = 'Decodificando IFC embebido...';
+        const ifcData = base64ToArrayBuffer(ifcBase64);
+
+        status.textContent = 'Procesando modelo IFC...';
+        const modelID = ifcApi.OpenModel(ifcData);
+        const flatMeshes = ifcApi.LoadAllGeometry(modelID);
+
+        status.textContent = 'Generando geometria 3D...';
+        const grupo = new THREE.Group();
+
+        for (let i = 0; i < flatMeshes.size(); i++) {{
+            const fm = flatMeshes.get(i);
+            for (let j = 0; j < fm.geometries.size(); j++) {{
+                const pg = fm.geometries.get(j);
+                const geom = ifcApi.GetGeometry(modelID, pg.geometryExpressID);
+                const verts = ifcApi.GetVertexArray(geom.GetVertexData(), geom.GetVertexDataSize());
+                const indices = ifcApi.GetIndexArray(geom.GetIndexData(), geom.GetIndexDataSize());
+
+                if (!verts.length || !indices.length) continue;
+
+                const positions = new Float32Array(verts.length / 2);
+                for (let k = 0; k < verts.length; k += 6) {{
+                    const n = (k / 6) * 3;
+                    positions[n] = verts[k];
+                    positions[n + 1] = verts[k + 1];
+                    positions[n + 2] = verts[k + 2];
+                }}
+
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+                geometry.computeVertexNormals();
+
+                const material = new THREE.MeshPhongMaterial({{
+                    color: new THREE.Color(pg.color.x, pg.color.y, pg.color.z),
+                    side: THREE.DoubleSide,
+                    transparent: pg.color.w < 1,
+                    opacity: pg.color.w
+                }});
+
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.applyMatrix4(new THREE.Matrix4().fromArray(pg.flatTransformation));
+                grupo.add(mesh);
+            }}
+        }}
+
+        scene.add(grupo);
+        ifcApi.CloseModel(modelID);
+
+        const box = new THREE.Box3().setFromObject(grupo);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = Math.max(...box.getSize(new THREE.Vector3()).toArray());
+
+        camera.position.set(center.x + size, center.y + size, center.z + size);
+        controls.target.copy(center);
+        controls.update();
+
+        loading.style.display = 'none';
+
+        function animate() {{
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }}
+        animate();
+
+    }} catch (error) {{
+        loading.innerHTML = '<div style=""color: #e74c3c;"">Error: ' + error.message + '</div>';
+    }}
+}})();
+</script>
+
+</body>
+</html>";
+        }
+
+        /// <summary>
         /// Generate HTML viewer that loads IFC file from virtual host
         /// Uses virtual host for all resources: https://calcpad.ifc/
         /// </summary>
@@ -2224,9 +2612,11 @@ namespace Calcpad.Common.MultLangCode
 
             if (isHtml)
             {
-                // Content is already HTML - process IFC file references
-                // Look for https://calcpad.ifc/*.ifc URLs and ensure the IFC files exist
-                return ProcessHtmlIfcReferences(trimmedContent);
+                // Content is already HTML - return as-is WITHOUT extracting
+                // The Converter will handle URL conversions for CLI vs WPF
+                // Don't validate file existence here - files may be in different locations
+                // Keep the full HTML document intact so Converter can detect it
+                return trimmedContent;
             }
 
             // Content is a file path - process as before
