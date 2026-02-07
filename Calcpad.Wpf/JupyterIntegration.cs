@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -177,15 +178,41 @@ namespace Calcpad.Wpf
 
                 File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Proceso iniciado, esperando servidor...\n");
 
-                // Esperar con actualización de progreso
+                // Esperar activamente hasta que el servidor responda (max 30 segundos)
                 progressWindow.UpdateMessage($"Esperando servidor... ({stopwatch.ElapsedMilliseconds} ms)");
-                for (int i = 0; i < 30; i++) // 3 segundos total
+                bool serverReady = false;
+                using (var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(2) })
                 {
-                    await Task.Delay(100);
-                    progressWindow.UpdateMessage($"Esperando servidor... ({stopwatch.ElapsedMilliseconds} ms)");
+                    for (int i = 0; i < 60; i++) // 60 × 500ms = 30 segundos max
+                    {
+                        try
+                        {
+                            var response = await httpClient.GetAsync($"http://localhost:{_port}/api?token={_token}");
+                            if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                            {
+                                serverReady = true;
+                                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Servidor respondió OK (intento {i + 1})\n");
+                                break;
+                            }
+                        }
+                        catch { /* servidor aún no listo */ }
+
+                        await Task.Delay(500);
+                        progressWindow.UpdateMessage($"Esperando servidor... ({stopwatch.ElapsedMilliseconds} ms)");
+                    }
                 }
 
-                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Servidor debe estar listo\n");
+                if (!serverReady)
+                {
+                    File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] TIMEOUT: servidor no respondió en 30s\n");
+                    progressWindow.Close();
+                    MessageBox.Show("El servidor Jupyter no respondió a tiempo.\nIntenta nuevamente.",
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    StopJupyterServer();
+                    return false;
+                }
+
+                File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Servidor listo!\n");
 
                 _isRunning = true;
                 File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] Inicializando WebView2...\n");

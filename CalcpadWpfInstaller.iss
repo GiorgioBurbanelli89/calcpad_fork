@@ -2,7 +2,7 @@
 ; Genera un instalador setup.exe con todo incluido
 
 #define MyAppName "Hekatan Calc"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Hekatan Project"
 #define MyAppURL "https://github.com/GiorgioBurbanelli89/hekatan"
 #define MyAppExeName "HekatanCalc.exe"

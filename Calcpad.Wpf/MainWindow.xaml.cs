@@ -1392,7 +1392,16 @@ namespace Calcpad.Wpf
         private void Command_Paste(object sender, ExecutedRoutedEventArgs e)
         {
             if (_isWebView2Focused)
-                WebViewer.CoreWebView2.ExecuteScriptAsync($"var input = document.activeElement; input.setRangeText('{Clipboard.GetText()}', input.selectionStart, input.selectionEnd, 'end');");
+            {
+                var text = Clipboard.GetText();
+                if (!string.IsNullOrEmpty(text))
+                {
+                    // Escape for JavaScript template literal
+                    var escaped = text.Replace("\\", "\\\\").Replace("`", "\\`").Replace("${", "\\${");
+                    WebViewer.CoreWebView2.ExecuteScriptAsync(
+                        $"document.execCommand('insertText', false, `{escaped}`);");
+                }
+            }
             else if(InputFrame.Visibility == Visibility.Visible)
             {
                 RichTextBox.Paste();
