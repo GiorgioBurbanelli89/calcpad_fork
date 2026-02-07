@@ -47,74 +47,48 @@ Source: "Calcpad.Wpf\bin\Release\net10.0-windows\*"; DestDir: "{app}"; Flags: ig
 ; Configuración de lenguajes externos actualizada (CSS, HTML, TypeScript, etc.)
 Source: "Calcpad.Common\MultLangCode\MultLangConfig.json"; DestDir: "{app}"; Flags: ignoreversion
 
-; Ejemplos de HTML + CSS + TypeScript
-Source: "Examples\Practica_Simple_HTML_CSS_TS.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "Examples\Practica_HTML_CSS_TS_Combinado.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "Examples\Practica_Avanzada_Reactive_HTML_CSS_TS.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
+; ===== EJEMPLOS EN DOCUMENTOS DEL USUARIO =====
+; Se instalan en: Documentos\Hekatan Calc\Examples
 
-; Ejemplos corregidos con CSS en HTML (sin @{css} separado)
-Source: "Examples\Practica_Simple_HTML_TS_CORREGIDA.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "Examples\Practica_Avanzada_Reactive_CORREGIDA.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
+; Ejemplos organizados por categoría
+Source: "Examples\cpd\awatif\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\Awatif - Análisis Estructural"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "Examples\cpd\fem-mesh\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\FEM - Elementos Finitos"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "Examples\cpd\html-css-ts\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\HTML CSS TypeScript"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "Examples\cpd\ifc-viewer\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\IFC - Visor 3D"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "Examples\cpd\parsers-multilang\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\Parsers - Multi-Lenguaje"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "Examples\cpd\svg\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\SVG - Gráficos Vectoriales"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "Examples\cpd\silvana-proyecto\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\Proyecto Ejemplo"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "Examples\cpd\otros\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\Otros"; Flags: ignoreversion skipifsourcedoesntexist
 
-; Ejemplo de generación y guardado de archivos web
-Source: "Examples\Demo_Generar_y_Guardar_Archivos.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
+; Ejemplos clásicos de Calcpad (Mathematics, Mechanics, Physics)
+Source: "Examples\Mathematics\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\Mathematics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__,*.txt"
+Source: "Examples\Mechanics\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\Mechanics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__,*.txt"
+Source: "Examples\Physics\*"; DestDir: "{userdocs}\Hekatan Calc\Examples\Physics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__"
 
-; Ejemplos de TypeScript
-Source: "Examples\Test_TypeScript_@ts.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "Examples\TypeScript_en_Calcpad.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
-
-; Otros ejemplos existentes - SOLO archivos pequeños (NO incluir *.ifc, *.py, etc.)
-Source: "Examples\*.cpd"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
-; Excluir HTML temporales de prueba - solo incluir visores IFC esenciales
-Source: "Examples\visor ifc.html"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "Examples\IFC-Viewer-Standalone.html"; DestDir: "{app}\Examples"; Flags: ignoreversion skipifsourcedoesntexist
-
-; Incluir subcarpetas de ejemplos importantes (sin archivos temporales)
-Source: "Examples\Mathematics\*"; DestDir: "{app}\Examples\Mathematics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__"
-Source: "Examples\Mechanics\*"; DestDir: "{app}\Examples\Mechanics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__"
-Source: "Examples\Physics\*"; DestDir: "{app}\Examples\Physics"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist; Excludes: "*.py,__pycache__"
-Source: "Examples\Binario IFC\*"; DestDir: "{app}\Examples\Binario IFC"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
-; Incluir libs necesarios para IFC (web-ifc, three.js)
-Source: "Examples\libs\*"; DestDir: "{app}\Examples\libs"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
+; Libs necesarios para IFC (en carpeta de instalación, no en Documentos)
+Source: "Examples\libs\*"; DestDir: "{app}\libs"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
 
 ; ===== ARCHIVOS EXCLUIDOS DEL INSTALADOR =====
 ; NO incluir: *.ifc (archivos 3D gigantes hasta 1.1GB)
 ; NO incluir: *.EDB, *.$et, *.sdb (modelos ETABS/SAP2000)
 ; NO incluir: *.py (scripts Python de desarrollo)
-; NO incluir: temp_*.html, test-*.html (archivos de prueba temporales)
+; NO incluir: test-debug/ (archivos de prueba)
 
 ; Documentación general
+; Documentación principal para usuarios
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme skipifsourcedoesntexist
-Source: "CHANGELOG.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "CHANGELOG.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 
-; Documentación de HTML + CSS + TypeScript
-Source: "HTML_CSS_TYPESCRIPT_LISTO.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion
-Source: "COMO_FUNCIONA_AWATIF_UI.md"; DestDir: "{app}\Docs"; Flags: ignoreversion
-Source: "CHEAT_SHEET_HTML_CSS_TS.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion
-Source: "RESUMEN_SESION_HTML_CSS_TS_AWATIF.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "INDICE_ARCHIVOS_CREADOS.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-
-; Documentación de TypeScript
-Source: "TYPESCRIPT_LISTO.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "TYPESCRIPT_@TS_CONFIGURADO.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "RESUMEN_TYPESCRIPT_@TS.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-
-; Documentación de fixes críticos v1.0.1
-Source: "AUDITORIA_COMPLETA_MATHEDITOR.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "FIXES_CRITICOS_MEMORY_LEAKS_APLICADOS.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "RESUMEN_FINAL_TODOS_LOS_FIXES.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "TODOS_LOS_FIXES_APLICADOS.md"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-
-; Documentación del sistema de archivos separados y guardado
-Source: "NUEVO_SISTEMA_ARCHIVOS_SEPARADOS.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "PROBLEMA_CSS_SOLUCION.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "COMO_GUARDAR_ARCHIVOS_WEB.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "RESUMEN_GUARDAR_ARCHIVOS_WEB.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "REFERENCIA_RAPIDA_GUARDAR_WEB.txt"; DestDir: "{app}\Docs"; Flags: ignoreversion skipifsourcedoesntexist
+[Dirs]
+; Crear carpeta de ejemplos en Documentos
+Name: "{userdocs}\Hekatan Calc"; Flags: uninsalwaysuninstall
+Name: "{userdocs}\Hekatan Calc\Examples"; Flags: uninsalwaysuninstall
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\Ejemplos"; Filename: "{userdocs}\Hekatan Calc\Examples"
 Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
