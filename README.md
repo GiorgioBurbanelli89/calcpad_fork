@@ -1,17 +1,55 @@
-# Calcpad Fork - Symbolic Math & Expression Parsers Edition
+# Hekatan Calc
 
-> 🚀 **Fork mejorado de Calcpad con soporte completo para cálculo simbólico y parsers de expresiones matemáticas**
+> ☥ **The Magic of Calculation** - Multi-language engineering calculator with symbolic math
 
-[![Version](https://img.shields.io/badge/version-7.5.8--symbolic-blue.svg)](https://github.com/GiorgioBurbanelli89/calcpad_fork)
+[![Version](https://img.shields.io/badge/version-1.0.7-gold.svg)](https://github.com/GiorgioBurbanelli89/hekatan)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Fork](https://img.shields.io/badge/fork%20of-Calcpad-green.svg)](https://github.com/Proektsoftbg/Calcpad)
 
 ---
 
-## 🌟 Nuevas Características del Fork (v7.5.8-symbolic)
+## 🔱 About This Project
 
-### ✨ Parser Simbólico con AngouriMath
+**Hekatan Calc is a fork of [Calcpad](https://github.com/Proektsoftbg/Calcpad)** by [PROEKTSOFT EOOD](https://calcpad.eu).
 
-Cálculo simbólico completo usando AngouriMath v1.3.0:
+This fork extends the original Calcpad math engine with:
+- **Multi-language support**: Python, C++, C#, Fortran, Julia, R, Octave, OpenSees, and more
+- **Symbolic math**: Derivatives, integrals, limits using AngouriMath
+- **IFC 3D Viewer**: Load and visualize IFC structural models
+- **Advanced engineering tools**: FEM integration, seismic analysis (NEC-SE-DS)
+
+> **Original Project:** https://github.com/Proektsoftbg/Calcpad
+>
+> **Original Author:** Nedyo Zhekov / PROEKTSOFT EOOD®
+
+---
+
+---
+
+## 📁 Architecture
+
+Hekatan Calc is organized into independent modules:
+
+| Module | Description |
+|--------|-------------|
+| **📁 Calcpad Parser** | Native math engine for formulas, units, vectors, matrices |
+| **📁 External Parsers** | Python, C++, C#, Fortran, Julia, R, Octave, PowerShell, Bash |
+| **📁 Symbolic Math** | AngouriMath for derivatives, integrals, limits, expansion |
+| **📁 Expression Parsers** | LaTeX, Python Math, Mathcad syntax converters |
+
+---
+
+## 🌟 New Features (v1.0.7)
+
+### ☥ Hekatan Visual Theme
+- Egyptian gold & turquoise color scheme
+- Custom title color picker (View > Choose Title Color)
+- Hekatan logo with Ankh (☥) and Double Integral (∬)
+
+### ✨ Symbolic Math Parser (AngouriMath)
+
+Symbolic calculus using AngouriMath v1.3.0:
 
 ```calcpad
 @{symbolic}
@@ -29,90 +67,105 @@ lim = limit((x^2 - 1)/(x - 1), x, 1)
 @{end symbolic}
 ```
 
-### 📐 Sistema de Expression Parsers
+### 📁 External Parsers (Multi-Language)
+
+Execute code in other languages directly from Hekatan Calc documents:
+
+```calcpad
+@{python}
+import numpy as np
+result = np.sqrt(2)
+print(f"CALCPAD:sqrt2={result}")
+@{end python}
+
+@{cpp}
+#include <iostream>
+#include <cmath>
+int main() {
+    std::cout << "CALCPAD:pi=" << M_PI << std::endl;
+    return 0;
+}
+@{end cpp}
+```
+
+**Supported Languages:**
+- **General:** Python, C#, C++, C, Fortran
+- **Scientific:** Julia, R, GNU Octave, OpenSees
+- **Scripting:** PowerShell, Bash, CMD
+- **GUI:** XAML, WPF, Avalonia, Qt, GTK
+- **Markup:** HTML, Markdown
+
+### 📐 Expression Parsers
 
 - **LaTeX Parser** - `@{latex}...@{end latex}`
 - **Python Math Parser** - `@{pymath}...@{end pymath}`
 - **Mathcad Parser** - `@{mathcad}...@{end mathcad}`
 
-### 📑 Columnas Multi-Layout
+### 📑 Multi-Column Layout
 
 ```calcpad
 @{columns 3}
-Columna 1
+Column 1
 ---
-Columna 2
+Column 2
 ---
-Columna 3
+Column 3
 @{end columns}
 ```
 
-## 📥 Instalación Rápida
+---
+
+## 📥 Quick Installation
 
 ```bash
-git clone https://github.com/GiorgioBurbanelli89/calcpad_fork.git
-cd calcpad_fork
+git clone https://github.com/GiorgioBurbanelli89/hekatan.git
+cd hekatan
 dotnet build -c Release
 ```
 
-## 📖 Documentación
+Or download the installer from [Releases](https://github.com/GiorgioBurbanelli89/hekatan/releases).
 
-- **[CALCPAD_CLI_MEJORAS.md](CALCPAD_CLI_MEJORAS.md)** - Documentación completa de mejoras
-- **[Examples/](Examples/)** - Ejemplos: `Test-Symbolic-Only.cpd`, `demo-simbolico.cpd`
+## 📖 Documentation
 
-## 🎯 Uso con CLI
+- **[Examples/](Examples/)** - Example files: `Test-Symbolic-Simple.cpd`, `demo-simbolico.cpd`
+- **Help (F1)** - Built-in quick reference with all parsers documented
+
+## 🎯 CLI Usage
 
 ```bash
-./Cli.exe "archivo.cpd output.html -s"
+./Cli.exe "file.cpd output.html -s"
 ```
 
-## 📊 Parsers Disponibles
+## 📊 Available Parsers Summary
 
-| Parser | Directiva | Funcionalidad |
+| Module | Directive | Functionality |
 |--------|-----------|---------------|
-| Simbólico | `@{symbolic}` | Derivadas, integrales, límites, expansión |
-| LaTeX | `@{latex}` | Expresiones LaTeX → Calcpad |
-| Python Math | `@{pymath}` | Sintaxis Python → Calcpad |
-| Mathcad | `@{mathcad}` | Sintaxis Mathcad → Calcpad |
-| Columnas | `@{columns N}` | Layout 2-4 columnas |
-
-## 🛠️ Cambios Técnicos
-
-### Añadido
-- AngouriMath v1.3.0 dependency
-- 7 nuevos archivos en `Calcpad.Common/ExpressionParsers/`
-- MultLangProcessor.ExpressionParsers.cs
-- Debug logging extensivo
-
-### Modificado
-- MultLangProcessor.cs (+500 líneas)
-- MultLangConfig.json (+4 parsers)
-- GlobalParser.cs (detección código mixto)
-- CalcpadInstaller.iss (v7.5.8-symbolic)
-
-## 📄 Changelog v7.5.8-symbolic (2026-01-25)
-
-✅ Parser Simbólico completo
-✅ Sistema Expression Parsers
-✅ Soporte columnas multi-layout
-✅ +2,500 líneas de código
-🐛 Fixes: reflection, límites, expand
-
-## 🙏 Créditos
-
-- **Calcpad Original:** [Proektsoft](https://github.com/Proektsoftbg/Calcpad)
-- **AngouriMath:** [ASC Community](https://github.com/asc-community/AngouriMath)
-- **Fork Mejoras:** Claude (Anthropic) + Desarrollo
+| **Calcpad** | (native) | Math formulas, units, vectors, matrices |
+| **Symbolic** | `@{symbolic}` | Derivatives, integrals, limits, expansion |
+| **Python** | `@{python}` | Python code execution |
+| **C++** | `@{cpp}` | C++ code execution |
+| **C#** | `@{csharp}` | C# code execution |
+| **Julia** | `@{julia}` | Julia code execution |
+| **LaTeX** | `@{latex}` | LaTeX → Calcpad syntax |
+| **Columns** | `@{columns N}` | 2-4 column layout |
 
 ---
 
-## 📜 README Original de Calcpad
+## 🙏 Credits
 
-# Calcpad Readme  
+- **Calcpad (Original Project):** [Nedyo Zhekov / PROEKTSOFT EOOD](https://github.com/Proektsoftbg/Calcpad) - The core math engine
+- **Awatif (FEM Library):** [Mohamed Adil](https://github.com/madil4/awatif) - Structural analysis
+- **AngouriMath:** [ASC Community](https://github.com/asc-community/AngouriMath) - Symbolic math
+- **Hekatan Extensions:** Claude (Anthropic) + Contributors
+
+---
+
+# 📁 Calcpad Parser Documentation
+
+> The native Calcpad math engine - formulas, units, vectors, matrices
+
+The Calcpad parser is the core math engine, originally from [Calcpad](https://calcpad.eu) by Proektsoft. It provides:
   
-Project Website: [https://calcpad.eu](https://calcpad.eu)  
-  
-Calcpad is free software for mathematical and engineering calculations. It represents a flexible and modern programmable calculator with Html report generator. It is simple and easy to use, but it also includes many advanced features:  
   
 * real and complex numbers (rectangular and polar-phasor formats);
 * units of measurement (SI, Imperial and USCS);
@@ -141,46 +194,8 @@ Calcpad is free software for mathematical and engineering calculations. It repre
   
 This software is developed using the C# programming language and the latest computer technologies. It automatically parses the input, substitutes the variables, calculates the expressions and displays the output. All results are sent to a professional looking Html report for viewing and printing.
   
-![Sample](https://github.com/Proektsoftbg/Calcpad/blob/main/Help/Images/Sample.png?raw=true)  
+## Calcpad Language Elements
   
-## Fields of application  
-This software is suitable for engineers and other professionals that need to perform repetitive calculations and present them in official documentation such as calculation notes. They can automate this task efficiently by creating powerful and reliable Calcpad worksheets. It can also help teachers to prepare calculation examples, papers, manuals, books etc. Students can use it to solve various problems, prepare homeworks, theses etc.  
-  
-## Installation  
-The installation is performed by the automated setup program [calcpad-VM-setup-en-x64.exe](https://github.com/Proektsoftbg/CalcpadVM/blob/main/Setup/calcpad-VM-setup-en-x64.exe). Follow the instruction of the setup wizard. The software requires a 64 bit computer with Windows 10/11 and [Microsoft .NET Desktop Runtime 10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).  
-You can also use Calcpad directly in the browser from our website: [https://calcpad.eu/Ide](https://calcpad.eu/Ide)  
-  
-## Licensing and terms of use  
-This software is free for both commercial and non-commercial use. It is distributed under the MIT license:  
-  
-Copyright © 2025 PROEKTSOFT EOOD®  
-  
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:  
-  
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  
-  
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  
-  
-Any scripts, developed with Calcpad are property of the respective authors. They can be used without additional limitations except those appointed by the authors themselves.  
-
-### Acknowledgments  
-This project uses some additional third party components, software and design. They are re-distributed free of charge, under the license conditions, provided by the respective authors.  
-1. The new and beautiful icons are created using [icons8.com](https://icons8.com/).  
-2. The pdf export was made possible thanks to the [wkhtmltopdf.org](https://wkhtmltopdf.org/) project.  
-3. Some symbols are displayed, using the Jost* font family by [indestructible type*](https://indestructibletype.com/), under the [SIL open font license](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web).
-Square brackets are slightly modified to suit the application needs.  
-  
-## How it works  
-The software is quick and easy to use. Just follow these simple steps:  
-  
-1. **Enter** text and formulas into the "**Code**" box on the left.  
-2. Press **F5** or click <img alt="Play" height="24" src="https://github.com/Proektsoftbg/Calcpad/blob/main/Help/Images/Play.png"> to calculate. Results will appear in the "**Output**" box on the right as a professionally formatted Html **report**.  
-3. Click <img alt="PrintPreview" height="24" src="https://github.com/Proektsoftbg/Calcpad/blob/main/Help/Images/PrintPreview.png"> to **print** or <img alt="Copy" height="24" src="https://github.com/Proektsoftbg/Calcpad/blob/main/Help/Images/Copy.png"> to **copy** the output.  
-You can also **export** it to **Html** <img alt="Html" height="24" src="https://github.com/Proektsoftbg/Calcpad/blob/main/Help/Images/Save.png">, **PDF** <img alt="PDF" height="24" src="https://github.com/Proektsoftbg/Calcpad/blob/main/Help/Images/Pdf.png"> or **MS Word** <img alt="Word" height="24" src="https://github.com/Proektsoftbg/Calcpad/blob/main/Help/Images/Word.png"> document.  
-  
-## The language  
-  
-Calcpad uses a simple programming language that includes the following elements:  
 * Real numbers: digits 0 - 9 and decimal point ".";  
 * Complex numbers: re ± imi (e.g. 3 - 2i);  
 * Vectors: [v₁; v₂; v₃; …; vₙ];  
@@ -644,5 +659,29 @@ You can add or omit as many "#else if's" as needed. Only one "#else" is allowed.
 &emsp;Pressure: osi, osf psi, psf, ksi, ksf, tsi, tsf, inHg;  
 &emsp;Energy/work: BTU, therm, (or therm_UK, therm_US), quad;  
 &emsp;Power: hp, hpE, hpS;  
-* Custom units - .Name = expression.  
+* Custom units - .Name = expression.
 Names can include currency symbols: €, £, ₤, ¥, ¢, ₽, ₹, ₩, ₪.
+
+---
+
+# 📜 License
+
+## Hekatan Calc License (MIT)
+
+Copyright © 2026 Hekatan Calc Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+## Calcpad License
+
+The Calcpad parser is based on [Calcpad](https://github.com/Proektsoftbg/Calcpad) by PROEKTSOFT EOOD®, distributed under the MIT license.
+
+## Acknowledgments
+
+- **Calcpad:** [Proektsoft](https://github.com/Proektsoftbg/Calcpad)
+- **AngouriMath:** [ASC Community](https://github.com/asc-community/AngouriMath)
+- **Icons:** [icons8.com](https://icons8.com/)
+- **PDF Export:** [wkhtmltopdf.org](https://wkhtmltopdf.org/)
+- **Fonts:** Jost* by [indestructible type*](https://indestructibletype.com/)
